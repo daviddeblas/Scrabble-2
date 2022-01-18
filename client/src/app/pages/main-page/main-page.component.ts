@@ -15,6 +15,7 @@ export class MainPageComponent {
 
     constructor(private readonly communicationService: CommunicationService) {}
 
+    // TODO à retirer
     sendTimeToServer(): void {
         const newTimeMessage: Message = {
             title: 'Hello from the client',
@@ -24,6 +25,7 @@ export class MainPageComponent {
         this.communicationService.basicPost(newTimeMessage).subscribe();
     }
 
+    // TODO à retirer
     getMessagesFromServer(): void {
         this.communicationService
             .basicGet()

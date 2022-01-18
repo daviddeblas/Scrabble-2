@@ -6,13 +6,8 @@
 .justified {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-}
-
-.button {
-    margin-top: 10px;
-    text-align: center;
 }
 
 .team-name {
@@ -21,24 +16,32 @@
     color: green;
 }
 
-.header-item {
-    justify-content: center;
-    text-align: center;
-}
-
 .footer-item {
     text-align: center;
 }
 
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
+.members-name {
+    li {
+        display: inline;
+        &:not(:first-child)::before {
+            content: ' - ';
+        }
+    }
 }
 
-.server-message {
-    justify-content: center;
-    width: 20%;
-    min-width: min-content;
+.main-menu {
+    display: grid;
+    width: 90%;
+    max-width: 500px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 60px 60px;
+    gap: 15px;
+
+    .top-score {
+        grid-column: 1 / 3;
+    }
+}
+
+.welcome-message {
+    font-size: 25px;
 }
