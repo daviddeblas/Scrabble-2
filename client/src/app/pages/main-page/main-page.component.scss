@@ -55,21 +55,42 @@ img {
     margin-bottom: 30px;
 }
 
-// .wave{
-//     display: inline-block;
-//     animation: animate-wave 500ms infinite ease-in-out;
-// }
+.wave {
+    display: inline-block;
+    transform-origin: 70% 70%;
+    animation: animate-wave 2s infinite ease-in-out;
+}
 
-// @keyframes animate-wave{
-//     0%{
-//         transform: rotate(0);
-//     }
+@keyframes animate-wave {
+    0% {
+        transform: rotate(0deg);
+    }
 
-//     50%{
-//         transform: rotate(30deg);
-//     }
+    10% {
+        transform: rotate(14deg);
+    }
 
-//     100%{
-//         transform: rotate(0);
-//     }
-// }
+    20% {
+        transform: rotate(-8deg);
+    }
+
+    30% {
+        transform: rotate(14deg);
+    }
+
+    40% {
+        transform: rotate(-4deg);
+    }
+
+    50% {
+        transform: rotate(10deg);
+    }
+
+    60% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
