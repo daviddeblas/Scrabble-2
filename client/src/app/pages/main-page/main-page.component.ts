@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Message } from '@app/classes/message';
+import { MultiConfigWindowComponent } from '@app/pages/multi-config-window/multi-config-window.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-main-page',
@@ -13,7 +16,18 @@ export class MainPageComponent {
     readonly title: string = 'LOG2990';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(
+        private readonly communicationService: CommunicationService,
+        public dialog: MatDialog,
+    ) {}
+
+    openDialog() {
+        const dialogRef = this.dialog.open( MultiConfigWindowComponent);
+
+        dialogRef.afterClosed().subscribe(result => {
+        console.log(`Dialog result: ${result}`);
+        });
+    }
 
     sendTimeToServer(): void {
         const newTimeMessage: Message = {
