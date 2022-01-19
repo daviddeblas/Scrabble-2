@@ -1,13 +1,21 @@
 .container {
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
     height: auto;
 }
 
-.justified {
+main {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+    flex: 1;
+}
+
+img {
+    cursor: pointer;
+    margin-bottom: 60px;
 }
 
 .team-name {
@@ -44,4 +52,24 @@
 
 .welcome-message {
     font-size: 25px;
+    margin-bottom: 30px;
 }
+
+// .wave{
+//     display: inline-block;
+//     animation: animate-wave 500ms infinite ease-in-out;
+// }
+
+// @keyframes animate-wave{
+//     0%{
+//         transform: rotate(0);
+//     }
+
+//     50%{
+//         transform: rotate(30deg);
+//     }
+
+//     100%{
+//         transform: rotate(0);
+//     }
+// }

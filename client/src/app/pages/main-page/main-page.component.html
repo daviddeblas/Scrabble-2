@@ -1,8 +1,12 @@
-<div class="container justified">
+<div class="container">
+    <mat-toolbar color="primary">
+        <span>Mode de jeu</span>
+    </mat-toolbar>
     <!--<h1 class="header-item">Bienvenue au cours {{ title }}</h1>-->
-    <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
+    <main>
+        <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
 
-    <!--<section id="server-message">
+        <!--<section id="server-message">
         <p>Petit message du serveur : {{ message.getValue() }}</p>
         <div class="justified">
             <button class="button" (click)="getMessagesFromServer()">Récupérer un message du serveur</button>
@@ -11,27 +15,28 @@
         </div>
     </section>-->
 
-    <p class="welcome-message">
-        Bienvenue dans le jeu de Scrabble de LOG2990.
-        <mat-icon>waving_hand</mat-icon>
-    </p>
+        <p class="welcome-message">
+            Bienvenue dans le jeu de Scrabble de LOG2990.
+            <mat-icon class="wave">waving_hand</mat-icon>
+        </p>
 
-    <div class="main-menu">
-        <button routerLink="/game" mat-raised-button color="primary">
-            <mat-icon>play_arrow</mat-icon>
-            Scrabble classique
-        </button>
+        <div class="main-menu">
+            <button routerLink="/game-selection" mat-raised-button color="primary">
+                <mat-icon>play_arrow</mat-icon>
+                Scrabble classique
+            </button>
 
-        <button routerLink="/game" mat-raised-button disabled color="primary">
-            <mat-icon>play_arrow</mat-icon>
-            Scrabble LOG2990
-        </button>
+            <button routerLink="/game-selection" mat-raised-button disabled color="primary">
+                <mat-icon>play_arrow</mat-icon>
+                Scrabble LOG2990
+            </button>
 
-        <button class="top-score" routerLink="/game" mat-raised-button disabled color="primary">
-            <mat-icon>emoji_events</mat-icon>
-            Meilleurs scores
-        </button>
-    </div>
+            <button class="top-score" routerLink="/game" mat-raised-button disabled color="primary">
+                <mat-icon>emoji_events</mat-icon>
+                Meilleurs scores
+            </button>
+        </div>
+    </main>
 
     <div class="footer-item">
         <h4 class="team-name">Équipe 101</h4>
