@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Message } from '@app/classes/message';
-import { MultiConfigWindowComponent } from '@app/pages/multi-config-window/multi-config-window.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { GamePreparationPageComponent } from '../game-preparation-page/game-preparation-page.component';
 
 
 @Component({
@@ -22,7 +22,7 @@ export class MainPageComponent {
     ) {}
 
     openDialog() {
-        const dialogRef = this.dialog.open( MultiConfigWindowComponent);
+        const dialogRef = this.dialog.open( GamePreparationPageComponent);
 
         dialogRef.afterClosed().subscribe(result => {
         console.log(`Dialog result: ${result}`);

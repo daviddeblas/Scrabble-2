@@ -1,10 +1,10 @@
-.parameter-container{
+.parameter-countainer{
     display: flex;
     flex-direction: column;
     position:relative;
 }
 
-#timer-container{
+#timer-countainer{
     width: 100%;
     margin-bottom: 5%;
     padding: 5% 2% 4%;
@@ -13,12 +13,12 @@
     flex: 1 1 auto;
 }
 
-#timer2-container{
+#timer2-countainer{
     text-align: right;
     width: 25%;
 }
 
-#timer2-container button{
+#timer2-countainer button{
     margin-right : 5%;
     margin-left: 5%;
 }

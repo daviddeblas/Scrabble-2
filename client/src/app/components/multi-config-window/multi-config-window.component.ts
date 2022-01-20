@@ -13,7 +13,7 @@ export class MultiConfigWindowComponent implements OnInit {
     selectedDictionnary: ['', Validators.required],
   });
 
-  
+  //private routeur: Router;
   dictionnaries : string[];
   timer : number;
   constructor(private fb: FormBuilder) {
@@ -35,8 +35,7 @@ export class MultiConfigWindowComponent implements OnInit {
       this.timer -= 30;
   }
 
-  onSubmit(){
-    console.log(this.settingsForm);
-    alert("Entered Name : " + this.settingsForm.value.name);
+  onSubmit(){ 
+    //alert("Entered Name : " + this.settingsForm.value.name);
   }
 }

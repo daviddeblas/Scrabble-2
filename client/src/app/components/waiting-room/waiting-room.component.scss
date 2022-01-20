@@ -1,0 +1,41 @@
+.general-countainer{
+}
+
+#text-countainer{
+    text-align: center;
+}
+
+#spinner-countainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#start-button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#reject-button{
+
+}
+
+#cancel-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#solo-button{
+    //text-align: center;
+    position: relative;
+    min-width: auto;
+    float:right
+
+}
+
+#tabs-countainer{
+    margin-bottom: 20%;
+    font-size: 130%;
+}

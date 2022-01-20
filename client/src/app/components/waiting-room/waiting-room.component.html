@@ -1,0 +1,53 @@
+<div class="general-countainer">
+    <div id="solo-button">
+        <button mat-raised-button color="basic">
+            Solo
+            <mat-icon>person_outline</mat-icon>
+        </button>
+        <!-- <p>Convertir la partie en partie solo</p> -->
+    </div>
+    <section *ngIf="!player2">
+        <div id="text-countainer">
+            <h1>En attente d'un autre joueur...</h1>
+        </div >
+        <div id="spinner-countainer">
+            <mat-spinner></mat-spinner>
+        </div>
+    </section>
+    <section *ngIf="player2 && player1">
+        <h1>
+            Partie de Jeu :
+        </h1>
+        <mat-tab-group id="tabs-countainer" dynamicHeight>
+            <mat-tab label="Joueurs"> 
+                <b>{{player1.name}}</b> contre  <b>{{player2.name}}</b>
+            </mat-tab>
+            <mat-tab label="Temps"> 
+                <b>{{gameBoard.timeSetting}}</b> secondes
+            </mat-tab>
+            <mat-tab label="Dictionnaire"> 
+                <b>{{gameBoard.dictionnary}}</b>
+            </mat-tab>          
+        </mat-tab-group>
+
+    </section>
+    <div id="start-button">
+        <button mat-stroked-button color="primary"  routerLink="/game" (click)="closeDialog()">
+            <mat-icon>task_alt</mat-icon>
+            Démarrer
+        </button>
+        <button mat-stroked-button color="primary" disabled>
+            <mat-icon>delete_forever</mat-icon>
+            Rejeter
+        </button>
+    </div>
+    <div id="cancel-button">
+        <button mat-raised-button matStepperPrevious color="warn">
+            <mat-icon>undo</mat-icon>
+            Annuler
+        </button>
+    </div>
+</div>
+
+
+
