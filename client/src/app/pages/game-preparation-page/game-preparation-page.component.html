@@ -3,9 +3,8 @@
         <ng-template matStepLabel>Donnez les Paramètres</ng-template>
         <app-multi-config-window #MultiConfigWindowComponent></app-multi-config-window>
     </mat-step>
-    <mat-step [stepControl]="secondFormGroup" [editable]="isEditable">
+    <mat-step>
         <ng-template matStepLabel>Attente d'un joueur</ng-template>
-        <app-waiting-room #WaitingRoomComponent></app-waiting-room>
+        <app-waiting-room [stepper]="stepper"></app-waiting-room>
     </mat-step>
 </mat-stepper>
-
