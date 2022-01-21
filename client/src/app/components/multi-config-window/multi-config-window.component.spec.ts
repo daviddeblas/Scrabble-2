@@ -52,15 +52,12 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should not decrease timer below 30', () => {
-        component.decrementTime();
+        for (let _ = 0; _ < 5; _++) component.decrementTime();
         expect(component.timer).toEqual(minTimer);
     });
 
     it('should not increase timer higher 300', () => {
-        for (let _ = 0; _ < 10; _++) {
-            component.incrementTime();
-        }
-
+        for (let _ = 0; _ < 10; _++) component.incrementTime();
         expect(component.timer).toEqual(maxTimer);
     });
 
