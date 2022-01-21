@@ -32,8 +32,7 @@
             <mat-icon>task_alt</mat-icon>
             Démarrer
         </button>
-
-        <button mat-stroked-button color="primary" disabled>
+        <button mat-stroked-button color="primary" [disabled]="player2 === undefined">
             <mat-icon>delete_forever</mat-icon>
             Rejeter
         </button>

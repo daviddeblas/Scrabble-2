@@ -1,41 +1,40 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-multi-config-window',
-  templateUrl: './multi-config-window.component.html',
-  styleUrls: ['./multi-config-window.component.scss']
+    selector: 'app-multi-config-window',
+    templateUrl: './multi-config-window.component.html',
+    styleUrls: ['./multi-config-window.component.scss'],
 })
 export class MultiConfigWindowComponent implements OnInit {
-  settingsForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-    selectedDictionnary: ['', Validators.required],
-  });
+    private maxTime: number = 300;
+    private minTime: number = 30;
+    settingsForm: FormGroup;
 
-  //private routeur: Router;
-  dictionnaries : string[];
-  timer : number;
-  constructor(private fb: FormBuilder) {
-    //this.dictionnaries = httpService.getDictionnaries();
-    this.dictionnaries = ["Dictionnaire Français"];
-    this.timer = 30;
-   }
+    dictionnaries: string[];
+    timer: number;
+    constructor(private fb: FormBuilder) {
+        //this.dictionnaries = httpService.getDictionnaries();
+        this.dictionnaries = ['Dictionnaire Français'];
+        this.timer = 60;
+    }
 
-  ngOnInit(): void {
-  }
+    ngOnInit(): void {
+        this.settingsForm = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+            selectedDictionnary: ['', Validators.required],
+        });
+    }
 
-  incrementTime() : void {
-    if(this.timer < 300)
-      this.timer += 30;
-  }
+    incrementTime(): void {
+        if (this.timer < this.maxTime) this.timer += 30;
+    }
 
-  decrementTime() : void {
-    if(this.timer > 30)
-      this.timer -= 30;
-  }
+    decrementTime(): void {
+        if (this.timer > this.minTime) this.timer -= 30;
+    }
 
-  onSubmit(){ 
-    //alert("Entered Name : " + this.settingsForm.value.name);
-  }
+    onSubmit() {
+        //alert("Entered Name : " + this.settingsForm.value.name);
+    }
 }
