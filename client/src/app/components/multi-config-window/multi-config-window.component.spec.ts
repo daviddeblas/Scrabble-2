@@ -4,18 +4,9 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { of } from 'rxjs';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 
-export class FormGroupMock {
-    open() {
-        return {
-            afterClosed: () => of({}),
-        };
-    }
-}
-
-fdescribe('MultiConfigWindowComponent', () => {
+describe('MultiConfigWindowComponent', () => {
     let component: MultiConfigWindowComponent;
     let fixture: ComponentFixture<MultiConfigWindowComponent>;
     const minTimer = 30;
