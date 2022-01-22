@@ -11,18 +11,19 @@ export class MultiConfigWindowComponent implements OnInit {
     private minTime: number = 30;
     settingsForm: FormGroup;
 
-    dictionnaries: string[];
+    dictionaries: string[];
     timer: number;
+
     constructor(private fb: FormBuilder) {
-        //this.dictionnaries = httpService.getDictionnaries();
-        this.dictionnaries = ['Dictionnaire Français'];
+        //this.dictionaries = httpService.getDictionaries();
+        this.dictionaries = ['Dictionnaire Français'];
         this.timer = 60;
     }
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-            selectedDictionnary: ['', Validators.required],
+            selectedDictionary: ['', Validators.required],
         });
     }
 
