@@ -5,7 +5,7 @@
             <mat-icon>person_outline</mat-icon>
         </button>
     </div>
-    <section *ngIf="!player2">
+    <section id="waiting-section" *ngIf="!player2">
         <div id="text-countainer">
             <h1>En attente d'un autre joueur...</h1>
         </div>
@@ -28,7 +28,11 @@
         </mat-tab-group>
     </section>
     <div id="start-button">
-        <button mat-stroked-button color="primary" routerLink="/game" (click)="closeDialog()" [disabled]="player2 === undefined">
+        <!-- <button mat-button color="primary" [mat-dialog-close]="true" routerLink="/game" id="begin-button" [disabled]="player2 === undefined">
+            Démarrer
+            <mat-icon>task_alt</mat-icon>
+        </button> -->
+        <button mat-stroked-button color="primary" routerLink="/game"  (click)="closeDialog()"  id="begin-button" [disabled]="player2 === undefined">
             <mat-icon>task_alt</mat-icon>
             Démarrer
         </button>
@@ -37,8 +41,8 @@
             Rejeter
         </button>
     </div>
-    <div id="cancel-button">
-        <button mat-raised-button (click)="stepper.reset()" color="warn">
+    <div id="cancel-button-countainer">
+        <button mat-raised-button (click)="stepper.reset()" color="warn" id="cancel-button">
             <mat-icon>undo</mat-icon>
             Annuler
         </button>

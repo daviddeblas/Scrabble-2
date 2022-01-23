@@ -8,9 +8,6 @@ import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/g
  */
 class Player {
     name: string;
-    constructor(name: string) {
-        this.name = name;
-    }
 }
 
 class GameBoard {
@@ -27,6 +24,10 @@ class GameBoard {
     styleUrls: ['./waiting-room.component.scss'],
 })
 export class WaitingRoomComponent implements OnInit {
+    static dialog(dialog: any, arg1: string) {
+        throw new Error('Method not implemented.');
+    }
+    
     @Input() stepper: MatStepper;
     player1: Player;
     player2: Player;
@@ -43,10 +44,12 @@ export class WaitingRoomComponent implements OnInit {
             this.player2 = player;
         }
     }
-    closeDialog() {
-        this.dialogRef.close();
-    }
+  
     playerArrival(): void {
         this.player2 = { name: 'Francis' };
+    }
+
+    closeDialog(){
+        this.dialogRef.close();
     }
 }
