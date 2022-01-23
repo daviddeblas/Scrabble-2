@@ -1,6 +1,8 @@
 <div id="grid-container">
     <p>Scrabble!</p>
-    <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width" [attr.height]="height"></canvas>
+    <app-board></app-board>
+    <canvas id="canvas" #gridCanvas (click)="mouseHitDetect($event)" [attr.width]="width"
+        [attr.height]="height"></canvas>
     <div id="mouse-position-display">
         <p>Cliquez sur la grille pour avoir la position de la souris</p>
         <p *ngIf="mousePosition.x !== 0">X : {{ mousePosition.x }}</p>
