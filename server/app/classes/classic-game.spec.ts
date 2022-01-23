@@ -7,6 +7,7 @@ import { Letter, stringToLetters } from '@app/classes/letter';
 import { GameError } from './game.exception';
 import { Vec2 } from './vec2';
 import { PlacedLetter } from './placed-letter';
+import { Multiplier, MultiplierType } from './multiplier';
 
 describe('ClassicGame', () => {
     let dictionary: DictionaryService;
@@ -27,8 +28,8 @@ describe('ClassicGame', () => {
         expect(game.board.length).to.eq(BOARD_WIDTH);
         game.board.forEach((arr) => {
             expect(game.board.length).to.eq(BOARD_HEIGHT);
-            arr.forEach((box) => {
-                expect(box).to.deep.equal({ letter: null, multiplier: null });
+            arr.forEach((letter) => {
+                expect(letter).to.equal(null);
             });
         });
         expect(game.players.length).to.eq(2);
@@ -104,9 +105,9 @@ describe('ClassicGame', () => {
         game.place(lettersToAdd, game.activePlayer);
         expect(game.activePlayer).to.eq(1);
         expect(game.players[0].easel.length).to.eq(AMT_OF_LETTERS_IN_EASEL);
-        expect(game.board[lettersToAdd[0].position.x][lettersToAdd[0].position.y].letter).to.eq(lettersToAdd[0].letter);
-        expect(game.board[lettersToAdd[1].position.x][lettersToAdd[1].position.y].letter).to.eq(lettersToAdd[1].letter);
-        expect(game.board[lettersToAdd[2].position.x][lettersToAdd[2].position.y].letter).to.eq(lettersToAdd[2].letter);
+        expect(game.board[lettersToAdd[0].position.x][lettersToAdd[0].position.y]).to.eq(lettersToAdd[0].letter);
+        expect(game.board[lettersToAdd[1].position.x][lettersToAdd[1].position.y]).to.eq(lettersToAdd[1].letter);
+        expect(game.board[lettersToAdd[2].position.x][lettersToAdd[2].position.y]).to.eq(lettersToAdd[2].letter);
         expect(game.letterPot.length).to.eq(originalLetterPotLength - lettersToAdd.length);
         expect(game.players[0].easel).to.not.deep.equal(originalEasel);
         expect(game.players[0].score).to.eq(5);
@@ -114,6 +115,7 @@ describe('ClassicGame', () => {
         originalLetterPotLength = game.letterPot.length;
         game.players[game.activePlayer].easel = stringToLetters('bonyuia');
         originalEasel = [...game.players[game.activePlayer].easel];
+        game.multipliers[7][4] = new Multiplier(2, MultiplierType.Word);
         lettersToAdd = [
             { letter: 'B' as Letter, position: new Vec2(7, 4) },
             { letter: 'O' as Letter, position: new Vec2(7, 5) },
@@ -121,10 +123,11 @@ describe('ClassicGame', () => {
         game.place(lettersToAdd, game.activePlayer);
         expect(game.activePlayer).to.eq(0);
         expect(game.players[1].easel.length).to.eq(AMT_OF_LETTERS_IN_EASEL);
-        expect(game.board[lettersToAdd[0].position.x][lettersToAdd[0].position.y].letter).to.eq(lettersToAdd[0].letter);
-        expect(game.board[lettersToAdd[1].position.x][lettersToAdd[1].position.y].letter).to.eq(lettersToAdd[1].letter);
+        expect(game.board[lettersToAdd[0].position.x][lettersToAdd[0].position.y]).to.eq(lettersToAdd[0].letter);
+        expect(game.board[lettersToAdd[1].position.x][lettersToAdd[1].position.y]).to.eq(lettersToAdd[1].letter);
         expect(game.letterPot.length).to.eq(originalLetterPotLength - lettersToAdd.length);
         expect(game.players[game.activePlayer].easel).to.not.deep.equal(originalEasel);
-        expect(game.players[1].score).to.eq(5);
+        expect(game.players[1].score).to.eq(5 * 2);
+        expect(game.multipliers[7][4]).to.eq(null);
     });
 });

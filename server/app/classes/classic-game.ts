@@ -4,8 +4,7 @@ import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
-import { Box } from '@app/classes/box';
-import { MultiplierType } from '@app/classes/multiplier';
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { LetterConfigService } from '@app/services/letter-config.service';
 
 export const AMT_OF_LETTERS_IN_EASEL = 7;
@@ -17,7 +16,8 @@ const STARTING_POSITION = new Vec2(STARTING_WIDTH, STARTING_HEIGHT);
 
 export class ClassicGame {
     players: Player[];
-    board: Box[][];
+    board: (Letter | null)[][];
+    multipliers: (Multiplier | null)[][];
     activePlayer: number;
     letterPot: Letter[];
     pointPerLetter: Map<Letter, number>;
@@ -31,7 +31,14 @@ export class ClassicGame {
         for (let i = 0; i < this.board.length; i++) {
             this.board[i] = new Array(BOARD_HEIGHT);
             for (let j = 0; j < this.board.length; j++) {
-                this.board[i][j] = new Box(null, null);
+                this.board[i][j] = null;
+            }
+        }
+        this.multipliers = new Array(BOARD_WIDTH);
+        for (let i = 0; i < this.multipliers.length; i++) {
+            this.multipliers[i] = new Array(BOARD_HEIGHT);
+            for (let j = 0; j < this.multipliers.length; j++) {
+                this.multipliers[i][j] = null;
             }
         }
         this.activePlayer = 0;
@@ -91,23 +98,23 @@ export class ClassicGame {
         }
         // utilise plus tard pour calculer le score
         const wordsPositions: Vec2[][] = [];
-        const tempBoard: Box[][] = new Array(BOARD_WIDTH);
+        const tempBoard: (Letter | null)[][] = new Array(BOARD_WIDTH);
         // copie board dans tempBoard en profondeur
         for (let i = 0; i < tempBoard.length; i++) {
             tempBoard[i] = new Array(BOARD_HEIGHT);
             for (let j = 0; j < tempBoard.length; j++) {
-                tempBoard[i][j] = new Box(this.board[i][j].letter, this.board[i][j].multiplier);
+                tempBoard[i][j] = this.board[i][j];
             }
         }
-        letters.forEach((l) => (tempBoard[l.position.x][l.position.y].letter = l.letter));
+        letters.forEach((l) => (tempBoard[l.position.x][l.position.y] = l.letter));
         letters.forEach((l) => {
             let checking = new Vec2(l.position.x, l.position.y);
             let wordPositions: Vec2[] = [];
             let word: Letter[] = [];
-            while (checking.x - 1 >= 0 && tempBoard[checking.x - 1][checking.y].letter !== null) checking.x--;
-            while (checking.x <= BOARD_WIDTH && tempBoard[checking.x][checking.y].letter !== null) {
+            while (checking.x - 1 >= 0 && tempBoard[checking.x - 1][checking.y] !== null) checking.x--;
+            while (checking.x <= BOARD_WIDTH && tempBoard[checking.x][checking.y] !== null) {
                 wordPositions.push(new Vec2(checking.x, checking.y));
-                word.push(tempBoard[checking.x][checking.y].letter as Letter);
+                word.push(tempBoard[checking.x][checking.y] as Letter);
                 checking.x++;
             }
             if (word.length > 1) {
@@ -131,10 +138,10 @@ export class ClassicGame {
             checking = new Vec2(l.position.x, l.position.y);
             wordPositions = [];
             word = [];
-            while (checking.y - 1 >= 0 && tempBoard[checking.x][checking.y - 1].letter !== null) checking.y--;
-            while (checking.y <= BOARD_HEIGHT && tempBoard[checking.x][checking.y].letter !== null) {
+            while (checking.y - 1 >= 0 && tempBoard[checking.x][checking.y - 1] !== null) checking.y--;
+            while (checking.y <= BOARD_HEIGHT && tempBoard[checking.x][checking.y] !== null) {
                 wordPositions.push(new Vec2(checking.x, checking.y));
-                word.push(tempBoard[checking.x][checking.y].letter as Letter);
+                word.push(tempBoard[checking.x][checking.y] as Letter);
                 checking.y++;
             }
             if (word.length > 1) {
@@ -156,13 +163,15 @@ export class ClassicGame {
             }
         });
         letters.forEach((l) => {
-            this.board[l.position.x][l.position.y].letter = l.letter;
-            this.board[l.position.x][l.position.y].multiplier = null;
+            this.board[l.position.x][l.position.y] = l.letter;
             this.players[player].easel.splice(this.players[player].easel.indexOf(l.letter), 1);
             this.players[player].easel.push(this.takeLetterFromPot());
         });
         let totalScoreForMove = 0;
-        wordsPositions.forEach((w) => (totalScoreForMove += this.scoreWord(w)));
+        wordsPositions.forEach((w) => {
+            totalScoreForMove += this.scoreWord(w);
+            w.forEach((pos) => (this.multipliers[pos.x][pos.y] = null));
+        });
         this.players[player].score += totalScoreForMove;
         // prochain tour
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
@@ -175,7 +184,7 @@ export class ClassicGame {
         const playerTempEasel = [...this.players[player].easel];
         letters.forEach((l) => {
             const index = playerTempEasel.indexOf(l);
-            if (index === -1) {
+            if (index < 0) {
                 throw new GameError(GameErrorType.LettersAreNotInEasel);
             }
             playerTempEasel.splice(index, 1);
@@ -190,11 +199,11 @@ export class ClassicGame {
         let score = 0;
         let multiplier = 1;
         positions.forEach((vec) => {
-            const letter = this.board[vec.x][vec.y].letter;
+            const letter = this.board[vec.x][vec.y];
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
             const letterPoints = this.pointPerLetter.get(letter);
             if (letterPoints === undefined) throw new GameError(GameErrorType.UndefinedPoints);
-            const multi = this.board[vec.x][vec.y].multiplier;
+            const multi = this.multipliers[vec.x][vec.y];
             if (multi !== null) {
                 switch (multi.type) {
                     case MultiplierType.Letter:
@@ -214,6 +223,6 @@ export class ClassicGame {
     }
 
     private letterAt(position: Vec2): Letter | null {
-        return this.board[position.x][position.y].letter;
+        return this.board[position.x][position.y];
     }
 }

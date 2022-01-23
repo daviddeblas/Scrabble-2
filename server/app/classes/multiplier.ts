@@ -4,6 +4,5 @@ export enum MultiplierType {
 }
 
 export class Multiplier {
-    type: MultiplierType;
-    amt: number;
+    constructor(public amt: number, public type: MultiplierType = MultiplierType.Letter) {}
 }
