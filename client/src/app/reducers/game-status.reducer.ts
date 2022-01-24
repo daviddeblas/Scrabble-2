@@ -2,16 +2,16 @@ import { Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
 import * as gameActions from '../actions/game.actions';
 
-export const gameFeatureKey = 'game';
+export const gameStatusFeatureKey = 'gameStatus';
 
-export interface GameState {
+export interface GameStatus {
     currentPlayer?: Player;
     opponentPlayer?: Player;
     activePlayer?: string;
     waitingForServer: boolean;
 }
 
-export const initialState: GameState = {
+export const initialState: GameStatus = {
     waitingForServer: true,
 };
 
@@ -26,5 +26,4 @@ export const reducer = createReducer(
     on(gameActions.startNewRound, (state, newRound) => {
         return { ...state, activePlayer: newRound.activePlayer };
     }),
-    on(gameActions.syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
 );

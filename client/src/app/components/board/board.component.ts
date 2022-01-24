@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameState } from '@app/reducers/game.reducer';
+import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -9,10 +9,10 @@ import { Observable } from 'rxjs';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent implements OnInit {
-    gameState$: Observable<GameState>;
+    gameStatus$: Observable<GameStatus>;
 
-    constructor(store: Store<{ game: GameState }>) {
-        this.gameState$ = store.select('game');
+    constructor(store: Store<{ gameStatus: GameStatus }>) {
+        this.gameStatus$ = store.select('gameStatus');
     }
 
     ngOnInit(): void {}
