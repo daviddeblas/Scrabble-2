@@ -1,22 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
+import { GameOptions } from '@app/classes/game-options';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 /*
  *   #TODO : Enelever ces classes une fois déclarés dans les services.
  */
-class Player {
-    name: string;
-}
-
-class GameBoard {
-    gameType: string;
-    timeSetting: number;
-    dictionary: string;
-    player1: Player;
-    player2: Player;
-}
 
 @Component({
     selector: 'app-waiting-room',
@@ -24,32 +15,34 @@ class GameBoard {
     styleUrls: ['./waiting-room.component.scss'],
 })
 export class WaitingRoomComponent implements OnInit {
-    static dialog(dialog: any, arg1: string) {
-        throw new Error('Method not implemented.');
-    }
-    
     @Input() stepper: MatStepper;
-    player1: Player;
-    player2: Player;
-    gameBoard: GameBoard;
-    constructor(private dialogRef: MatDialogRef<GamePreparationPageComponent>) {}
+    player1: string;
+    player2: string;
+    timer: number;
+    dictionary: string;
+    constructor(private dialogRef: MatDialogRef<GamePreparationPageComponent>, public socketService: SocketClientService) {}
 
     ngOnInit(): void {
-        this.gameBoard = { gameType: 'Waiting', timeSetting: 90, dictionary: 'Dictionnaire Français', player1: this.player1, player2: this.player2 };
-        this.player1 = { name: 'Jackie' };
+        this.connect();
+        this.configureBaseSocketFeatures();
     }
 
-    set setPlayer2(player: Player) {
-        if (player.name && !this.player2) {
-            this.player2 = player;
+    connect() {
+        if (!this.socketService.isSocketAlive()) {
+            this.socketService.connect();
         }
     }
-  
-    playerArrival(): void {
-        this.player2 = { name: 'Francis' };
+
+    configureBaseSocketFeatures() {
+        // Récupère la liste des dictionnaires disponibles
+        this.socketService.on('game settings', (gameOptions: GameOptions) => {
+            this.player1 = gameOptions.hostname;
+            this.timer = gameOptions.timePerRound;
+            this.dictionary = gameOptions.dictionaryType;
+        });
     }
 
-    closeDialog(){
+    closeDialog() {
         this.dialogRef.close();
     }
 }

@@ -17,13 +17,13 @@
         <h1>Partie de Jeu :</h1>
         <mat-tab-group id="tabs-countainer" dynamicHeight>
             <mat-tab label="Joueurs">
-                <b>{{ player1.name }}</b> contre <b>{{ player2.name }}</b>
+                <b>{{ player1 }}</b> contre <b>{{ player2 }}</b>
             </mat-tab>
             <mat-tab label="Temps">
-                <b>{{ gameBoard.timeSetting }}</b> secondes
+                <b>{{ timer }}</b> secondes
             </mat-tab>
             <mat-tab label="Dictionnaire">
-                <b>{{ gameBoard.dictionary }}</b>
+                <b>{{ dictionary }}</b>
             </mat-tab>
         </mat-tab-group>
     </section>
@@ -32,7 +32,7 @@
             Démarrer
             <mat-icon>task_alt</mat-icon>
         </button> -->
-        <button mat-stroked-button color="primary" routerLink="/game"  (click)="closeDialog()"  id="begin-button" [disabled]="player2 === undefined">
+        <button mat-stroked-button color="primary" routerLink="/game" (click)="closeDialog()" id="begin-button" [disabled]="player2 === undefined">
             <mat-icon>task_alt</mat-icon>
             Démarrer
         </button>

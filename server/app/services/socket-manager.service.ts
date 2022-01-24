@@ -12,6 +12,7 @@ export class SocketService {
         this.sio.on('connection', (socket) => {
             socket.on('create room', (options) => {
                 rooms.createRoom(socket, options);
+                socket.emit('game settings', options);
             });
             socket.on('request list', () => {
                 socket.emit('get list', rooms.getRooms());
