@@ -17,4 +17,12 @@
 
     <!-- Grille du fond-->
     <rect x="50" y="50" width="750" height="750" fill="url(#grid)" />
+
+    <!-- Coordonées -->
+    <text [attr.x]="75 + i * 50" y="25" class="coordinate-text" *ngFor="let number of numberSequence(15); let i = index">
+        {{ number }}
+    </text>
+    <text x="25" [attr.y]="75 + i * 50" class="coordinate-text" *ngFor="let number of letterSequence(15); let i = index">
+        {{ number }}
+    </text>
 </svg>
