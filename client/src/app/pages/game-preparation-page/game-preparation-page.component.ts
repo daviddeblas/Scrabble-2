@@ -12,10 +12,10 @@ export class GamePreparationPageComponent implements OnInit {
     firstFormGroup: FormGroup;
     secondFormGroup: FormGroup;
     isEditable = false;
-    constructor(private _formBuilder: FormBuilder) {}
+    constructor(private formBuilder: FormBuilder) {}
 
     ngOnInit(): void {
-        this.firstFormGroup = this._formBuilder.group({
+        this.firstFormGroup = this.formBuilder.group({
             firstCtrl: ['', Validators.required],
         });
     }
