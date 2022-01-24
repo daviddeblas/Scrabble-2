@@ -12,6 +12,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { BoardComponent } from './components/board/board.component';
 
 /**
  * Main module that is used in main.ts.
@@ -28,6 +29,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         PlayAreaComponent,
         SidebarComponent,
         GameSelectionPageComponent,
+        BoardComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
