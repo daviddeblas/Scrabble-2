@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { GameOptions } from '@app/classes/game-options';
+import { SocketClientService } from '../../services/socket-client.service';
 
 @Component({
     selector: 'app-multi-config-window',
@@ -14,7 +16,7 @@ export class MultiConfigWindowComponent implements OnInit {
     dictionaries: string[];
     timer: number;
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder, public socketService: SocketClientService) {
         //this.dictionaries = httpService.getDictionaries();
         this.dictionaries = ['Dictionnaire Français'];
         this.timer = 60;
@@ -25,6 +27,13 @@ export class MultiConfigWindowComponent implements OnInit {
             name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
             selectedDictionary: ['', Validators.required],
         });
+        this.connect();
+    }
+
+    connect() {
+        if (!this.socketService.isSocketAlive()) {
+            this.socketService.connect();
+        }
     }
 
     incrementTime(): void {
@@ -36,6 +45,11 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     onSubmit() {
-        //alert("Entered Name : " + this.settingsForm.value.name);
+        const gameOptions: GameOptions = {
+            hostname: this.settingsForm.controls.name.value,
+            dictionaryType: this.settingsForm.controls.selectedDictionary.value,
+            timePerRound: this.timer,
+        };
+        this.socketService.send('create room', gameOptions);
     }
 }
