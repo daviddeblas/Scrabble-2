@@ -11,14 +11,14 @@ import { SocketClientService } from '../../services/socket-client.service';
 export class MultiConfigWindowComponent implements OnInit {
     private maxTime: number = 300;
     private minTime: number = 30;
+    private startTime: number = 60;
     settingsForm: FormGroup;
 
     dictionaries: string[];
     timer: number;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
-        //this.dictionaries = httpService.getDictionaries();
-        this.timer = 60;
+        this.timer = this.startTime;
     }
 
     ngOnInit(): void {
