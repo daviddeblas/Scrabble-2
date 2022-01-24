@@ -12,6 +12,8 @@ describe('MultiConfigWindowComponent', () => {
     const minTimer = 30;
     const maxTimer = 300;
     const startValue = 60;
+    const incrementValue = 30;
+    const iterationValue = 10;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -43,34 +45,34 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should not decrease timer below 30', () => {
-        for (let _ = 0; _ < 5; _++) component.decrementTime();
+        for (let _ = 0; _ < iterationValue; _++) component.decrementTime();
         expect(component.timer).toEqual(minTimer);
     });
 
     it('should not increase timer higher 300', () => {
-        for (let _ = 0; _ < 10; _++) component.incrementTime();
+        for (let _ = 0; _ < iterationValue; _++) component.incrementTime();
         expect(component.timer).toEqual(maxTimer);
     });
 
     it('should change timer by increments of 30', () => {
         component.incrementTime();
-        expect(component.timer).toEqual(startValue + 30);
+        expect(component.timer).toEqual(startValue + incrementValue);
         component.incrementTime();
-        expect(component.timer).toEqual(startValue + 60);
+        expect(component.timer).toEqual(startValue + incrementValue + incrementValue);
         component.decrementTime();
-        expect(component.timer).toEqual(startValue + 30);
+        expect(component.timer).toEqual(startValue + incrementValue);
     });
 
     it('should increase timer when + button pressed', () => {
         const addButton = document.getElementsByTagName('button')[1];
         addButton.click();
-        expect(component.timer).toEqual(startValue + 30);
+        expect(component.timer).toEqual(startValue + incrementValue);
     });
 
     it('should decrease timer when - button pressed', () => {
         const subButton = document.getElementsByTagName('button')[0];
         subButton.click();
-        expect(component.timer).toEqual(startValue - 30);
+        expect(component.timer).toEqual(startValue - incrementValue);
     });
 
     it('should not be possible to enter a name smaller then 3 characters', () => {
