@@ -20,6 +20,9 @@ export class SocketService {
             socket.on('get dictionaries', () => {
                 socket.emit('receive dictionaries', ['Mon dictionnaire']);
             });
+            socket.on('join room', (playerName: string) => {
+                socket.emit('player arrival', playerName);
+            });
         });
     }
 }

@@ -40,6 +40,9 @@ export class WaitingRoomComponent implements OnInit {
             this.timer = gameOptions.timePerRound;
             this.dictionary = gameOptions.dictionaryType;
         });
+        this.socketService.on('player arrival', (playerName: string) => {
+            this.player2 = playerName;
+        });
     }
 
     closeDialog() {
