@@ -13,6 +13,7 @@ export const BOARD_HEIGHT = 15;
 const STARTING_HEIGHT = 6;
 const STARTING_WIDTH = 6;
 const STARTING_POSITION = new Vec2(STARTING_WIDTH, STARTING_HEIGHT);
+const MAX_TURNS_PASSED = 6;
 
 export class ClassicGame {
     players: Player[];
@@ -22,8 +23,10 @@ export class ClassicGame {
     letterPot: Letter[];
     pointPerLetter: Map<Letter, number>;
     gameStarting: boolean;
+    turnsPassed: number;
 
-    constructor(private dictionaryService: DictionaryService, letterConfigService: LetterConfigService) {
+    constructor(private dictionaryService: DictionaryService, letterConfigService: LetterConfigService, private onFinish: () => void) {
+        this.turnsPassed = 0;
         this.gameStarting = true;
         this.players = [new Player('player 1'), new Player('player 2')];
         // TODO trouver une facon de lire un fichier qui dicte board
@@ -62,6 +65,7 @@ export class ClassicGame {
     skip(player: number): void {
         this.checkMove([], player);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
+        this.turnsPassed++;
     }
 
     draw(letters: Letter[], player: number): void {
@@ -81,6 +85,7 @@ export class ClassicGame {
         for (const l in letters)
             if (l) this.players[player].easel.push(this.letterPot.splice(Math.round(Math.random() * this.letterPot.length), 1)[0]);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
+        this.turnsPassed = 0;
     }
 
     place(letters: PlacedLetter[], player: number): void {
@@ -176,6 +181,13 @@ export class ClassicGame {
         // prochain tour
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         if (this.gameStarting) this.gameStarting = false;
+        this.turnsPassed = 0;
+    }
+
+    checkFinish(): void {
+        if (this.letterPot.length !== 0 || this.players[0].easel.length !== 0 || this.players[1].easel.length !== 0) return;
+        if (this.turnsPassed < MAX_TURNS_PASSED) return;
+        this.onFinish();
     }
 
     private checkMove(letters: Letter[], player: number): void {
