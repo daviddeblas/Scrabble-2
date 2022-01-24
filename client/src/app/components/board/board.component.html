@@ -1,4 +1,4 @@
-<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" class="board">
     <defs>
         <!-- Effet 3D : https://stackoverflow.com/questions/60344788/svg-light-and-shadow-a-3d-feelling -->
         <filter id="3d-effect">
@@ -13,6 +13,48 @@
         <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
             <rect filter="url(#3d-effect)" width="50" height="50" fill="#c4bda1" />
         </pattern>
+
+        <clipPath id="cell-clip">
+            <rect x="0" y="0" width="50" height="50" />
+        </clipPath>
+
+        <!-- Cases spéciales -->
+        <g id="cell-word-x2">
+            <rect width="50" height="50" fill="#ff7777" filter="url(#3d-effect)" clip-path="url(#cell-clip)" />
+            <text x="25" y="18" class="cell-text">
+                <tspan>MOT</tspan>
+                <tspan x="25" y="32">x 2</tspan>
+            </text>
+        </g>
+        <g id="cell-word-x3">
+            <rect width="50" height="50" fill="#ff0000" filter="url(#3d-effect)" clip-path="url(#cell-clip)" />
+            <text x="25" y="18" class="cell-text">
+                <tspan>MOT</tspan>
+                <tspan x="25" y="32">x 3</tspan>
+            </text>
+        </g>
+        <g id="cell-letter-x2">
+            <rect width="50" height="50" fill="#9daeac" filter="url(#3d-effect)" clip-path="url(#cell-clip)" />
+            <text x="25" y="18" class="cell-text">
+                <tspan>LETTRE</tspan>
+                <tspan x="25" y="32">x 2</tspan>
+            </text>
+        </g>
+        <g id="cell-letter-x3">
+            <rect width="50" height="50" fill="#598691" filter="url(#3d-effect)" clip-path="url(#cell-clip)" />
+            <text x="25" y="18" class="cell-text">
+                <tspan>LETTRE</tspan>
+                <tspan x="25" y="32">x 3</tspan>
+            </text>
+        </g>
+
+        <g id="cell-star">
+            <rect width="50" height="50" fill="#c69c95" filter="url(#3d-effect)" clip-path="url(#cell-clip)" />
+            <path
+                fill="#4f3a36"
+                d="M 25,2.3872871 30.877852,19.297117 48.776413,19.661863 34.510565,30.477457 39.694631,47.612712 25,37.387287 10.305368,47.612712 15.489435,30.477457 1.2235871,19.661862 19.122147,19.297117 Z"
+            />
+        </g>
     </defs>
 
     <!-- Grille du fond-->
@@ -25,4 +67,11 @@
     <text x="25" [attr.y]="75 + i * 50" class="coordinate-text" *ngFor="let number of letterSequence(15); let i = index">
         {{ number }}
     </text>
+
+    <!-- Instances cases spéciales-->
+    <use xlink:href="#cell-word-x2" x="50" y="50" />
+    <use xlink:href="#cell-word-x3" x="100" y="50" />
+    <use xlink:href="#cell-letter-x2" x="150" y="50" />
+    <use xlink:href="#cell-letter-x3" x="200" y="50" />
+    <use xlink:href="#cell-star" x="250" y="50" />
 </svg>
