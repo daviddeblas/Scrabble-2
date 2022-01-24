@@ -14,6 +14,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
+import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -22,7 +23,18 @@ import { GamePreparationPageComponent } from './pages/game-preparation-page/game
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, GamePageComponent, MainPageComponent, MaterialPageComponent, PlayAreaComponent, SidebarComponent, MultiConfigWindowComponent, GamePreparationPageComponent, WaitingRoomComponent],
+    declarations: [
+        AppComponent,
+        GamePageComponent,
+        MainPageComponent,
+        MaterialPageComponent,
+        PlayAreaComponent,
+        SidebarComponent,
+        GameSelectionPageComponent,
+        MultiConfigWindowComponent,
+        GamePreparationPageComponent,
+        WaitingRoomComponent,
+    ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
     bootstrap: [AppComponent],
