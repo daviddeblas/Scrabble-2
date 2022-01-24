@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GameOptions } from '@app/classes/game-options';
-import { SocketClientService } from '../../services/socket-client.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
     selector: 'app-multi-config-window',
@@ -9,13 +9,12 @@ import { SocketClientService } from '../../services/socket-client.service';
     styleUrls: ['./multi-config-window.component.scss'],
 })
 export class MultiConfigWindowComponent implements OnInit {
+    settingsForm: FormGroup;
+    dictionaries: string[];
+    timer: number;
     private maxTime: number = 300;
     private minTime: number = 30;
     private startTime: number = 60;
-    settingsForm: FormGroup;
-
-    dictionaries: string[];
-    timer: number;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
         this.timer = this.startTime;

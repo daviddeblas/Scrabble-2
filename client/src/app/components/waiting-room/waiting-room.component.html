@@ -28,10 +28,6 @@
         </mat-tab-group>
     </section>
     <div id="start-button">
-        <!-- <button mat-button color="primary" [mat-dialog-close]="true" routerLink="/game" id="begin-button" [disabled]="player2 === undefined">
-            Démarrer
-            <mat-icon>task_alt</mat-icon>
-        </button> -->
         <button mat-stroked-button color="primary" routerLink="/game" (click)="closeDialog()" id="begin-button" [disabled]="player2 === undefined">
             <mat-icon>task_alt</mat-icon>
             Démarrer

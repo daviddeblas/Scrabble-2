@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { GameSelectionPageComponent } from './game-selection-page.component';
 
 describe('GameSelectionPageComponent', () => {
@@ -8,6 +10,8 @@ describe('GameSelectionPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameSelectionPageComponent],
+            imports: [AppMaterialModule],
+            providers: [{ provide: MatDialogRef, useValue: {} }],
         }).compileComponents();
     });
 
