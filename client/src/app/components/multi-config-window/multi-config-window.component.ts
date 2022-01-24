@@ -18,7 +18,6 @@ export class MultiConfigWindowComponent implements OnInit {
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
         //this.dictionaries = httpService.getDictionaries();
-        this.dictionaries = ['Dictionnaire Français'];
         this.timer = 60;
     }
 
@@ -28,12 +27,21 @@ export class MultiConfigWindowComponent implements OnInit {
             selectedDictionary: ['', Validators.required],
         });
         this.connect();
+        this.configureBaseSocketFeatures();
+        this.socketService.send('get dictionaries');
     }
 
     connect() {
         if (!this.socketService.isSocketAlive()) {
             this.socketService.connect();
         }
+    }
+
+    configureBaseSocketFeatures() {
+        // Récupère la liste des dictionnaires disponibles
+        this.socketService.on('receive dictionaries', (dictionaries: string[]) => {
+            this.dictionaries = dictionaries;
+        });
     }
 
     incrementTime(): void {

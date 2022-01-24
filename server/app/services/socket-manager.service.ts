@@ -1,6 +1,6 @@
-import { Service } from 'typedi';
-import io from 'socket.io';
 import http from 'http';
+import io from 'socket.io';
+import { Service } from 'typedi';
 import { RoomManager } from './rooms-manager.service';
 
 @Service()
@@ -15,6 +15,9 @@ export class SocketService {
             });
             socket.on('request list', () => {
                 socket.emit('get list', rooms.getRooms());
+            });
+            socket.on('get dictionaries', () => {
+                socket.emit('receive dictionaries', ['Mon dictionnaire']);
             });
         });
     }
