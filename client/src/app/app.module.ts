@@ -11,6 +11,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { GamePageModule } from './modules/game-page.module';
+import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -19,7 +20,7 @@ import { GamePageModule } from './modules/game-page.module';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, MaterialPageComponent],
+    declarations: [AppComponent, MainPageComponent, MaterialPageComponent, GameSelectionPageComponent],
     imports: [
         AppMaterialModule,
         AppRoutingModule,
