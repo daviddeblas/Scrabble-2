@@ -1,4 +1,4 @@
-import { loadPlayers } from '@app/actions/player.actions';
+import { startGameSuccess } from '@app/actions/game-status.actions';
 import { initialState, Players, reducer } from './player.reducer';
 
 describe('[Players] Reducer', () => {
@@ -9,7 +9,7 @@ describe('[Players] Reducer', () => {
 
     describe('[Players] Load Players', () => {
         it('should return the loaded players', () => {
-            const action = loadPlayers({ players: playersMock });
+            const action = startGameSuccess({ players: playersMock, activePlayer: 'Player 1' });
 
             const result = reducer(initialState, action);
 
