@@ -2,7 +2,7 @@ import { loadPlayers } from '@app/actions/player.actions';
 import { Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
 
-export const playerFeatureKey = 'player';
+export const playerFeatureKey = 'players';
 
 export interface Players {
     player?: Player;
