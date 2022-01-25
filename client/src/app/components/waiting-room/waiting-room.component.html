@@ -32,13 +32,13 @@
             <mat-icon>task_alt</mat-icon>
             Démarrer
         </button>
-        <button mat-stroked-button color="primary" [disabled]="player2 === undefined">
+        <button mat-stroked-button color="primary" (click)="rejectInvite()" [disabled]="player2 === undefined">
             <mat-icon>delete_forever</mat-icon>
             Rejeter
         </button>
     </div>
     <div id="cancel-button-countainer">
-        <button mat-raised-button (click)="stepper.reset()" color="warn" id="cancel-button">
+        <button mat-raised-button (click)="quitWaitingRoom()" color="warn" id="cancel-button">
             <mat-icon>undo</mat-icon>
             Annuler
         </button>

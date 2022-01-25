@@ -5,10 +5,6 @@ import { GameOptions } from '@app/classes/game-options';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { SocketClientService } from '@app/services/socket-client.service';
 
-/*
- *   #TODO : Enelever ces classes une fois déclarés dans les services.
- */
-
 @Component({
     selector: 'app-waiting-room',
     templateUrl: './waiting-room.component.html',
@@ -40,12 +36,25 @@ export class WaitingRoomComponent implements OnInit {
             this.timer = gameOptions.timePerRound;
             this.dictionary = gameOptions.dictionaryType;
         });
-        this.socketService.on('player arrival', (playerName: string) => {
+        this.socketService.on('player joining', (playerName: string) => {
             this.player2 = playerName;
         });
     }
 
     closeDialog() {
+        this.socketService.send('accept');
         this.dialogRef.close();
+    }
+    rejectInvite() {
+        this.socketService.send('refuse');
+        this.player2 = '';
+    }
+    quitWaitingRoom() {
+        if (this.player2) {
+            this.socketService.send('refuse');
+            this.socketService.send('quit');
+            this.player2 = '';
+        }
+        this.stepper.reset();
     }
 }
