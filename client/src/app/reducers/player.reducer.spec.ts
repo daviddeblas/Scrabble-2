@@ -8,7 +8,7 @@ describe('Player Reducer', () => {
 
             const result = reducer(initialState, action);
 
-            expect(result).toBe(initialState);
+            expect(result).toEqual(initialState);
         });
     });
 });
