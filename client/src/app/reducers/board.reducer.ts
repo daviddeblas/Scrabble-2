@@ -1,5 +1,5 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
-import { placeWord } from '@app/actions/game-status.actions';
+import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { createReducer, on } from '@ngrx/store';
 
@@ -11,10 +11,7 @@ export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (newBoard) => newBoard),
 
+    // TODO: Implementer les commandes
     // eslint-disable-next-line no-unused-vars
-    on(placeWord, (state, { word }) => {
-        const newState = state;
-        // TODO: Implementer ajouter un mot
-        return newState;
-    }),
+    on(placeWordSuccess, (state, { word }) => ({ ...state })),
 );
