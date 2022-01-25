@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { startNewRound } from '@app/actions/game.actions';
+import { startNewRound } from '@app/actions/game-status.actions';
 import { Store } from '@ngrx/store';
 
 @Component({

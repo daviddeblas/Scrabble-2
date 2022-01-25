@@ -6,6 +6,7 @@ import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import * as boardReducer from '@app/reducers/board.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
+import * as playerReducer from '@app/reducers/player.reducer';
 import { StoreModule } from '@ngrx/store';
 
 @NgModule({
@@ -14,6 +15,7 @@ import { StoreModule } from '@ngrx/store';
         CommonModule,
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
+        StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),
     ],
 })
 export class GamePageModule {}

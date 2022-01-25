@@ -1,7 +1,7 @@
 import { Letter } from './letter';
 import { Vec2 } from './vec2';
 
-enum Direction {
+export enum Direction {
     HORIZONTAL = 'h',
     VERTICAL = 'v',
 }
