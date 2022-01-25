@@ -1,5 +1,5 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
-import { placeWord } from '@app/actions/game.actions';
+import { placeWord } from '@app/actions/game-status.actions';
 import { Letter } from '@app/classes/letter';
 import { createReducer, on } from '@ngrx/store';
 
