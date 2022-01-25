@@ -5,7 +5,7 @@ import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { Multiplier, MultiplierType } from '@app/classes/multiplier';
-import { LetterConfigService } from '@app/services/letter-config.service';
+import { GameConfigService } from '@app/services/game-config.service';
 
 export const AMT_OF_LETTERS_IN_EASEL = 7;
 export const BOARD_WIDTH = 15;
@@ -25,7 +25,13 @@ export class ClassicGame {
     gameStarting: boolean;
     turnsPassed: number;
 
-    constructor(private dictionaryService: DictionaryService, letterConfigService: LetterConfigService, private onFinish: () => void) {
+    constructor(
+        private dictionaryService: DictionaryService,
+        gameConfigService: GameConfigService,
+        private onFinish: () => void = () => {
+            return;
+        },
+    ) {
         this.turnsPassed = 0;
         this.gameStarting = true;
         this.players = [new Player('player 1'), new Player('player 2')];
@@ -47,7 +53,12 @@ export class ClassicGame {
         this.activePlayer = 0;
         this.letterPot = [];
         this.pointPerLetter = new Map();
-        const config = letterConfigService.getConfigFromName('Classic');
+        const config = gameConfigService.getConfigFromName('Classic');
+        config.multipliers.forEach((mul) => {
+            mul.positions.forEach((pos) => {
+                this.multipliers[pos.x][pos.y] = new Multiplier(mul.multiplier.amt, mul.multiplier.type);
+            });
+        });
         config.letters.forEach((l) => {
             for (let i = 0; i < l.amt; i++) {
                 this.letterPot.push(l.letter);
@@ -219,7 +230,7 @@ export class ClassicGame {
             if (multi !== null) {
                 switch (multi.type) {
                     case MultiplierType.Letter:
-                        score += letterPoints * multi.type === MultiplierType.Letter ? multi.amt : 1;
+                        score += letterPoints * (multi.type === MultiplierType.Letter ? multi.amt : 1);
                         break;
                     case MultiplierType.Word:
                         score += letterPoints;

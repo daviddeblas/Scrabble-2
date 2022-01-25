@@ -1,13 +1,13 @@
-import { LetterConfigService } from '@app/services/letter-config.service';
+import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Container } from 'typedi';
 import { describe } from 'mocha';
 import { Letter } from '@app/classes/letter';
 
 describe('Letter config service', () => {
-    let service: LetterConfigService;
+    let service: GameConfigService;
     beforeEach(() => {
-        service = Container.get(LetterConfigService);
+        service = Container.get(GameConfigService);
     });
 
     it('getConfigFromName with "Classic" as input should return the classic letter config', () => {

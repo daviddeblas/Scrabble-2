@@ -25,6 +25,7 @@ export type Letter =
     | 'X'
     | 'Y'
     | 'Z'
+    // BLANK
     | '*';
 
 export const stringToLetter = (string: string): Letter => {

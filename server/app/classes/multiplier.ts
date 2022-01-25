@@ -1,6 +1,6 @@
 export enum MultiplierType {
-    Word,
-    Letter,
+    Word = 'Word',
+    Letter = 'Letter',
 }
 
 export class Multiplier {

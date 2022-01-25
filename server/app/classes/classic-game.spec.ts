@@ -1,6 +1,5 @@
 import { ClassicGame, AMT_OF_LETTERS_IN_EASEL, BOARD_HEIGHT, BOARD_WIDTH } from '@app/classes/classic-game';
 import { DictionaryService } from '@app/services/dictionary.service';
-import { LetterConfigService } from '@app/services/letter-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
 import { Letter, stringToLetters } from '@app/classes/letter';
@@ -8,6 +7,7 @@ import { GameError } from './game.exception';
 import { Vec2 } from './vec2';
 import { PlacedLetter } from './placed-letter';
 import { Multiplier, MultiplierType } from './multiplier';
+import { GameConfigService } from '@app/services/game-config.service';
 
 describe('ClassicGame', () => {
     let dictionary: DictionaryService;
@@ -15,7 +15,7 @@ describe('ClassicGame', () => {
 
     beforeEach(() => {
         dictionary = Container.get(DictionaryService);
-        const letterConfig = Container.get(LetterConfigService);
+        const letterConfig = Container.get(GameConfigService);
         game = new ClassicGame(dictionary, letterConfig);
     });
 
@@ -35,7 +35,7 @@ describe('ClassicGame', () => {
         expect(game.players.length).to.eq(2);
         expect(game.pointPerLetter.size).to.eq('abcdefghijklmnopqrstuvwxyz*'.length);
         let sum = 0;
-        Container.get(LetterConfigService)
+        Container.get(GameConfigService)
             .getConfigFromName('Classic')
             .letters.forEach((l) => {
                 sum += l.amt;
@@ -98,9 +98,9 @@ describe('ClassicGame', () => {
         game.players[game.activePlayer].easel = stringToLetters('bonyuia');
         let originalEasel = [...game.players[game.activePlayer].easel];
         let lettersToAdd: PlacedLetter[] = [
-            { letter: 'B' as Letter, position: new Vec2(5, 6) },
-            { letter: 'O' as Letter, position: new Vec2(6, 6) },
-            { letter: 'N' as Letter, position: new Vec2(7, 6) },
+            new PlacedLetter('B' as Letter, new Vec2(5,6)),
+            new PlacedLetter('O' as Letter, new Vec2(6,6)),
+            new PlacedLetter('N' as Letter, new Vec2(7,6)),
         ];
         game.place(lettersToAdd, game.activePlayer);
         expect(game.activePlayer).to.eq(1);
@@ -116,10 +116,7 @@ describe('ClassicGame', () => {
         game.players[game.activePlayer].easel = stringToLetters('bonyuia');
         originalEasel = [...game.players[game.activePlayer].easel];
         game.multipliers[7][4] = new Multiplier(2, MultiplierType.Word);
-        lettersToAdd = [
-            { letter: 'B' as Letter, position: new Vec2(7, 4) },
-            { letter: 'O' as Letter, position: new Vec2(7, 5) },
-        ];
+        lettersToAdd = [new PlacedLetter('B' as Letter, new Vec2(7, 4)), new PlacedLetter('O' as Letter, new Vec2(7, 5))];
         game.place(lettersToAdd, game.activePlayer);
         expect(game.activePlayer).to.eq(0);
         expect(game.players[1].easel.length).to.eq(AMT_OF_LETTERS_IN_EASEL);
