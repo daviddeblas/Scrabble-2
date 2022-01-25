@@ -1,6 +1,6 @@
+import * as gameActions from '@app/actions/game-status.actions';
 import { Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
-import * as gameActions from '../actions/game.actions';
 
 export const gameStatusFeatureKey = 'gameStatus';
 
