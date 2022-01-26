@@ -13,7 +13,7 @@ export const BOARD_HEIGHT = 15;
 const STARTING_HEIGHT = 6;
 const STARTING_WIDTH = 6;
 const STARTING_POSITION = new Vec2(STARTING_WIDTH, STARTING_HEIGHT);
-const MAX_TURNS_PASSED = 6;
+const MAX_TURNS_PASSED = 5;
 
 export class ClassicGame {
     players: Player[];
@@ -77,9 +77,11 @@ export class ClassicGame {
         this.checkMove([], player);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         this.turnsPassed++;
+        this.checkFinish();
     }
 
     draw(letters: Letter[], player: number): void {
+        if (this.letterPot.length < AMT_OF_LETTERS_IN_EASEL) throw new GameError(GameErrorType.NotEnoughLetters);
         // validation
         this.checkMove(letters, player);
         if (letters.length === 0) {
@@ -97,6 +99,7 @@ export class ClassicGame {
             if (l) this.players[player].easel.push(this.letterPot.splice(Math.round(Math.random() * this.letterPot.length), 1)[0]);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         this.turnsPassed = 0;
+        this.checkFinish();
     }
 
     place(letters: PlacedLetter[], player: number): void {
@@ -110,7 +113,7 @@ export class ClassicGame {
         if (this.gameStarting) {
             // TODO new error types
             if (letters.filter((l) => l.position.x === STARTING_POSITION.x && l.position.y === STARTING_POSITION.y).length === 0)
-                throw new GameError(GameErrorType.InvalidWord);
+                throw new GameError(GameErrorType.WrongPosition);
         }
         // utilise plus tard pour calculer le score
         const wordsPositions: Vec2[][] = [];
@@ -183,6 +186,7 @@ export class ClassicGame {
             this.players[player].easel.splice(this.players[player].easel.indexOf(l.letter), 1);
             this.players[player].easel.push(this.takeLetterFromPot());
         });
+        if (wordsPositions.length === 0) throw new GameError(GameErrorType.InvalidWord);
         let totalScoreForMove = 0;
         wordsPositions.forEach((w) => {
             totalScoreForMove += this.scoreWord(w);
@@ -193,16 +197,19 @@ export class ClassicGame {
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         if (this.gameStarting) this.gameStarting = false;
         this.turnsPassed = 0;
+        this.checkFinish();
     }
 
     checkFinish(): void {
+        if (this.turnsPassed >= MAX_TURNS_PASSED) {
+            this.onFinish();
+            return;
+        }
         if (this.letterPot.length !== 0 || this.players[0].easel.length !== 0 || this.players[1].easel.length !== 0) return;
-        if (this.turnsPassed < MAX_TURNS_PASSED) return;
         this.onFinish();
     }
 
     private checkMove(letters: Letter[], player: number): void {
-        if (this.letterPot.length < AMT_OF_LETTERS_IN_EASEL) throw new GameError(GameErrorType.NotEnoughLetters);
         if (player !== this.activePlayer) throw new GameError(GameErrorType.WrongPlayer);
         const playerTempEasel = [...this.players[player].easel];
         letters.forEach((l) => {

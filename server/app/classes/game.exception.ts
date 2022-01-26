@@ -12,4 +12,5 @@ export enum GameErrorType {
     InvalidWord = 'This letter placement creates an invalid word',
     LetterIsNull = 'Unexpected null letter',
     UndefinedPoints = 'This letter does not have an associated point count',
+    WrongPosition = 'This word is in the wrong position',
 }
