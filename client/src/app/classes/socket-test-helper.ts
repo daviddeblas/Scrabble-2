@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 type CallbackSignature = (params: unknown) => unknown;
 
 export class SocketTestHelper {
@@ -8,6 +9,11 @@ export class SocketTestHelper {
         }
 
         this.callbacks.get(event)?.push(callback);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    emit(event: string, ...params: any): void {
+        return;
     }
 
     disconnect(): void {

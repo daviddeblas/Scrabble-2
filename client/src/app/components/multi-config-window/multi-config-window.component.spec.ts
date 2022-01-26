@@ -3,12 +3,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SocketTestHelper } from '@app/classes/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { SocketClientService } from '@app/services/socket-client.service';
+import { Socket } from 'socket.io-client';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
+
+class SocketClientServiceMock extends SocketClientService {
+    override connect() {}
+}
 
 describe('MultiConfigWindowComponent', () => {
     let component: MultiConfigWindowComponent;
     let fixture: ComponentFixture<MultiConfigWindowComponent>;
+    let socketServiceMock: SocketClientServiceMock;
+    let socketHelper: SocketTestHelper;
     const minTimer = 30;
     const maxTimer = 300;
     const startValue = 60;
@@ -16,6 +25,9 @@ describe('MultiConfigWindowComponent', () => {
     const iterationValue = 10;
 
     beforeEach(async () => {
+        socketHelper = new SocketTestHelper();
+        socketServiceMock = new SocketClientServiceMock();
+        socketServiceMock.socket = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
             declarations: [MultiConfigWindowComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule],
@@ -26,6 +38,7 @@ describe('MultiConfigWindowComponent', () => {
                     provide: MatDialogRef,
                     useValue: {},
                 },
+                { provide: SocketClientService, useValue: socketServiceMock },
             ],
         }).compileComponents();
     });
@@ -102,7 +115,10 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should not be submittable if the inputs are empty', () => {
-        spyOn(component, 'onSubmit');
+        const fakeSubmit = () => {
+            return;
+        };
+        const spy = spyOn(component, 'onSubmit').and.callFake(fakeSubmit);
         expect(component.settingsForm.controls.name.valid).toBeFalse();
         expect(component.settingsForm.controls.selectedDictionary.valid).toBeFalse();
         expect(component.settingsForm.valid).toBeFalse();
@@ -111,11 +127,14 @@ describe('MultiConfigWindowComponent', () => {
         const submitButton = document.getElementsByTagName('button')[2];
         submitButton.click();
         expect(submitButton.disabled).toBeTrue();
-        expect(component.onSubmit).toHaveBeenCalledTimes(0);
+        expect(spy).toHaveBeenCalledTimes(0);
     });
 
     it('should be submittable if the inputs are filled', () => {
-        spyOn(component, 'onSubmit');
+        const fakeSubmit = () => {
+            return;
+        };
+        const spy = spyOn(component, 'onSubmit').and.callFake(fakeSubmit);
         component.settingsForm.controls.name.setValue('My Name');
         component.settingsForm.controls.selectedDictionary.setValue('My Dictionary');
         fixture.detectChanges();
@@ -125,6 +144,25 @@ describe('MultiConfigWindowComponent', () => {
         // Verification que le bouton peut être pressé
         expect(submitButton.disabled).toBeFalse();
         submitButton.click();
-        expect(component.onSubmit).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should send the create room socket when submitted', () => {
+        const spy = spyOn(component.socketService, 'send');
+        const eventName = 'create room';
+        component.settingsForm.controls.name.setValue('My Name');
+        component.settingsForm.controls.selectedDictionary.setValue('My Dictionary');
+        fixture.detectChanges();
+        const submitButton = document.getElementsByTagName('button')[2];
+        submitButton.click();
+        const startTimer = 60;
+        const expectedGameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: startTimer };
+        expect(spy).toHaveBeenCalledWith(eventName, expectedGameOptions);
+    });
+
+    it('should handle receive dictionaries event with the dictionaries names from the server', () => {
+        const serverDictionary = ['My dictionary', 'My other Dictionary'];
+        socketHelper.peerSideEmit('receive dictionaries', serverDictionary);
+        expect(component.dictionaries).toBe(serverDictionary);
     });
 });
