@@ -1,3 +1,6 @@
+// Fichier issu de l'exemple du cours de socketIo
+// https://gitlab.com/nikolayradoev/socket-io-exemple/-/tree/master
+
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';

@@ -1,3 +1,6 @@
+// Fichier issu de l'exemple du cours de socketIo
+// https://gitlab.com/nikolayradoev/socket-io-exemple/-/tree/master
+
 /* eslint-disable no-unused-vars */
 type CallbackSignature = (params: unknown) => unknown;
 
