@@ -10,7 +10,13 @@ import { Socket } from 'socket.io-client';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 
 class SocketClientServiceMock extends SocketClientService {
-    override connect() {}
+    connected = false;
+    override connect() {
+        this.connected = true; // Permet de ne pas se reconnecter
+    }
+    override isSocketAlive() {
+        return this.connected;
+    }
 }
 
 describe('MultiConfigWindowComponent', () => {
@@ -164,5 +170,11 @@ describe('MultiConfigWindowComponent', () => {
         const serverDictionary = ['My dictionary', 'My other Dictionary'];
         socketHelper.peerSideEmit('receive dictionaries', serverDictionary);
         expect(component.dictionaries).toBe(serverDictionary);
+    });
+
+    it('should not be able to reconnect after the initialization', () => {
+        const spy = spyOn(socketServiceMock, 'connect');
+        component.connect();
+        expect(spy).toHaveBeenCalledTimes(0);
     });
 });
