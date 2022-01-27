@@ -37,12 +37,8 @@ describe('SocketTestHelper', () => {
     });
 
     it('peerSideEmit should not call a function if the event is not initialized', () => {
-        const counter = () => {
-            // eslint-disable-next-line no-console
-            console.log();
-        };
-        socketTestHelper.on('test counter', counter);
-        const spy = spyOn(console, 'log');
+        const spy = jasmine.createSpy();
+        socketTestHelper.on('test counter', spy);
         socketTestHelper.peerSideEmit('counter');
         expect(spy).toHaveBeenCalledTimes(0);
     });
