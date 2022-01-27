@@ -3,9 +3,11 @@ import { createServer, Server } from 'http';
 import { io as Client, Socket } from 'socket.io-client';
 import io from 'socket.io';
 import { Room } from '@app/classes/room';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { GameOptions } from './game-options';
-import { RoomsManager } from '@app/services/rooms-manager.service'
+import { RoomsManager } from '@app/services/rooms-manager.service';
+
+const PORT = 3000;
 
 describe('room', () => {
     let hostSocket: Socket;
@@ -15,7 +17,7 @@ describe('room', () => {
 
     before((done) => {
         httpServer = createServer();
-        httpServer.listen(3000);
+        httpServer.listen(PORT);
         server = new io.Server(httpServer);
         httpServer.on('listening', () => done());
     });
