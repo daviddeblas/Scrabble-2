@@ -1,13 +1,13 @@
 import http from 'http';
 import io from 'socket.io';
 import { Service } from 'typedi';
-import { RoomManager } from './rooms-manager.service';
+import { RoomsManager } from './rooms-manager.service';
 
 @Service()
 export class SocketService {
     private sio: io.Server;
 
-    constructor(server: http.Server, public rooms: RoomManager) {
+    constructor(server: http.Server, public rooms: RoomsManager) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.sio.on('connection', (socket) => {
             socket.on('create room', (options) => {

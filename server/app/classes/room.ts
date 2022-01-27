@@ -1,4 +1,4 @@
-import { RoomManager } from '@app/services/rooms-manager.service';
+import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import { GameOptions } from './game-options';
 
@@ -6,7 +6,7 @@ export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
     // TODO supprimer des rooms
-    constructor(public host: io.Socket, public manager: RoomManager, public gameOptions: GameOptions) {
+    constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => {

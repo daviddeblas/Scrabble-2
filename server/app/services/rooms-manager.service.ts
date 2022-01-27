@@ -4,7 +4,7 @@ import io from 'socket.io';
 import { GameOptions } from '@app/classes/game-options';
 
 @Service()
-export class RoomManager {
+export class RoomsManager {
     rooms: Room[] = [];
 
     createRoom(socket: io.Socket, options: GameOptions): void {
