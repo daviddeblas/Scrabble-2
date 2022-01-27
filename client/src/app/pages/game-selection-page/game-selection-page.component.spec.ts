@@ -16,11 +16,10 @@ describe('GameSelectionPageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GameSelectionPageComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule],
-            providers: 
-            [
+            providers: [
                 {
-                 provide: MatDialog, 
-                 useValue: mockDialogSpy,
+                    provide: MatDialog,
+                    useValue: mockDialogSpy,
                 },
                 FormBuilder,
             ],
