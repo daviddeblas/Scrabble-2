@@ -11,7 +11,8 @@ export class SocketTestHelper {
             this.callbacks.set(event, []);
         }
 
-        this.callbacks.get(event)?.push(callback);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.callbacks.get(event)!.push(callback);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
