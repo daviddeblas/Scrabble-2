@@ -13,15 +13,14 @@ import { Socket } from 'socket.io-client';
 import { WaitingRoomComponent } from './waiting-room.component';
 
 class SocketClientServiceMock extends SocketClientService {
-    public connected = false;
+    connected = false;
     override connect() {
-        this.connected = true;  // Permet de ne pas se reconnecter
+        this.connected = true; // Permet de ne pas se reconnecter
     }
     override isSocketAlive() {
         return this.connected;
     }
 }
-
 
 describe('WaitingRoomComponent', () => {
     let component: WaitingRoomComponent;
@@ -29,19 +28,17 @@ describe('WaitingRoomComponent', () => {
     const mockDialogSpy: { close: jasmine.Spy } = {
         close: jasmine.createSpy('close'),
     };
-    //let service: SocketClientService;
     let socketHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
 
     beforeEach(async () => {
-        socketHelper = new SocketTestHelper()
+        socketHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
             declarations: [WaitingRoomComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, FormsModule],
-            providers: 
-            [
+            providers: [
                 FormBuilder,
                 {
                     provide: CdkStepper,
@@ -50,9 +47,9 @@ describe('WaitingRoomComponent', () => {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
                 },
-                { 
-                    provide: SocketClientService, 
-                    useValue: socketServiceMock, 
+                {
+                    provide: SocketClientService,
+                    useValue: socketServiceMock,
                 },
             ],
         }).compileComponents();
@@ -74,8 +71,8 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('should send an accept event', () => {
-        const spy = spyOn(component.socketService, "send");
-        const eventName = "accept";
+        const spy = spyOn(component.socketService, 'send');
+        const eventName = 'accept';
         component.closeDialog();
         expect(spy).toHaveBeenCalledWith(eventName);
     });
@@ -94,26 +91,25 @@ describe('WaitingRoomComponent', () => {
     });
 
     describe('Receiving events', () => {
-
         it('should handle gameSettings event with the three settings from the server', () => {
             let gameSettings = new GameOptions();
-            gameSettings =   {hostname: "Jack",dictionaryType: "Français", timePerRound: 60}
-            socketHelper.peerSideEmit("game settings", gameSettings);
+            gameSettings = { hostname: 'Jack', dictionaryType: 'Français', timePerRound: 60 };
+            socketHelper.peerSideEmit('game settings', gameSettings);
             expect(component.player1).toBe(gameSettings.hostname);
             expect(component.timer).toBe(gameSettings.timePerRound);
             expect(component.dictionary).toBe(gameSettings.dictionaryType);
         });
 
         it('should handle player joining event with a name for the player 2', () => {
-            const name = "Leonardo";
-            socketHelper.peerSideEmit("player joining", name);
+            const name = 'Leonardo';
+            socketHelper.peerSideEmit('player joining', name);
             expect(component.player2).toBe(name);
         });
-    })
+    });
 
     it('should send the event refuse to the server and reset player2', () => {
-        const spy = spyOn(component.socketService, "send");
-        const eventName = "refuse";
+        const spy = spyOn(component.socketService, 'send');
+        const eventName = 'refuse';
         const testString = 'Leonardo';
         component.player2 = testString;
         component.rejectInvite();
@@ -122,22 +118,29 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('should called quitWaitingRoom if there is a player 2', () => {
-        component.stepper = {reset(){} } as MatStepper;
+        component.stepper = {
+            reset: () => {
+                return;
+            },
+        } as MatStepper;
         component.player2 = 'AlexTerrieur';
         component.quitWaitingRoom();
         expect(component.player2).toEqual('');
     });
 
     it('should only call the stepper.reset if player 2 is undefined', () => {
-        component.stepper = {reset(){} } as MatStepper;
+        component.stepper = {
+            reset: () => {
+                return;
+            },
+        } as MatStepper;
         component.quitWaitingRoom();
         expect(component.player2).toBeUndefined();
     });
 
     it('should not be able to reconnect after the initialization', () => {
-        const spy = spyOn(socketServiceMock, "connect");
+        const spy = spyOn(socketServiceMock, 'connect');
         component.connect();
         expect(spy).toHaveBeenCalledTimes(0);
     });
-    
 });
