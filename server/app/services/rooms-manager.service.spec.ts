@@ -5,7 +5,7 @@ import { Socket } from 'socket.io';
 import { Container } from 'typedi';
 import { RoomsManager } from './rooms-manager.service';
 
-describe('Date Service', () => {
+describe('Rooms Manager Service', () => {
     let roomsManager: RoomsManager;
     let options: GameOptions;
     let socket: Socket;

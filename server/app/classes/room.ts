@@ -15,17 +15,17 @@ export class Room {
     }
 
     join(socket: io.Socket, name: string): void {
-        if (this.clients[0]) throw new Error('A client is already connected');
         this.host.emit('player joining', name);
         this.clients[0] = socket;
+        const client = socket;
         this.host.once('accept', () => {
-            this.clients[0]?.emit('accepted');
+            client.emit('accepted');
         });
         this.host.once('refuse', () => {
-            this.clients[0]?.emit('refused');
+            client.emit('refused');
             this.clients[0] = null;
         });
-        this.clients[0].once('quit', () => {
+        client.once('quit', () => {
             this.manager.removeRoom(this);
         });
     }
