@@ -26,4 +26,8 @@ export class SocketService {
             });
         });
     }
+
+    isOpen(): boolean {
+        return this.sio.getMaxListeners() > 0;
+    }
 }

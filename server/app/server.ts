@@ -30,7 +30,8 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
         this.socketService = new SocketService(this.server, new RoomManager());
-        this.socketService;
+        // eslint-disable-next-line no-console
+        console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
