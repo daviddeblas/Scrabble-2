@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GameOptions } from '@app/classes/game-options';
 import { SocketClientService } from '@app/services/socket-client.service';
 
+const MAX_TIME = 300;
+const MIN_TIME = 30;
+const START_TIME = 60;
+const INCREMENT = 30;
+
 @Component({
     selector: 'app-multi-config-window',
     templateUrl: './multi-config-window.component.html',
@@ -12,17 +17,16 @@ export class MultiConfigWindowComponent implements OnInit {
     settingsForm: FormGroup;
     dictionaries: string[];
     timer: number;
-    private maxTime: number = 300;
-    private minTime: number = 30;
-    private startTime: number = 60;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
-        this.timer = this.startTime;
+        this.timer = START_TIME;
     }
 
     ngOnInit(): void {
+        const minLength = 3;
+        const maxLength = 20;
         this.settingsForm = this.fb.group({
-            name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+            name: ['', [Validators.required, Validators.minLength(minLength), Validators.maxLength(maxLength)]],
             selectedDictionary: ['', Validators.required],
         });
         this.connect();
@@ -44,11 +48,11 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     incrementTime(): void {
-        if (this.timer < this.maxTime) this.timer += 30;
+        if (this.timer < MAX_TIME) this.timer += INCREMENT;
     }
 
     decrementTime(): void {
-        if (this.timer > this.minTime) this.timer -= 30;
+        if (this.timer > MIN_TIME) this.timer -= INCREMENT;
     }
 
     onSubmit() {
