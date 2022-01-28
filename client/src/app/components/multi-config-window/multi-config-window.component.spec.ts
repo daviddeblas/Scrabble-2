@@ -26,7 +26,7 @@ describe('MultiConfigWindowComponent', () => {
     let socketHelper: SocketTestHelper;
     const minTimer = 30;
     const maxTimer = 300;
-    const startValue = 60;
+    const defaultTimer = 60;
     const incrementValue = 30;
     const iterationValue = 10;
 
@@ -60,7 +60,7 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should have timer initiated as 60', () => {
-        expect(component.timer).toEqual(startValue);
+        expect(component.timer).toEqual(defaultTimer);
     });
 
     it('should not decrease timer below 30', () => {
@@ -75,23 +75,23 @@ describe('MultiConfigWindowComponent', () => {
 
     it('should change timer by increments of 30', () => {
         component.incrementTime();
-        expect(component.timer).toEqual(startValue + incrementValue);
+        expect(component.timer).toEqual(defaultTimer + incrementValue);
         component.incrementTime();
-        expect(component.timer).toEqual(startValue + incrementValue + incrementValue);
+        expect(component.timer).toEqual(defaultTimer + incrementValue + incrementValue);
         component.decrementTime();
-        expect(component.timer).toEqual(startValue + incrementValue);
+        expect(component.timer).toEqual(defaultTimer + incrementValue);
     });
 
     it('should increase timer when + button pressed', () => {
         const addButton = document.getElementsByTagName('button')[1];
         addButton.click();
-        expect(component.timer).toEqual(startValue + incrementValue);
+        expect(component.timer).toEqual(defaultTimer + incrementValue);
     });
 
     it('should decrease timer when - button pressed', () => {
         const subButton = document.getElementsByTagName('button')[0];
         subButton.click();
-        expect(component.timer).toEqual(startValue - incrementValue);
+        expect(component.timer).toEqual(defaultTimer - incrementValue);
     });
 
     it('should not be possible to enter a name smaller then 3 characters', () => {

@@ -5,8 +5,10 @@ import { SocketClientService } from '@app/services/socket-client.service';
 
 const MAX_TIME = 300;
 const MIN_TIME = 30;
-const START_TIME = 60;
-const INCREMENT = 30;
+const DEFAULT_TIMER = 60;
+const TIMER_INCREMENT = 30;
+const MIN_INPUT_LENGTH = 3;
+const MAX_INPUT_LENGTH = 20;
 
 @Component({
     selector: 'app-multi-config-window',
@@ -17,16 +19,16 @@ export class MultiConfigWindowComponent implements OnInit {
     settingsForm: FormGroup;
     dictionaries: string[];
     timer: number;
+    readonly minLength: number = MIN_INPUT_LENGTH;
+    readonly maxLength: number = MAX_INPUT_LENGTH;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
-        this.timer = START_TIME;
+        this.timer = DEFAULT_TIMER;
     }
 
     ngOnInit(): void {
-        const minLength = 3;
-        const maxLength = 20;
         this.settingsForm = this.fb.group({
-            name: ['', [Validators.required, Validators.minLength(minLength), Validators.maxLength(maxLength)]],
+            name: ['', [Validators.required, Validators.minLength(this.minLength), Validators.maxLength(this.maxLength)]],
             selectedDictionary: ['', Validators.required],
         });
         this.connect();
@@ -48,11 +50,11 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     incrementTime(): void {
-        if (this.timer < MAX_TIME) this.timer += INCREMENT;
+        if (this.timer < MAX_TIME) this.timer += TIMER_INCREMENT;
     }
 
     decrementTime(): void {
-        if (this.timer > MIN_TIME) this.timer -= INCREMENT;
+        if (this.timer > MIN_TIME) this.timer -= TIMER_INCREMENT;
     }
 
     onSubmit() {
