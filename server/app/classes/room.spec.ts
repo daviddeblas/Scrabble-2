@@ -3,9 +3,9 @@ import { createServer, Server } from 'http';
 import { io as Client, Socket } from 'socket.io-client';
 import io from 'socket.io';
 import { Room } from '@app/classes/room';
-import { Container } from 'typedi';
 import { GameOptions } from './game-options';
 import { RoomsManager } from '@app/services/rooms-manager.service';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 
 const PORT = 3000;
 
@@ -14,6 +14,7 @@ describe('room', () => {
     let clientSocket: Socket;
     let server: io.Server;
     let httpServer: Server;
+    let roomsManager: SinonStubbedInstance<RoomsManager>;
 
     before((done) => {
         httpServer = createServer();
@@ -25,6 +26,7 @@ describe('room', () => {
     beforeEach(() => {
         hostSocket = Client('http://localhost:3000');
         clientSocket = Client('http://localhost:3000');
+        roomsManager = createStubInstance(RoomsManager);
     });
 
     afterEach(() => {
@@ -41,7 +43,7 @@ describe('room', () => {
         const gameOptions = new GameOptions('a', 'b');
         server.on('connection', (socket) => {
             socket.on('create room', () => {
-                room = new Room(socket, new RoomsManager(), gameOptions);
+                room = new Room(socket, roomsManager, gameOptions);
                 expect(room.clients.length).to.eq(1);
                 expect(room.gameOptions).to.eq(gameOptions);
                 expect(room.host).to.eq(socket);
@@ -52,27 +54,20 @@ describe('room', () => {
         hostSocket.emit('create room');
     });
 
-    it('quit', (done) => {
-        let room: Room;
-        const roomsManager = new RoomsManager();
+    it('quit should call RoomsManager.removeRoom', (done) => {
         const gameOptions = new GameOptions('a', 'b');
-        roomsManager.removeRoom = (roomIn: Room) => {
-            expect(roomIn).to.deep.eq(room);
-            done();
-        };
+        roomsManager.removeRoom.callsFake(() => done());
         server.on('connection', (socket) => {
             socket.on('create room', () => {
-                room = new Room(socket, roomsManager, gameOptions);
+                new Room(socket, roomsManager, gameOptions);
             });
         });
         hostSocket.emit('create room');
         hostSocket.emit('quit');
-        expect(Container.get(RoomsManager).rooms.length).to.eq(0);
     });
 
     it('join', (done) => {
         let room: Room;
-        const roomsManager = new RoomsManager();
         const gameOptions = new GameOptions('a', 'b');
         server.on('connection', (socket) => {
             socket.on('create room', () => {
@@ -93,7 +88,6 @@ describe('room', () => {
 
     it('accept', (done) => {
         let room: Room;
-        const roomsManager = new RoomsManager();
         const gameOptions = new GameOptions('a', 'b');
         server.on('connection', (socket) => {
             socket.on('create room', () => {
@@ -115,9 +109,8 @@ describe('room', () => {
         clientSocket.emit('join');
     });
 
-    it('accept', (done) => {
+    it('client should receive confirmation if host accepts', (done) => {
         let room: Room;
-        const roomsManager = new RoomsManager();
         const gameOptions = new GameOptions('a', 'b');
         server.on('connection', (socket) => {
             socket.on('create room', () => {
@@ -142,12 +135,11 @@ describe('room', () => {
 
     it('client quit', (done) => {
         let room: Room;
-        const roomsManager = new RoomsManager();
         const gameOptions = new GameOptions('a', 'b');
-        roomsManager.removeRoom = (roomIn: Room) => {
+        roomsManager.removeRoom.callsFake((roomIn: Room) => {
             expect(roomIn).to.deep.eq(room);
             done();
-        };
+        });
         server.on('connection', (socket) => {
             socket.on('create room', () => {
                 room = new Room(socket, roomsManager, gameOptions);
