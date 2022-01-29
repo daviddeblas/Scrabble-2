@@ -11,7 +11,7 @@ export const placeWordFailed = createAction('[Players] Place Word Failed', props
 
 export const exchangeLetters = createAction('[Players] Exchange Letters', props<{ letters: Letter[] }>());
 
-export const exchangeLettersSuccess = createAction('[Players] Exchange Letters Success', props<{ newLetters: Letter[] }>());
+export const exchangeLettersSuccess = createAction('[Players] Exchange Letters Success', props<{ oldLetters: Letter[]; newLetters: Letter[] }>());
 
 export const exchangeLettersFailure = createAction('[Players] Exchange Letters Failure', props<{ error: Error }>());
 

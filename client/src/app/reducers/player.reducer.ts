@@ -6,19 +6,34 @@ import { createReducer, on } from '@ngrx/store';
 export const playerFeatureKey = 'players';
 
 export interface Players {
-    player?: Player;
-    opponent?: Player;
+    player: Player;
+    opponent: Player;
 }
 
-export const initialState: Players = {};
+export const initialState: Players = {
+    player: new Player(''),
+    opponent: new Player(''),
+};
 
 export const reducer = createReducer(
     initialState,
     on(startGameSuccess, (state, { players }) => players),
 
-    // TODO: Implementer les commandes
-    // eslint-disable-next-line no-unused-vars
-    on(placeWordSuccess, (state, { newLetters, newScore }) => ({ ...state })),
-    // eslint-disable-next-line no-unused-vars
-    on(exchangeLettersSuccess, (state, { newLetters }) => ({ ...state })),
+    on(placeWordSuccess, (state, { word, newLetters, newScore }) => {
+        const letterToRemove = [...word.letters];
+        state.player.removeLettersFromEasel(letterToRemove);
+
+        if (newLetters) state.player.addLettersToEasel(newLetters);
+        if (newScore) state.player.score = newScore;
+
+        return state;
+    }),
+
+    on(exchangeLettersSuccess, (state, { oldLetters, newLetters }) => {
+        const letterToRemove = [...oldLetters];
+        state.player.removeLettersFromEasel(letterToRemove);
+        state.player.addLettersToEasel(newLetters);
+
+        return state;
+    }),
 );
