@@ -1,7 +1,7 @@
 // Fichier issu de l'exemple du cours de socketIo
 // https://gitlab.com/nikolayradoev/socket-io-exemple/-/tree/master
 
-/* eslint-disable no-unused-vars */
+/* eslint-disable */
 type CallbackSignature = (params: unknown) => unknown;
 
 export class SocketTestHelper {
@@ -11,11 +11,9 @@ export class SocketTestHelper {
             this.callbacks.set(event, []);
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.callbacks.get(event)!.push(callback);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     emit(event: string, ...params: any): void {
         return;
     }
@@ -24,12 +22,11 @@ export class SocketTestHelper {
         return;
     }
 
-    peerSideEmit(event: string, params?: unknown) {
+    peerSideEmit(event: string, params?: unknown): void {
         if (!this.callbacks.has(event)) {
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         for (const callback of this.callbacks.get(event)!) {
             callback(params);
         }

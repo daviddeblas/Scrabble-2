@@ -6,7 +6,7 @@ import { MatStepper } from '@angular/material/stepper';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GameOptions } from '@app/classes/game-options';
-import { SocketTestHelper } from '@app/classes/socket-test-helper';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Socket } from 'socket.io-client';

@@ -1,4 +1,4 @@
-import { SocketTestHelper } from '@app/classes/socket-test-helper';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 
 describe('SocketTestHelper', () => {
     let socketTestHelper: SocketTestHelper;
