@@ -10,7 +10,7 @@ export class Room {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => {
-            this.manager.removeRoom(this);
+            this.quitRoomHost();
         });
     }
 
@@ -19,14 +19,29 @@ export class Room {
         this.clients[0] = socket;
         const client = socket;
         this.host.once('accept', () => {
-            client.emit('accepted');
+            this.inviteAccepted(client);
         });
         this.host.once('refuse', () => {
-            client.emit('refused');
-            this.clients[0] = null;
+            this.inviteRefused(client);
         });
         client.once('quit', () => {
-            this.manager.removeRoom(this);
+            this.quitRoomClient();
         });
+    }
+
+    quitRoomHost(): void {
+        this.manager.removeRoom(this);
+    }
+    inviteAccepted(client: io.Socket): void {
+        client.emit('accepted');
+    }
+
+    inviteRefused(client: io.Socket): void {
+        client.emit('refused');
+        this.clients[0] = null;
+    }
+
+    quitRoomClient(): void {
+        this.manager.removeRoom(this);
     }
 }
