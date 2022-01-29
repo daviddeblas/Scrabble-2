@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SocketTestHelper } from '@app/classes/socket-test-helper';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Socket } from 'socket.io-client';

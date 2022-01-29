@@ -2,8 +2,8 @@
 // https://gitlab.com/nikolayradoev/socket-io-exemple/-/tree/master
 
 import { TestBed } from '@angular/core/testing';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { Socket } from 'socket.io-client';
-import { SocketTestHelper } from '@app/classes/socket-test-helper';
 import { SocketClientService } from './socket-client.service';
 
 describe('SocketClientService', () => {
