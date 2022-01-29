@@ -6,7 +6,12 @@ import { initialState, reducer } from './board.reducer';
 
 describe('[Board] Reducer', () => {
     const boardSize = 15;
-    const boardStub: Letter[][] = new Array(boardSize).fill(Array(boardSize).fill(null));
+    let boardStub: Letter[][];
+
+    beforeEach(() => {
+        boardStub = new Array(boardSize);
+        for (let i = 0; i < boardSize; ++i) boardStub[i] = new Array(boardSize).fill(null);
+    });
 
     it('should sync the state with the new board', () => {
         const action = boardActions.syncBoardSuccess({ newBoard: boardStub });
@@ -22,7 +27,7 @@ describe('[Board] Reducer', () => {
 
         const result = reducer(boardStub, action);
 
-        for (let x = 0; x < action.word.length(); ++x) {
+        for (let x = newWord.position.x; x < newWord.length(); ++x) {
             expect(result[x][0]).toEqual(newWord.letters[x]);
         }
     });
@@ -33,7 +38,7 @@ describe('[Board] Reducer', () => {
 
         const result = reducer(boardStub, action);
 
-        for (let y = 0; y < action.word.length(); ++y) {
+        for (let y = newWord.position.y; y < newWord.length(); ++y) {
             expect(result[0][y]).toEqual(newWord.letters[y]);
         }
     });

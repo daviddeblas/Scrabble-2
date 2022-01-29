@@ -1,6 +1,7 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
+import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
 
 export const boardFeatureKey = 'board';
@@ -9,9 +10,21 @@ export const initialState: Letter[][] = [];
 
 export const reducer = createReducer(
     initialState,
-    on(syncBoardSuccess, (newBoard) => newBoard),
+    on(syncBoardSuccess, (state, { newBoard }) => newBoard),
 
     // TODO: Implementer les commandes
     // eslint-disable-next-line no-unused-vars
-    on(placeWordSuccess, (state, { word }) => ({ ...state })),
+    on(placeWordSuccess, (state, { word }) => {
+        for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {
+            switch (word.direction) {
+                case Direction.HORIZONTAL:
+                    state[word.position.x + i][word.position.y] = word.letters[i];
+                    break;
+                case Direction.VERTICAL:
+                    state[word.position.x][word.position.y + i] = word.letters[i];
+                    break;
+            }
+        }
+        return state;
+    }),
 );
