@@ -2,13 +2,13 @@ import * as boardActions from '@app/actions/board.actions';
 import * as playersActions from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { Direction, Word } from '@app/classes/word';
-import { initialState, reducer } from './board.reducer';
+import { createInitialBoard, reducer } from './board.reducer';
 
 describe('[Board] Reducer', () => {
     let boardStub: Letter[][];
 
     beforeEach(() => {
-        boardStub = [...initialState];
+        boardStub = createInitialBoard();
         boardStub[5][5] = 'O';
         boardStub[5][6] = 'U';
         boardStub[5][7] = 'I';
@@ -18,7 +18,7 @@ describe('[Board] Reducer', () => {
         it('should sync the state with the new board', () => {
             const action = boardActions.syncBoardSuccess({ newBoard: boardStub });
 
-            const result = reducer(initialState, action);
+            const result = reducer(createInitialBoard(), action);
 
             expect(result).toEqual(boardStub);
         });

@@ -8,11 +8,14 @@ export const boardFeatureKey = 'board';
 
 export const boardSize = 15;
 
-export const initialState: Letter[][] = new Array(boardSize);
-for (let i = 0; i < boardSize; ++i) initialState[i] = new Array(boardSize).fill(null);
+export const createInitialBoard = () => {
+    const initialState: Letter[][] = new Array(boardSize);
+    for (let i = 0; i < boardSize; ++i) initialState[i] = new Array(boardSize).fill(null);
+    return initialState;
+};
 
 export const reducer = createReducer(
-    initialState,
+    createInitialBoard(),
     on(syncBoardSuccess, (state, { newBoard }) => newBoard),
 
     on(placeWordSuccess, (state, { word }) => {
