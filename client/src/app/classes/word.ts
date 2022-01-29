@@ -7,7 +7,9 @@ export enum Direction {
 }
 
 export class Word {
-    letters: Letter[];
-    position: Vec2;
-    direction?: Direction;
+    constructor(public letters: Letter[], public position: Vec2, public direction?: Direction) {}
+
+    length(): number {
+        return this.letters.length;
+    }
 }
