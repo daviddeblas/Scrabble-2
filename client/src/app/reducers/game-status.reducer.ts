@@ -5,15 +5,12 @@ export const gameStatusFeatureKey = 'gameStatus';
 
 export interface GameStatus {
     activePlayer?: string;
-    waitingForServer: boolean;
 }
 
-export const initialState: GameStatus = {
-    waitingForServer: true,
-};
+export const initialState: GameStatus = {};
 
 export const reducer = createReducer(
     initialState,
     on(gameActions.startGameSuccess, (state, { activePlayer }) => ({ ...state, activePlayer })),
-    on(gameActions.startNewRound, (state, newRound) => ({ ...state, activePlayer: newRound.activePlayer })),
+    on(gameActions.startNewRound, (state, { activePlayer }) => ({ ...state, activePlayer })),
 );
