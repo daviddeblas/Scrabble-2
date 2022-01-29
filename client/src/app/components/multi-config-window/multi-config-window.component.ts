@@ -36,13 +36,13 @@ export class MultiConfigWindowComponent implements OnInit {
         this.socketService.send('get dictionaries');
     }
 
-    connect() {
+    connect(): void {
         if (!this.socketService.isSocketAlive()) {
             this.socketService.connect();
         }
     }
 
-    configureBaseSocketFeatures() {
+    configureBaseSocketFeatures(): void {
         // Récupère la liste des dictionnaires disponibles
         this.socketService.on('receive dictionaries', (dictionaries: string[]) => {
             this.dictionaries = dictionaries;
@@ -57,7 +57,7 @@ export class MultiConfigWindowComponent implements OnInit {
         if (this.timer > MIN_TIME) this.timer -= TIMER_INCREMENT;
     }
 
-    onSubmit() {
+    onSubmit(): void {
         const gameOptions: GameOptions = {
             hostname: this.settingsForm.controls.name.value,
             dictionaryType: this.settingsForm.controls.selectedDictionary.value,

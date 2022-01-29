@@ -10,7 +10,6 @@ import { MultiConfigWindowComponent } from '@app/components/multi-config-window/
 export class GamePreparationPageComponent implements OnInit {
     @ViewChild('MultiConfigWindowComponent') multiConfigWindowComponent: MultiConfigWindowComponent;
     firstFormGroup: FormGroup;
-    secondFormGroup: FormGroup;
     isEditable = false;
     constructor(private formBuilder: FormBuilder) {}
 
@@ -19,7 +18,7 @@ export class GamePreparationPageComponent implements OnInit {
             firstCtrl: ['', Validators.required],
         });
     }
-    get formSettings() {
+    get formSettings(): FormGroup {
         return this.multiConfigWindowComponent ? this.multiConfigWindowComponent.settingsForm : this.firstFormGroup;
     }
 }

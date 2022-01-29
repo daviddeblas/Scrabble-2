@@ -23,13 +23,13 @@ export class WaitingRoomComponent implements OnInit {
         this.configureBaseSocketFeatures();
     }
 
-    connect() {
+    connect(): void {
         if (!this.socketService.isSocketAlive()) {
             this.socketService.connect();
         }
     }
 
-    configureBaseSocketFeatures() {
+    configureBaseSocketFeatures(): void {
         // Récupère la liste des dictionnaires disponibles
         this.socketService.on('game settings', (gameOptions: GameOptions) => {
             this.player1 = gameOptions.hostname;
@@ -41,15 +41,15 @@ export class WaitingRoomComponent implements OnInit {
         });
     }
 
-    closeDialog() {
+    closeDialog(): void {
         this.socketService.send('accept');
         this.dialogRef.close();
     }
-    rejectInvite() {
+    rejectInvite(): void {
         this.socketService.send('refuse');
         this.player2 = '';
     }
-    quitWaitingRoom() {
+    quitWaitingRoom(): void {
         if (this.player2) {
             this.socketService.send('refuse');
             this.socketService.send('quit');

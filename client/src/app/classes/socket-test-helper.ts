@@ -24,7 +24,7 @@ export class SocketTestHelper {
         return;
     }
 
-    peerSideEmit(event: string, params?: unknown) {
+    peerSideEmit(event: string, params?: unknown): void {
         if (!this.callbacks.has(event)) {
             return;
         }
