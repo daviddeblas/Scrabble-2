@@ -6,7 +6,10 @@ import { createReducer, on } from '@ngrx/store';
 
 export const boardFeatureKey = 'board';
 
-export const initialState: Letter[][] = [];
+export const boardSize = 15;
+
+export const initialState: Letter[][] = new Array(boardSize);
+for (let i = 0; i < boardSize; ++i) initialState[i] = new Array(boardSize).fill(null);
 
 export const reducer = createReducer(
     initialState,
