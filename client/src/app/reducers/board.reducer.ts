@@ -12,8 +12,6 @@ export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (state, { newBoard }) => newBoard),
 
-    // TODO: Implementer les commandes
-    // eslint-disable-next-line no-unused-vars
     on(placeWordSuccess, (state, { word }) => {
         for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {
             switch (word.direction) {
