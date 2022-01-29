@@ -24,7 +24,7 @@ describe('MultiConfigWindowComponent', () => {
     let fixture: ComponentFixture<MultiConfigWindowComponent>;
     let socketServiceMock: SocketClientServiceMock;
     let socketHelper: SocketTestHelper;
-    const iterationValue = 10;
+    const iterationAmount = 10;
 
     beforeEach(async () => {
         socketHelper = new SocketTestHelper();
@@ -60,12 +60,12 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should not decrease timer below 30', () => {
-        for (let _ = 0; _ < iterationValue; _++) component.decrementTime();
+        for (let _ = 0; _ < iterationAmount; _++) component.decrementTime();
         expect(component.timer).toEqual(component.minTime);
     });
 
     it('should not increase timer higher 300', () => {
-        for (let _ = 0; _ < iterationValue; _++) component.incrementTime();
+        for (let _ = 0; _ < iterationAmount; _++) component.incrementTime();
         expect(component.timer).toEqual(component.maxTime);
     });
 
