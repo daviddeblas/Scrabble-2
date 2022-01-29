@@ -7,7 +7,7 @@ import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Socket } from 'socket.io-client';
-import { DEFAULT_TIMER, MAX_TIME, MIN_TIME, MultiConfigWindowComponent, TIMER_INCREMENT } from './multi-config-window.component';
+import { MultiConfigWindowComponent } from './multi-config-window.component';
 
 class SocketClientServiceMock extends SocketClientService {
     connected = false;
@@ -56,38 +56,38 @@ describe('MultiConfigWindowComponent', () => {
     });
 
     it('should have timer initiated as 60', () => {
-        expect(component.timer).toEqual(DEFAULT_TIMER);
+        expect(component.timer).toEqual(component.defaultTimer);
     });
 
     it('should not decrease timer below 30', () => {
         for (let _ = 0; _ < iterationValue; _++) component.decrementTime();
-        expect(component.timer).toEqual(MIN_TIME);
+        expect(component.timer).toEqual(component.minTime);
     });
 
     it('should not increase timer higher 300', () => {
         for (let _ = 0; _ < iterationValue; _++) component.incrementTime();
-        expect(component.timer).toEqual(MAX_TIME);
+        expect(component.timer).toEqual(component.maxTime);
     });
 
     it('should change timer by increments of 30', () => {
         component.incrementTime();
-        expect(component.timer).toEqual(DEFAULT_TIMER + TIMER_INCREMENT);
+        expect(component.timer).toEqual(component.defaultTimer + component.timerIncrement);
         component.incrementTime();
-        expect(component.timer).toEqual(DEFAULT_TIMER + TIMER_INCREMENT + TIMER_INCREMENT);
+        expect(component.timer).toEqual(component.defaultTimer + 2 * component.timerIncrement);
         component.decrementTime();
-        expect(component.timer).toEqual(DEFAULT_TIMER + TIMER_INCREMENT);
+        expect(component.timer).toEqual(component.defaultTimer + component.timerIncrement);
     });
 
     it('should increase timer when + button pressed', () => {
         const addButton = document.getElementsByTagName('button')[1];
         addButton.click();
-        expect(component.timer).toEqual(DEFAULT_TIMER + TIMER_INCREMENT);
+        expect(component.timer).toEqual(component.defaultTimer + component.timerIncrement);
     });
 
     it('should decrease timer when - button pressed', () => {
         const subButton = document.getElementsByTagName('button')[0];
         subButton.click();
-        expect(component.timer).toEqual(DEFAULT_TIMER - TIMER_INCREMENT);
+        expect(component.timer).toEqual(component.defaultTimer - component.timerIncrement);
     });
 
     it('should not be possible to enter a name smaller then 3 characters', () => {

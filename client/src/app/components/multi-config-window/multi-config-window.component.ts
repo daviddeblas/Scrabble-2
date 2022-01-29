@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GameOptions } from '@app/classes/game-options';
 import { SocketClientService } from '@app/services/socket-client.service';
 
-export const MAX_TIME = 300;
-export const MIN_TIME = 30;
-export const DEFAULT_TIMER = 60;
-export const TIMER_INCREMENT = 30;
+const MAX_TIME = 300;
+const MIN_TIME = 30;
+const DEFAULT_TIMER = 60;
+const TIMER_INCREMENT = 30;
 const MIN_NAME_LENGTH = 3;
 const MAX_NAME_LENGTH = 20;
 
@@ -21,9 +21,13 @@ export class MultiConfigWindowComponent implements OnInit {
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
+    readonly maxTime: number = MAX_TIME;
+    readonly minTime: number = MIN_TIME;
+    readonly defaultTimer: number = DEFAULT_TIMER;
+    readonly timerIncrement: number = TIMER_INCREMENT;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
-        this.timer = DEFAULT_TIMER;
+        this.timer = this.defaultTimer;
     }
 
     ngOnInit(): void {
@@ -50,11 +54,11 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     incrementTime(): void {
-        if (this.timer < MAX_TIME) this.timer += TIMER_INCREMENT;
+        if (this.timer < this.maxTime) this.timer += this.timerIncrement;
     }
 
     decrementTime(): void {
-        if (this.timer > MIN_TIME) this.timer -= TIMER_INCREMENT;
+        if (this.timer > this.minTime) this.timer -= this.timerIncrement;
     }
 
     onSubmit(): void {
