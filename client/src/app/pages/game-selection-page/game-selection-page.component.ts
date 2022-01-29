@@ -9,7 +9,7 @@ import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/g
 })
 export class GameSelectionPageComponent {
     constructor(public dialog: MatDialog) {}
-    openDialog() {
+    openGamePreparationPage() {
         this.dialog.open(GamePreparationPageComponent);
     }
 }

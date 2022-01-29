@@ -37,7 +37,7 @@ describe('GameSelectionPageComponent', () => {
     });
 
     it('should close the window when the begin button is clicked', () => {
-        component.openDialog();
+        component.openGamePreparationPage();
         expect(mockDialogSpy.open).toHaveBeenCalled();
     });
 });

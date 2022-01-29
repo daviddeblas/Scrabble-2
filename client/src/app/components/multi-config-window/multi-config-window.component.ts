@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GameOptions } from '@app/classes/game-options';
 import { SocketClientService } from '@app/services/socket-client.service';
 
-const MAX_TIME = 300;
-const MIN_TIME = 30;
-const DEFAULT_TIMER = 60;
-const TIMER_INCREMENT = 30;
-const MIN_INPUT_LENGTH = 3;
-const MAX_INPUT_LENGTH = 20;
+export const MAX_TIME = 300;
+export const MIN_TIME = 30;
+export const DEFAULT_TIMER = 60;
+export const TIMER_INCREMENT = 30;
+const MIN_NAME_LENGTH = 3;
+const MAX_NAME_LENGTH = 20;
 
 @Component({
     selector: 'app-multi-config-window',
@@ -19,8 +19,8 @@ export class MultiConfigWindowComponent implements OnInit {
     settingsForm: FormGroup;
     dictionaries: string[];
     timer: number;
-    readonly minLength: number = MIN_INPUT_LENGTH;
-    readonly maxLength: number = MAX_INPUT_LENGTH;
+    readonly minNameLength: number = MIN_NAME_LENGTH;
+    readonly maxNameLength: number = MAX_NAME_LENGTH;
 
     constructor(private fb: FormBuilder, public socketService: SocketClientService) {
         this.timer = DEFAULT_TIMER;
@@ -28,7 +28,7 @@ export class MultiConfigWindowComponent implements OnInit {
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
-            name: ['', [Validators.required, Validators.minLength(this.minLength), Validators.maxLength(this.maxLength)]],
+            name: ['', [Validators.required, Validators.minLength(this.minNameLength), Validators.maxLength(this.maxNameLength)]],
             selectedDictionary: ['', Validators.required],
         });
         this.connect();
