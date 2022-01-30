@@ -1,0 +1,46 @@
+<div class="general-container">
+    <div id="solo-button">
+        <button mat-raised-button color="basic">
+            Solo
+            <mat-icon>person_outline</mat-icon>
+        </button>
+    </div>
+    <section id="waiting-section" *ngIf="!player2">
+        <div id="text-container">
+            <h1>En attente d'un autre joueur...</h1>
+        </div>
+        <div id="spinner-container">
+            <mat-spinner></mat-spinner>
+        </div>
+    </section>
+    <section *ngIf="player2 && player1">
+        <h1>Partie de Jeu :</h1>
+        <mat-tab-group id="tabs-container" dynamicHeight>
+            <mat-tab label="Joueurs">
+                <b>{{ player1 }}</b> contre <b>{{ player2 }}</b>
+            </mat-tab>
+            <mat-tab label="Temps">
+                <b>{{ timer }}</b> secondes
+            </mat-tab>
+            <mat-tab label="Dictionnaire">
+                <b>{{ dictionary }}</b>
+            </mat-tab>
+        </mat-tab-group>
+    </section>
+    <div id="button-container">
+        <button mat-stroked-button color="primary" routerLink="/game" (click)="closeDialog()" id="begin-button" [disabled]="player2 === undefined">
+            <mat-icon>task_alt</mat-icon>
+            Démarrer
+        </button>
+        <button mat-stroked-button color="primary" (click)="rejectInvite()" [disabled]="player2 === undefined">
+            <mat-icon>delete_forever</mat-icon>
+            Rejeter
+        </button>
+    </div>
+    <div id="cancel-button-container">
+        <button mat-raised-button (click)="quitWaitingRoom()" color="warn" id="cancel-button">
+            <mat-icon>undo</mat-icon>
+            Annuler
+        </button>
+    </div>
+</div>
