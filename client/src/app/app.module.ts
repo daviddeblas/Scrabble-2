@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -12,12 +12,15 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { BoardComponent } from './components/board/board.component';
-import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
-import { CellWordX2Component } from './components/cells/cell-word-x2/cell-word-x2.component';
-import { CellWordX3Component } from './components/cells/cell-word-x3/cell-word-x3.component';
 import { CellLetterX2Component } from './components/cells/cell-letter-x2/cell-letter-x2.component';
 import { CellLetterX3Component } from './components/cells/cell-letter-x3/cell-letter-x3.component';
 import { CellStarComponent } from './components/cells/cell-star/cell-star.component';
+import { CellWordX2Component } from './components/cells/cell-word-x2/cell-word-x2.component';
+import { CellWordX3Component } from './components/cells/cell-word-x3/cell-word-x3.component';
+import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
+import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
+import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -40,8 +43,11 @@ import { CellStarComponent } from './components/cells/cell-star/cell-star.compon
         CellLetterX2Component,
         CellLetterX3Component,
         CellStarComponent,
+        MultiConfigWindowComponent,
+        GamePreparationPageComponent,
+        WaitingRoomComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
     bootstrap: [AppComponent],
 })

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
 describe('MainPageComponent', () => {
@@ -8,6 +9,7 @@ describe('MainPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [MainPageComponent],
+            imports: [AppMaterialModule],
         }).compileComponents();
     });
 
