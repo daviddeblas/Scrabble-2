@@ -1,15 +1,46 @@
+// .container {
+//     height: 100%;
+//     display: flex;
+// }
+
+// .play-area-container {
+//     overflow: auto;
+//     flex: 1 1 auto;
+// }
+
+// .play-area {
+//     display: grid;
+//     width: min-content;
+//     outline: none;
+// }
+
 .container {
-    height: 100%;
     display: flex;
+    flex-direction: row;
 }
 
-.play-area-container {
-    overflow: auto;
-    flex: 1 1 auto;
+.game-area {
+    display: flex;
+    flex-direction: column;
 }
 
-.play-area {
-    display: grid;
-    width: min-content;
-    outline: none;
+.chevalet {
+    border: solid;
+    height: 100px;
+}
+
+.game-rightSide {
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbox {
+    border: solid;
+    width: 100px;
+    height: 100px;
+}
+
+.tools {
+    border: solid;
+    height: 100px;
 }
