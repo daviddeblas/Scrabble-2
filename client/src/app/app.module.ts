@@ -11,8 +11,13 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 import { BoardComponent } from './components/board/board.component';
+import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { CellWordX2Component } from './components/cells/cell-word-x2/cell-word-x2.component';
+import { CellWordX3Component } from './components/cells/cell-word-x3/cell-word-x3.component';
+import { CellLetterX2Component } from './components/cells/cell-letter-x2/cell-letter-x2.component';
+import { CellLetterX3Component } from './components/cells/cell-letter-x3/cell-letter-x3.component';
+import { CellStarComponent } from './components/cells/cell-star/cell-star.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,6 +35,11 @@ import { BoardComponent } from './components/board/board.component';
         SidebarComponent,
         GameSelectionPageComponent,
         BoardComponent,
+        CellWordX2Component,
+        CellWordX3Component,
+        CellLetterX2Component,
+        CellLetterX3Component,
+        CellStarComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
