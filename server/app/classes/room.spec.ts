@@ -90,21 +90,6 @@ describe('room', () => {
             server.close();
             httpServer.close();
         });
-        it('quit should call quitRoomHost() when emitted', (done) => {
-            const gameOptions = new GameOptions('a', 'b');
-            server.on('connection', (socket) => {
-                socket.on('create room', () => {
-                    const room = new Room(socket, roomsManager, gameOptions);
-                    const quitRoomHostStub = stub(room, 'quitRoomHost');
-                    hostSocket.emit('quit');
-                    setTimeout(() => {
-                        expect(quitRoomHostStub.calledOnce).to.deep.equal(true);
-                        done();
-                    }, RESPONSE_DELAY);
-                });
-            });
-            hostSocket.emit('create room');
-        });
 
         describe('Emitting', () => {
             let room: Room;
@@ -113,6 +98,7 @@ describe('room', () => {
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
+                        clientSocket.emit('join');
                     });
                     socket.on('join', () => {
                         room.join(socket, 'player 2');
@@ -125,7 +111,6 @@ describe('room', () => {
                     done();
                 });
                 hostSocket.emit('create room');
-                clientSocket.emit('join');
             });
             it('client should receive refused if host refuses', (done) => {
                 hostSocket.on('player joining', () => {
@@ -136,7 +121,6 @@ describe('room', () => {
                     done();
                 });
                 hostSocket.emit('create room');
-                clientSocket.emit('join');
             });
 
             it('client should receive accepted if host accepts', (done) => {
@@ -147,11 +131,26 @@ describe('room', () => {
                     done();
                 });
                 hostSocket.emit('create room');
-                clientSocket.emit('join');
             });
         });
 
         describe('Receiving', () => {
+            it('quit should call quitRoomHost() when emitted', (done) => {
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        const room = new Room(socket, roomsManager, gameOptions);
+                        const quitRoomHostStub = stub(room, 'quitRoomHost');
+                        hostSocket.emit('quit');
+                        setTimeout(() => {
+                            expect(quitRoomHostStub.calledOnce).to.deep.equal(true);
+                            done();
+                        }, RESPONSE_DELAY);
+                    });
+                });
+                hostSocket.emit('create room');
+            });
+
             it('accept should call inviteAccepted()', (done) => {
                 let room: Room;
                 const gameOptions = new GameOptions('a', 'b');
@@ -180,6 +179,7 @@ describe('room', () => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
                         const quitRoomClientStub = stub(room, 'quitRoomClient');
+                        clientSocket.emit('join');
                         setTimeout(() => {
                             expect(quitRoomClientStub.calledOnce).to.deep.equal(true);
                             done();
@@ -193,7 +193,6 @@ describe('room', () => {
                     clientSocket.emit('quit');
                 });
                 hostSocket.emit('create room');
-                clientSocket.emit('join');
             });
         });
     });
