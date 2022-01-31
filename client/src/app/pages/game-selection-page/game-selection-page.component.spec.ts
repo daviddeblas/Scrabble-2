@@ -36,7 +36,7 @@ describe('GameSelectionPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should close the window when the begin button is clicked', () => {
+    it('should open the window when the begin button is clicked', () => {
         component.openGamePreparationPage();
         expect(mockDialogSpy.open).toHaveBeenCalled();
     });

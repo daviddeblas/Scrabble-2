@@ -12,7 +12,7 @@ export class SurrenderGameButtonComponent {
     @Input() socket: Socket;
     constructor(public dialog: MatDialog) {}
 
-    openDialog(): void {
+    openConfirmSurrenderDialog(): void {
         this.dialog.open(ConfirmSurrenderDialogComponent, {
             data: this.socket,
         });
