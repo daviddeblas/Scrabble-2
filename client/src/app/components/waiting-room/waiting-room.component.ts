@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { GameOptions } from '@app/classes/game-options';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { SocketClientService } from '@app/services/socket-client.service';
 
@@ -19,26 +18,19 @@ export class WaitingRoomComponent implements OnInit {
     constructor(private dialogRef: MatDialogRef<GamePreparationPageComponent>, public socketService: SocketClientService) {}
 
     ngOnInit(): void {
-        this.connect();
         this.configureBaseSocketFeatures();
-    }
-
-    connect(): void {
-        if (!this.socketService.isSocketAlive()) {
-            this.socketService.connect();
-        }
     }
 
     configureBaseSocketFeatures(): void {
         // Récupère la liste des dictionnaires disponibles
-        this.socketService.on('game settings', (gameOptions: GameOptions) => {
-            this.player1 = gameOptions.hostname;
-            this.timer = gameOptions.timePerRound;
-            this.dictionary = gameOptions.dictionaryType;
-        });
-        this.socketService.on('player joining', (playerName: string) => {
-            this.player2 = playerName;
-        });
+        // this.socketService.on('game settings', (gameOptions: GameOptions) => {
+        //     this.player1 = gameOptions.hostname;
+        //     this.timer = gameOptions.timePerRound;
+        //     this.dictionary = gameOptions.dictionaryType;
+        // });
+        // this.socketService.on('player joining', (playerName: string) => {
+        //     this.player2 = playerName;
+        // });
     }
 
     closeDialog(): void {
@@ -49,6 +41,7 @@ export class WaitingRoomComponent implements OnInit {
         this.socketService.send('refuse');
         this.player2 = '';
     }
+
     quitWaitingRoom(): void {
         if (this.player2) {
             this.socketService.send('refuse');
