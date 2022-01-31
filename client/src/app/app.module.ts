@@ -11,9 +11,9 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { ConfirmSurrenderComponent } from './components/confirm-surrender/confirm-surrender.component';
+import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
-import { SurrenderGameComponent } from './components/surrender-game/surrender-game.component';
+import { SurrenderGameButtonComponent } from './components/surrender-game-button/surrender-game-button.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
@@ -32,8 +32,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
-        SurrenderGameComponent,
-        ConfirmSurrenderComponent,
+        SurrenderGameButtonComponent,
+        ConfirmSurrenderDialogComponent,
         GameSelectionPageComponent,
         MultiConfigWindowComponent,
         GamePreparationPageComponent,
