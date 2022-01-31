@@ -1,3 +1,15 @@
 <mat-stepper linear #stepper>
-
+    <mat-step [stepControl]="formGroup">
+        <mat-card style="display: flex; justify-content: center; align-items: center">
+            <form [formGroup]="formGroup">
+                <mat-form-field class="parameter-container" appearance="fill">
+                    <mat-label>Veuillez saisir votre nom</mat-label>
+                    <input matInput formControlName="name" placeholder="Nom" />
+                </mat-form-field>
+                <mat-card-actions>
+                    <button mat-raised-button matStepperNext color="primary" type="submit" id="confirm-name" class="centered">Confirmer</button>
+                </mat-card-actions>
+            </form>
+        </mat-card>
+    </mat-step>
 </mat-stepper>
