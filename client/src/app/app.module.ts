@@ -8,14 +8,17 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { DictionariesEffects } from './effects/dictionaries.effects';
 import { GamePageModule } from './modules/game-page.module';
+import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
-import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -41,7 +44,8 @@ import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.com
         BrowserModule,
         FormsModule,
         HttpClientModule,
-        StoreModule.forRoot({}),
+        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer }),
+        EffectsModule.forRoot([DictionariesEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,

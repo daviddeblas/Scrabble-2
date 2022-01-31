@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { GameOptions } from '@app/classes/game-options';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { RoomService } from '@app/services/room.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
 const MAX_TIME = 300;
 const MIN_TIME = 30;
@@ -17,7 +20,7 @@ const MAX_NAME_LENGTH = 20;
 })
 export class MultiConfigWindowComponent implements OnInit {
     settingsForm: FormGroup;
-    dictionaries: string[];
+    dictionaries$: Observable<string[]>;
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
@@ -26,30 +29,16 @@ export class MultiConfigWindowComponent implements OnInit {
     readonly defaultTimer: number = DEFAULT_TIMER;
     readonly timerIncrement: number = TIMER_INCREMENT;
 
-    constructor(private fb: FormBuilder, public socketService: SocketClientService) {
+    constructor(private fb: FormBuilder, public roomService: RoomService, dictionariesStore: Store<{ dictionaries: string[] }>, store: Store) {
         this.timer = this.defaultTimer;
+        this.dictionaries$ = dictionariesStore.select('dictionaries');
+        store.dispatch(loadDictionaries());
     }
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(this.minNameLength), Validators.maxLength(this.maxNameLength)]],
             selectedDictionary: ['', Validators.required],
-        });
-        this.connect();
-        this.configureBaseSocketFeatures();
-        this.socketService.send('get dictionaries');
-    }
-
-    connect(): void {
-        if (!this.socketService.isSocketAlive()) {
-            this.socketService.connect();
-        }
-    }
-
-    configureBaseSocketFeatures(): void {
-        // Récupère la liste des dictionnaires disponibles
-        this.socketService.on('receive dictionaries', (dictionaries: string[]) => {
-            this.dictionaries = dictionaries;
         });
     }
 
@@ -67,6 +56,6 @@ export class MultiConfigWindowComponent implements OnInit {
             dictionaryType: this.settingsForm.controls.selectedDictionary.value,
             timePerRound: this.timer,
         };
-        this.socketService.send('create room', gameOptions);
+        this.roomService.createRoom(gameOptions);
     }
 }
