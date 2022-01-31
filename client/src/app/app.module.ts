@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
@@ -10,7 +10,10 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
+import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { GamePageModule } from './modules/game-page.module';
+import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 
 /**
@@ -20,7 +23,15 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MainPageComponent, MaterialPageComponent, GameSelectionPageComponent],
+    declarations: [
+        AppComponent,
+        MainPageComponent,
+        MaterialPageComponent,
+        GameSelectionPageComponent,
+        MultiConfigWindowComponent,
+        GamePreparationPageComponent,
+        WaitingRoomComponent,
+    ],
     imports: [
         AppMaterialModule,
         AppRoutingModule,
@@ -31,6 +42,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         StoreModule.forRoot({}),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
+        ReactiveFormsModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

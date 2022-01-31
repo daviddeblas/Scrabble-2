@@ -15,8 +15,8 @@
         "noUnusedLocals": true,
         "noImplicitReturns": true,
         "suppressImplicitAnyIndexErrors": true,
-        "strictNullChecks": true,
         "resolveJsonModule": true,
+        "strictNullChecks": true,
         "esModuleInterop": true,
 
         "paths": {

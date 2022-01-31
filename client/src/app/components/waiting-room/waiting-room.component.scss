@@ -1,0 +1,32 @@
+#text-container {
+    text-align: center;
+}
+
+#spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#cancel-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#solo-button {
+    position: relative;
+    min-width: auto;
+    float: right;
+}
+
+#tabs-container {
+    margin-bottom: 20%;
+    font-size: 130%;
+}
