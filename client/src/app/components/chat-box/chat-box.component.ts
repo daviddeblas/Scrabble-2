@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { ChatMessage } from '@app/classes/chat-message';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -7,12 +8,10 @@ import { Observable } from 'rxjs';
     templateUrl: './chat-box.component.html',
     styleUrls: ['./chat-box.component.scss'],
 })
-export class ChatBoxComponent implements OnInit {
-    chat$: Observable<string[]>;
+export class ChatBoxComponent {
+    chat$: Observable<ChatMessage[]>;
 
-    constructor(store: Store<{ chat: string[] }>) {
+    constructor(store: Store<{ chat: ChatMessage[] }>) {
         this.chat$ = store.select('chat');
     }
-
-    ngOnInit(): void {}
 }

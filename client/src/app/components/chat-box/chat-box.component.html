@@ -1,4 +1,4 @@
 <p>chat-box works!</p>
 <ul>
-    <li *ngFor="let line of chat$ | async">{{ line }}</li>
+    <li *ngFor="let line of chat$ | async">{{ line.username }} {{ line.message }}</li>
 </ul>
