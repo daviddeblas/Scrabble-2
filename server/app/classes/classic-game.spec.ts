@@ -1,13 +1,13 @@
-import { ClassicGame, AMT_OF_LETTERS_IN_EASEL, BOARD_HEIGHT, BOARD_WIDTH } from '@app/classes/classic-game';
+import { AMT_OF_LETTERS_IN_EASEL, BOARD_HEIGHT, BOARD_WIDTH, ClassicGame } from '@app/classes/classic-game';
+import { Letter, stringToLetters } from '@app/classes/letter';
 import { DictionaryService } from '@app/services/dictionary.service';
+import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { Letter, stringToLetters } from '@app/classes/letter';
 import { GameError } from './game.exception';
-import { Vec2 } from './vec2';
-import { PlacedLetter } from './placed-letter';
 import { Multiplier, MultiplierType } from './multiplier';
-import { GameConfigService } from '@app/services/game-config.service';
+import { PlacedLetter } from './placed-letter';
+import { Vec2 } from './vec2';
 
 describe('ClassicGame', () => {
     let dictionary: DictionaryService;
@@ -117,9 +117,9 @@ describe('ClassicGame', () => {
         }).to.throw();
 
         let lettersToAdd: PlacedLetter[] = [
-            new PlacedLetter('B' as Letter, new Vec2(5,6)),
-            new PlacedLetter('O' as Letter, new Vec2(6,6)),
-            new PlacedLetter('N' as Letter, new Vec2(7,6)),
+            new PlacedLetter('B' as Letter, new Vec2(5, 6)),
+            new PlacedLetter('O' as Letter, new Vec2(6, 6)),
+            new PlacedLetter('N' as Letter, new Vec2(7, 6)),
         ];
         game.place(lettersToAdd, game.activePlayer);
         expect(game.activePlayer).to.eq(1);
