@@ -25,6 +25,12 @@ export class Room {
         this.manager.removeRoom(this);
     }
     inviteAccepted(client: io.Socket): void {
+        client.on('surrender game', () => {
+            this.host.emit('victory');
+        });
+        this.host.on('surrender game', () => {
+            client.emit('victory');
+        });
         client.emit('accepted');
     }
 
