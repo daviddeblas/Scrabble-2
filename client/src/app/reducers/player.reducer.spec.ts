@@ -1,10 +1,11 @@
 import { startGameSuccess } from '@app/actions/game-status.actions';
+import { Player } from '@app/classes/player';
 import { initialState, Players, reducer } from './player.reducer';
 
 describe('[Players] Reducer', () => {
     const playersMock: Players = {
-        player: { easel: ['H', 'E', 'A', 'L', 'O', 'L', 'W'], name: 'Player 1', score: 0 },
-        opponent: { easel: ['S', 'U', 'A', 'L', 'T', 'L', 'P'], name: 'Player 2', score: 0 },
+        player: new Player('Player 1'),
+        opponent: new Player('Player 2'),
     };
 
     describe('[Players] Load Players', () => {
