@@ -1,22 +1,42 @@
-<div class="container justified">
-    <h1 class="header-item">Bienvenue au cours {{ title }}</h1>
-    <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
-    <section id="server-message">
-        <p>Petit message du serveur : {{ message.getValue() }}</p>
-        <div class="justified">
-            <button class="button" (click)="getMessagesFromServer()">Récupérer un message du serveur</button>
-            <button class="button" (click)="sendTimeToServer()">Envoyer un message au serveur</button>
-            <button class="button" routerLink="/material">Voir la page démo Angular Material</button>
-        </div>
-    </section>
+<div class="container">
+    <mat-toolbar color="primary">
+        <span>Mode de jeu</span>
+    </mat-toolbar>
+    <main>
+        <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
 
-    <button class="button" routerLink="/game">Jouer!</button>
+        <p class="welcome-message">
+            Bienvenue dans le jeu de Scrabble de LOG2990.
+            <span class="wave">👋</span>
+        </p>
+
+        <div class="main-menu">
+            <button routerLink="/game-selection" mat-raised-button color="primary">
+                <mat-icon>play_arrow</mat-icon>
+                Scrabble classique
+            </button>
+
+            <button routerLink="/game-selection" mat-raised-button disabled color="primary">
+                <mat-icon>play_arrow</mat-icon>
+                Scrabble LOG2990
+            </button>
+
+            <button class="top-score" routerLink="/game" mat-raised-button disabled color="primary">
+                <mat-icon>emoji_events</mat-icon>
+                Meilleurs scores
+            </button>
+        </div>
+    </main>
 
     <div class="footer-item">
-        <h4 class="team-name">Équipe Poly</h4>
-        <p>
-            <span>Coéquipier #1</span>, <span>Coéquipier #2</span>, <span>Coéquipier #3</span>, <span>Coéquipier #4</span>,
-            <span>Coéquipier #5</span>, <span>Coéquipier #6</span>
-        </p>
+        <h4 class="team-name">Équipe 101</h4>
+        <ul class="members-name">
+            <li>William Bouillon</li>
+            <li>David de Blas</li>
+            <li>Nicolas Deloumeau</li>
+            <li>Théo Louesdon</li>
+            <li>Mymanat Mohammed</li>
+            <li>Raphael Tremblay</li>
+        </ul>
     </div>
 </div>

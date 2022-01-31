@@ -4,7 +4,7 @@ import { ExampleService } from '@app/services/example.service';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
 import { Container } from 'typedi';
 
 const HTTP_STATUS_OK = StatusCodes.OK;
