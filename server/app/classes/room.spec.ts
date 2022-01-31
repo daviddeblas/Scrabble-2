@@ -194,6 +194,43 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+
+            it('should handle surrender game from client and emit victory to host', (done) => {
+                let room: Room;
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        room = new Room(socket, roomsManager, gameOptions);
+                        clientSocket.emit('join room');
+                    });
+                    socket.on('join room', () => {
+                        room.inviteAccepted(socket);
+                        clientSocket.emit('surrender game');
+                    });
+                });
+                hostSocket.on('victory', () => {
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
+            it('should handle surrender game from client and emit victory to host', (done) => {
+                let room: Room;
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        room = new Room(socket, roomsManager, gameOptions);
+                        clientSocket.emit('join room');
+                    });
+                    socket.on('join room', () => {
+                        room.inviteAccepted(socket);
+                        hostSocket.emit('surrender game');
+                    });
+                });
+                clientSocket.on('victory', () => {
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
         });
     });
 });
