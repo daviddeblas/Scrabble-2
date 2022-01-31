@@ -1,7 +1,8 @@
-import { Room } from '@app/classes/room';
-import { Service } from 'typedi';
-import io from 'socket.io';
 import { GameOptions } from '@app/classes/game-options';
+import { Room } from '@app/classes/room';
+import { RoomInfo } from '@app/classes/room-info';
+import io from 'socket.io';
+import { Service } from 'typedi';
 
 @Service()
 export class RoomsManager {
@@ -24,7 +25,7 @@ export class RoomsManager {
         }
     }
 
-    getRooms(): string[] {
-        return this.rooms.map((r) => r.gameOptions.hostname);
+    getRooms(): RoomInfo[] {
+        return this.rooms.map((r) => new RoomInfo(r.gameOptions.hostname, r.host.id));
     }
 }

@@ -1,4 +1,5 @@
 import { GameOptions } from '@app/classes/game-options';
+import { RoomInfo } from '@app/classes/room-info';
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
@@ -72,8 +73,8 @@ describe('SocketManager service tests', () => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.emit('request list');
-        clientSocket.on('get list', (listOfRooms) => {
-            expect(listOfRooms).to.deep.contain(defaultOptions.hostname);
+        clientSocket.on('get list', (listOfRooms: RoomInfo[]) => {
+            expect(listOfRooms.filter((room) => room.host === defaultOptions.hostname).length).to.eq(1);
             expect(listOfRooms).to.be.length(1);
             done();
         });
