@@ -1,11 +1,12 @@
-import { Player } from '@app/classes/player';
-import { Letter } from '@app/classes/letter';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Letter } from '@app/classes/letter';
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Player } from '@app/classes/player';
 import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { GameConfigService } from '@app/services/game-config.service';
+import { GameFinishStatus } from './game-finish-status';
 
 export const AMT_OF_LETTERS_IN_EASEL = 7;
 export const BOARD_WIDTH = 15;
@@ -28,7 +29,7 @@ export class ClassicGame {
     constructor(
         private dictionaryService: DictionaryService,
         gameConfigService: GameConfigService,
-        private onFinish: () => void = () => {
+        private onFinish: (info: GameFinishStatus) => void = () => {
             return;
         },
     ) {
@@ -202,11 +203,11 @@ export class ClassicGame {
 
     checkFinish(): void {
         if (this.turnsPassed >= MAX_TURNS_PASSED) {
-            this.onFinish();
+            this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
             return;
         }
-        if (this.letterPot.length !== 0 || this.players[0].easel.length !== 0 || this.players[1].easel.length !== 0) return;
-        this.onFinish();
+        if (!(this.letterPot.length === 0 || this.players[0].easel.length === 0) || this.players[1].easel.length !== 0) return;
+        this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
     }
 
     private checkMove(letters: Letter[], player: number): void {
@@ -254,5 +255,11 @@ export class ClassicGame {
 
     private letterAt(position: Vec2): Letter | null {
         return this.board[position.x][position.y];
+    }
+
+    private determineWinner(): string | null {
+        if (this.players[0].score === this.players[1].score) return null;
+        if (this.players[0].score < this.players[1].score) return this.players[1].name;
+        return this.players[0].name;
     }
 }
