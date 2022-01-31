@@ -10,6 +10,6 @@ export const loadRooms = createAction('[Room] Load Rooms');
 export const loadRoomsSuccess = createAction('[Room] Load Rooms Success', props<{ rooms: RoomInfo[] }>());
 export const loadRoomsFailed = createAction('[Room] Load Rooms Failed', props<{ error: Error }>());
 
-export const joinRoom = createAction('[Room] Join Room', props<{ playerName: string; roomId: string }>());
-export const joinRoomAccepted = createAction('[Room] Join Room Accepted', props<{ playerName: string; roomId: string }>());
-export const joinRoomDeclined = createAction('[Room] Join Room Declined', props<{ playerName: string; roomId: string }>());
+export const joinRoom = createAction('[Room] Join Room', props<{ playerName: string; roomInfo: RoomInfo }>());
+export const joinRoomAccepted = createAction('[Room] Join Room Accepted', props<{ playerName: string; roomInfo: RoomInfo }>());
+export const joinRoomDeclined = createAction('[Room] Join Room Declined', props<{ playerName: string; roomInfo: RoomInfo }>());
