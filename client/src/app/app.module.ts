@@ -9,12 +9,14 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
+import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
+import { RoomEffects } from './effects/room.effects';
 import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
@@ -44,8 +46,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         BrowserModule,
         FormsModule,
         HttpClientModule,
-        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer }),
-        EffectsModule.forRoot([DictionariesEffects]),
+        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer, room: roomReducer.reducer }),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,
