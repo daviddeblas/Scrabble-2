@@ -1,3 +1,5 @@
+import { GameOptions } from './game-options';
+
 export class RoomInfo {
-    constructor(public host: string, public roomId: string) {}
+    constructor(public roomId: string, public gameOptions: GameOptions) {}
 }

@@ -1,6 +1,7 @@
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import { GameOptions } from './game-options';
+import { RoomInfo } from './room-info';
 
 export class Room {
     started: boolean;
@@ -35,5 +36,9 @@ export class Room {
 
     quitRoomClient(): void {
         this.manager.removeRoom(this);
+    }
+
+    getRoomInfo(): RoomInfo {
+        return new RoomInfo(this.host.id, this.gameOptions);
     }
 }

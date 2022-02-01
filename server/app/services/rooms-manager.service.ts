@@ -8,8 +8,24 @@ import { Service } from 'typedi';
 export class RoomsManager {
     rooms: Room[] = [];
 
-    createRoom(socket: io.Socket, options: GameOptions): void {
-        this.rooms.push(new Room(socket, this, options));
+    setupSocketConnection(socket: io.Socket) {
+        socket.on('create room', (options) => {
+            socket.emit('create room success', this.createRoom(socket, options));
+        });
+        socket.on('request list', () => {
+            socket.emit('get list', this.getRooms());
+        });
+
+        socket.on('join room', (data) => {
+            this.joinRoom(data.roomId, socket, data.playerName);
+            socket.emit('player arrival', data.playerName);
+        });
+    }
+
+    createRoom(socket: io.Socket, options: GameOptions): RoomInfo {
+        const newRoom = new Room(socket, this, options);
+        this.rooms.push(newRoom);
+        return newRoom.getRoomInfo();
     }
 
     removeRoom(room: Room): void {
@@ -26,6 +42,6 @@ export class RoomsManager {
     }
 
     getRooms(): RoomInfo[] {
-        return this.rooms.map((r) => new RoomInfo(r.gameOptions.hostname, r.host.id));
+        return this.rooms.map((r) => r.getRoomInfo());
     }
 }
