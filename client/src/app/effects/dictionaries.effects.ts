@@ -11,7 +11,6 @@ export class DictionariesEffects {
             this.actions$.pipe(
                 ofType(loadDictionaries),
                 tap(() => {
-                    console.log('Action One Dispatched');
                     this.dictionaryService.getDictionaries();
                 }),
             ),
