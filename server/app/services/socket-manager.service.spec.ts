@@ -30,12 +30,12 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle create room event and create a new Room', (done) => {
-        const roomManagerSpy = sinon.spy(service.rooms, 'createRoom');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'createRoom');
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         setTimeout(() => {
             assert(roomManagerSpy.calledOnce);
-            assert(service.rooms.rooms.length === 1); // Une salle a bien été ajouté
+            assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
             done();
         }, RESPONSE_DELAY);
     });
@@ -58,7 +58,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and call getRooms', (done) => {
-        const roomManagerSpy = sinon.spy(service.rooms, 'getRooms');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'getRooms');
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms) => {
             expect(listOfRooms).to.deep.equal([]);
@@ -74,7 +74,7 @@ describe('SocketManager service tests', () => {
         clientSocket.emit('create room', defaultOptions);
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms: RoomInfo[]) => {
-            expect(listOfRooms.filter((room) => room.host === defaultOptions.hostname).length).to.eq(1);
+            expect(listOfRooms.filter((room) => room.gameOptions.hostname === defaultOptions.hostname).length).to.eq(1);
             expect(listOfRooms).to.be.length(1);
             done();
         });
@@ -91,7 +91,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle join room event and call joinRoom', (done) => {
-        const roomsManagerStub = sinon.stub(service.rooms);
+        const roomsManagerStub = sinon.stub(service.roomManager);
         const data = { roomId: 0, playerName: 'Second Player' };
         clientSocket.emit('join room', data);
         setTimeout(() => {
@@ -102,7 +102,7 @@ describe('SocketManager service tests', () => {
     });
 
     it("should handle join room event and emit player arrival event with the new player's name", (done) => {
-        const roomsManagerMock = sinon.mock(service.rooms);
+        const roomsManagerMock = sinon.mock(service.roomManager);
         roomsManagerMock.expects('joinRoom');
         const data = { roomId: 0, playerName: 'Second Player' };
         clientSocket.emit('join room', data);

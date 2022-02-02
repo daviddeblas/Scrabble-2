@@ -65,11 +65,11 @@ describe('Rooms Manager Service', () => {
 
     it('getRooms should return the hostname of all rooms', () => {
         roomsManager.createRoom(socket, options);
-        const expectedResult = [new RoomInfo(options.hostname, socket.id)];
+        const expectedResult = [new RoomInfo(socket.id, options)];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
-        expectedResult.push(new RoomInfo(otherOption.hostname, socket.id));
+        expectedResult.push(new RoomInfo(socket.id, otherOption));
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 
