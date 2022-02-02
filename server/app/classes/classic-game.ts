@@ -78,7 +78,9 @@ export class ClassicGame {
         this.checkMove([], player);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         this.turnsPassed++;
-        if (this.isFinished()) this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
+        if (this.isFinished()) {
+            this.finishGame(player);
+        }
     }
 
     draw(letters: Letter[], player: number): void {
@@ -198,11 +200,7 @@ export class ClassicGame {
         if (this.gameStarting) this.gameStarting = false;
         this.turnsPassed = 0;
         if (this.isFinished()) {
-            if (this.players[player].easel.length === 0 && this.letterPot.length === 0) {
-                this.players[this.activePlayer].easel.forEach((letter) => {
-                    this.players[player].score += this.pointPerLetter[letter];
-                });
-            }
+            this.finishGame(player);
             this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
         }
     }
@@ -211,6 +209,24 @@ export class ClassicGame {
         if (this.turnsPassed >= MAX_TURNS_PASSED) return true;
         if (!(this.letterPot.length === 0 || this.players[0].easel.length === 0) || this.players[1].easel.length !== 0) return true;
         return false;
+    }
+
+    private finishGame(lastPlayerToPlay: number): void {
+        if (this.players[lastPlayerToPlay].easel.length === 0 && this.letterPot.length === 0) {
+            this.players[(lastPlayerToPlay + 1) % this.players.length].easel.forEach((letter) => {
+                this.players[lastPlayerToPlay].score += this.pointPerLetter[letter];
+            });
+        }
+        this.calculateFinalPoints();
+        this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
+    }
+
+    private calculateFinalPoints(): void {
+        this.players.forEach((p) => {
+            p.easel.forEach((l) => {
+                p.score -= this.pointPerLetter[l];
+            });
+        });
     }
 
     private checkMove(letters: Letter[], player: number): void {
