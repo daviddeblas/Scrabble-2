@@ -78,7 +78,9 @@ export class ClassicGame {
         this.checkMove([], player);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         this.turnsPassed++;
-        this.checkFinish();
+        if (this.isFinished()) {
+            this.finishGame(player);
+        }
     }
 
     draw(letters: Letter[], player: number): void {
@@ -100,7 +102,6 @@ export class ClassicGame {
             if (l) this.players[player].easel.push(this.letterPot.splice(Math.round(Math.random() * this.letterPot.length), 1)[0]);
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         this.turnsPassed = 0;
-        this.checkFinish();
     }
 
     place(letters: PlacedLetter[], player: number): void {
@@ -185,7 +186,7 @@ export class ClassicGame {
         letters.forEach((l) => {
             this.board[l.position.x][l.position.y] = l.letter;
             this.players[player].easel.splice(this.players[player].easel.indexOf(l.letter), 1);
-            this.players[player].easel.push(this.takeLetterFromPot());
+            if (this.letterPot.length > 0) this.players[player].easel.push(this.takeLetterFromPot());
         });
         if (wordsPositions.length === 0) throw new GameError(GameErrorType.InvalidWord);
         let totalScoreForMove = 0;
@@ -198,16 +199,34 @@ export class ClassicGame {
         this.activePlayer = (this.activePlayer + 1) % this.players.length;
         if (this.gameStarting) this.gameStarting = false;
         this.turnsPassed = 0;
-        this.checkFinish();
+        if (this.isFinished()) {
+            this.finishGame(player);
+            this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
+        }
     }
 
-    checkFinish(): void {
-        if (this.turnsPassed >= MAX_TURNS_PASSED) {
-            this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
-            return;
+    isFinished(): boolean {
+        if (this.turnsPassed >= MAX_TURNS_PASSED) return true;
+        if (!(this.letterPot.length === 0 || this.players[0].easel.length === 0) || this.players[1].easel.length !== 0) return true;
+        return false;
+    }
+
+    private finishGame(lastPlayerToPlay: number): void {
+        if (this.players[lastPlayerToPlay].easel.length === 0 && this.letterPot.length === 0) {
+            this.players[(lastPlayerToPlay + 1) % this.players.length].easel.forEach((letter) => {
+                this.players[lastPlayerToPlay].score += this.pointPerLetter[letter];
+            });
         }
-        if (!(this.letterPot.length === 0 || this.players[0].easel.length === 0) || this.players[1].easel.length !== 0) return;
+        this.calculateFinalPoints();
         this.onFinish(new GameFinishStatus(this.players, this.determineWinner()));
+    }
+
+    private calculateFinalPoints(): void {
+        this.players.forEach((p) => {
+            p.easel.forEach((l) => {
+                p.score -= this.pointPerLetter[l];
+            });
+        });
     }
 
     private checkMove(letters: Letter[], player: number): void {
@@ -223,6 +242,7 @@ export class ClassicGame {
     }
 
     private takeLetterFromPot(): Letter {
+        if (this.letterPot.length === 0) throw new Error('Unexpected empty letter pot');
         return this.letterPot.splice(Math.round(Math.random() * this.letterPot.length), 1)[0];
     }
 

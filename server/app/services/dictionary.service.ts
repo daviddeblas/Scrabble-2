@@ -17,6 +17,6 @@ export class DictionaryService {
 
     isWord(word: Letter[]): boolean {
         // TODO remplacer cette recherche lineaire qui est trop longue
-        return this.dictionary.words.find((w) => w === lettersToString(word).toLowerCase()) === undefined;
+        return this.dictionary.words.find((w) => new RegExp(lettersToString(word).toLowerCase().replace('*', '.')).test(w)) === undefined;
     }
 }
