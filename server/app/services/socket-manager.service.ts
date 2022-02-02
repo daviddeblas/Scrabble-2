@@ -6,6 +6,9 @@ import { RoomsManager } from './rooms-manager.service';
 @Service()
 export class SocketService {
     private sio: io.Server;
+    private tempClientSocketId: string;
+    private tempServerSocket: io.Socket;
+    private timeoutId: ReturnType<typeof setTimeout>;
 
     constructor(server: http.Server, public rooms: RoomsManager) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
@@ -23,6 +26,21 @@ export class SocketService {
             socket.on('join room', (data) => {
                 this.rooms.joinRoom(data.roomId, socket, data.playerName);
                 socket.emit('player arrival', data.playerName);
+            });
+            socket.on('closed browser', (userId) => {
+                this.tempClientSocketId = userId;
+                this.tempServerSocket = socket;
+                const maxTimeForReload = 5000;
+                this.timeoutId = setTimeout(() => {
+                    const clientSocket = rooms.getOpponentSocket(socket.id);
+                    clientSocket?.emit('victory');
+                }, maxTimeForReload);
+            });
+            socket.on('browser reconnection', (oldClientId) => {
+                if (oldClientId === this.tempClientSocketId) {
+                    clearTimeout(this.timeoutId);
+                    socket = this.tempServerSocket;
+                }
             });
         });
     }
