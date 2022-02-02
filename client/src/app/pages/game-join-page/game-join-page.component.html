@@ -8,7 +8,8 @@
                     <input matInput formControlName="name" placeholder="Nom" />
                 </mat-form-field>
                 <mat-card-actions>
-                    <button mat-raised-button matStepperNext color="primary" type="submit" id="confirm-name" class="centered">Confirmer</button>
+                    <button mat-raised-button matStepperNext color="primary" type="submit" id="confirm-name"
+                        class="centered">Confirmer</button>
                 </mat-card-actions>
             </form>
         </mat-card>
@@ -18,7 +19,10 @@
         <ng-template matStepLabel>Rejoindre une partie</ng-template>
         <h3>Rooms:</h3>
         <mat-list>
-            <mat-list-item *ngFor="let host of hosts$ | async">{{ host.gameOptions.hostname }}</mat-list-item>
+            <mat-list-item *ngFor="let host of hosts$ | async">
+                <h2 class='room-name'>{{ host.gameOptions.hostname }}</h2>
+                <button mat-raised-button color='success' class='join-button'>Join</button>
+            </mat-list-item>
         </mat-list>
     </mat-step>
 </mat-stepper>
