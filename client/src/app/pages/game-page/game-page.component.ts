@@ -19,6 +19,15 @@ export class GamePageComponent {
         document.cookie = 'socket=' + (this.socketService.socket.id || '') + expires + '; path=/';
     }
 
+    @HostListener('window:load')
+    onloadHandler() {
+        if (!this.socketService.isSocketAlive()) {
+            this.socketService.connect();
+            const oldSocketId = this.readCookieSocket;
+            if (oldSocketId !== undefined) this.socketService.send('browser reconnection', oldSocketId);
+        }
+    }
+
     get readCookieSocket(): string | undefined {
         const cookieName = 'socket';
         const cookies = document.cookie.split(';');
