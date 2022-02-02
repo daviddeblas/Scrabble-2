@@ -10,17 +10,19 @@ export interface RoomState {
     pendingPlayer?: string;
 
     // For Joining
-    roomList?: RoomInfo[];
+    roomList: RoomInfo[];
     pendingRoom?: RoomInfo;
 }
 
-export const initialState: RoomState = {};
+export const initialState: RoomState = {
+    roomList: [],
+};
 
 export const reducer = createReducer(
     initialState,
     // For hosting
     on(roomActions.createRoomSuccess, (state, { roomInfo }) => ({ ...state, roomInfo })),
-    on(roomActions.closeRoom, () => ({})),
+    on(roomActions.closeRoom, () => initialState),
     on(roomActions.joinInviteReceived, (state, { playerName }) => ({ ...state, pendingPlayer: playerName })),
     on(roomActions.refuseInvite, (state) => ({ ...state, pendingPlayer: undefined })),
 

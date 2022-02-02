@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { createRoomSuccess, joinInviteReceived } from '@app/actions/room.actions';
+import { createRoomSuccess, joinInviteReceived, loadRoomsSuccess } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { Store } from '@ngrx/store';
@@ -35,5 +35,12 @@ export class RoomService {
 
     closeRoom() {
         this.socketService.send('quit');
+    }
+
+    fetchRoomList() {
+        this.socketService.send('request list');
+        this.socketService.on('get list', (roomInfo: RoomInfo[]) => {
+            this.store.dispatch(loadRoomsSuccess({ rooms: roomInfo }));
+        });
     }
 }
