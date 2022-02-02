@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
+import { createRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
@@ -29,7 +30,12 @@ export class MultiConfigWindowComponent implements OnInit {
     readonly defaultTimer: number = DEFAULT_TIMER;
     readonly timerIncrement: number = TIMER_INCREMENT;
 
-    constructor(private fb: FormBuilder, public roomService: RoomService, dictionariesStore: Store<{ dictionaries: string[] }>, store: Store) {
+    constructor(
+        private fb: FormBuilder,
+        public roomService: RoomService,
+        dictionariesStore: Store<{ dictionaries: string[] }>,
+        private store: Store,
+    ) {
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');
         store.dispatch(loadDictionaries());
@@ -56,6 +62,6 @@ export class MultiConfigWindowComponent implements OnInit {
             dictionaryType: this.settingsForm.controls.selectedDictionary.value,
             timePerRound: this.timer,
         };
-        this.roomService.createRoom(gameOptions);
+        this.store.dispatch(createRoom({ gameOptions }));
     }
 }
