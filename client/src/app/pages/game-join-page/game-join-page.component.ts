@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { loadRooms } from '@app/actions/room.actions';
+import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { RoomState } from '@app/reducers/room.reducer';
 import { Store } from '@ngrx/store';
@@ -11,18 +11,25 @@ import { Observable } from 'rxjs';
     templateUrl: './game-join-page.component.html',
     styleUrls: ['./game-join-page.component.scss'],
 })
-export class GameJoinPageComponent implements OnInit {
+export class GameJoinPageComponent {
     formGroup: FormGroup;
-    hosts$: Observable<RoomInfo[]>;
+    roomList$: Observable<RoomInfo[]>;
+    pendingRooms$: Observable<RoomInfo | undefined>;
 
-    constructor(formBuilder: FormBuilder, roomStore: Store<{ room: RoomState }>, store: Store) {
+    constructor(formBuilder: FormBuilder, roomStore: Store<{ room: RoomState }>, private store: Store) {
         this.formGroup = formBuilder.group({
             name: ['', Validators.required],
         });
 
-        this.hosts$ = roomStore.select('room', 'roomList');
-        store.dispatch(loadRooms());
+        this.roomList$ = roomStore.select('room', 'roomList');
+        this.pendingRooms$ = roomStore.select('room', 'pendingRoom');
+        this.store.dispatch(loadRooms());
+    }
+    joinGame(roomInfo: RoomInfo): void {
+        this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo }));
     }
 
-    ngOnInit(): void {}
+    cancelJoin(roomInfo: RoomInfo): void {
+        this.store.dispatch(cancelJoinRoom({ roomInfo }));
+    }
 }

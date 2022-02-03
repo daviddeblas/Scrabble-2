@@ -10,6 +10,13 @@
     display: contents;
 }
 
-.join-button {
-    float: right;
+.button {
+    width: 120px;
+    height: 36px;
+}
+
+.cancel {
+    position: absolute;
+    right: 18px;
+    top: 0px;
 }

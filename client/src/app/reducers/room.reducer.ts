@@ -29,5 +29,6 @@ export const reducer = createReducer(
     // For joining
     on(roomActions.loadRoomsSuccess, (state, { rooms }) => ({ ...state, roomList: rooms })),
     on(roomActions.joinRoom, (state, { roomInfo }) => ({ ...state, pendingRoom: roomInfo })),
+    on(roomActions.cancelJoinRoom, (state) => ({ ...state, pendingRoom: undefined })),
     on(roomActions.joinRoomDeclined, (state) => ({ ...state, pendingRoom: undefined })),
 );
