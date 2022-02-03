@@ -22,7 +22,8 @@
             <mat-list-item *ngFor="let room of roomList$ | async">
                 <h2 class='room-name'>{{ room.gameOptions.hostname }}</h2>
                 <button mat-raised-button matStepperNext color="primary" class="button"
-                    *ngIf="(pendingRooms$ | async) === undefined; else elseCancelButton" (click)="joinGame(room)">
+                    [disabled]="(pendingRooms$ | async) !== undefined"
+                    *ngIf="(pendingRooms$ | async) !== room; else elseCancelButton" (click)="joinGame(room)">
                     Rejoindre
                 </button>
                 <ng-template #elseCancelButton>
