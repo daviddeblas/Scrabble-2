@@ -28,8 +28,9 @@ export class RoomsManager {
         return this.rooms.map((r) => r.gameOptions.hostname);
     }
 
-    getOpponentSocket(playerServerId: string): io.Socket | null | undefined {
+    getOpponentSocket(playerServerId: string): io.Socket | undefined {
         const room = this.rooms.find((r) => r.host.id === playerServerId || r.clients[0]?.id === playerServerId);
+        if (room?.clients[0] === null) return undefined;
         return room?.host.id === playerServerId ? room.clients[0] : room?.host;
     }
 }

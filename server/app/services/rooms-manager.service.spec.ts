@@ -72,8 +72,37 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 
-    it('getRooms should return empty list if no rooms ar created', () => {
+    it('getRooms should return empty list if no rooms are created', () => {
         const expectedResult: Room[] = [];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
+    });
+
+    it('getOpponentSocket should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        roomsManager.createRoom(socket, otherOption);
+        expect(roomsManager.getOpponentSocket('Tristan')).to.deep.equal(undefined);
+    });
+
+    it('getOpponentSocket should return the host socket if the opponent socket Id is passed as a parameter', () => {
+        const opponentSocket = { id: 'Opponent' } as unknown as Socket;
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        roomsManager.createRoom(socket, otherOption);
+        roomsManager.rooms[0].clients[0] = opponentSocket;
+        expect(roomsManager.getOpponentSocket(opponentSocket.id)).to.equal(socket);
+    });
+
+    it('getOpponentSocket should return the client socket if the host socket Id is passed as a parameter', () => {
+        const opponentSocket = { id: 'Opponent' } as unknown as Socket;
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        roomsManager.createRoom(socket, otherOption);
+        roomsManager.rooms[0].clients[0] = opponentSocket;
+        expect(roomsManager.getOpponentSocket(socket.id)).to.equal(opponentSocket);
+    });
+
+    it('getOpponentSocket should return undefined if the room clients are null', () => {
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        roomsManager.createRoom(socket, otherOption);
+        roomsManager.rooms[0].clients[0] = null;
+        expect(roomsManager.getOpponentSocket(socket.id)).to.equal(undefined);
     });
 });
