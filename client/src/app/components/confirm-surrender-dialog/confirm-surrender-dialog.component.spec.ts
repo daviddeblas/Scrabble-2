@@ -14,16 +14,16 @@ describe('ConfirmSurrenderComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [ConfirmSurrenderDialogComponent],
             imports: [AppMaterialModule],
-            providers: [ 
-                { 
-                    provide: MAT_DIALOG_DATA, 
-                    useValue: {} },
+            providers: [
+                {
+                    provide: MAT_DIALOG_DATA,
+                    useValue: {},
+                },
                 {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
-                }
-            ]
-                
+                },
+            ],
         }).compileComponents();
     });
 
@@ -43,7 +43,7 @@ describe('ConfirmSurrenderComponent', () => {
     });
 
     it('should call the closeDialog method when surrenderGame is called', () => {
-        const spy = spyOn(component, "closeDialog");
+        const spy = spyOn(component, 'closeDialog');
         component.surrenderGame();
         expect(spy).toHaveBeenCalled();
     });
