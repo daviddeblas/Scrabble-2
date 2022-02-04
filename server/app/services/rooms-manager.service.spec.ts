@@ -46,7 +46,7 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.rooms).to.be.length(1);
         const playerName = 'Second player';
         expect(roomsManager.rooms[0].clients[0]).to.be.equal(undefined);
-        roomsManager.joinRoom(1, socket, playerName);
+        roomsManager.joinRoom('1', socket, playerName);
         expect(roomsManager.rooms[0].clients[0]).to.deep.equal(socket);
     });
 
@@ -56,7 +56,7 @@ describe('Rooms Manager Service', () => {
         const expectedMessage = 'Game not found';
         try {
             const playerName = 'Second player';
-            roomsManager.joinRoom(1, socket, playerName);
+            roomsManager.joinRoom('1', socket, playerName);
         } catch (error) {
             errorMessage = error.message;
         }

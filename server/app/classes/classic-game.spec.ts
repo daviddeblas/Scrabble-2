@@ -1,6 +1,5 @@
 import { AMT_OF_LETTERS_IN_EASEL, BOARD_HEIGHT, BOARD_WIDTH, ClassicGame } from '@app/classes/classic-game';
 import { Letter, stringToLetters } from '@app/classes/letter';
-import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
@@ -10,7 +9,6 @@ import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
 
 describe('ClassicGame', () => {
-    let dictionary: DictionaryService;
     let game: ClassicGame;
     let hasActivated: boolean;
 
@@ -19,9 +17,7 @@ describe('ClassicGame', () => {
     };
 
     beforeEach(() => {
-        dictionary = Container.get(DictionaryService);
-        const letterConfig = Container.get(GameConfigService);
-        game = new ClassicGame(dictionary, letterConfig, finishFunction);
+        game = new ClassicGame(finishFunction);
         hasActivated = false;
     });
 
@@ -178,7 +174,7 @@ describe('ClassicGame', () => {
     });
 
     it('endgame default', () => {
-        game = new ClassicGame(Container.get(DictionaryService), Container.get(GameConfigService));
+        game = new ClassicGame();
         for (let i = 0; i < 6; i++) game.skip(game.activePlayer);
     });
 });
