@@ -1,6 +1,7 @@
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import { ClassicGame } from './classic-game';
+import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { RoomInfo } from './room-info';
 
@@ -39,9 +40,15 @@ export class Room {
         this.initGame();
     }
 
+    endGame(info: GameFinishStatus): void {
+        this.sockets.forEach((socket) => {
+            socket.emit('end game', info);
+        });
+    }
+
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
-        this.game = new ClassicGame();
+        this.game = new ClassicGame(this.endGame);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
         this.sockets.forEach((socket, index) => {
