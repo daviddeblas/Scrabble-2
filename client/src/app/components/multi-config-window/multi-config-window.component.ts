@@ -57,11 +57,7 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     onSubmit(): void {
-        const gameOptions: GameOptions = {
-            hostname: this.settingsForm.controls.name.value,
-            dictionaryType: this.settingsForm.controls.selectedDictionary.value,
-            timePerRound: this.timer,
-        };
+        const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
         this.store.dispatch(createRoom({ gameOptions }));
     }
 }
