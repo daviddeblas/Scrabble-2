@@ -5,22 +5,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GameOptions } from '@app/classes/game-options';
-import { SocketTestHelper } from '@app/helper/socket-test-helper';
+import { acceptInvite, closeRoom, refuseInvite } from '@app/actions/room.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { SocketClientService } from '@app/services/socket-client.service';
-import { Socket } from 'socket.io-client';
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { WaitingRoomComponent } from './waiting-room.component';
-
-class SocketClientServiceMock extends SocketClientService {
-    connected = false;
-    override connect() {
-        this.connected = true; // Permet de ne pas se reconnecter
-    }
-    override isSocketAlive() {
-        return this.connected;
-    }
-}
 
 describe('WaitingRoomComponent', () => {
     let component: WaitingRoomComponent;
@@ -28,13 +17,12 @@ describe('WaitingRoomComponent', () => {
     const mockDialogSpy: { close: jasmine.Spy } = {
         close: jasmine.createSpy('close'),
     };
-    let socketHelper: SocketTestHelper;
-    let socketServiceMock: SocketClientServiceMock;
+
+    let store: jasmine.SpyObj<Store>;
 
     beforeEach(async () => {
-        socketHelper = new SocketTestHelper();
-        socketServiceMock = new SocketClientServiceMock();
-        socketServiceMock.socket = socketHelper as unknown as Socket;
+        store = jasmine.createSpyObj<Store>('store', ['dispatch', 'select']);
+
         await TestBed.configureTestingModule({
             declarations: [WaitingRoomComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, FormsModule],
@@ -48,8 +36,8 @@ describe('WaitingRoomComponent', () => {
                     useValue: mockDialogSpy,
                 },
                 {
-                    provide: SocketClientService,
-                    useValue: socketServiceMock,
+                    provide: Store,
+                    useValue: store,
                 },
             ],
         }).compileComponents();
@@ -65,82 +53,34 @@ describe('WaitingRoomComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should close the window when the begin button is clicked', () => {
-        component.closeDialog();
+    it('should close the window and dispatch "[Room] Accept Invite" when the begin button is clicked', () => {
+        component.acceptInvite();
+        expect(store.dispatch).toHaveBeenCalledWith(acceptInvite());
         expect(mockDialogSpy.close).toHaveBeenCalled();
     });
 
-    it('should send an accept event', () => {
-        const spy = spyOn(component.socketService, 'send');
-        const eventName = 'accept';
-        component.closeDialog();
-        expect(spy).toHaveBeenCalledWith(eventName);
-    });
-
-    it('The démarrer button should be disabled when player 2 is coming', () => {
-        component.player2 = 'Johnson';
+    it('The démarrer button should be enabled when player 2 is coming', () => {
+        component.player2$ = of('Johnson');
         fixture.detectChanges();
         const beginButton = document.getElementsByTagName('button')[1];
         expect(beginButton.disabled).toBeFalse();
     });
 
     it('should hide the waiting-section if the player 2 is here', () => {
-        component.player2 = 'Johnson';
+        component.player2$ = of('Johnson');
         fixture.detectChanges();
         expect(fixture.debugElement.query(By.css('#waiting-section'))).toBeNull();
     });
 
-    describe('Receiving events', () => {
-        it('should handle gameSettings event with the three settings from the server', () => {
-            let gameSettings = new GameOptions();
-            gameSettings = { hostname: 'Jack', dictionaryType: 'Français', timePerRound: 60 };
-            socketHelper.peerSideEmit('game settings', gameSettings);
-            expect(component.player1).toBe(gameSettings.hostname);
-            expect(component.timer).toBe(gameSettings.timePerRound);
-            expect(component.dictionary).toBe(gameSettings.dictionaryType);
-        });
-
-        it('should handle player joining event with a name for the player 2', () => {
-            const name = 'Leonardo';
-            socketHelper.peerSideEmit('player joining', name);
-            expect(component.player2).toBe(name);
-        });
-    });
-
-    it('should send the event refuse to the server and reset player2', () => {
-        const spy = spyOn(component.socketService, 'send');
-        const eventName = 'refuse';
-        const testString = 'Leonardo';
-        component.player2 = testString;
+    it('should dispatch "[Room] Refuse Invite" when clicking on "refuser"', () => {
         component.rejectInvite();
-        expect(spy).toHaveBeenCalledWith(eventName);
-        expect(component.player2).toEqual('');
+        expect(store.dispatch).toHaveBeenCalledWith(refuseInvite());
     });
 
-    it('should called quitWaitingRoom if there is a player 2', () => {
-        component.stepper = {
-            reset: () => {
-                return;
-            },
-        } as MatStepper;
-        component.player2 = 'AlexTerrieur';
+    it('should dispatch "[Room] Close room" and reset form when clicking on "Annuler"', () => {
+        component.stepper = jasmine.createSpyObj<MatStepper>(['reset']);
         component.quitWaitingRoom();
-        expect(component.player2).toEqual('');
-    });
-
-    it('should only call the stepper.reset if player 2 is undefined', () => {
-        component.stepper = {
-            reset: () => {
-                return;
-            },
-        } as MatStepper;
-        component.quitWaitingRoom();
-        expect(component.player2).toBeUndefined();
-    });
-
-    it('should not be able to reconnect after the initialization', () => {
-        const spy = spyOn(socketServiceMock, 'connect');
-        component.connect();
-        expect(spy).toHaveBeenCalledTimes(0);
+        expect(store.dispatch).toHaveBeenCalledWith(closeRoom());
+        expect(component.stepper.reset).toHaveBeenCalled();
     });
 });
