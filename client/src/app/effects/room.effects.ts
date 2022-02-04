@@ -89,9 +89,5 @@ export class RoomEffects {
 
     dialogRef: MatDialogRef<GameJoinPageComponent>;
 
-    constructor(
-        private actions$: Actions,
-        private roomService: RoomService,
-        private router: Router,
-    ) {}
+    constructor(private actions$: Actions, private roomService: RoomService, private router: Router) {}
 }

@@ -5,21 +5,18 @@ import { Observable } from 'rxjs';
 import { DictionariesEffects } from './dictionaries.effects';
 
 describe('DictionariesEffects', () => {
-  let actions$: Observable<any>;
-  let effects: DictionariesEffects;
+    let actions$: Observable<any>;
+    let effects: DictionariesEffects;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        DictionariesEffects,
-        provideMockActions(() => actions$)
-      ]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [DictionariesEffects, provideMockActions(() => actions$)],
+        });
+
+        effects = TestBed.inject(DictionariesEffects);
     });
 
-    effects = TestBed.inject(DictionariesEffects);
-  });
-
-  it('should be created', () => {
-    expect(effects).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(effects).toBeTruthy();
+    });
 });

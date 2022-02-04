@@ -5,21 +5,18 @@ import { Observable } from 'rxjs';
 import { RoomEffects } from './room.effects';
 
 describe('RoomEffects', () => {
-  let actions$: Observable<any>;
-  let effects: RoomEffects;
+    let actions$: Observable<any>;
+    let effects: RoomEffects;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        RoomEffects,
-        provideMockActions(() => actions$)
-      ]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [RoomEffects, provideMockActions(() => actions$)],
+        });
+
+        effects = TestBed.inject(RoomEffects);
     });
 
-    effects = TestBed.inject(RoomEffects);
-  });
-
-  it('should be created', () => {
-    expect(effects).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(effects).toBeTruthy();
+    });
 });
