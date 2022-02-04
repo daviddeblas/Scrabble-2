@@ -1,6 +1,9 @@
 /* eslint-disable no-invalid-this */
 import { Injectable } from '@angular/core';
-import { acceptInvite, closeRoom, createRoom, joinRoom, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { acceptInvite, closeRoom, createRoom, joinRoom, joinRoomAccepted, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { RoomService } from '@app/services/room.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { tap } from 'rxjs/operators';
@@ -72,5 +75,23 @@ export class RoomEffects {
         { dispatch: false },
     );
 
-    constructor(private actions$: Actions, private roomService: RoomService) {}
+    acceptedRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(joinRoomAccepted),
+                tap(() => {
+                    this.router.navigateByUrl('game');
+                    this.dialogRef.close();
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    dialogRef: MatDialogRef<GameJoinPageComponent>;
+
+    constructor(
+        private actions$: Actions,
+        private roomService: RoomService,
+        private router: Router,
+    ) {}
 }

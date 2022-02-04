@@ -24,10 +24,10 @@ export class WaitingRoomComponent implements OnDestroy {
         private dialogRef: MatDialogRef<GamePreparationPageComponent>,
         public socketService: SocketClientService,
         private store: Store,
-        roomStore: Store<RoomState>,
+        roomStore: Store<{ room: RoomState }>,
     ) {
-        this.roomInfo$ = roomStore.select('roomInfo');
-        this.player2$ = roomStore.select('pendingPlayer');
+        this.roomInfo$ = roomStore.select('room', 'roomInfo');
+        this.player2$ = roomStore.select('room', 'pendingPlayer');
     }
 
     acceptInvite(): void {

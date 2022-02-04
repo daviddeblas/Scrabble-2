@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { createRoomSuccess, joinInviteReceived, loadRoomsSuccess } from '@app/actions/room.actions';
+import { createRoomSuccess, joinInviteReceived, joinRoomAccepted, joinRoomDeclined, loadRoomsSuccess } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { Store } from '@ngrx/store';
@@ -48,10 +48,10 @@ export class RoomService {
     joinRoom(roomInfo: RoomInfo, playerName: string) {
         this.socketService.send('join room', { roomId: roomInfo.roomId, playerName });
         this.socketService.on('accepted', () => {
-            console.log('accepted');
+            this.store.dispatch(joinRoomAccepted({ roomInfo, playerName }));
         });
         this.socketService.on('refused', () => {
-            console.log('refused');
+            this.store.dispatch(joinRoomDeclined({ roomInfo, playerName }));
         });
     }
 }
