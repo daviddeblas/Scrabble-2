@@ -16,6 +16,7 @@ export class RoomService {
 
         this.socketService.on('create room success', (roomInfo: RoomInfo) => {
             this.store.dispatch(createRoomSuccess({ roomInfo }));
+            this.waitForInvitations();
         });
     }
 
@@ -41,6 +42,16 @@ export class RoomService {
         this.socketService.send('request list');
         this.socketService.on('get list', (roomInfo: RoomInfo[]) => {
             this.store.dispatch(loadRoomsSuccess({ rooms: roomInfo }));
+        });
+    }
+
+    joinRoom(roomInfo: RoomInfo, playerName: string) {
+        this.socketService.send('join room', { roomId: roomInfo.roomId, playerName });
+        this.socketService.on('accepted', () => {
+            console.log('accepted');
+        });
+        this.socketService.on('refused', () => {
+            console.log('refused');
         });
     }
 }

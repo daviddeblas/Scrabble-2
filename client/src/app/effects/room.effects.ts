@@ -1,6 +1,6 @@
 /* eslint-disable no-invalid-this */
 import { Injectable } from '@angular/core';
-import { acceptInvite, closeRoom, createRoom, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import { acceptInvite, closeRoom, createRoom, joinRoom, loadRooms, refuseInvite } from '@app/actions/room.actions';
 import { RoomService } from '@app/services/room.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { tap } from 'rxjs/operators';
@@ -56,6 +56,17 @@ export class RoomEffects {
                 ofType(loadRooms),
                 tap(() => {
                     this.roomService.fetchRoomList();
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    joinRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(joinRoom),
+                tap((action) => {
+                    this.roomService.joinRoom(action.roomInfo, action.playerName);
                 }),
             ),
         { dispatch: false },

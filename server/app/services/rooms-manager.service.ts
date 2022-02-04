@@ -18,7 +18,7 @@ export class RoomsManager {
 
         socket.on('join room', (data) => {
             this.joinRoom(data.roomId, socket, data.playerName);
-            socket.emit('player arrival', data.playerName);
+            socket.emit('player joining', data.playerName);
         });
     }
 
@@ -32,8 +32,8 @@ export class RoomsManager {
         this.rooms.splice(this.rooms.indexOf(room), 1);
     }
 
-    joinRoom(roomId: number, socket: io.Socket, name: string): void {
-        const room = this.rooms.find((r) => r.host.id === roomId.toString());
+    joinRoom(roomId: string, socket: io.Socket, name: string): void {
+        const room = this.rooms.find((r) => r.getRoomInfo().roomId === roomId);
         if (room) {
             room.join(socket, name);
         } else {

@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { closeRoom, refuseInvite } from '@app/actions/room.actions';
+import { acceptInvite, closeRoom, refuseInvite } from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { RoomState } from '@app/reducers/room.reducer';
@@ -30,8 +30,8 @@ export class WaitingRoomComponent implements OnDestroy {
         this.player2$ = roomStore.select('pendingPlayer');
     }
 
-    closeDialog(): void {
-        this.store.dispatch(closeRoom());
+    acceptInvite(): void {
+        this.store.dispatch(acceptInvite());
         this.dialogRef.close();
     }
     rejectInvite(): void {
