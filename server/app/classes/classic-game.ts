@@ -6,6 +6,7 @@ import { Player } from '@app/classes/player';
 import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
+import Container from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 
 export const AMT_OF_LETTERS_IN_EASEL = 7;
@@ -27,8 +28,6 @@ export class ClassicGame {
     turnsPassed: number;
 
     constructor(
-        private dictionaryService: DictionaryService,
-        gameConfigService: GameConfigService,
         private onFinish: (info: GameFinishStatus) => void = () => {
             return;
         },
@@ -54,7 +53,7 @@ export class ClassicGame {
         this.activePlayer = 0;
         this.letterPot = [];
         this.pointPerLetter = new Map();
-        const config = gameConfigService.getConfigFromName('Classic');
+        const config = Container.get(GameConfigService).getConfigFromName('Classic');
         config.multipliers.forEach((mul) => {
             mul.positions.forEach((pos) => {
                 this.multipliers[pos.x][pos.y] = new Multiplier(mul.multiplier.amt, mul.multiplier.type);
@@ -140,7 +139,7 @@ export class ClassicGame {
             }
             if (word.length > 1) {
                 // TODO Validate correctly with blanks
-                if (this.dictionaryService.isWord(word)) throw new GameError(GameErrorType.InvalidWord);
+                if (Container.get(DictionaryService).isWord(word)) throw new GameError(GameErrorType.InvalidWord);
                 const wordShouldBeAdded =
                     wordsPositions.filter((wordPos) => {
                         let isTheSame = true;
@@ -167,7 +166,7 @@ export class ClassicGame {
             }
             if (word.length > 1) {
                 // TODO Validate correctly with blanks
-                if (this.dictionaryService.isWord(word)) throw new GameError(GameErrorType.InvalidWord);
+                if (Container.get(DictionaryService).isWord(word)) throw new GameError(GameErrorType.InvalidWord);
                 const wordShouldBeAdded =
                     wordsPositions.filter((wordPos) => {
                         let isTheSame = true;

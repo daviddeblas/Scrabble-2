@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { startNewRound } from '@app/actions/game-status.actions';
+import { getGameStatus } from '@app/actions/game-status.actions';
+import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -8,15 +9,7 @@ import { Store } from '@ngrx/store';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(private store: Store) {}
-
-    async dispatchTest(): Promise<void> {
-        for (let i = 0; i < 100; i++) {
-            this.store.dispatch(startNewRound({ activePlayer: 'test' + i }));
-        }
-    }
-
-    ngOnInit(): void {
-        this.dispatchTest();
+    constructor(private store: Store<GameStatus>) {
+        this.store.dispatch(getGameStatus());
     }
 }
