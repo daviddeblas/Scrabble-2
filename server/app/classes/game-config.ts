@@ -3,8 +3,10 @@ import { PositionedMultipliers } from './positioned-multipliers';
 import { Vec2 } from './vec2';
 
 export class GameConfig {
-    name: string;
-    letters: LetterConfigItem[];
-    boardSize: Vec2;
-    multipliers: PositionedMultipliers[];
+    constructor(
+        public name: string = 'default',
+        public letters: LetterConfigItem[] = [],
+        public boardSize: Vec2 = new Vec2(0, 0),
+        public multipliers: PositionedMultipliers[] = [],
+    ) {}
 }

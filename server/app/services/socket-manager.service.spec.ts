@@ -42,8 +42,8 @@ describe('SocketManager service tests', () => {
     it('should handle create room event and emit game settings event', (done) => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
-        clientSocket.on('game settings', (returnedOptions: GameOptions) => {
-            expect(defaultOptions).to.deep.equal(returnedOptions);
+        clientSocket.on('create room success', (info: RoomInfo) => {
+            expect(defaultOptions).to.deep.equal(info.gameOptions);
             done();
         });
     });
@@ -99,17 +99,6 @@ describe('SocketManager service tests', () => {
             done();
         }, RESPONSE_DELAY);
         done();
-    });
-
-    it("should handle join room event and emit player arrival event with the new player's name", (done) => {
-        const roomsManagerMock = sinon.mock(service.roomManager);
-        roomsManagerMock.expects('joinRoom');
-        const data = { roomId: 0, playerName: 'Second Player' };
-        clientSocket.emit('join room', data);
-        clientSocket.on('player arrival', (playerName: string) => {
-            expect(playerName).to.deep.equal(data.playerName);
-            done();
-        });
     });
 
     it('isOpen should return true when set to default value', (done) => {

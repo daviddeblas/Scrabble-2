@@ -68,6 +68,7 @@ export class ClassicGame {
 
         // chevalet de depart
         this.players.forEach((p) => {
+            p.score = 0;
             for (let i = 0; i < AMT_OF_LETTERS_IN_EASEL; i++)
                 p.easel.push(this.letterPot.splice(Math.round(Math.random() * this.letterPot.length), 1)[0]);
         });
@@ -206,7 +207,7 @@ export class ClassicGame {
 
     isFinished(): boolean {
         if (this.turnsPassed >= MAX_TURNS_PASSED) return true;
-        if (!(this.letterPot.length === 0 || this.players[0].easel.length === 0) || this.players[1].easel.length !== 0) return true;
+        if (this.letterPot.length === 0 && (this.players[0].easel.length === 0 || this.players[1].easel.length === 0)) return true;
         return false;
     }
 
