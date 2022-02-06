@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { chatMessageReceived } from '@app/actions/chat.actions';
+import { exchangeLetters, placeWord, skipTurn } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
+import { stringToLetters } from '@app/classes/letter';
+import { Vec2 } from '@app/classes/vec2';
+import { Direction, Word } from '@app/classes/word';
 import { Store } from '@ngrx/store';
 import { SocketClientService } from './socket-client.service';
-
+const POSITION_LAST_CHAR = -1;
 @Injectable({
     providedIn: 'root',
 })
 export class ChatService {
     constructor(private store: Store, private socketService: SocketClientService) {}
+
     sendMsg(username: string, message: string) {
         this.socketService.send('send message', { username, message });
     }
@@ -26,7 +31,20 @@ export class ChatService {
             switch (command[0]) {
                 case '!placer': {
                     if (this.validatePlaceCommand(command)) {
-                        // Envoyer placer a un autre effect
+                        let placedWord: Word;
+                        let position: Vec2;
+                        if (/^[vh]$/.test(command[1].slice(POSITION_LAST_CHAR))) {
+                            position = { x: parseInt(command[1].slice(0), 10), y: parseInt(command[1].slice(1, POSITION_LAST_CHAR), 10) };
+                            placedWord = new Word(
+                                stringToLetters(command[2]),
+                                position,
+                                command[1].slice(POSITION_LAST_CHAR) === 'h' ? Direction.HORIZONTAL : Direction.VERTICAL,
+                            );
+                        } else {
+                            position = { x: parseInt(command[1].slice(0), 10), y: parseInt(command[1].substring(1), 10) };
+                            placedWord = new Word(stringToLetters(command[2]), position);
+                        }
+                        this.store.dispatch(placeWord({ word: placedWord }));
                     } else {
                         this.store.dispatch(chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -35,7 +53,7 @@ export class ChatService {
                 }
                 case '!échanger': {
                     if (this.validateExchangeCommand(command)) {
-                        // Envoyer exchanger a un autre effect
+                        this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
                     } else {
                         this.store.dispatch(chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -44,7 +62,7 @@ export class ChatService {
                 }
                 case '!passer': {
                     if (command.length === 1) {
-                        // Appelé le l'effect passé
+                        this.store.dispatch(skipTurn());
                     } else {
                         this.store.dispatch(chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -72,8 +90,7 @@ export class ChatService {
             const maxColumnNumber = 15;
             commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
             if (command[2].length > 1) {
-                const positionLastChar = -1;
-                commandIsCorrect &&= /^[vh]$/.test(command[1].slice(positionLastChar));
+                commandIsCorrect &&= /^[vh]$/.test(command[1].slice(POSITION_LAST_CHAR));
             }
         }
         return commandIsCorrect;
@@ -81,6 +98,6 @@ export class ChatService {
 
     private validateExchangeCommand(command: string[]): boolean {
         // Verifier que seulement des lettres sont présente dans la commande
-        return /^[a-z]*$/.test(command[1]);
+        return /^[a-z]*$/.test(command[1]) && command.length === 2;
     }
 }
