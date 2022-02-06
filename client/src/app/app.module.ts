@@ -52,7 +52,12 @@ import * as chatReducer from './reducer/chat.reducer';
         BrowserModule,
         FormsModule,
         HttpClientModule,
-        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer, room: roomReducer.reducer, game: gameReducer.reducer, chat: chatReducer.reducer }),
+        StoreModule.forRoot({
+            dictionaries: dictionariesReducer.reducer,
+            room: roomReducer.reducer,
+            game: gameReducer.reducer,
+            chat: chatReducer.reducer,
+        }),
         EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, ChatEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
