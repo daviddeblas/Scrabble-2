@@ -12,10 +12,12 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { ChatEffects } from './effects/chat.effects';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 import * as chatReducer from './reducer/chat.reducer';
@@ -37,6 +39,7 @@ import * as chatReducer from './reducer/chat.reducer';
         ReactiveFormsModule,
         StoreModule.forRoot({ chat: chatReducer.reducer }),
         StoreDevtoolsModule.instrument({}),
+        EffectsModule.forRoot([ChatEffects]),
     ],
     declarations: [
         AppComponent,
