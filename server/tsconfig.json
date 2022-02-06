@@ -18,6 +18,7 @@
         "resolveJsonModule": true,
         "strictNullChecks": true,
         "esModuleInterop": true,
+
         "paths": {
             "@app/*": ["./app/*"]
         }

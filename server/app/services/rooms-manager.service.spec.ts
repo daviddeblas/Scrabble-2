@@ -1,5 +1,6 @@
 import { GameOptions } from '@app/classes/game-options';
 import { Room } from '@app/classes/room';
+import { RoomInfo } from '@app/classes/room-info';
 import { expect } from 'chai';
 import { Socket } from 'socket.io';
 import { Container } from 'typedi';
@@ -45,7 +46,7 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.rooms).to.be.length(1);
         const playerName = 'Second player';
         expect(roomsManager.rooms[0].clients[0]).to.be.equal(undefined);
-        roomsManager.joinRoom(1, socket, playerName);
+        roomsManager.joinRoom('1', socket, playerName);
         expect(roomsManager.rooms[0].clients[0]).to.deep.equal(socket);
     });
 
@@ -55,7 +56,7 @@ describe('Rooms Manager Service', () => {
         const expectedMessage = 'Game not found';
         try {
             const playerName = 'Second player';
-            roomsManager.joinRoom(1, socket, playerName);
+            roomsManager.joinRoom('1', socket, playerName);
         } catch (error) {
             errorMessage = error.message;
         }
@@ -64,11 +65,11 @@ describe('Rooms Manager Service', () => {
 
     it('getRooms should return the hostname of all rooms', () => {
         roomsManager.createRoom(socket, options);
-        const expectedResult = [options.hostname];
+        const expectedResult = [new RoomInfo(socket.id, options)];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
-        expectedResult.push(otherOption.hostname);
+        expectedResult.push(new RoomInfo(socket.id, otherOption));
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 

@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { getGameStatus } from '@app/actions/game-status.actions';
+import { GameStatus } from '@app/reducers/game-status.reducer';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-game-page',
@@ -6,5 +9,7 @@ import { Component } from '@angular/core';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor() {}
+    constructor(private store: Store<GameStatus>) {
+        this.store.dispatch(getGameStatus());
+    }
 }
