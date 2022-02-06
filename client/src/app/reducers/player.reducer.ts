@@ -1,3 +1,4 @@
+import { gameStatusReceived } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
 import { Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
@@ -16,6 +17,8 @@ export const initialState: Players = {
 
 export const reducer = createReducer(
     initialState,
+
+    on(gameStatusReceived, (state, { players }) => players),
 
     on(placeWordSuccess, (state, { word, newLetters, newScore }) => {
         const letterToRemove = [...word.letters];
