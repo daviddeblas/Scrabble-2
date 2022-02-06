@@ -60,13 +60,27 @@ export class ChatService {
         }
     }
 
-    validatePlaceCommand(command: string[]): boolean {
-        command;
-        return true;
+    private validatePlaceCommand(command: string[]): boolean {
+        let commandIsCorrect = false;
+        if (command.length === 3) {
+            commandIsCorrect = true;
+            commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
+            commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
+            commandIsCorrect &&= /^[a-z]*$/.test(command[2]);
+            const columnNumber = parseInt(command[1].replace(/^\D+/g, ''), 10); // Prend les nombres d'un string
+            const minColumnNumber = 1;
+            const maxColumnNumber = 15;
+            commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
+            if (command[2].length > 1) {
+                const positionLastChar = -1;
+                commandIsCorrect &&= /^[vh]$/.test(command[1].slice(positionLastChar));
+            }
+        }
+        return commandIsCorrect;
     }
 
-    validateExchangeCommand(command: string[]): boolean {
-        command;
-        return true;
+    private validateExchangeCommand(command: string[]): boolean {
+        // Verifier que seulement des lettres sont présente dans la commande
+        return /^[a-z]*$/.test(command[1]);
     }
 }
