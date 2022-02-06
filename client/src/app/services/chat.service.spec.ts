@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
 import { ChatService } from './chat.service';
 // eslint-disable dot-notation
-fdescribe('ChatService', () => {
+describe('ChatService', () => {
     let service: ChatService;
     // const mockStore = new MockStore<MockAppState>(emptyState);
     beforeEach(() => {
