@@ -1,28 +1,30 @@
 import * as gameStatusActions from '@app/actions/game-status.actions';
 import { Player } from '@app/classes/player';
-import { initialState, reducer } from '@app/reducers/game-status.reducer';
+import { GameStatus, initialState, reducer } from '@app/reducers/game-status.reducer';
+import { Players } from './player.reducer';
 
-describe('[Game Status] Reducer', () => {
-    describe('[Game Status] Start New Round', () => {
-        it('should set the active player', () => {
-            const action = gameStatusActions.startNewRound({ activePlayer: 'player 1' });
+describe('[Game Status] Game Status Received', () => {
+    const gameStatusStub: GameStatus = {
+        multipliers: [],
+        activePlayer: 0,
+        letterPotLength: 0,
+        pointsPerLetter: new Map(),
+    };
 
-            const result = reducer(initialState, action);
+    const playersStub: Players = {
+        player: new Player('Player 1'),
+        opponent: new Player('Player 2'),
+    };
 
-            expect(result).toEqual({ ...initialState, activePlayer: 'player 1' });
+    it('should set the game status', () => {
+        const action = gameStatusActions.gameStatusReceived({
+            status: gameStatusStub,
+            players: playersStub,
+            board: [],
         });
-    });
 
-    describe('[Game Status] Start Game Success', () => {
-        it('should set the active player', () => {
-            const action = gameStatusActions.startGameSuccess({
-                players: { player: new Player(''), opponent: new Player('') },
-                activePlayer: 'player 1',
-            });
+        const result = reducer(initialState, action);
 
-            const result = reducer(initialState, action);
-
-            expect(result).toEqual({ ...initialState, activePlayer: 'player 1' });
-        });
+        expect(result).toEqual(gameStatusStub);
     });
 });
