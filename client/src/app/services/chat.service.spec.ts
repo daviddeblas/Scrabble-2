@@ -12,7 +12,7 @@ import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { ChatService } from './chat.service';
 
-fdescribe('ChatService', () => {
+describe('ChatService', () => {
     let service: ChatService;
     let store: MockStore;
     let username: string;
