@@ -1,22 +1,39 @@
-import { Room } from '@app/classes/room';
-import { Service } from 'typedi';
-import io from 'socket.io';
 import { GameOptions } from '@app/classes/game-options';
+import { Room } from '@app/classes/room';
+import { RoomInfo } from '@app/classes/room-info';
+import io from 'socket.io';
+import { Service } from 'typedi';
 
 @Service()
 export class RoomsManager {
     rooms: Room[] = [];
 
-    createRoom(socket: io.Socket, options: GameOptions): void {
-        this.rooms.push(new Room(socket, this, options));
+    setupSocketConnection(socket: io.Socket) {
+        socket.on('create room', (options) => {
+            socket.emit('create room success', this.createRoom(socket, options));
+        });
+        socket.on('request list', () => {
+            socket.emit('get list', this.getRooms());
+        });
+
+        socket.on('join room', (data) => {
+            this.joinRoom(data.roomId, socket, data.playerName);
+            socket.emit('player joining', data.playerName);
+        });
+    }
+
+    createRoom(socket: io.Socket, options: GameOptions): RoomInfo {
+        const newRoom = new Room(socket, this, options);
+        this.rooms.push(newRoom);
+        return newRoom.getRoomInfo();
     }
 
     removeRoom(room: Room): void {
         this.rooms.splice(this.rooms.indexOf(room), 1);
     }
 
-    joinRoom(roomId: number, socket: io.Socket, name: string): void {
-        const room = this.rooms.find((r) => r.host.id === roomId.toString());
+    joinRoom(roomId: string, socket: io.Socket, name: string): void {
+        const room = this.rooms.find((r) => r.getRoomInfo().roomId === roomId);
         if (room) {
             room.join(socket, name);
         } else {
@@ -24,7 +41,7 @@ export class RoomsManager {
         }
     }
 
-    getRooms(): string[] {
-        return this.rooms.map((r) => r.gameOptions.hostname);
+    getRooms(): RoomInfo[] {
+        return this.rooms.map((r) => r.getRoomInfo());
     }
 }

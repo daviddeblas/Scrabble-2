@@ -3,14 +3,17 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
+import * as gameReducer from '@app/reducers/game-status.reducer';
+import * as roomReducer from '@app/reducers/room.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { BoardComponent } from './components/board/board.component';
 import { CellLetterX2Component } from './components/cells/cell-letter-x2/cell-letter-x2.component';
 import { CellLetterX3Component } from './components/cells/cell-letter-x3/cell-letter-x3.component';
@@ -19,6 +22,11 @@ import { CellWordX2Component } from './components/cells/cell-word-x2/cell-word-x
 import { CellWordX3Component } from './components/cells/cell-word-x3/cell-word-x3.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { DictionariesEffects } from './effects/dictionaries.effects';
+import { GameEffects } from './effects/game.effects';
+import { RoomEffects } from './effects/room.effects';
+import { GamePageModule } from './modules/game-page.module';
+import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 
@@ -31,11 +39,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
 @NgModule({
     declarations: [
         AppComponent,
-        GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
-        PlayAreaComponent,
-        SidebarComponent,
         GameSelectionPageComponent,
         BoardComponent,
         CellWordX2Component,
@@ -46,8 +51,21 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         MultiConfigWindowComponent,
         GamePreparationPageComponent,
         WaitingRoomComponent,
+        GameJoinPageComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer, room: roomReducer.reducer, game: gameReducer.reducer }),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
+        StoreDevtoolsModule.instrument({}),
+        GamePageModule,
+        ReactiveFormsModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })
