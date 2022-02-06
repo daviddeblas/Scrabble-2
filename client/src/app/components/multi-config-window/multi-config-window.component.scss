@@ -1,10 +1,10 @@
-.parameter-container{
+.parameter-container {
     display: flex;
     flex-direction: column;
-    position:relative;
+    position: relative;
 }
 
-#timer-container{
+#timer-container {
     width: 100%;
     margin-bottom: 5%;
     padding: 5% 2% 4%;
@@ -13,25 +13,25 @@
     flex: 1 1 auto;
 }
 
-#timer2-container{
+#timer2-container {
     text-align: right;
     width: 25%;
 }
 
-#timer2-container button{
-    margin-right : 5%;
+#timer2-container button {
+    margin-right: 5%;
     margin-left: 5%;
 }
 
-#time{
-    display: inline-flex; 
+#time {
+    display: inline-flex;
 }
 
-#dec{
+#dec {
     margin-right: auto;
 }
 
-#confirm-settings{
+#confirm-settings {
     position: absolute;
     right: 0;
     bottom: 0;

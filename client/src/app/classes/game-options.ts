@@ -1,5 +1,3 @@
 export class GameOptions {
-    hostname: string;
-    dictionaryType: string;
-    timePerRound: number;
+    constructor(public hostname: string, public dictionaryType: string, public timePerRound: number) {}
 }
