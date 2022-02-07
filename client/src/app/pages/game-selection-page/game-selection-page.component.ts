@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 
 @Component({
@@ -11,5 +12,8 @@ export class GameSelectionPageComponent {
     constructor(public dialog: MatDialog) {}
     openGamePreparationPage() {
         this.dialog.open(GamePreparationPageComponent);
+    }
+    openGameJoinPage() {
+        this.dialog.open(GameJoinPageComponent);
     }
 }

@@ -5,7 +5,7 @@
             <mat-icon>person_outline</mat-icon>
         </button>
     </div>
-    <section id="waiting-section" *ngIf="!player2">
+    <section id="waiting-section" *ngIf="(player2$ | async) === undefined">
         <div id="text-container">
             <h1>En attente d'un autre joueur...</h1>
         </div>
@@ -13,26 +13,33 @@
             <mat-spinner></mat-spinner>
         </div>
     </section>
-    <section *ngIf="player2 && player1">
+    <section *ngIf="(player2$ | async) && (roomInfo$ | async)?.gameOptions?.hostname">
         <h1>Partie de Jeu :</h1>
         <mat-tab-group id="tabs-container" dynamicHeight>
             <mat-tab label="Joueurs">
-                <b>{{ player1 }}</b> contre <b>{{ player2 }}</b>
+                <b>{{ (roomInfo$ | async)?.gameOptions?.hostname }}</b> contre <b>{{ player2$ | async }}</b>
             </mat-tab>
             <mat-tab label="Temps">
-                <b>{{ timer }}</b> secondes
+                <b>{{ (roomInfo$ | async)?.gameOptions?.timePerRound }}</b> secondes
             </mat-tab>
             <mat-tab label="Dictionnaire">
-                <b>{{ dictionary }}</b>
+                <b>{{ (roomInfo$ | async)?.gameOptions?.dictionaryType }}</b>
             </mat-tab>
         </mat-tab-group>
     </section>
     <div id="button-container">
-        <button mat-stroked-button color="primary" routerLink="/game" (click)="closeDialog()" id="begin-button" [disabled]="player2 === undefined">
+        <button
+            mat-stroked-button
+            color="primary"
+            routerLink="/game"
+            (click)="acceptInvite()"
+            id="begin-button"
+            [disabled]="(player2$ | async) === undefined"
+        >
             <mat-icon>task_alt</mat-icon>
             Démarrer
         </button>
-        <button mat-stroked-button color="primary" (click)="rejectInvite()" [disabled]="player2 === undefined">
+        <button mat-stroked-button color="primary" (click)="rejectInvite()" [disabled]="(player2$ | async) === undefined">
             <mat-icon>delete_forever</mat-icon>
             Rejeter
         </button>

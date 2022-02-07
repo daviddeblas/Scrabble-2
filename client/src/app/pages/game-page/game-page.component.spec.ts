@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { GamePageModule } from '@app/modules/game-page.module';
+import { StoreModule } from '@ngrx/store';
 import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
@@ -9,7 +9,7 @@ describe('GamePageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent],
+            imports: [StoreModule.forRoot({}), GamePageModule],
         }).compileComponents();
     });
 

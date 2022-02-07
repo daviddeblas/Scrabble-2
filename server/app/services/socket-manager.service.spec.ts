@@ -1,5 +1,6 @@
 /* eslint-disable dot-notation */
 import { GameOptions } from '@app/classes/game-options';
+import { RoomInfo } from '@app/classes/room-info';
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
@@ -33,20 +34,20 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle create room event and create a new Room', (done) => {
-        const roomManagerSpy = sinon.spy(service.rooms, 'createRoom');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'createRoom');
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         setTimeout(() => {
             assert(roomManagerSpy.calledOnce);
-            assert(service.rooms.rooms.length === 1); // Une salle a bien été ajouté
+            assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
             done();
         }, RESPONSE_DELAY);
     });
     it('should handle create room event and emit game settings event', (done) => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
-        clientSocket.on('game settings', (returnedOptions: GameOptions) => {
-            expect(defaultOptions).to.deep.equal(returnedOptions);
+        clientSocket.on('create room success', (info: RoomInfo) => {
+            expect(defaultOptions).to.deep.equal(info.gameOptions);
             done();
         });
     });
@@ -61,7 +62,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and call getRooms', (done) => {
-        const roomManagerSpy = sinon.spy(service.rooms, 'getRooms');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'getRooms');
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms) => {
             expect(listOfRooms).to.deep.equal([]);
@@ -76,8 +77,8 @@ describe('SocketManager service tests', () => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.emit('request list');
-        clientSocket.on('get list', (listOfRooms) => {
-            expect(listOfRooms).to.deep.contain(defaultOptions.hostname);
+        clientSocket.on('get list', (listOfRooms: RoomInfo[]) => {
+            expect(listOfRooms.filter((room) => room.gameOptions.hostname === defaultOptions.hostname).length).to.eq(1);
             expect(listOfRooms).to.be.length(1);
             done();
         });
@@ -94,25 +95,13 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle join room event and call joinRoom', (done) => {
-        const roomsManagerStub = sinon.stub(service.rooms);
+        const roomsManagerStub = sinon.stub(service.roomManager);
         const data = { roomId: 0, playerName: 'Second Player' };
         clientSocket.emit('join room', data);
         setTimeout(() => {
             assert(roomsManagerStub.joinRoom.calledOnce);
             done();
         }, RESPONSE_DELAY);
-    });
-
-    it("should handle join room event and emit player arrival event with the new player's name", (done) => {
-        const roomsManagerMock = sinon.mock(service.rooms);
-        roomsManagerMock.expects('joinRoom');
-        const data = { roomId: 0, playerName: 'Second Player' };
-        clientSocket.emit('join room', data);
-        clientSocket.on('player arrival', (playerName: string) => {
-            expect(playerName).to.deep.equal(data.playerName);
-            roomsManagerMock.verify();
-            done();
-        });
     });
 
     it('isOpen should return true when set to default value', (done) => {
@@ -169,7 +158,7 @@ describe('SocketManager service tests', () => {
 
     it('closed browser should set a 5 second timeout and call getOpponentSocket ', (done) => {
         const testUserId = '123';
-        const roomsManagerMock = sinon.mock(service.rooms);
+        const roomsManagerMock = sinon.mock(service.roomManager);
         roomsManagerMock.expects('getOpponentSocket').once();
         clientSocket.emit('closed browser', testUserId);
         const timeoutSixSec = 6000;
@@ -189,7 +178,7 @@ describe('SocketManager service tests', () => {
             },
         } as unknown as io.Socket;
         const testUserId = '123';
-        const roomsManagerStub = sinon.stub(service.rooms, 'getOpponentSocket').callsFake(() => {
+        const roomsManagerStub = sinon.stub(service.roomManager, 'getOpponentSocket').callsFake(() => {
             return opponentSocketStub;
         });
         clientSocket.emit('closed browser', testUserId);
