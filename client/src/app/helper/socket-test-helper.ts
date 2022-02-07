@@ -1,5 +1,4 @@
 // Fichier issu de l'exemple du cours de socketIo
-// https://gitlab.com/nikolayradoev/socket-io-exemple/-/tree/master
 
 /* eslint-disable */
 type CallbackSignature = (params: unknown) => unknown;
