@@ -12,7 +12,6 @@ export class ChatEffects {
             this.actions$.pipe(
                 ofType(messageWritten),
                 tap((action) => {
-                    console.log('Je suis arrivé');
                     this.chatService.messageWritten(action.username, action.message);
                 }),
             ),
