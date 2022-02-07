@@ -22,6 +22,7 @@ export class ChatBoxComponent implements OnInit {
     }
     ngOnInit(): void {
         this.store.dispatch(chatActions.initiateChatting());
+        document.getElementById('chat-input')?.getElementsByTagName('input')[0].focus();
     }
 
     submitMessage(): void {
