@@ -30,7 +30,18 @@ describe('RoomEffects', () => {
         expect(effects).toBeTruthy();
     });
 
-    it('should call the function messageWriten from chat service', () => {
+    it('initiateChattingEffect$ should call the function acceptNewMessages from chat service', () => {
+        actions$ = cold('a', { a: chatActions.initiateChatting() });
+        effects.initiateChattingEffect$.subscribe(() => {
+            try {
+                expect(service.info).toHaveBeenCalledWith();
+            } catch (error) {
+                fail('initiateChattingEffect$: ' + error);
+            }
+        });
+    });
+
+    it('should call the function messageWritten from chat service', () => {
         actions$ = cold('a', { a: chatActions.messageWritten({ username: 'Test1', message: 'Test2' }) });
         effects.messageWrittenEffect$.subscribe(() => {
             try {
