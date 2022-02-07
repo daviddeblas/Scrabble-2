@@ -4,8 +4,9 @@ import { SocketClientService } from './socket-client.service';
 
 describe('BrowserManagerService', () => {
     let service: BrowserManagerService;
-    const socketService: SocketClientService = new SocketClientService();
+    let socketService: SocketClientService;
     beforeEach(async () => {
+        socketService = new SocketClientService();
         service = TestBed.inject(BrowserManagerService);
         socketService.connect();
     });
