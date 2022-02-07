@@ -6,6 +6,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
+import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
@@ -193,6 +194,33 @@ describe('room', () => {
                     clientSocket.emit('quit');
                 });
                 hostSocket.emit('create room');
+            });
+
+            it('should receive end game namespace with given info', (done) => {
+                const finishStatus = new GameFinishStatus([], null);
+                let room: Room;
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        room = new Room(socket, roomsManager, gameOptions);
+                    });
+                    socket.on('join', () => {
+                        room.join(socket, 'player 2');
+                    });
+                });
+                hostSocket.on('end game', (receivedStatus: GameFinishStatus) => {
+                    expect(receivedStatus).to.deep.eq(finishStatus);
+                    done();
+                });
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('game status', () => {
+                    room.endGame(finishStatus);
+                });
+                hostSocket.emit('create room');
+                clientSocket.emit('join');
+                clientSocket.emit('get game status');
             });
         });
     });
