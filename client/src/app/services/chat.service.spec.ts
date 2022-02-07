@@ -18,6 +18,7 @@ describe('ChatService', () => {
     let username: string;
     let socketHelper: SocketTestHelper;
     const RESPONSE_TIME = 200;
+    const ASCII_ALPHABET_POSITION = 97;
     beforeEach(async () => {
         socketHelper = new SocketTestHelper();
         await TestBed.configureTestingModule({ providers: [provideMockStore()] }).compileComponents();
@@ -31,10 +32,10 @@ describe('ChatService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('sendMsg should emit send message with the username and message', (done) => {
+    it('broadcastMsg should emit send message with the username and message', (done) => {
         const sendSpy = spyOn(service['socketService'], 'send');
         const expectedMessage = { username: 'My Name', message: 'Coucou' };
-        service.sendMsg(expectedMessage.username, expectedMessage.message);
+        service.broadcastMsg(expectedMessage.username, expectedMessage.message);
         setTimeout(() => {
             expect(sendSpy).toHaveBeenCalledOnceWith('send message', expectedMessage);
             done();
@@ -87,30 +88,39 @@ describe('ChatService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    it('should dispatch "[Players] Place Word" with a h direction when the place command is valid and has a h direction', () => {
+    it('should call handlePlaceCommand when typing a valid place command', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
         const exampleMessage = '!placer a11h abcpzoe';
-        const position: Vec2 = { x: parseInt('a', 10), y: 11 };
+        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
         const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.HORIZONTAL);
         service.messageWritten(username, exampleMessage);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
     });
 
+    it('should dispatch "[Players] Place Word" with a h direction when the place command is valid and has a h direction', () => {
+        const dispatchSpy = spyOn(service['store'], 'dispatch');
+        const exampleCommand = ['!placer', 'a11h', 'abcpzoe'];
+        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
+        const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.HORIZONTAL);
+        service['handlePlaceCommand'](exampleCommand);
+        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
+    });
+
     it('should dispatch "[Players] Place Word" with a v direction when the place command is valid and has a v direction', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleMessage = '!placer a11v abcpzoe';
-        const position: Vec2 = { x: parseInt('a', 10), y: 11 };
+        const exampleCommand = ['!placer', 'a11v', 'abcpzoe'];
+        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
         const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.VERTICAL);
-        service.messageWritten(username, exampleMessage);
+        service['handlePlaceCommand'](exampleCommand);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
     });
 
     it('should dispatch "[Players] Place Word" without a direction when the command is valid and no direction is given', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleMessage = '!placer a11 s';
-        const position: Vec2 = { x: parseInt('a', 10), y: 11 };
+        const exampleCommand = ['!placer', 'a11', 's'];
+        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
         const expectedWord: Word = new Word(stringToLetters('s'), position);
-        service.messageWritten(username, exampleMessage);
+        service['handlePlaceCommand'](exampleCommand);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
     });
 
@@ -128,7 +138,7 @@ describe('ChatService', () => {
     });
 
     it('validatePlaceCommand should return true when the command is properly called', () => {
-        const exampleCommand = ['!placer', 'a11h', 'abcpzoe'];
+        const exampleCommand = ['!placer', 'a11h', 'abcpzo*e'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeTrue();
     });
 
