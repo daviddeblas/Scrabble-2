@@ -52,7 +52,6 @@ describe('Rooms Manager Service', () => {
     });
 
     it('joinRoom should throw Game not found error if the Room does not exist', () => {
-        // const joinRoomSpy = sinon.spy(roomsManager.joinRoom);
         let errorMessage = 'Not the right message';
         const expectedMessage = 'Game not found';
         try {

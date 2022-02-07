@@ -36,14 +36,9 @@ export class Room {
     }
 
     inviteAccepted(client: io.Socket): void {
-        client.on('surrender game', () => {
-            this.host.emit('victory');
-        });
-        this.host.on('surrender game', () => {
-            client.emit('victory');
-        });
         client.emit('accepted');
         this.initGame();
+        this.initSurrenderGame();
     }
 
     endGame(info: GameFinishStatus): void {
@@ -74,6 +69,18 @@ export class Room {
         });
     }
 
+    initSurrenderGame(): void {
+        this.sockets.forEach((socket) => {
+            socket.on('surrender game', () => {
+                if (!this.game?.players) return;
+                const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
+                    this.game.players,
+                    socket.id === this.host.id ? this.clientName : this.gameOptions.hostname,
+                );
+                this.endGame(gameFinishStatus);
+            });
+        });
+    }
     inviteRefused(client: io.Socket): void {
         client.emit('refused');
         this.clients[0] = null;
