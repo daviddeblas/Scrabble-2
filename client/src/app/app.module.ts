@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
@@ -16,6 +15,7 @@ import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { ChatEffects } from './effects/chat.effects';
@@ -42,8 +42,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         MultiConfigWindowComponent,
         GamePreparationPageComponent,
         WaitingRoomComponent,
-        ChatBoxComponent,
         GameJoinPageComponent,
+        ChatBoxComponent,
     ],
     imports: [
         AppMaterialModule,
