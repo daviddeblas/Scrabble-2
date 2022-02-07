@@ -12,4 +12,5 @@ import { Vec2 } from '@app/classes/vec2';
 export class LetterComponent {
     @Input() pos: Vec2 = { x: 0, y: 0 };
     @Input() letter: Letter = 'A';
+    @Input() value: number | undefined;
 }
