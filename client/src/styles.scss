@@ -114,7 +114,6 @@ body {
     justify-content: space-between;
 }
 
-.mat-progress-spinner circle,
-.mat-spinner circle {
+.mat-spinner.join circle {
     stroke: white;
 }
