@@ -14,12 +14,6 @@ import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { BoardComponent } from './components/board/board.component';
-import { CellLetterX2Component } from './components/cells/cell-letter-x2/cell-letter-x2.component';
-import { CellLetterX3Component } from './components/cells/cell-letter-x3/cell-letter-x3.component';
-import { CellStarComponent } from './components/cells/cell-star/cell-star.component';
-import { CellWordX2Component } from './components/cells/cell-word-x2/cell-word-x2.component';
-import { CellWordX3Component } from './components/cells/cell-word-x3/cell-word-x3.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
@@ -42,12 +36,6 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         MainPageComponent,
         MaterialPageComponent,
         GameSelectionPageComponent,
-        BoardComponent,
-        CellWordX2Component,
-        CellWordX3Component,
-        CellLetterX2Component,
-        CellLetterX3Component,
-        CellStarComponent,
         MultiConfigWindowComponent,
         GamePreparationPageComponent,
         WaitingRoomComponent,
