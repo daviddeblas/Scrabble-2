@@ -3,6 +3,8 @@ import { Letter } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
 
 @Component({
+    /* Nécessaire pour les composantes SVG */
+    /* eslint-disable-next-line @angular-eslint/component-selector */
     selector: '[app-letter]',
     templateUrl: './letter.component.html',
     styleUrls: ['./letter.component.scss'],
