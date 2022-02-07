@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Vec2 } from '@app/classes/vec2';
 
 @Component({
     /* Nécessaire pour les composantes SVG */
@@ -8,6 +9,5 @@ import { Component, Input } from '@angular/core';
     styleUrls: ['./cell-star.component.scss'],
 })
 export class CellStarComponent {
-    @Input() posX: number = 0;
-    @Input() posY: number = 0;
+    @Input() pos: Vec2 = { x: 0, y: 0 };
 }

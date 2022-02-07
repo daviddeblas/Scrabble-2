@@ -31,11 +31,11 @@
     </text>
 
     <g transform="translate(50, 50)">
-        <g app-cell-word-x2 [posX]="100" [posY]="100"></g>
-        <g app-cell-word-x3 [posX]="50" [posY]="50"></g>
-        <g app-cell-letter-x2 [posX]="200" [posY]="50"></g>
-        <g app-cell-letter-x3 [posX]="300" [posY]="100"></g>
-        <g app-cell-star [posX]="400" [posY]="400"></g>
+        <g app-cell-word-x2 [pos]="{ x: 50, y: 50 }"></g>
+        <g app-cell-word-x3 [pos]="{ x: 0, y: 0 }"></g>
+        <g app-cell-letter-x2 [pos]="{ x: 150, y: 0 }"></g>
+        <g app-cell-letter-x3 [pos]="{ x: 250, y: 50 }"></g>
+        <g app-cell-star [pos]="{ x: 350, y: 350 }"></g>
         <g app-letter></g>
     </g>
 </svg>
