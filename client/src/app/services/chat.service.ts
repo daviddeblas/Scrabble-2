@@ -13,8 +13,7 @@ const POSITION_LAST_CHAR = -1;
 })
 export class ChatService {
     constructor(private store: Store, private socketService: SocketClientService) {}
-
-    sendMsg(username: string, message: string) {
+    broadcastMsg(username: string, message: string) {
         this.socketService.send('send message', { username, message });
     }
 
@@ -25,8 +24,10 @@ export class ChatService {
     }
 
     messageWritten(username: string, message: string) {
-        if (message[0] !== '!') this.store.dispatch(chatMessageReceived({ username, message }));
-        else {
+        if (message[0] !== '!') {
+            this.store.dispatch(chatMessageReceived({ username, message }));
+            this.broadcastMsg(username, message);
+        } else {
             const command = message.split(' ');
             switch (command[0]) {
                 case '!placer': {
