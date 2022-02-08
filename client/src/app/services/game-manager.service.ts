@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { endGame, gameStatusReceived } from '@app/actions/game-status.actions';
-import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { Letter } from '@app/classes/letter';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
@@ -12,8 +11,8 @@ import { SocketClientService } from './socket-client.service';
 })
 export class GameManagerService {
     constructor(private socketService: SocketClientService, private store: Store) {
-        this.socketService.on('end game', (status: GameFinishStatus) => {
-            this.store.dispatch(endGame({ gameFinishStatus: status }));
+        this.socketService.on('end game', (status: { players: Players; winner: string }) => {
+            this.store.dispatch(endGame(status));
         });
     }
 
