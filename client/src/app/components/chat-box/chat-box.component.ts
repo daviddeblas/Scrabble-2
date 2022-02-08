@@ -14,11 +14,10 @@ import { take } from 'rxjs/operators';
 export class ChatBoxComponent implements OnInit {
     @ViewChild('chatMessage') chatMessage: ElementRef<HTMLInputElement>;
     chat$: Observable<ChatMessage[]>;
-    players$: Observable<string>;
     username: string;
     constructor(private store: Store<{ chat: ChatMessage[] }>, private playerStore: Store<{ players: Players }>) {
         this.chat$ = store.select('chat');
-        this.players$ = playerStore.select('players', 'player', 'name');
+        this.playerStore.pipe(take(1)).subscribe((us) => (this.username = us.players.player.name));
     }
     ngOnInit(): void {
         this.store.dispatch(chatActions.initiateChatting());
@@ -26,7 +25,6 @@ export class ChatBoxComponent implements OnInit {
     }
 
     submitMessage(): void {
-        this.playerStore.pipe(take(1)).subscribe((us) => (this.username = us.players.player.name));
         this.store.dispatch(chatActions.messageWritten({ username: this.username, message: this.chatMessage.nativeElement.value }));
         this.chatMessage.nativeElement.value = '';
     }

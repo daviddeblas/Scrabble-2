@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { chatMessageReceived } from '@app/actions/chat.actions';
+import { receivedMessage } from '@app/actions/chat.actions';
 import { exchangeLetters, placeWord, skipTurn } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { stringToLetters } from '@app/classes/letter';
@@ -47,7 +47,7 @@ describe('ChatService', () => {
         service.acceptNewMessages();
         socketHelper.peerSideEmit('receive message', expectedMessage);
         setTimeout(() => {
-            const expectedAction = cold('a', { a: chatMessageReceived(expectedMessage) });
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
             expect(store.scannedActions$).toBeObservable(expectedAction);
             done();
         }, RESPONSE_TIME);
@@ -56,35 +56,35 @@ describe('ChatService', () => {
     it('should dispatch "[Chat] Received message" with the username and message when the message does not start by !', () => {
         const exampleMessage = 'Bonjour';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: chatMessageReceived({ username, message: exampleMessage }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username, message: exampleMessage }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with an Error if the command does not exist', () => {
         const exampleMessage = '!Bonjour';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: chatMessageReceived({ username: 'Error', message: 'Commande impossible à réalisée' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Commande impossible à réalisée' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
         const exampleMessage = '!passer ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command placer is not valid', () => {
         const exampleMessage = '!placer nfpe ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command échanger is not valid', () => {
         const exampleMessage = '!échanger n_fpe38';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: chatMessageReceived({ username: 'Error', message: 'Erreur de syntaxe' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
