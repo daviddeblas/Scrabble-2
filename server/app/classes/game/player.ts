@@ -10,14 +10,20 @@ export class Player {
         this.score = 0;
     }
 
-    removeLetters(letters: Letter[]): void {
+    canRemoveLetters(letters: Letter[]): boolean {
+        let returnValue = true;
         const playerTempEasel = [...this.easel];
         // validation
         letters.forEach((l) => {
             const index = playerTempEasel.indexOf(l);
-            if (index < 0) throw new GameError(GameErrorType.LettersAreNotInEasel);
+            if (index < 0) returnValue = false;
             playerTempEasel.splice(index, 1);
         });
+        return returnValue;
+    }
+
+    removeLetters(letters: Letter[]): void {
+        if (!this.canRemoveLetters(letters)) throw new GameError(GameErrorType.LettersAreNotInEasel);
 
         // execution
         letters.forEach((l) => {

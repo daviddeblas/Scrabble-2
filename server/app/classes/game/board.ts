@@ -24,7 +24,8 @@ export class Board {
             }
         }
         config.letters.forEach((l) => this.pointsPerLetter.set(l.letter, l.points));
-        config.multipliers.forEach((m) => m.positions.forEach((p) => {
+        config.multipliers.forEach((m) =>
+            m.positions.forEach((p) => {
                 this.multipliers[p.x][p.y] = m.multiplier;
             }),
         );
