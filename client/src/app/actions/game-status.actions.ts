@@ -1,4 +1,3 @@
-import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { Letter } from '@app/classes/letter';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
@@ -11,4 +10,4 @@ export const gameStatusReceived = createAction(
     props<{ status: GameStatus; players: Players; board: Letter[] }>(),
 );
 
-export const endGame = createAction('[Game Status] End Game', props<{ gameFinishStatus: GameFinishStatus }>());
+export const endGame = createAction('[Game Status] End Game', props<{ players: Players; winner: string }>());

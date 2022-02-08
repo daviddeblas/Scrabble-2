@@ -27,10 +27,8 @@ describe('[Players] Reducer', () => {
         };
 
         const gameStatusStub: GameStatus = {
-            multipliers: [],
             activePlayer: 0,
             letterPotLength: 0,
-            pointsPerLetter: new Map(),
         };
 
         it('should return the loaded players', () => {
