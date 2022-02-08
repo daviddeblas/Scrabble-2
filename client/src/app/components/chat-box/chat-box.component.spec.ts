@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { messageWritten } from '@app/actions/chat.actions';
+import { initiateChatting, messageWritten } from '@app/actions/chat.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { ChatBoxComponent } from './chat-box.component';
@@ -13,8 +14,16 @@ describe('ChatBoxComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ChatBoxComponent],
-            imports: [AppMaterialModule, BrowserAnimationsModule],
-            providers: [provideMockStore()],
+            imports: [AppMaterialModule, BrowserAnimationsModule, EffectsRootModule],
+            providers: [
+                provideMockStore(),
+                {
+                    provide: EffectsRootModule,
+                    useValue: {
+                        addEffects: jasmine.createSpy('addEffects'),
+                    },
+                },
+            ],
         }).compileComponents();
         store = TestBed.inject(MockStore);
     });
@@ -22,11 +31,21 @@ describe('ChatBoxComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(ChatBoxComponent);
         component = fixture.componentInstance;
+
         fixture.detectChanges();
+    });
+
+    afterEach(() => {
+        fixture.destroy();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should dispatch "[Chat] Initiate Chatting" when created', () => {
+        const expectedAction = cold('a', { a: initiateChatting() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Message written" when submitted', () => {
