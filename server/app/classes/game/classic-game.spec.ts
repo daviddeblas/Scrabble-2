@@ -3,10 +3,10 @@ import { Letter, stringToLetters } from '@app/classes/letter';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { GameError } from './game.exception';
-import { Multiplier, MultiplierType } from './multiplier';
-import { PlacedLetter } from './placed-letter';
-import { Vec2 } from './vec2';
+import { GameError } from '@app/classes/game.exception';
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
+import { PlacedLetter } from '@app/classes/placed-letter';
+import { Vec2 } from '@app/classes/vec2';
 
 describe('ClassicGame', () => {
     let game: ClassicGame;

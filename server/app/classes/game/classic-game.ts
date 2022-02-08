@@ -7,7 +7,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import Container from 'typedi';
-import { GameFinishStatus } from './game-finish-status';
+import { GameFinishStatus } from '@app/classes/game-finish-status';
 
 export const AMT_OF_LETTERS_IN_EASEL = 7;
 export const BOARD_WIDTH = 15;
