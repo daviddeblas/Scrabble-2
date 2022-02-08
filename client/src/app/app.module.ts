@@ -8,17 +8,14 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import * as chatReducer from '@app/reducers/chat.reducer';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
-import { ChatEffects } from './effects/chat.effects';
 import { DictionariesEffects } from './effects/dictionaries.effects';
 import { GameEffects } from './effects/game.effects';
 import { RoomEffects } from './effects/room.effects';
@@ -43,7 +40,6 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         GamePreparationPageComponent,
         WaitingRoomComponent,
         GameJoinPageComponent,
-        ChatBoxComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -56,9 +52,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
             dictionaries: dictionariesReducer.reducer,
             room: roomReducer.reducer,
             game: gameReducer.reducer,
-            chat: chatReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, ChatEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,

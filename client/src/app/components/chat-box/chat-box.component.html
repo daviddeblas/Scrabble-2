@@ -19,7 +19,7 @@
             </mat-list-item>
         </mat-list>
     </mat-card>
-    <form class="chat-box-form">
+    <form class="chat-box-form" onsubmit="return false;">
         <mat-form-field id="chat-input" appearance="fill">
             <mat-label>Message</mat-label>
             <input matInput #chatMessage maxlength="512" placeholder="Aide: !info" autocomplete="off" />
