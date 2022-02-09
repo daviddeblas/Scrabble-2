@@ -5,7 +5,6 @@ import * as sinon from 'sinon';
 import io from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { BrowserService } from './browser.service';
-import { RoomsManager } from './rooms-manager.service';
 
 describe('Browser service tests', () => {
     let service: BrowserService;
@@ -26,8 +25,7 @@ describe('Browser service tests', () => {
         server.on('connection', (socket) => {
             service.setupSocketConnection(socket);
         });
-        const roomsManager = new RoomsManager();
-        service = new BrowserService(roomsManager);
+        service = new BrowserService();
         clientSocket = ioClient(urlString);
     });
 

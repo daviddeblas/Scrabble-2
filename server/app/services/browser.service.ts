@@ -1,14 +1,11 @@
 import io from 'socket.io';
 import { Service } from 'typedi';
-import { RoomsManager } from './rooms-manager.service';
-// TODO pouvoir changer de dictionnaire
 
 @Service()
 export class BrowserService {
     tempClientSocketId: string;
     tempServerSocket: io.Socket;
     timeoutId: ReturnType<typeof setTimeout>;
-    constructor(public rooms: RoomsManager) {}
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('closed browser', (userId) => {
@@ -16,8 +13,7 @@ export class BrowserService {
             this.tempServerSocket = socket;
             const maxTimeForReload = 5000;
             this.timeoutId = setTimeout(() => {
-                const clientSocket = this.rooms.getOpponentSocket(socket.id);
-                clientSocket?.emit('victory');
+                socket.emit('surrender game');
             }, maxTimeForReload);
         });
 
