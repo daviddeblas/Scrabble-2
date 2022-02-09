@@ -122,16 +122,6 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
-
-            it('client should receive accepted if host accepts', (done) => {
-                hostSocket.on('player joining', () => {
-                    hostSocket.emit('accept');
-                });
-                clientSocket.on('accepted', () => {
-                    done();
-                });
-                hostSocket.emit('create room');
-            });
         });
 
         describe('Receiving', () => {

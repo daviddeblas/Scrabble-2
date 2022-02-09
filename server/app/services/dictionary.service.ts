@@ -21,8 +21,7 @@ export class DictionaryService {
     }
 
     getMatchingWords(word: Letter[]): string[] {
-        if (word.findIndex((char) => char === BLANK_LETTER) < 0) return [lettersToString(word).toLowerCase()];
-        return this.dictionary.words.filter((w) => new RegExp(lettersToString(word).toLowerCase().replace('*', '.')).test(w));
+        return this.dictionary.words.filter((w) => new RegExp('^'.concat(lettersToString(word).toLowerCase().replace('*', '.').concat('$'))).test(w));
     }
 
     determineLetterFromBlanks(letters: Letter[][]): Letter {

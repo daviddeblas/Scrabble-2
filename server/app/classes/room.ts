@@ -1,15 +1,17 @@
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import { Game } from './game/game';
-import { GameFinishStatus } from './game-finish-status';
+// import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { RoomInfo } from './room-info';
+import Container from 'typedi';
+import { GameConfigService } from '@app/services/game-config.service';
 
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
     clientName: string | null;
-    game: ClassicGame | null;
+    game: Game | null;
 
     sockets: io.Socket[];
     // TODO supprimer des rooms
@@ -40,29 +42,22 @@ export class Room {
         this.initGame();
     }
 
-    endGame(info: GameFinishStatus): void {
-        this.sockets.forEach((socket) => {
-            socket.emit('end game', info);
-        });
-    }
-
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
-        this.game = new ClassicGame(this.endGame);
+        this.game = new Game(Container.get(GameConfigService).configs.configs[0], [this.gameOptions.hostname, this.clientName as string]);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
-                if (this.game === null) throw new Error();
+                const game = this.game as Game;
                 socket.emit('game status', {
-                    playerNames: [this.game.players[0].name, this.game.players[1].name],
+                    playerNames: [game.players[0].name, game.players[1].name],
                     thisPlayer: index,
-                    playerEasel: this.game.players[index].easel,
-                    board: this.game.board,
-                    multipliers: this.game.multipliers,
-                    activePlayer: this.game.activePlayer,
-                    letterPotLength: this.game.letterPot.length,
-                    pointsPerLetter: this.game.pointPerLetter,
+                    playerEasel: game.players[index].easel,
+                    board: game.board,
+                    activePlayer: game.activePlayer,
+                    letterPotLength: game.bag.letters.length,
+                    pointsPerLetter: game.board.pointsPerLetter,
                 });
             });
         });
