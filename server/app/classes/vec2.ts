@@ -12,4 +12,8 @@ export class Vec2 {
     sub(b: Vec2): Vec2 {
         return new Vec2(this.x - b.x, this.y - b.y);
     }
+
+    copy(): Vec2 {
+        return new Vec2(this.x, this.y);
+    }
 }
