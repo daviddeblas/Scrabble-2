@@ -3,6 +3,7 @@ import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.ac
 import { Letter } from '@app/classes/letter';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
+import { BoardState } from './board.reducer';
 import { GameStatus } from './game-status.reducer';
 import { initialState, Players, reducer } from './player.reducer';
 
@@ -31,11 +32,17 @@ describe('[Players] Reducer', () => {
             letterPotLength: 0,
         };
 
+        const boardState: BoardState = {
+            board: [],
+            multipliers: [],
+            pointsPerLetter: new Map(),
+        };
+
         it('should return the loaded players', () => {
             const action = gameStatusReceived({
                 status: gameStatusStub,
                 players: playersStub,
-                board: [],
+                board: boardState,
             });
 
             const result = reducer(initialState, action);

@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { endGame } from '@app/actions/game-status.actions';
+import { endGame, gameStatusReceived } from '@app/actions/game-status.actions';
 import { Player } from '@app/classes/player';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
+import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -15,17 +16,22 @@ describe('GameManagerService', () => {
         player: new Player('Player 1'),
         opponent: new Player('Player 2'),
     };
+    const gameStatus: GameStatus = { activePlayer: 0, letterPotLength: 10 };
+    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map() };
+    const status = { status: gameStatus, players, board: boardState };
 
     let service: GameManagerService;
     let socketService: SocketTestHelper;
     let store: MockStore;
 
     beforeEach(() => {
+        socketService = new SocketTestHelper();
         TestBed.configureTestingModule({
             providers: [provideMockStore()],
         });
-        service = TestBed.inject(GameManagerService);
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
+        TestBed.compileComponents();
+        service = TestBed.inject(GameManagerService);
         store = TestBed.inject(MockStore);
     });
 
@@ -43,13 +49,19 @@ describe('GameManagerService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    it('should dispatch "[Game Status] Game Status Received" when receive game status from server', () => {
-        const gameStatus: GameStatus = { activePlayer: 0, letterPotLength: 5 };
+    it('should send "get game status" to the socket', () => {
+        const sendSpy = spyOn(socketService, 'emit');
 
-        socketService.peerSideEmit('end game', gameStatus);
+        service.getGameStatus();
 
-        // const expectedAction = cold('a', { a: gameStatusReceived({ gameStatus, players }) });
+        expect(sendSpy).toHaveBeenCalledWith('get game status');
+    });
 
-        // expect(store.scannedActions$).toBeObservable(expectedAction);
+    it('should dispatch "[Game Status] Game Status Received" when receive game status from socket', () => {
+        service.getGameStatus();
+        socketService.peerSideEmit('game status', status);
+
+        const expectedAction = cold('a', { a: gameStatusReceived(status) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 });
