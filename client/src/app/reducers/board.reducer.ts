@@ -1,4 +1,5 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
+import { gameStatusReceived } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { Multiplier } from '@app/classes/multiplier';
@@ -20,6 +21,8 @@ export const initialState: BoardState = { board: [], pointsPerLetter: new Map(),
 export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
+
+    on(gameStatusReceived, (state, { board }) => board),
 
     on(placeWordSuccess, (state, { word }) => {
         for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {

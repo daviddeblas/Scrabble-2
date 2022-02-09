@@ -58,7 +58,7 @@ export class Room {
                 const opponentEasel = [...this.game.players[(index + 1) % 2].easel];
                 this.game.players[(index + 1) % 2].easel = [];
                 socket.emit('game status', {
-                    gameState: { activePlayer: this.game.activePlayer, letterPotLength: this.game.letterPot.length },
+                    status: { activePlayer: this.game.activePlayer, letterPotLength: this.game.letterPot.length },
                     players: { player: this.game.players[index], opponent: this.game.players[(index + 1) % 2] },
                     board: { board: this.game.board, multipliers: this.game.multipliers, pointsPerLetter: this.game.pointPerLetter },
                 });
