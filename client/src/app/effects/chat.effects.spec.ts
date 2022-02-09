@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import * as chatActions from '@app/actions/chat.actions';
 import { ChatService } from '@app/services/chat.service';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { cold } from 'jasmine-marbles';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ChatEffects } from './chat.effects';
-describe('RoomEffects', () => {
+
+describe('ChatEffects', () => {
     let actions$: Observable<unknown>;
     let effects: ChatEffects;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,7 +18,7 @@ describe('RoomEffects', () => {
                 provideMockActions(() => actions$),
                 {
                     provide: ChatService,
-                    useValue: jasmine.createSpyObj('ChatService', ['info']),
+                    useValue: jasmine.createSpyObj('ChatService', ['acceptNewMessages', 'messageWritten']),
                 },
             ],
         });
@@ -30,25 +30,17 @@ describe('RoomEffects', () => {
         expect(effects).toBeTruthy();
     });
 
-    it('initiateChattingEffect$ should call the function acceptNewMessages from chat service', () => {
-        actions$ = cold('a', { a: chatActions.initiateChatting() });
-        effects.initiateChattingEffect$.subscribe(() => {
-            try {
-                expect(service.info).toHaveBeenCalledWith();
-            } catch (error) {
-                fail('initiateChattingEffect$: ' + error);
-            }
-        });
+    it('initiateChattingEffect$ should call the function acceptNewMessages from chat service', (done) => {
+        actions$ = of({ type: '[Chat] Initiate chatting' });
+        effects.initiateChattingEffect$.subscribe();
+        expect(service.acceptNewMessages).toHaveBeenCalledWith();
+        done();
     });
 
-    it('should call the function messageWritten from chat service', () => {
-        actions$ = cold('a', { a: chatActions.messageWritten({ username: 'Test1', message: 'Test2' }) });
-        effects.messageWrittenEffect$.subscribe(() => {
-            try {
-                expect(service.info).toHaveBeenCalledWith({ username: 'Test1', message: 'Test2' });
-            } catch (error) {
-                fail('messageWrittenEffect$: ' + error);
-            }
-        });
+    it('should call the function messageWritten from chat service', (done) => {
+        actions$ = of(chatActions.messageWritten({ username: 'Test1', message: 'Test2' }));
+        effects.messageWrittenEffect$.subscribe();
+        expect(service.messageWritten).toHaveBeenCalledWith('Test1', 'Test2');
+        done();
     });
 });
