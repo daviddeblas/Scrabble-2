@@ -7,6 +7,7 @@ import { CellStarComponent } from '@app/components/cells/cell-star/cell-star.com
 import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-word-x2.component';
 import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
+import { EaselComponent } from '@app/components/easel/easel.component';
 import { LetterComponent } from '@app/components/letter/letter.component';
 import { ChatEffects } from '@app/effects/chat.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -29,6 +30,7 @@ import { StoreModule } from '@ngrx/store';
         CellStarComponent,
         LetterComponent,
         ChatBoxComponent,
+        EaselComponent,
     ],
     imports: [
         AppMaterialModule,
