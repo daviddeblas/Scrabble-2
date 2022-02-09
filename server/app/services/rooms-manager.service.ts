@@ -6,7 +6,19 @@ import { Service } from 'typedi';
 
 @Service()
 export class RoomsManager {
+    private static instance: RoomsManager;
     rooms: Room[] = [];
+
+    private constructor() {
+        return;
+    }
+    static getInstance(): RoomsManager {
+        if (!RoomsManager.instance) {
+            RoomsManager.instance = new RoomsManager();
+        }
+
+        return RoomsManager.instance;
+    }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('create room', (options) => {
@@ -45,9 +57,18 @@ export class RoomsManager {
         return this.rooms.map((r) => r.getRoomInfo());
     }
 
-    getOpponentSocket(playerServerId: string): io.Socket | undefined {
-        const room = this.rooms.find((r) => r.host.id === playerServerId || r.clients[0]?.id === playerServerId);
-        if (room?.clients[0] === null) return undefined;
-        return room?.host.id === playerServerId ? room.clients[0] : room?.host;
+    switchPlayerSocket(oldSocket: io.Socket, newSocket: io.Socket): void {
+        const room = this.getRoom(oldSocket.id);
+        if (!room) return;
+        if (room.host.id === oldSocket.id) {
+            room.host = newSocket;
+        } else {
+            room.clients[0] = newSocket;
+        }
+        room.initiateRoomEvents();
+    }
+
+    getRoom(playerServerId: string): Room | undefined {
+        return this.rooms.find((r) => r.host.id === playerServerId || r.clients[0]?.id === playerServerId);
     }
 }

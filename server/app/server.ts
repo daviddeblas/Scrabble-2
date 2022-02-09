@@ -31,7 +31,7 @@ export class Server {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
-        this.socketService = new SocketService(this.server, new RoomsManager(), new DictionaryService(), new BrowserService());
+        this.socketService = new SocketService(this.server, RoomsManager.getInstance(), new DictionaryService(), new BrowserService());
         // eslint-disable-next-line no-console
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
