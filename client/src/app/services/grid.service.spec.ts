@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { CanvasTestHelper } from '@app/helper/canvas-test-helper';
 import { GridService } from '@app/services/grid.service';
 
 describe('GridService', () => {
