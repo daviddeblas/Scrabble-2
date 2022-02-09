@@ -1,14 +1,13 @@
 import * as gameStatusActions from '@app/actions/game-status.actions';
 import { Player } from '@app/classes/player';
 import { GameStatus, initialState, reducer } from '@app/reducers/game-status.reducer';
+import { BoardState } from './board.reducer';
 import { Players } from './player.reducer';
 
 describe('[Game Status] Game Status Received', () => {
     const gameStatusStub: GameStatus = {
-        multipliers: [],
         activePlayer: 0,
         letterPotLength: 0,
-        pointsPerLetter: new Map(),
     };
 
     const playersStub: Players = {
@@ -16,11 +15,17 @@ describe('[Game Status] Game Status Received', () => {
         opponent: new Player('Player 2'),
     };
 
+    const boardState: BoardState = {
+        board: [],
+        multipliers: [],
+        pointsPerLetter: new Map(),
+    };
+
     it('should set the game status', () => {
         const action = gameStatusActions.gameStatusReceived({
             status: gameStatusStub,
             players: playersStub,
-            board: [],
+            board: boardState,
         });
 
         const result = reducer(initialState, action);
