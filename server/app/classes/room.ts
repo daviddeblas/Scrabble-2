@@ -38,6 +38,7 @@ export class Room {
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initGame();
+        this.initChatting();
     }
 
     endGame(info: GameFinishStatus): void {
@@ -65,6 +66,15 @@ export class Room {
                     pointsPerLetter: this.game.pointPerLetter,
                 });
             });
+        });
+    }
+
+    initChatting(): void {
+        this.host.on('send message', ({ username, message }) => {
+            this.clients[0]?.emit('receive message', { username, message });
+        });
+        this.clients[0]?.on('send message', ({ username, message }) => {
+            this.host.emit('receive message', { username, message });
         });
     }
 
