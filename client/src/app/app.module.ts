@@ -50,7 +50,11 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         BrowserModule,
         FormsModule,
         HttpClientModule,
-        StoreModule.forRoot({ dictionaries: dictionariesReducer.reducer, room: roomReducer.reducer, game: gameReducer.reducer }),
+        StoreModule.forRoot({
+            dictionaries: dictionariesReducer.reducer,
+            room: roomReducer.reducer,
+            game: gameReducer.reducer,
+        }),
         EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,

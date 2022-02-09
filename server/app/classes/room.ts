@@ -39,6 +39,7 @@ export class Room {
         client.emit('accepted');
         this.initGame();
         this.initSurrenderGame();
+        this.initChatting();
     }
 
     endGame(info: GameFinishStatus): void {
@@ -55,16 +56,14 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
                 if (this.game === null) throw new Error();
+                const opponentEasel = [...this.game.players[(index + 1) % 2].easel];
+                this.game.players[(index + 1) % 2].easel = [];
                 socket.emit('game status', {
-                    playerNames: [this.game.players[0].name, this.game.players[1].name],
-                    thisPlayer: index,
-                    playerEasel: this.game.players[index].easel,
-                    board: this.game.board,
-                    multipliers: this.game.multipliers,
-                    activePlayer: this.game.activePlayer,
-                    letterPotLength: this.game.letterPot.length,
-                    pointsPerLetter: this.game.pointPerLetter,
+                    status: { activePlayer: this.game.activePlayer, letterPotLength: this.game.letterPot.length },
+                    players: { player: this.game.players[index], opponent: this.game.players[(index + 1) % 2] },
+                    board: { board: this.game.board, multipliers: this.game.multipliers, pointsPerLetter: this.game.pointPerLetter },
                 });
+                this.game.players[(index + 1) % 2].easel = opponentEasel;
             });
         });
     }
@@ -81,6 +80,15 @@ export class Room {
             });
         });
     }
+    initChatting(): void {
+        this.host.on('send message', ({ username, message }) => {
+            this.clients[0]?.emit('receive message', { username, message });
+        });
+        this.clients[0]?.on('send message', ({ username, message }) => {
+            this.host.emit('receive message', { username, message });
+        });
+    }
+
     inviteRefused(client: io.Socket): void {
         client.emit('refused');
         this.clients[0] = null;

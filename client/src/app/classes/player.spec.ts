@@ -32,7 +32,7 @@ describe('Player', () => {
             player.addLettersToEasel(letters);
             expect(() => {
                 player.addLettersToEasel(letters);
-            }).toThrow(new Error('The easel capacity has been exceeded'));
+            }).toThrow(new Error('The easel capacity has been exceeded: 9'));
         });
 
         it('should remove letter from easel', () => {
