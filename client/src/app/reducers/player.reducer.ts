@@ -21,8 +21,7 @@ export const reducer = createReducer(
     on(gameStatusReceived, (state, { players }) => players),
 
     on(placeWordSuccess, (state, { word, newLetters, newScore }) => {
-        const letterToRemove = [...word.letters];
-        state.player.removeLettersFromEasel(letterToRemove);
+        state.player.removeLettersFromEasel(word.letters);
 
         if (newLetters) state.player.addLettersToEasel(newLetters);
         if (newScore) state.player.score = newScore;
@@ -31,8 +30,7 @@ export const reducer = createReducer(
     }),
 
     on(exchangeLettersSuccess, (state, { oldLetters, newLetters }) => {
-        const letterToRemove = [...oldLetters];
-        state.player.removeLettersFromEasel(letterToRemove);
+        state.player.removeLettersFromEasel(oldLetters);
         state.player.addLettersToEasel(newLetters);
 
         return state;

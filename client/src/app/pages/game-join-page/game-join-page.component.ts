@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatStepper } from '@angular/material/stepper';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { RoomEffects } from '@app/effects/room.effects';
@@ -14,7 +15,12 @@ import { Observable } from 'rxjs';
     styleUrls: ['./game-join-page.component.scss'],
 })
 export class GameJoinPageComponent {
+    @ViewChild(MatStepper) stepper: MatStepper;
+
     formGroup: FormGroup;
+    selectedRoom: RoomInfo | undefined;
+    isFormDisabled: boolean = false;
+
     roomList$: Observable<RoomInfo[]>;
     pendingRooms$: Observable<RoomInfo | undefined>;
 
@@ -26,7 +32,7 @@ export class GameJoinPageComponent {
         dialogRef: MatDialogRef<GameJoinPageComponent>,
     ) {
         this.formGroup = formBuilder.group({
-            name: ['', Validators.required],
+            name: new FormControl({ value: '', disabled: this.isFormDisabled }),
         });
 
         this.roomList$ = roomStore.select('room', 'roomList');
@@ -35,11 +41,19 @@ export class GameJoinPageComponent {
         this.effects.dialogRef = dialogRef;
     }
 
-    joinGame(roomInfo: RoomInfo): void {
-        this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo }));
+    selectRoom(roomInfo: RoomInfo): void {
+        this.selectedRoom = roomInfo;
     }
 
-    cancelJoin(roomInfo: RoomInfo): void {
-        this.store.dispatch(cancelJoinRoom({ roomInfo }));
+    joinGame(): void {
+        if (this.selectedRoom) this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo: this.selectedRoom }));
+        this.formGroup.controls.name.disable();
+    }
+
+    cancelJoin(): void {
+        if (this.selectedRoom) this.store.dispatch(cancelJoinRoom({ roomInfo: this.selectedRoom }));
+        this.selectedRoom = undefined;
+        this.formGroup.controls.name.enable();
+        this.stepper.reset();
     }
 }
