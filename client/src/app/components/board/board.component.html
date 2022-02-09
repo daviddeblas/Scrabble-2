@@ -31,7 +31,7 @@
     </text>
 
     <g transform="translate(50, 50)">
-        <g app-cell-word-x2 [pos]="{ x: 1, y: 1 }"></g>
+        <!--<g app-cell-word-x2 [pos]="{ x: 1, y: 1 }"></g>
         <g app-cell-word-x2 [pos]="{ x: 2, y: 2 }"></g>
         <g app-cell-word-x2 [pos]="{ x: 3, y: 3 }"></g>
         <g app-cell-word-x2 [pos]="{ x: 4, y: 4 }"></g>
@@ -60,7 +60,6 @@
         <g app-cell-word-x3 [pos]="{ x: 7, y: 14 }"></g>
         <g app-cell-word-x3 [pos]="{ x: 14, y: 14 }"></g>
 
-
         <g app-cell-letter-x2 [pos]="{ x: 3, y: 0 }"></g>
         <g app-cell-letter-x2 [pos]="{ x: 11, y: 0 }"></g>
         <g app-cell-letter-x2 [pos]="{ x: 6, y: 2 }"></g>
@@ -86,8 +85,7 @@
         <g app-cell-letter-x2 [pos]="{ x: 8, y: 12 }"></g>
         <g app-cell-letter-x2 [pos]="{ x: 3, y: 14 }"></g>
         <g app-cell-letter-x2 [pos]="{ x: 11, y: 14 }"></g>
-         
-        
+
         <g app-cell-letter-x3 [pos]="{ x: 5, y: 1 }"></g>
         <g app-cell-letter-x3 [pos]="{ x: 9, y: 1 }"></g>
         <g app-cell-letter-x3 [pos]="{ x: 1, y: 5 }"></g>
@@ -98,10 +96,23 @@
         <g app-cell-letter-x3 [pos]="{ x: 5, y: 9 }"></g>
         <g app-cell-letter-x3 [pos]="{ x: 9, y: 9 }"></g>
         <g app-cell-letter-x3 [pos]="{ x: 13, y: 9 }"></g>
-         <g app-cell-letter-x3 [pos]="{ x: 5, y: 13 }"></g>
+        <g app-cell-letter-x3 [pos]="{ x: 5, y: 13 }"></g>
         <g app-cell-letter-x3 [pos]="{ x: 9, y: 13 }"></g>
 
-        <g app-cell-star [pos]="{ x: 7, y: 7 }"></g>
-        <!-- <g app-letter [letter]="'W'" [value]="10"></g> -->
+        <g app-cell-star [pos]="{ x: 7, y: 7 }"></g>-->
+
+        <g *ngFor="let multipliersColumn of (boardState$ | async)?.multipliers; let i = index">
+            <g *ngFor="let multiplier of multipliersColumn; let j = index" app-cell-letter-x3 [pos]="{ x: i, y: j }"></g>
+        </g>
+
+        <g *ngFor="let letterArray of (boardState$ | async)?.board; let i = index">
+            <g
+                *ngFor="let letter of letterArray; let j = index"
+                app-letter
+                [letter]="letter"
+                [value]="(boardState$ | async)?.pointsPerLetter?.get(letter)"
+                [pos]="{ x: i, y: j }"
+            ></g>
+        </g>
     </g>
 </svg>
