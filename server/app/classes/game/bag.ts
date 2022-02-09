@@ -17,7 +17,7 @@ export class Bag {
 
     getLetters(amt: number): Letter[] {
         const val: Letter[] = [];
-        for (let i = 0; i < amt; i++) val.push(this.letters.splice(Math.round(Math.random() * this.letters.length), 1)[0]);
+        for (let i = 0; i < amt && this.letters.length > 0; i++) val.push(this.letters.splice(Math.round(Math.random() * this.letters.length), 1)[0]);
         return val;
     }
 }

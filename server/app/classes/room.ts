@@ -1,6 +1,6 @@
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
-import { ClassicGame } from './classic-game';
+import { Game } from './game/game';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { RoomInfo } from './room-info';
