@@ -78,32 +78,33 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 
-    it('getOpponentSocket should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
+    it('getRoom should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
-        expect(roomsManager.getOpponentSocket('Tristan')).to.deep.equal(undefined);
+        roomsManager.rooms.push(new Room(socket, roomsManager, otherOption));
+        const undefinedID = '3';
+        expect(roomsManager.getRoom(undefinedID)).to.deep.equal(undefined);
     });
 
-    it('getOpponentSocket should return the host socket if the opponent socket Id is passed as a parameter', () => {
+    it('getRoom should return the room if the host socket Id is passed as a parameter', () => {
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const expectedRoom = new Room(socket, roomsManager, otherOption);
+        roomsManager.rooms.push(expectedRoom);
+        expect(roomsManager.getRoom(socket.id)).to.equal(expectedRoom);
+    });
+
+    it('getRoom should return the room if the opponent socket Id is passed as a parameter', () => {
         const opponentSocket = { id: 'Opponent' } as unknown as Socket;
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
-        roomsManager.rooms[0].clients[0] = opponentSocket;
-        expect(roomsManager.getOpponentSocket(opponentSocket.id)).to.equal(socket);
+        const expectedRoom = new Room(socket, roomsManager, otherOption);
+        expectedRoom.clients[0] = opponentSocket;
+        roomsManager.rooms.push(expectedRoom);
+        expect(roomsManager.getRoom(opponentSocket.id)).to.equal(expectedRoom);
     });
 
-    it('getOpponentSocket should return the client socket if the host socket Id is passed as a parameter', () => {
-        const opponentSocket = { id: 'Opponent' } as unknown as Socket;
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
-        roomsManager.rooms[0].clients[0] = opponentSocket;
-        expect(roomsManager.getOpponentSocket(socket.id)).to.equal(opponentSocket);
-    });
-
-    it('getOpponentSocket should return undefined if the room clients are null', () => {
+    /* it('getRoom should return undefined if the room clients are null', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
         roomsManager.rooms[0].clients[0] = null;
-        expect(roomsManager.getOpponentSocket(socket.id)).to.equal(undefined);
-    });
+        expect(roomsManager.getRoom(socket.id)).to.equal(undefined);
+    });*/
 });

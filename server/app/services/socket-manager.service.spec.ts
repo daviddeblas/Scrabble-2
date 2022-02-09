@@ -26,6 +26,7 @@ describe('SocketManager service tests', () => {
     });
 
     afterEach(() => {
+        service.roomManager.rooms = [];
         clientSocket.close();
         // eslint-disable-next-line dot-notation
         service['sio'].close();

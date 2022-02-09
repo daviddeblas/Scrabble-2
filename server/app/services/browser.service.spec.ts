@@ -1,3 +1,4 @@
+import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { assert, expect } from 'chai';
 import { createServer, Server } from 'http';
@@ -5,6 +6,7 @@ import * as sinon from 'sinon';
 import io from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { BrowserService } from './browser.service';
+import { RoomsManager } from './rooms-manager.service';
 
 describe('Browser service tests', () => {
     let service: BrowserService;
@@ -12,7 +14,6 @@ describe('Browser service tests', () => {
     let server: io.Server;
     let httpServer: Server;
     const urlString = 'http://localhost:3000';
-    // let serverSocket: io.Socket;
 
     before((done) => {
         httpServer = createServer();
@@ -43,7 +44,8 @@ describe('Browser service tests', () => {
     it('browser reconnection should call clear timeout if the old sockets are equal', (done) => {
         const oldClientId = '123';
         const timeoutSpy = sinon.spy(global, 'clearTimeout');
-
+        const roomsManagerMock = sinon.mock(RoomsManager.getInstance());
+        roomsManagerMock.expects('switchPlayerSocket').once();
         service.tempClientSocketId = oldClientId;
         const testTimeoutId = setTimeout(() => {
             assert(false);
@@ -52,6 +54,8 @@ describe('Browser service tests', () => {
         clientSocket.emit('browser reconnection', oldClientId);
         setTimeout(() => {
             assert(timeoutSpy.calledWith(testTimeoutId) === true);
+            roomsManagerMock.verify();
+            roomsManagerMock.restore();
             done();
         }, RESPONSE_DELAY);
     });
@@ -78,31 +82,29 @@ describe('Browser service tests', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('closed browser should set a 5 second timeout and call getOpponentSocket ', (done) => {
+    it('closed browser should set a 5 second timeout and call surrenderGame from the room received ', (done) => {
         const testUserId = '123';
-        const roomsManagerMock = sinon.mock(service.rooms);
-        roomsManagerMock.expects('getOpponentSocket').once();
-        clientSocket.emit('closed browser', testUserId);
-        const timeoutSixSec = 6000;
-        setTimeout(() => {
-            roomsManagerMock.verify();
-            done();
-        }, timeoutSixSec);
-    });
-
-    it('closed browser should set a 5 second timeout and emit victory to the opponent ', (done) => {
-        const opponentSocketStub = {
-            emit: (emitType: string) => {
-                if (emitType === 'victory') {
-                    expect(roomsManagerStub.calledOnce).to.equal(true);
-                    done();
-                }
+        const fakeRoom = {
+            surrenderGame: () => {
+                done();
             },
-        } as unknown as io.Socket;
-        const testUserId = '123';
-        const roomsManagerStub = sinon.stub(service.rooms, 'getOpponentSocket').callsFake(() => {
-            return opponentSocketStub;
+        } as unknown as Room;
+        sinon.stub(RoomsManager.getInstance(), 'getRoom').callsFake(() => {
+            return fakeRoom;
         });
         clientSocket.emit('closed browser', testUserId);
+    });
+
+    it('closed browser should set a 5 second timeout and pass if getRoom returns undefined  ', (done) => {
+        const testUserId = '123';
+        const getRoomStub = sinon.stub(RoomsManager.getInstance(), 'getRoom').callsFake(() => {
+            return undefined;
+        });
+        const maxTimeout = 5500;
+        clientSocket.emit('closed browser', testUserId);
+        setTimeout(() => {
+            assert(getRoomStub.called === true);
+            done();
+        }, maxTimeout);
     });
 });
