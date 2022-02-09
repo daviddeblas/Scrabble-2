@@ -1,11 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { surrender } from '@app/actions/player.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { EffectsRootModule } from '@ngrx/effects';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
 import { ConfirmSurrenderDialogComponent } from './confirm-surrender-dialog.component';
 
 describe('ConfirmSurrenderComponent', () => {
     let component: ConfirmSurrenderDialogComponent;
     let fixture: ComponentFixture<ConfirmSurrenderDialogComponent>;
+    let store: MockStore;
     const mockDialogSpy: { close: jasmine.Spy } = {
         close: jasmine.createSpy('close'),
     };
@@ -13,7 +19,7 @@ describe('ConfirmSurrenderComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ConfirmSurrenderDialogComponent],
-            imports: [AppMaterialModule],
+            imports: [AppMaterialModule, BrowserAnimationsModule, EffectsRootModule],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,
@@ -23,8 +29,16 @@ describe('ConfirmSurrenderComponent', () => {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
                 },
+                {
+                    provide: EffectsRootModule,
+                    useValue: {
+                        addEffects: jasmine.createSpy('addEffects'),
+                    },
+                },
+                provideMockStore(),
             ],
         }).compileComponents();
+        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
@@ -33,8 +47,18 @@ describe('ConfirmSurrenderComponent', () => {
         fixture.detectChanges();
     });
 
+    afterEach(() => {
+        fixture.destroy();
+    });
+
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should dispatch [Players] Surrender when created', () => {
+        component.surrenderGame();
+        const expectedAction = cold('a', { a: surrender() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should close the window when the accept button is clicked', () => {
