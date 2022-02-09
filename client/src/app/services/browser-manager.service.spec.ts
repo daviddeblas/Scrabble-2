@@ -8,6 +8,7 @@ describe('BrowserManagerService', () => {
     beforeEach(async () => {
         socketService = new SocketClientService();
         service = TestBed.inject(BrowserManagerService);
+        service.socketService = socketService;
         socketService.connect();
     });
     afterEach(() => {
@@ -21,7 +22,7 @@ describe('BrowserManagerService', () => {
 
     it('beforeUnloadHandler should call socketService.send', () => {
         const socketSendSpy = spyOn(socketService, 'send').and.callThrough();
-        service.onBrowserClosed(socketService);
+        service.onBrowserClosed();
         expect(socketSendSpy).toHaveBeenCalled();
     });
 
@@ -29,7 +30,7 @@ describe('BrowserManagerService', () => {
         const testSocketId = 'theSocketId';
         socketService.socket.id = testSocketId;
         const expectedCookie = 'socket=' + testSocketId;
-        service.onBrowserClosed(socketService);
+        service.onBrowserClosed();
         expect(document.cookie.includes(expectedCookie)).toBeTrue();
     });
 
@@ -38,7 +39,7 @@ describe('BrowserManagerService', () => {
             return true;
         });
         const connectSpy = spyOn(socketService, 'connect').and.callThrough();
-        service.onBrowserLoad(socketService);
+        service.onBrowserLoad();
         expect(socketAliveSpy).toHaveBeenCalled();
         expect(connectSpy).not.toHaveBeenCalled();
     });
@@ -46,7 +47,7 @@ describe('BrowserManagerService', () => {
     it("onloadHandler should call socketService.connect if a socket isn't connected", () => {
         const connectSpy = spyOn(socketService, 'connect').and.callThrough();
         socketService.disconnect();
-        service.onBrowserLoad(socketService);
+        service.onBrowserLoad();
         expect(connectSpy).toHaveBeenCalled();
     });
 
@@ -58,7 +59,7 @@ describe('BrowserManagerService', () => {
         socketService.disconnect();
         const expectedOldId = 'MyOldSocketId';
         document.cookie = 'socket=' + expectedOldId + '; path=/';
-        service.onBrowserLoad(socketService);
+        service.onBrowserLoad();
         expect(sendSpy).toHaveBeenCalledOnceWith('browser reconnection', expectedOldId);
     });
 

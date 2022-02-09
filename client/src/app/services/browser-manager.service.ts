@@ -5,20 +5,21 @@ import { SocketClientService } from '@app/services/socket-client.service';
     providedIn: 'root',
 })
 export class BrowserManagerService {
-    onBrowserClosed(socketService: SocketClientService): void {
-        socketService.send('closed browser', socketService.socket.id);
+    constructor(public socketService: SocketClientService) {}
+    onBrowserClosed(): void {
+        this.socketService.send('closed browser', this.socketService.socket.id);
         const date = new Date();
         const expiryTimer = 5000;
         date.setTime(date.getTime() + expiryTimer);
         const expires = '; expires=' + date.toUTCString();
-        document.cookie = 'socket=' + (socketService.socket.id || '') + expires + '; path=/';
+        document.cookie = 'socket=' + (this.socketService.socket.id || '') + expires + '; path=/';
     }
 
-    onBrowserLoad(socketService: SocketClientService): void {
-        if (!socketService.isSocketAlive()) {
-            socketService.connect();
+    onBrowserLoad(): void {
+        if (!this.socketService.isSocketAlive()) {
+            this.socketService.connect();
             const oldSocketId = this.readCookieSocket;
-            if (oldSocketId !== undefined) socketService.send('browser reconnection', oldSocketId);
+            if (oldSocketId !== undefined) this.socketService.send('browser reconnection', oldSocketId);
         }
     }
 
