@@ -37,6 +37,10 @@ export class Room {
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
+        this.initiateRoomEvents();
+    }
+
+    initiateRoomEvents() {
         this.initGame();
         this.initSurrenderGame();
         this.initChatting();
@@ -71,15 +75,20 @@ export class Room {
     initSurrenderGame(): void {
         this.sockets.forEach((socket) => {
             socket.on('surrender game', () => {
-                if (!this.game?.players) return;
-                const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
-                    this.game.players,
-                    socket.id === this.host.id ? this.clientName : this.gameOptions.hostname,
-                );
-                this.endGame(gameFinishStatus);
+                this.surrenderGame(socket.id);
             });
         });
     }
+
+    surrenderGame(looserId: string) {
+        if (!this.game?.players) return;
+        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
+            this.game.players,
+            looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
+        );
+        this.endGame(gameFinishStatus);
+    }
+
     initChatting(): void {
         this.host.on('send message', ({ username, message }) => {
             this.clients[0]?.emit('receive message', { username, message });

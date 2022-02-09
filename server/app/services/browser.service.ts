@@ -1,5 +1,6 @@
 import io from 'socket.io';
 import { Service } from 'typedi';
+import { RoomsManager } from './rooms-manager.service';
 
 @Service()
 export class BrowserService {
@@ -13,14 +14,16 @@ export class BrowserService {
             this.tempServerSocket = socket;
             const maxTimeForReload = 5000;
             this.timeoutId = setTimeout(() => {
-                socket.emit('surrender game');
+                const room = RoomsManager.getInstance().getRoom(socket.id);
+                room?.surrenderGame(socket.id);
             }, maxTimeForReload);
         });
 
         socket.on('browser reconnection', (oldClientId) => {
             if (oldClientId === this.tempClientSocketId) {
                 clearTimeout(this.timeoutId);
-                socket = this.tempServerSocket;
+                const roomsManager = RoomsManager.getInstance();
+                roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
             }
         });
     }
