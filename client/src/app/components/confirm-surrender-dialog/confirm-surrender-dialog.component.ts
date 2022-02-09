@@ -1,6 +1,7 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Socket } from 'socket.io-client';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { surrender } from '@app/actions/player.actions';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-confirm-surrender-dialog',
@@ -8,16 +9,14 @@ import { Socket } from 'socket.io-client';
     styleUrls: ['./confirm-surrender-dialog.component.scss'],
 })
 export class ConfirmSurrenderDialogComponent {
-    socket: Socket;
-    constructor(public dialogRef: MatDialogRef<ConfirmSurrenderDialogComponent>, @Inject(MAT_DIALOG_DATA) data: Socket) {
-        this.socket = data;
-    }
+    constructor(public dialogRef: MatDialogRef<ConfirmSurrenderDialogComponent>, private store: Store) {}
 
     closeDialog(): void {
         this.dialogRef.close();
     }
 
     surrenderGame(): void {
+        this.store.dispatch(surrender());
         this.closeDialog();
     }
 }
