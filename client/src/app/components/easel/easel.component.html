@@ -1,1 +1,12 @@
-<p>easel works!</p>
+<mat-card class="easel">
+    <svg
+        app-letter
+        *ngFor="let letter of (players$ | async)?.player?.easel"
+        height="50"
+        width="50"
+        viewBox="'0 0 50 50"
+        xmlns="http://www.w3.org/2000/svg"
+        [letter]="letter"
+        [value]="(boardState$ | async)?.pointsPerLetter?.get(letter)"
+    ></svg>
+</mat-card>
