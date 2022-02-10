@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { EaselComponent } from './easel.component';
 
 describe('EaselComponent', () => {
@@ -8,6 +9,7 @@ describe('EaselComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [EaselComponent],
+            providers: [provideMockStore()],
         }).compileComponents();
     });
 
