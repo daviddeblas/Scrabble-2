@@ -3,6 +3,7 @@ import { GameOptions } from '@app/classes/game-options';
 import { Room } from '@app/classes/room';
 import { RoomInfo } from '@app/classes/room-info';
 import { expect } from 'chai';
+import { stub } from 'sinon';
 import { Socket } from 'socket.io';
 import { Container } from 'typedi';
 import { RoomsManager } from './rooms-manager.service';
@@ -78,6 +79,57 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 
+    describe('switchPlayerSocket', () => {
+        let oldPlayerSocket: Socket;
+        let newPlayerSocket: Socket;
+
+        beforeEach(() => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            oldPlayerSocket = { id: 'Old Player', once: () => {} } as unknown as Socket;
+            newPlayerSocket = { id: 'New Player' } as unknown as Socket;
+        });
+
+        it('switchPlayerSocket should not call initiateRoomEvents if the room is undefined', () => {
+            const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
+                return undefined;
+            });
+            roomsManager.switchPlayerSocket(oldPlayerSocket, newPlayerSocket);
+            expect(getRoomStub.calledOnceWith(oldPlayerSocket.id)).to.deep.equal(true);
+            getRoomStub.restore();
+        });
+
+        it('switchPlayerSocket should switch the host if the ids match and call initiateRoom', () => {
+            const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
+            const initiateRoomStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
+                return;
+            });
+            const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
+                return testRoom;
+            });
+            roomsManager.switchPlayerSocket(oldPlayerSocket, newPlayerSocket);
+            expect(getRoomStub.calledOnceWith(oldPlayerSocket.id)).to.deep.equal(true);
+            expect(testRoom.host).to.deep.equal(newPlayerSocket);
+            expect(initiateRoomStub.calledOnce).to.deep.equal(true);
+            getRoomStub.restore();
+        });
+
+        it('switchPlayerSocket should switch the client if the ids match and call initiateRoom', () => {
+            const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
+            testRoom.clients[0] = socket;
+            const initiateRoomStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
+                return;
+            });
+            const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
+                return testRoom;
+            });
+            roomsManager.switchPlayerSocket(socket, newPlayerSocket);
+            expect(getRoomStub.calledOnceWith(socket.id)).to.deep.equal(true);
+            expect(testRoom.clients[0]).to.deep.equal(newPlayerSocket);
+            expect(initiateRoomStub.calledOnce).to.deep.equal(true);
+            getRoomStub.restore();
+        });
+    });
+
     it('getRoom should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.rooms.push(new Room(socket, roomsManager, otherOption));
@@ -100,11 +152,4 @@ describe('Rooms Manager Service', () => {
         roomsManager.rooms.push(expectedRoom);
         expect(roomsManager.getRoom(opponentSocket.id)).to.equal(expectedRoom);
     });
-
-    /* it('getRoom should return undefined if the room clients are null', () => {
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
-        roomsManager.rooms[0].clients[0] = null;
-        expect(roomsManager.getRoom(socket.id)).to.equal(undefined);
-    });*/
 });
