@@ -1,11 +1,13 @@
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
+import { fail } from 'assert';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStubbedInstance, spy, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, spy, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
+import { ClassicGame } from './classic-game';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 describe('room', () => {
@@ -62,6 +64,25 @@ describe('room', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             room.join(socket, 'Player 2');
             expect(room.clients[0]).to.deep.equal(socket);
+        });
+
+        it('surrenderGame should call endGame if the game is not null', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const endGameStub = stub(room, 'endGame').callsFake(() => {
+                return;
+            });
+            room.game = { players: ['player1', 'player2'] } as unknown as ClassicGame;
+            room.surrenderGame(socket.id);
+            expect(endGameStub.calledOnce).to.deep.equal(true);
+        });
+
+        it('surrenderGame should throw error if the game is null', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            try {
+                room.surrenderGame(socket.id);
+            } catch (error) {
+                expect(error.message).to.deep.equal('Game does not exist');
+            }
         });
     });
 
@@ -159,6 +180,40 @@ describe('room', () => {
                     done();
                 });
                 hostSocket.emit('create room');
+            });
+
+            it('initSurrenderGame should enable the surrender event which calls surrenderGame', (done) => {
+                let surrenderGameStub: SinonStub;
+                hostSocket.on('player joining', () => {
+                    surrenderGameStub = stub(room, 'surrenderGame').callsFake(() => {
+                        return;
+                    });
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('accepted', () => {
+                    hostSocket.emit('surrender game');
+                });
+                hostSocket.emit('create room');
+                setTimeout(() => {
+                    expect(surrenderGameStub.called).to.equal(true);
+                    surrenderGameStub.restore();
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
+            it('initChatting should not initiate the client socket if clients[0] is null', (done) => {
+                hostSocket.on('player joining', () => {
+                    room.clients[0] = null;
+                    room.initChatting();
+                    hostSocket.emit('send message', { username: 'player', message: 'message' });
+                });
+                clientSocket.on('receive message', () => {
+                    fail('Client should not receive message');
+                });
+                hostSocket.emit('create room');
+                setTimeout(() => {
+                    done();
+                }, RESPONSE_DELAY);
             });
         });
 
