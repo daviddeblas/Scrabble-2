@@ -1,5 +1,5 @@
 export class Dictionary {
-    name: string;
+    title: string;
     description: string;
     words: string[];
 }

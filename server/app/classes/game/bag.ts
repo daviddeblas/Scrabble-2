@@ -12,6 +12,7 @@ export class Bag {
     }
 
     exchangeLetters(old: Letter[]): Letter[] {
+        old.forEach((l) => this.letters.push(l));
         return this.getLetters(old.length);
     }
 

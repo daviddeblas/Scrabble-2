@@ -24,12 +24,14 @@ export class Board {
                 this.multipliers[i][j] = null;
             }
         }
+        this.pointsPerLetter = new Map();
         config.letters.forEach((l) => this.pointsPerLetter.set(l.letter, l.points));
         config.multipliers.forEach((m) =>
             m.positions.forEach((p) => {
                 this.multipliers[p.x][p.y] = m.multiplier;
             }),
         );
+        this.blanks = [];
     }
 
     place(letters: PlacedLetter[]): number {
@@ -87,38 +89,6 @@ export class Board {
         return this.board[vec.x][vec.y];
     }
 
-    getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
-        const words: PlacedLetter[][] = [];
-        letters.forEach((l) => {
-            ALLOWED_DIRECTIONS.forEach((d) => {
-                const word = this.getAffectedWordFromSinglePlacement(d, l.position);
-                // ajouter s'il nexiste pas
-                const index = words.findIndex((w) => {
-                    let bool = true;
-                    // eslint-disable-next-line no-unused-vars
-                    w.forEach((letter, i) => {
-                        bool &&= letter.equals(word[i]);
-                    });
-                    return bool;
-                });
-                if (index < 0) words.push(word);
-            });
-        });
-        return words;
-    }
-
-    getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {
-        let checkingPosition = new Vec2(pos.x, pos.y);
-        const word: PlacedLetter[] = [];
-        while (this.letterAt(checkingPosition) !== null) checkingPosition = checkingPosition.sub(direction);
-        checkingPosition = checkingPosition.add(direction);
-        while (this.letterAt(checkingPosition) !== null) {
-            word.push(new PlacedLetter(this.letterAt(checkingPosition) as Letter, checkingPosition.copy()));
-            checkingPosition = checkingPosition.add(direction);
-        }
-        return word;
-    }
-
     copy(): Board {
         const returnValue = new Board(this.config);
 
@@ -135,5 +105,39 @@ export class Board {
         });
 
         return returnValue;
+    }
+
+    private getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
+        const tempBoard = this.copy();
+        letters.forEach((l) => {
+            tempBoard.board[l.position.x][l.position.y] = l.letter;
+        });
+        const words: PlacedLetter[][] = [];
+        letters.forEach((l) => {
+            ALLOWED_DIRECTIONS.forEach((d) => {
+                const word = tempBoard.getAffectedWordFromSinglePlacement(d, l.position);
+                if (word.length < 2) return;
+                // ajouter s'il nexiste pas
+                const index = words.findIndex((w) => {
+                    let bool = true;
+                    for (let i = 0; i < w.length && i < word.length; i++) bool &&= w[i].equals(word[i]);
+                    return bool;
+                });
+                if (index < 0) words.push(word);
+            });
+        });
+        return words;
+    }
+
+    private getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {
+        let checkingPosition = new Vec2(pos.x, pos.y);
+        const word: PlacedLetter[] = [];
+        while (this.letterAt(checkingPosition) !== null) checkingPosition = checkingPosition.sub(direction);
+        checkingPosition = checkingPosition.add(direction);
+        while (this.letterAt(checkingPosition) !== null) {
+            word.push(new PlacedLetter(this.letterAt(checkingPosition) as Letter, checkingPosition.copy()));
+            checkingPosition = checkingPosition.add(direction);
+        }
+        return word;
     }
 }
