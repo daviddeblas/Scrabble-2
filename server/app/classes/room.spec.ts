@@ -131,6 +131,33 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+            it('client should receive message if host emits send message', (done) => {
+                const message = { username: 'Hostname', message: 'Host Message' };
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                    hostSocket.emit('send message', message);
+                });
+                clientSocket.on('receive message', (data) => {
+                    expect(data.username).to.equal(message.username);
+                    expect(data.message).to.equal(message.message);
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
+
+            it('host should receive message if client emits send message', (done) => {
+                const message = { username: 'ClientName', message: 'Client Message' };
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                    clientSocket.emit('send message', message);
+                });
+                hostSocket.on('receive message', (data) => {
+                    expect(data.username).to.equal(message.username);
+                    expect(data.message).to.equal(message.message);
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
         });
 
         describe('getGameInfo', () => {

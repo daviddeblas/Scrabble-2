@@ -1,0 +1,33 @@
+<mat-card>
+    <mat-card-title>Boite de Clavardage</mat-card-title>
+    <mat-card id="chat-list">
+        <mat-list role="list">
+            <mat-list-item role="listitem" id="chat-log-list" *ngFor="let line of chat$ | async">
+                <mat-card *ngIf="line.username === this.username; else errorMessage" id="user-message">
+                    <strong>{{ line.username }}</strong> : {{ line.message }}
+                </mat-card>
+                <ng-template #errorMessage>
+                    <section *ngIf="line.username === 'Error'; else opponentMessage" id="error-message">
+                        <strong>{{ line.username }}</strong> : {{ line.message }}
+                    </section>
+                </ng-template>
+                <ng-template #opponentMessage>
+                    <mat-card id="opponent-message">
+                        <strong>{{ line.username }}</strong> : {{ line.message }}
+                    </mat-card>
+                </ng-template>
+            </mat-list-item>
+        </mat-list>
+    </mat-card>
+    <form class="chat-box-form" onsubmit="return false;">
+        <mat-form-field id="chat-input" appearance="fill">
+            <mat-label>Message</mat-label>
+            <input matInput #chatMessage maxlength="512" placeholder="Aide: !info" autocomplete="off" />
+            <mat-hint align="start"><strong>Parlez avec l'adversaire</strong> </mat-hint>
+            <mat-hint align="end">{{ chatMessage.value.length }} / 512</mat-hint>
+        </mat-form-field>
+        <button mat-raised-button type="submit" id="submit-message-button" color="primary" (click)="submitMessage()">
+            <mat-icon aria-hidden="false" aria-label="send message">send</mat-icon>
+        </button>
+    </form>
+</mat-card>

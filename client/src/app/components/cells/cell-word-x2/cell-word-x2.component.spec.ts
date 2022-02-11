@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { CellWordX2Component } from './cell-word-x2.component';
 
-describe('SidebarComponent', () => {
-    let component: SidebarComponent;
-    let fixture: ComponentFixture<SidebarComponent>;
+describe('CellWordX2Component', () => {
+    let component: CellWordX2Component;
+    let fixture: ComponentFixture<CellWordX2Component>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SidebarComponent],
+            declarations: [CellWordX2Component],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(SidebarComponent);
+        fixture = TestBed.createComponent(CellWordX2Component);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
