@@ -31,81 +31,16 @@
     </text>
 
     <g transform="translate(50, 50)">
-        <!--<g app-cell-word-x2 [pos]="{ x: 1, y: 1 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 2, y: 2 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 3, y: 3 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 4, y: 4 }"></g>
+        <ng-container *ngFor="let multipliersColumn of multipliers$ | async; let i = index">
+            <ng-container *ngFor="let multiplier of multipliersColumn; let j = index">
+                <g *ngIf="multiplier?.amt === 2 && multiplier?.type === multiplierType.Letter" app-cell-letter-x2 [pos]="{ x: i, y: j }"></g>
+                <g *ngIf="multiplier?.amt === 3 && multiplier?.type === multiplierType.Letter" app-cell-letter-x3 [pos]="{ x: i, y: j }"></g>
+                <g *ngIf="multiplier?.amt === 2 && multiplier?.type === multiplierType.Word" app-cell-word-x2 [pos]="{ x: i, y: j }"></g>
+                <g *ngIf="multiplier?.amt === 3 && multiplier?.type === multiplierType.Word" app-cell-word-x3 [pos]="{ x: i, y: j }"></g>
+            </ng-container>
+        </ng-container>
 
-        <g app-cell-word-x2 [pos]="{ x: 13, y: 1 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 12, y: 2 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 11, y: 3 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 10, y: 4 }"></g>
-
-        <g app-cell-word-x2 [pos]="{ x: 1, y: 13 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 2, y: 12 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 3, y: 11 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 4, y: 10 }"></g>
-
-        <g app-cell-word-x2 [pos]="{ x: 13, y: 13 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 12, y: 12 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 11, y: 11 }"></g>
-        <g app-cell-word-x2 [pos]="{ x: 10, y: 10 }"></g>
-
-        <g app-cell-word-x3 [pos]="{ x: 0, y: 0 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 7, y: 0 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 14, y: 0 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 0, y: 7 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 14, y: 7 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 0, y: 14 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 7, y: 14 }"></g>
-        <g app-cell-word-x3 [pos]="{ x: 14, y: 14 }"></g>
-
-        <g app-cell-letter-x2 [pos]="{ x: 3, y: 0 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 11, y: 0 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 6, y: 2 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 8, y: 2 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 7, y: 3 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 0, y: 3 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 14, y: 3 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 2, y: 6 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 6, y: 6 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 8, y: 6 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 12, y: 6 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 3, y: 7 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 11, y: 7 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 2, y: 8 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 6, y: 8 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 8, y: 8 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 12, y: 8 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 6, y: 6 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 0, y: 11 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 7, y: 11 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 14, y: 11 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 6, y: 12 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 8, y: 12 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 3, y: 14 }"></g>
-        <g app-cell-letter-x2 [pos]="{ x: 11, y: 14 }"></g>
-
-        <g app-cell-letter-x3 [pos]="{ x: 5, y: 1 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 9, y: 1 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 1, y: 5 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 5, y: 5 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 9, y: 5 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 13, y: 5 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 1, y: 9 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 5, y: 9 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 9, y: 9 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 13, y: 9 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 5, y: 13 }"></g>
-        <g app-cell-letter-x3 [pos]="{ x: 9, y: 13 }"></g>
-
-        <g app-cell-star [pos]="{ x: 7, y: 7 }"></g>-->
-
-        <!--<g *ngFor="let multipliersColumn of (boardState$ | async)?.multipliers; let i = index">
-            <g *ngFor="let multiplier of multipliersColumn; let j = index" app-cell-letter-x3 [pos]="{ x: i, y: j }"></g>
-        </g>-->
-
-        <g *ngFor="let letterArray of board$ | async; let i = index">
+        <ng-container *ngFor="let letterArray of board$ | async; let i = index">
             <g
                 *ngFor="let letter of letterArray; let j = index"
                 app-letter
@@ -113,6 +48,6 @@
                 [pos]="{ x: i, y: j }"
                 [value]="(pointsPerLetter$ | async)?.get(letter)"
             ></g>
-        </g>
+        </ng-container>
     </g>
 </svg>

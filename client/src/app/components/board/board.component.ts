@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Letter } from '@app/classes/letter';
-import { Multiplier } from '@app/classes/multiplier';
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { BOARD_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Store } from '@ngrx/store';
@@ -14,7 +14,9 @@ const LETTER_A = 'A'.charCodeAt(0);
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent {
+    readonly multiplierType = MultiplierType;
     readonly boardSize = BOARD_SIZE;
+
     board$: Observable<Letter[][]>;
     pointsPerLetter$: Observable<Map<Letter, number>>;
     multipliers$: Observable<(Multiplier | null)[][]>;
