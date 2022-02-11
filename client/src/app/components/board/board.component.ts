@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { Letter } from '@app/classes/letter';
+import { Multiplier } from '@app/classes/multiplier';
 import { BOARD_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
-import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -14,12 +15,14 @@ const LETTER_A = 'A'.charCodeAt(0);
 })
 export class BoardComponent {
     readonly boardSize = BOARD_SIZE;
-    gameStatus$: Observable<GameStatus>;
-    boardState$: Observable<BoardState>;
+    board$: Observable<Letter[][]>;
+    pointsPerLetter$: Observable<Map<Letter, number>>;
+    multipliers$: Observable<(Multiplier | null)[][]>;
 
-    constructor(store: Store<{ gameStatus: GameStatus; boardState: BoardState }>) {
-        this.gameStatus$ = store.select('gameStatus');
-        this.boardState$ = store.select('boardState');
+    constructor(store: Store<{ board: BoardState }>) {
+        this.board$ = store.select('board', 'board');
+        this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
+        this.multipliers$ = store.select('board', 'multipliers');
     }
 
     numberSequence(n: number): number[] {

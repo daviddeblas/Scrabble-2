@@ -101,17 +101,17 @@
 
         <g app-cell-star [pos]="{ x: 7, y: 7 }"></g>-->
 
-        <g *ngFor="let multipliersColumn of (boardState$ | async)?.multipliers; let i = index">
+        <!--<g *ngFor="let multipliersColumn of (boardState$ | async)?.multipliers; let i = index">
             <g *ngFor="let multiplier of multipliersColumn; let j = index" app-cell-letter-x3 [pos]="{ x: i, y: j }"></g>
-        </g>
+        </g>-->
 
-        <g *ngFor="let letterArray of (boardState$ | async)?.board; let i = index">
+        <g *ngFor="let letterArray of board$ | async; let i = index">
             <g
                 *ngFor="let letter of letterArray; let j = index"
                 app-letter
                 [letter]="letter"
-                [value]="(boardState$ | async)?.pointsPerLetter?.get(letter)"
                 [pos]="{ x: i, y: j }"
+                [value]="(pointsPerLetter$ | async)?.get(letter)"
             ></g>
         </g>
     </g>
