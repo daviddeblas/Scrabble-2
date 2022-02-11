@@ -77,4 +77,10 @@ describe('Rooms Manager Service', () => {
         const expectedResult: Room[] = [];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
+
+    it('emit join room', () => {
+        roomsManager.createRoom(socket, options);
+        socket.emit('join room', { roomId: '1', playerName: 'player 2' });
+        expect(roomsManager.rooms[0].clientName).to.eq(null);
+    });
 });

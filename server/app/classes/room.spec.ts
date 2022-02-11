@@ -122,6 +122,42 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+            it('client should receive accepted if host accepts', (done) => {
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('accepted', () => {
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
+        });
+
+        describe('getGameInfo', () => {
+            it('client should receive game info when requested', (done) => {
+                let room: Room;
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        room = new Room(socket, roomsManager, gameOptions);
+                        clientSocket.emit('join');
+                    });
+                    socket.on('join', () => {
+                        room.join(socket, 'player 2');
+                    });
+                });
+
+                clientSocket.on('accepted', () => {
+                    clientSocket.emit('get game status');
+                });
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('game status', () => {
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
         });
 
         describe('Receiving', () => {
