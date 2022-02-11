@@ -62,10 +62,16 @@ export class RoomsManager {
         if (!room) return;
         if (room.host.id === oldSocket.id) {
             room.host = newSocket;
+            if (room.clients[0]) this.removeUnneededListeners(room.clients[0]);
         } else {
             room.clients[0] = newSocket;
+            this.removeUnneededListeners(room.host);
         }
         room.initiateRoomEvents();
+    }
+
+    removeUnneededListeners(socket: io.Socket): void {
+        socket.removeAllListeners('send message').removeAllListeners('surrender game').removeAllListeners('get game status');
     }
 
     getRoom(playerServerId: string): Room | undefined {
