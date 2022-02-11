@@ -4,7 +4,7 @@ import Container from 'typedi';
 import { Vec2 } from '@app/classes/vec2';
 import { Board } from './board';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Multiplier, MultiplierType } from '../multiplier';
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 
 describe('board', () => {
     let board: Board;
@@ -67,6 +67,32 @@ describe('board', () => {
 
         expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(
             lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points) * 2,
+        );
+    });
+
+    it('place throws on invalid placement', () => {
+        const lettersToPlace = [new PlacedLetter('O', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        expect(() => board.place(lettersToPlace)).to.throw();
+    });
+
+    it('place throws on invalid placement', () => {
+        const lettersToPlace = [new PlacedLetter('*', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        board.place(lettersToPlace);
+        expect(board.blanks.length).to.eq(1);
+    });
+
+    it('scoreWord throws on invalid position', () => {
+        expect(() => board.scorePositions([new Vec2(0, 0)])).to.throw();
+    });
+
+    it('scorePositions with multiplier letter', () => {
+        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
+        board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
+        board.place(lettersToPlace);
+
+        expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(
+            lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points) * 3,
         );
     });
 

@@ -8,8 +8,8 @@ import { Board } from './board';
 import { Player } from './player';
 
 const MAX_TURNS_SKIPPED = 5;
-const MAX_LETTERS_IN_EASEL = 7;
-const BONUS_POINTS_FOR_FULL_EASEL = 50;
+export const MAX_LETTERS_IN_EASEL = 7;
+export const BONUS_POINTS_FOR_FULL_EASEL = 50;
 
 export class Game {
     players: Player[];
@@ -88,6 +88,7 @@ export class Game {
     }
 
     private determineWinner(): string {
+        if (this.players.filter((p) => p.score === this.players[0].score).length === this.players.length) return '';
         return this.players.reduce((winningPlayer, currentPlayer) => (currentPlayer.score > winningPlayer.score ? currentPlayer : winningPlayer))
             .name;
     }

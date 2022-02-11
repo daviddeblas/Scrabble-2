@@ -61,8 +61,7 @@ export class Board {
             const letter = this.board[vec.x][vec.y];
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
             // prendre ne nombre de points associe a cette lettre
-            const letterPoints = this.pointsPerLetter.get(letter);
-            if (letterPoints === undefined) throw new GameError(GameErrorType.UndefinedPoints);
+            const letterPoints = this.pointsPerLetter.get(letter) as number;
             // annuler s'il s'agit d'un blank
             if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
             // obtenir le multiplieur a cette position
@@ -73,7 +72,7 @@ export class Board {
             }
             switch (multi.type) {
                 case MultiplierType.Letter:
-                    score += letterPoints * (multi.type === MultiplierType.Letter ? multi.amt : 1);
+                    score += letterPoints * multi.amt;
                     break;
                 case MultiplierType.Word:
                     score += letterPoints;
