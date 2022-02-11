@@ -1,10 +1,6 @@
 @use 'sass:map';
-@use '@angular/material' as mat;
 
-@import '../../../styles.scss';
-
-$color-config: mat.get-color-config($scrabble-theme);
-$primary-palette: map.get($color-config, 'primary');
+@import '../../../theme.scss';
 
 .easel {
     display: flex;
@@ -12,5 +8,5 @@ $primary-palette: map.get($color-config, 'primary');
     justify-content: center;
     height: 100%;
     margin: 0 1rem;
-    background-color: mat.get-color-from-palette($primary-palette, 500);
+    background-color: $primary;
 }
