@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Letter } from '@app/classes/letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
@@ -10,11 +11,11 @@ import { Observable } from 'rxjs';
     styleUrls: ['./easel.component.scss'],
 })
 export class EaselComponent {
-    boardState$: Observable<BoardState>;
+    pointsPerLetter$: Observable<Map<Letter, number>>;
     players$: Observable<Players>;
 
-    constructor(store: Store<{ boardState: BoardState; players: Players }>) {
-        this.boardState$ = store.select('boardState');
+    constructor(store: Store<{ board: BoardState; players: Players }>) {
+        this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.players$ = store.select('players');
     }
 }

@@ -7,6 +7,6 @@
         viewBox="'0 0 50 50"
         xmlns="http://www.w3.org/2000/svg"
         [letter]="letter"
-        [value]="(boardState$ | async)?.pointsPerLetter?.get(letter)"
+        [value]="(pointsPerLetter$ | async)?.get(letter)"
     ></svg>
 </mat-card>
