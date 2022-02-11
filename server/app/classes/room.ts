@@ -40,6 +40,7 @@ export class Room {
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initGame();
+        this.initChatting();
     }
 
     initGame(): void {
@@ -59,7 +60,17 @@ export class Room {
                     letterPotLength: game.bag.letters.length,
                     pointsPerLetter: game.board.pointsPerLetter,
                 });
+                this.game.players[(index + 1) % 2].easel = opponentEasel;
             });
+        });
+    }
+
+    initChatting(): void {
+        this.host.on('send message', ({ username, message }) => {
+            this.clients[0]?.emit('receive message', { username, message });
+        });
+        this.clients[0]?.on('send message', ({ username, message }) => {
+            this.host.emit('receive message', { username, message });
         });
     }
 

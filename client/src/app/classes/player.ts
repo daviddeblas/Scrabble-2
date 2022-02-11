@@ -21,7 +21,8 @@ export class Player {
     }
 
     addLettersToEasel(lettersToAdd: Letter[]): void {
-        if (this.easel.length + lettersToAdd.length > EASEL_CAPACITY) throw new Error('The easel capacity has been exceeded');
+        if (this.easel.length + lettersToAdd.length > EASEL_CAPACITY)
+            throw new Error(`The easel capacity has been exceeded: ${this.easel.length + lettersToAdd.length}`);
         this.easel = this.easel.concat(lettersToAdd);
     }
 }
