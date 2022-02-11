@@ -64,7 +64,7 @@ export class Board {
             const letterPoints = this.pointsPerLetter.get(letter);
             if (letterPoints === undefined) throw new GameError(GameErrorType.UndefinedPoints);
             // annuler s'il s'agit d'un blank
-            if (this.blanks.findIndex((p) => p.equals(vec)) < 0) return;
+            if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
             // obtenir le multiplieur a cette position
             const multi = this.multipliers[vec.x][vec.y];
             if (multi === null) {
