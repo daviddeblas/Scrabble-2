@@ -2,10 +2,10 @@
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { Letter } from '../letter';
-import { PlacedLetter } from '../placed-letter';
-import { Vec2 } from '../vec2';
-import { Game, MAX_LETTERS_IN_EASEL } from './game';
+import { Letter, stringToLetters } from '@app/classes/letter';
+import { PlacedLetter } from '@app/classes/placed-letter';
+import { Vec2 } from '@app/classes/vec2';
+import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';
 
 describe('game', () => {
     let game: Game;
@@ -22,13 +22,47 @@ describe('game', () => {
     });
 
     it('place', () => {
-        game.players[game.activePlayer].easel.push('C' as Letter, 'O' as Letter, 'N' as Letter);
+        const activePlayer = game.activePlayer;
+        const lettersToPlace = ['C' as Letter, 'O' as Letter, 'N' as Letter];
+        lettersToPlace.forEach((l) => {
+            game.players[game.activePlayer].easel.push(l);
+        });
         expect(() => {
             game.place(
-                [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))],
+                lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 game.activePlayer,
             );
         }).to.not.throw();
+        expect(game.activePlayer).to.not.eq(activePlayer);
+        expect(game.players[activePlayer].score).to.eq(game.board['scorePositions'](lettersToPlace.map((_l, i) => new Vec2(6 + i, 7))));
+    });
+
+    it('place with bonus', () => {
+        const activePlayer = game.activePlayer;
+        game.players[activePlayer].easel = stringToLetters('abacost');
+        const oldEasel = game.players[activePlayer].easel;
+        game.place(
+            oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
+            game.activePlayer,
+        );
+        expect(game.players[activePlayer].score).to.eq(
+            game.board['scorePositions'](oldEasel.map((_l, i) => new Vec2(3 + i, 7))) + BONUS_POINTS_FOR_FULL_EASEL,
+        );
+    });
+
+    it('place with endGame bonus', () => {
+        const activePlayer = game.activePlayer;
+        game.players[activePlayer].easel = stringToLetters('aa');
+        const oldEasel = [...game.players[activePlayer].easel];
+        game.bag.letters = [];
+        game.place(
+            oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 6, 7))),
+            game.activePlayer,
+        );
+        expect(game.players[activePlayer].score).to.eq(
+            game.players[game.activePlayer].easel.map((l) => game.board.pointsPerLetter.get(l) as number).reduce((s, p) => s + p) +
+                oldEasel.map((l) => game.board.pointsPerLetter.get(l) as number).reduce((s, p) => s + p),
+        );
     });
 
     it('draw', () => {
