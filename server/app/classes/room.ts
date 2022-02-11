@@ -60,7 +60,6 @@ export class Room {
                     letterPotLength: game.bag.letters.length,
                     pointsPerLetter: game.board.pointsPerLetter,
                 });
-                this.game.players[(index + 1) % 2].easel = opponentEasel;
             });
         });
     }
