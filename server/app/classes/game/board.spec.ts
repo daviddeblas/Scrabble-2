@@ -1,10 +1,10 @@
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
+import { PlacedLetter } from '@app/classes/placed-letter';
+import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { Vec2 } from '@app/classes/vec2';
-import { Board } from './board';
-import { PlacedLetter } from '@app/classes/placed-letter';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
+import { Board, createEmptyMatrix } from './board';
 
 describe('board', () => {
     let board: Board;
@@ -12,6 +12,15 @@ describe('board', () => {
 
     beforeEach(() => {
         board = new Board(gameConfig);
+    });
+
+    it('CreateEmptyMatrix should initialize a double array filled with null', () => {
+        const matrix = createEmptyMatrix(gameConfig.boardSize);
+
+        expect(matrix.length).to.equal(gameConfig.boardSize.x);
+        expect(matrix[0].length).to.equal(gameConfig.boardSize.y);
+        expect(matrix[0][0]).to.equal(null);
+        expect(matrix[gameConfig.boardSize.x - 1][gameConfig.boardSize.y - 1]).to.equal(null);
     });
 
     it('constructor', () => {
