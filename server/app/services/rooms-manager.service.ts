@@ -13,7 +13,7 @@ export class RoomsManager {
             socket.emit('create room success', this.createRoom(socket, options));
         });
         socket.on('request list', () => {
-            socket.emit('get list', this.getRooms());
+            socket.emit('get list', this.getAvailableRooms());
         });
 
         socket.on('join room', (data) => {
@@ -43,5 +43,9 @@ export class RoomsManager {
 
     getRooms(): RoomInfo[] {
         return this.rooms.map((r) => r.getRoomInfo());
+    }
+
+    getAvailableRooms(): RoomInfo[] {
+        return this.rooms.filter((r) => r.game === null).map((r) => r.getRoomInfo());
     }
 }
