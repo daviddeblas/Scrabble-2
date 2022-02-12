@@ -1,8 +1,12 @@
 import { GameOptions } from '@app/classes/game-options';
 import { Room } from '@app/classes/room';
 import { RoomInfo } from '@app/classes/room-info';
+import { PORT } from '@app/environnement.json';
 import { expect } from 'chai';
-import { Socket } from 'socket.io';
+import { createServer, Server } from 'http';
+import { stub } from 'sinon';
+import { Server as MainServer, Socket } from 'socket.io';
+import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { RoomsManager } from './rooms-manager.service';
 
@@ -77,10 +81,70 @@ describe('Rooms Manager Service', () => {
         const expectedResult: Room[] = [];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
+    describe('Setup connection events', () => {
+        let server: MainServer;
+        let httpServer: Server;
+        let clientSocket: ClientSocket;
+        before((done) => {
+            httpServer = createServer();
+            httpServer.listen(PORT);
+            server = new MainServer(httpServer);
+            httpServer.on('listening', () => done());
+        });
+        beforeEach(() => {
+            clientSocket = Client('http://localhost:3000');
+        });
+        afterEach(() => {
+            server.removeAllListeners();
+        });
 
-    it('emit join room', () => {
-        roomsManager.createRoom(socket, options);
-        socket.emit('join room', { roomId: '1', playerName: 'player 2' });
-        expect(roomsManager.rooms[0].clientName).to.eq(null);
+        after(() => {
+            server.close();
+            httpServer.close();
+        });
+
+        it('emitting create room should call the createRoom function', (done) => {
+            const room: RoomInfo = new RoomInfo('RoomID', {} as GameOptions);
+            const createRoomStub = stub(roomsManager, 'createRoom').callsFake(() => {
+                return room;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+                clientSocket.on('create room success', () => {
+                    expect(createRoomStub.calledOnce).to.equal(true);
+                    done();
+                });
+            });
+            clientSocket.emit('create room');
+        });
+
+        it('emitting request list should call the getRooms function', (done) => {
+            const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
+            const getRoomsStub = stub(roomsManager, 'getRooms').callsFake(() => {
+                return rooms;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+                clientSocket.on('get list', () => {
+                    expect(getRoomsStub.calledOnce).to.equal(true);
+                    done();
+                });
+            });
+            clientSocket.emit('request list');
+        });
+
+        it('emitting join room should call the joinRoom function', (done) => {
+            const joinStub = stub(roomsManager, 'joinRoom').callsFake(() => {
+                return;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+                clientSocket.on('player joining', () => {
+                    expect(joinStub.calledOnce).to.equal(true);
+                    done();
+                });
+            });
+            clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
+        });
     });
 });
