@@ -111,4 +111,8 @@ export class Room {
     getRoomInfo(): RoomInfo {
         return new RoomInfo(this.host.id, this.gameOptions);
     }
+
+    removeUnneededListeners(socket: io.Socket): void {
+        socket.removeAllListeners('send message').removeAllListeners('surrender game').removeAllListeners('get game status');
+    }
 }
