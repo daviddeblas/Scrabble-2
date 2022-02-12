@@ -1,7 +1,7 @@
 import { Application } from '@app/app';
 import http from 'http';
 import { AddressInfo } from 'net';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import { BrowserService } from './services/browser.service';
 import { DictionaryService } from './services/dictionary.service';
 import { RoomsManager } from './services/rooms-manager.service';
@@ -31,7 +31,12 @@ export class Server {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
-        this.socketService = new SocketService(this.server, RoomsManager.getInstance(), new DictionaryService(), new BrowserService());
+        this.socketService = new SocketService(
+            this.server,
+            Container.get(RoomsManager),
+            Container.get(DictionaryService),
+            Container.get(BrowserService),
+        );
         // eslint-disable-next-line no-console
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);

@@ -6,19 +6,7 @@ import { Service } from 'typedi';
 
 @Service()
 export class RoomsManager {
-    private static instance: RoomsManager;
     rooms: Room[] = [];
-
-    private constructor() {
-        return;
-    }
-    static getInstance(): RoomsManager {
-        if (!RoomsManager.instance) {
-            RoomsManager.instance = new RoomsManager();
-        }
-
-        return RoomsManager.instance;
-    }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('create room', (options) => {
