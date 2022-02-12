@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BoardComponent } from '@app/components/board/board.component';
+import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
+import { CellLetterX3Component } from '@app/components/cells/cell-letter-x3/cell-letter-x3.component';
+import { CellStarComponent } from '@app/components/cells/cell-star/cell-star.component';
+import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-word-x2.component';
+import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
+import { EaselComponent } from '@app/components/easel/easel.component';
+import { LetterComponent } from '@app/components/letter/letter.component';
 import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
 import { BrowserEffects } from '@app/effects/browser.effects';
 import { ChatEffects } from '@app/effects/chat.effects';
@@ -16,10 +23,23 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
 @NgModule({
-    declarations: [GamePageComponent, BoardComponent, ChatBoxComponent, SurrenderGameButtonComponent],
+    declarations: [
+        GamePageComponent,
+        BoardComponent,
+        CellWordX2Component,
+        CellWordX3Component,
+        CellLetterX2Component,
+        CellLetterX3Component,
+        CellStarComponent,
+        LetterComponent,
+        ChatBoxComponent,
+        EaselComponent,
+        SurrenderGameButtonComponent,
+    ],
     imports: [
         AppMaterialModule,
         CommonModule,
+        AppMaterialModule,
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
         StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),
