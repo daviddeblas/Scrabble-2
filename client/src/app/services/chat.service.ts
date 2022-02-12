@@ -31,7 +31,7 @@ export class ChatService {
         } else {
             const command = message.split(' ');
             switch (command[0]) {
-                case '!placer': {
+                case '!placer':
                     if (this.validatePlaceCommand(command)) {
                         this.handlePlaceCommand(command);
                     } else {
@@ -39,8 +39,7 @@ export class ChatService {
                         return;
                     }
                     break;
-                }
-                case '!échanger': {
+                case '!échanger':
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
                     } else {
@@ -48,8 +47,7 @@ export class ChatService {
                         return;
                     }
                     break;
-                }
-                case '!passer': {
+                case '!passer':
                     if (command.length === 1) {
                         this.store.dispatch(skipTurn());
                     } else {
@@ -57,11 +55,9 @@ export class ChatService {
                         return;
                     }
                     break;
-                }
-                default: {
+                default:
                     this.store.dispatch(receivedMessage({ username: 'Error', message: 'Commande impossible à réalisée' }));
                     return;
-                }
             }
             this.store.dispatch(receivedMessage({ username, message }));
         }
@@ -74,7 +70,7 @@ export class ChatService {
         commandIsCorrect = true;
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
-        commandIsCorrect &&= /^[a-z*]*$/.test(command[2]);
+        commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
         const columnNumber = parseInt(command[1].replace(/^\D+/g, ''), 10); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;

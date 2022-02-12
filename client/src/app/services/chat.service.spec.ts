@@ -138,7 +138,7 @@ describe('ChatService', () => {
     });
 
     it('validatePlaceCommand should return true when the command is properly called', () => {
-        const exampleCommand = ['!placer', 'a11h', 'abcpzo*e'];
+        const exampleCommand = ['!placer', 'a11h', 'abcpzoNe'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeTrue();
     });
 
