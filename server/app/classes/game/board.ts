@@ -23,22 +23,8 @@ export class Board {
     blanks: Vec2[];
 
     constructor(private config: GameConfig) {
-<<<<<<< HEAD
-        // initialize position to all null
-        this.board = new Array(config.boardSize.x);
-        this.multipliers = new Array(config.boardSize.x);
-        for (let i = 0; i < config.boardSize.x; i++) {
-            this.multipliers[i] = new Array(config.boardSize.y);
-            this.board[i] = new Array(config.boardSize.y);
-            for (let j = 0; j < config.boardSize.y; j++) {
-                this.board[i][j] = null;
-                this.multipliers[i][j] = null;
-            }
-        }
-=======
         this.board = createEmptyMatrix(config.boardSize);
         this.multipliers = createEmptyMatrix(config.boardSize);
->>>>>>> 795226c3e71f41cc98ec1185b897ba99e5ac6c8d
         this.pointsPerLetter = new Map();
 
         config.letters.forEach((l) => this.pointsPerLetter.set(l.letter, l.points));

@@ -62,7 +62,7 @@ describe('game', () => {
         );
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(6 + i, 7));
+        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(3 + i, 7));
         const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
         expect(thisPlayerScore).to.eq(expectedPoints + BONUS_POINTS_FOR_FULL_EASEL);
     });
@@ -154,7 +154,7 @@ describe('game', () => {
         const pointsSums = playersPointsArrayOfEasel.map((pointsArray) => pointsArray.reduce((sum, n) => sum + n));
 
         game['endGameScoreAdjustment']();
-        game.players.forEach((player, index) => expect(player.score).to.eq(pointsSums[index]));
+        game.players.forEach((player, index) => expect(player.score).to.eq(-pointsSums[index]));
     });
 
     it('determineWinner should return null if both players have the same amount of points', () => {

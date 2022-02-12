@@ -17,6 +17,7 @@ describe('Letter config service', () => {
         expect(letterConfigItem).to.not.eq(undefined);
         expect(letterConfigItem?.letter).to.eq('A' as Letter);
         expect(letterConfigItem?.points).to.eq(1);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(letterConfigItem?.amount).to.eq(9);
     });
 
