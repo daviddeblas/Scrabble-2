@@ -1,7 +1,6 @@
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import { Game } from './game/game';
-// import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { RoomInfo } from './room-info';
 import Container from 'typedi';
@@ -40,6 +39,7 @@ export class Room {
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initGame();
+        this.initChatting();
     }
 
     initGame(): void {
@@ -60,6 +60,15 @@ export class Room {
                     pointsPerLetter: game.board.pointsPerLetter,
                 });
             });
+        });
+    }
+
+    initChatting(): void {
+        this.host.on('send message', ({ username, message }) => {
+            this.clients[0]?.emit('receive message', { username, message });
+        });
+        this.clients[0]?.on('send message', ({ username, message }) => {
+            this.host.emit('receive message', { username, message });
         });
     }
 

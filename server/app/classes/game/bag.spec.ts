@@ -1,9 +1,9 @@
-import { Bag } from './bag';
 import { GameConfig } from '@app/classes/game-config';
+import { Letter } from '@app/classes/letter';
+import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { GameConfigService } from '@app/services/game-config.service';
-import { Letter } from '@app/classes/letter';
+import { Bag } from './bag';
 
 const LETTERS_TO_GET = 7;
 
@@ -16,8 +16,8 @@ describe('bag', () => {
     });
 
     it('constructor', () => {
-        expect(bag.letters.length).to.eq(gameConfig.letters.map((l) => l.amt).reduce((sum, amt) => sum + amt));
-        expect(bag.letters.filter((l) => l === ('A' as Letter)).length).to.eq(gameConfig.letters.find((l) => l.letter === ('A' as Letter))?.amt);
+        expect(bag.letters.length).to.eq(gameConfig.letters.map((l) => l.amount).reduce((sum, amount) => sum + amount));
+        expect(bag.letters.filter((l) => l === ('A' as Letter)).length).to.eq(gameConfig.letters.find((l) => l.letter === ('A' as Letter))?.amount);
     });
 
     it('get letters should return the right amount of letters', () => {

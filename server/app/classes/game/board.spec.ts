@@ -1,12 +1,15 @@
+<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
+=======
+import { Multiplier, MultiplierType } from '@app/classes/multiplier';
+import { PlacedLetter } from '@app/classes/placed-letter';
+import { Vec2 } from '@app/classes/vec2';
+>>>>>>> 795226c3e71f41cc98ec1185b897ba99e5ac6c8d
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import Container from 'typedi';
-import { Vec2 } from '@app/classes/vec2';
-import { Board } from './board';
-import { PlacedLetter } from '@app/classes/placed-letter';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
+import { Board, createEmptyMatrix } from './board';
 
 describe('board', () => {
     let board: Board;
@@ -16,7 +19,20 @@ describe('board', () => {
         board = new Board(gameConfig);
     });
 
+<<<<<<< HEAD
     it('constructor with default game config should reflect its values', () => {
+=======
+    it('CreateEmptyMatrix should initialize a double array filled with null', () => {
+        const matrix = createEmptyMatrix(gameConfig.boardSize);
+
+        expect(matrix.length).to.equal(gameConfig.boardSize.x);
+        expect(matrix[0].length).to.equal(gameConfig.boardSize.y);
+        expect(matrix[0][0]).to.equal(null);
+        expect(matrix[gameConfig.boardSize.x - 1][gameConfig.boardSize.y - 1]).to.equal(null);
+    });
+
+    it('constructor', () => {
+>>>>>>> 795226c3e71f41cc98ec1185b897ba99e5ac6c8d
         expect(board.pointsPerLetter.get('A')).to.eq(gameConfig.letters.find((l) => l.letter === 'A')?.points);
         expect(board.blanks).to.deep.eq([]);
         expect(board.multipliers.length).to.eq(gameConfig.boardSize.x);

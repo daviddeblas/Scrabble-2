@@ -3,33 +3,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SocketTestHelper } from '@app/helper/socket-test-helper';
+import { createRoom } from '@app/actions/room.actions';
+import { GameOptions } from '@app/classes/game-options';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { SocketClientService } from '@app/services/socket-client.service';
-import { Socket } from 'socket.io-client';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
-
-class SocketClientServiceMock extends SocketClientService {
-    connected = false;
-    override connect() {
-        this.connected = true; // Permet de ne pas se reconnecter
-    }
-    override isSocketAlive() {
-        return this.connected;
-    }
-}
 
 describe('MultiConfigWindowComponent', () => {
     let component: MultiConfigWindowComponent;
     let fixture: ComponentFixture<MultiConfigWindowComponent>;
-    let socketServiceMock: SocketClientServiceMock;
-    let socketHelper: SocketTestHelper;
     const iterationAmount = 10;
 
+    let store: MockStore;
+
     beforeEach(async () => {
-        socketHelper = new SocketTestHelper();
-        socketServiceMock = new SocketClientServiceMock();
-        socketServiceMock.socket = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
             declarations: [MultiConfigWindowComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule],
@@ -40,9 +28,11 @@ describe('MultiConfigWindowComponent', () => {
                     provide: MatDialogRef,
                     useValue: {},
                 },
-                { provide: SocketClientService, useValue: socketServiceMock },
+                provideMockStore(),
             ],
         }).compileComponents();
+
+        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
@@ -149,28 +139,14 @@ describe('MultiConfigWindowComponent', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should send the create room socket when submitted', () => {
-        const spy = spyOn(component.socketService, 'send');
-        const eventName = 'create room';
+    it('should dispatch "[Room] Create Room" when submitted', () => {
         component.settingsForm.controls.name.setValue('My Name');
         component.settingsForm.controls.selectedDictionary.setValue('My Dictionary');
         fixture.detectChanges();
-        const submitButton = document.getElementsByTagName('button')[2];
-        submitButton.click();
-        const startTimer = 60;
-        const expectedGameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: startTimer };
-        expect(spy).toHaveBeenCalledWith(eventName, expectedGameOptions);
-    });
 
-    it('should handle receive dictionaries event with the dictionaries names from the server', () => {
-        const serverDictionary = ['My dictionary', 'My other Dictionary'];
-        socketHelper.peerSideEmit('receive dictionaries', serverDictionary);
-        expect(component.dictionaries).toBe(serverDictionary);
-    });
-
-    it('should not be able to reconnect after the initialization', () => {
-        const spy = spyOn(socketServiceMock, 'connect');
-        component.connect();
-        expect(spy).toHaveBeenCalledTimes(0);
+        component.onSubmit();
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedAction = cold('a', { a: createRoom({ gameOptions: expectedGameOptions }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 });

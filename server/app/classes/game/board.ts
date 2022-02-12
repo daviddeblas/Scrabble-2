@@ -7,6 +7,15 @@ import { Vec2 } from '@app/classes/vec2';
 
 const ALLOWED_DIRECTIONS = [new Vec2(1, 0), new Vec2(0, 1)];
 
+export const createEmptyMatrix = (dimensions: Vec2) => {
+    const matrix = new Array(dimensions.x);
+    for (let i = 0; i < dimensions.x; i++) {
+        matrix[i] = new Array(dimensions.y);
+        for (let j = 0; j < dimensions.y; j++) matrix[i][j] = null;
+    }
+    return matrix;
+};
+
 export class Board {
     board: (Letter | null)[][];
     multipliers: (Multiplier | null)[][];
@@ -14,6 +23,7 @@ export class Board {
     blanks: Vec2[];
 
     constructor(private config: GameConfig) {
+<<<<<<< HEAD
         // initialize position to all null
         this.board = new Array(config.boardSize.x);
         this.multipliers = new Array(config.boardSize.x);
@@ -25,13 +35,19 @@ export class Board {
                 this.multipliers[i][j] = null;
             }
         }
+=======
+        this.board = createEmptyMatrix(config.boardSize);
+        this.multipliers = createEmptyMatrix(config.boardSize);
+>>>>>>> 795226c3e71f41cc98ec1185b897ba99e5ac6c8d
         this.pointsPerLetter = new Map();
+
         config.letters.forEach((l) => this.pointsPerLetter.set(l.letter, l.points));
         config.multipliers.forEach((m) =>
             m.positions.forEach((p) => {
                 this.multipliers[p.x][p.y] = m.multiplier;
             }),
         );
+
         this.blanks = [];
     }
 
@@ -61,7 +77,7 @@ export class Board {
             // get current letter
             const letter = this.board[vec.x][vec.y];
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
-            // prendre ne nombre de points associe a cette lettre
+            // prendre le nombre de points associe a cette lettre
             const letterPoints = this.pointsPerLetter.get(letter) as number;
             // annuler s'il s'agit d'un blank
             if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
@@ -73,11 +89,11 @@ export class Board {
             }
             switch (multi.type) {
                 case MultiplierType.Letter:
-                    score += letterPoints * multi.amt;
+                    score += letterPoints * multi.amount;
                     break;
                 case MultiplierType.Word:
                     score += letterPoints;
-                    multiplier = multiplier < multi.amt ? multi.amt : multiplier;
+                    multiplier = multiplier < multi.amount ? multi.amount : multiplier;
                     break;
             }
         });
@@ -114,6 +130,7 @@ export class Board {
         });
 
         const words: PlacedLetter[][] = [];
+
         letters.forEach((l) => {
             ALLOWED_DIRECTIONS.forEach((d) => {
                 const word = tempBoard.getAffectedWordFromSinglePlacement(d, l.position);
