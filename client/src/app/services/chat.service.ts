@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { placeWord, skipTurn } from '@app/actions/player.actions';
+import { placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { stringToLetters } from '@app/classes/letter';
 import { boardPositionToVec2 } from '@app/classes/vec2';
@@ -52,7 +52,7 @@ export class ChatService {
                 }
                 case '!passer': {
                     if (command.length === 1) {
-                        this.store.dispatch(skipTurn());
+                        this.handleSkipCommand(command);
                     } else {
                         this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -70,6 +70,11 @@ export class ChatService {
 
     handleExchangeCommand(command: string[]): void {
         const commandLine = command[0].slice(1, command[0].length) + ' ' + command[1];
+        this.socketService.send('command', commandLine);
+    }
+
+    handleSkipCommand(command: string[]): void {
+        const commandLine = command[0].slice(1, command[0].length);
         this.socketService.send('command', commandLine);
     }
 

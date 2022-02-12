@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { placeWord, skipTurn } from '@app/actions/player.actions';
+import { placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { stringToLetters } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
@@ -124,12 +124,13 @@ describe('ChatService', () => {
         expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
     });
 
-    it('should dispatch "[Players] Skip Turn" if a valid !passer command is given', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
+    it('should dispatch handleSkipCommand with the command to skip if the command is valid', () => {
+        const exchangeCommandSpy = spyOn(service, 'handleSkipCommand');
         const exampleMessage = '!passer';
         service.messageWritten(username, exampleMessage);
-        expect(dispatchSpy).toHaveBeenCalledWith(skipTurn());
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!passer']);
     });
+
     it('should call handleExchangeCommand with the command to exchange if the command is valid', () => {
         const exchangeCommandSpy = spyOn(service, 'handleExchangeCommand');
         const exampleMessage = '!échanger aerev';
@@ -142,6 +143,13 @@ describe('ChatService', () => {
         const sendSpy = spyOn(service['socketService'], 'send');
         service.handleExchangeCommand(exampleCommand);
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
+    });
+
+    it('handleSkipCommand should call socketService send with namespace command', () => {
+        const exampleCommand = ['!passer'];
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.handleSkipCommand(exampleCommand);
+        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'passer');
     });
 
     it('validatePlaceCommand should return true when the command is properly called', () => {
