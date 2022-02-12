@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
@@ -27,6 +28,9 @@ describe('room', () => {
                 id: '1',
                 emit: () => {
                     return;
+                },
+                removeAllListeners: () => {
+                    return socket;
                 },
             } as unknown as io.Socket;
             gameOptions = new GameOptions('a', 'b');
@@ -83,6 +87,15 @@ describe('room', () => {
             } catch (error) {
                 expect(error.message).to.deep.equal('Game does not exist');
             }
+        });
+
+        it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const socketStub = stub(socket, 'removeAllListeners').callThrough();
+            room.removeUnneededListeners(socket);
+            expect(socketStub.calledWith('send message')).to.equal(true);
+            expect(socketStub.calledWith('surrender game')).to.equal(true);
+            expect(socketStub.calledWith('get game status')).to.equal(true);
         });
     });
 
