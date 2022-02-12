@@ -22,7 +22,7 @@
     <form class="chat-box-form" onsubmit="return false;">
         <mat-form-field id="chat-input" appearance="fill">
             <mat-label>Message</mat-label>
-            <input matInput #chatMessage maxlength="512" placeholder="Aide: !info" autocomplete="off" />
+            <input matInput #chatMessage maxlength="512" placeholder="Discuter!" autocomplete="off" />
             <mat-hint align="start"><strong>Parlez avec l'adversaire</strong> </mat-hint>
             <mat-hint align="end">{{ chatMessage.value.length }} / 512</mat-hint>
         </mat-form-field>
