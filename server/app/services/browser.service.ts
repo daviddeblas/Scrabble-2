@@ -22,7 +22,6 @@ export class BrowserService {
 
         socket.on('browser reconnection', (oldClientId) => {
             if (oldClientId === this.tempClientSocketId) {
-                console.log(this.roomsManager.rooms);
                 clearTimeout(this.timeoutId);
                 this.roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
             }

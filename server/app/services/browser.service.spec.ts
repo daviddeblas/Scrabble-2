@@ -5,6 +5,7 @@ import { createServer, Server } from 'http';
 import * as sinon from 'sinon';
 import io from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
+import Container from 'typedi';
 import { BrowserService } from './browser.service';
 import { RoomsManager } from './rooms-manager.service';
 
@@ -13,9 +14,11 @@ describe('Browser service tests', () => {
     let clientSocket: Socket;
     let server: io.Server;
     let httpServer: Server;
+    let roomsManager: RoomsManager;
     const urlString = 'http://localhost:3000';
 
     before((done) => {
+        roomsManager = Container.get(RoomsManager);
         httpServer = createServer();
         httpServer.listen(PORT);
         server = new io.Server(httpServer);
@@ -44,7 +47,7 @@ describe('Browser service tests', () => {
     it('browser reconnection should call clear timeout if the old sockets are equal', (done) => {
         const oldClientId = '123';
         const timeoutSpy = sinon.spy(global, 'clearTimeout');
-        const roomsManagerMock = sinon.mock(RoomsManager.getInstance());
+        const roomsManagerMock = sinon.mock(roomsManager);
         roomsManagerMock.expects('switchPlayerSocket').once();
         service.tempClientSocketId = oldClientId;
         const testTimeoutId = setTimeout(() => {
@@ -89,7 +92,7 @@ describe('Browser service tests', () => {
                 done();
             },
         } as unknown as Room;
-        sinon.stub(RoomsManager.getInstance(), 'getRoom').callsFake(() => {
+        sinon.stub(roomsManager, 'getRoom').callsFake(() => {
             return fakeRoom;
         });
         clientSocket.emit('closed browser', testUserId);
@@ -97,7 +100,7 @@ describe('Browser service tests', () => {
 
     it('closed browser should set a 5 second timeout and pass if getRoom returns undefined  ', (done) => {
         const testUserId = '123';
-        const getRoomStub = sinon.stub(RoomsManager.getInstance(), 'getRoom').callsFake(() => {
+        const getRoomStub = sinon.stub(roomsManager, 'getRoom').callsFake(() => {
             return undefined;
         });
         const maxTimeout = 5500;
