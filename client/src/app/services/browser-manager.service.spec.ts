@@ -1,13 +1,21 @@
 import { TestBed } from '@angular/core/testing';
+import { restoreMessages } from '@app/actions/chat.actions';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
 import { BrowserManagerService } from './browser-manager.service';
 import { SocketClientService } from './socket-client.service';
 
 describe('BrowserManagerService', () => {
     let service: BrowserManagerService;
     let socketService: SocketClientService;
+    let store: MockStore;
     beforeEach(async () => {
         socketService = new SocketClientService();
+        await TestBed.configureTestingModule({
+            providers: [provideMockStore({ selectors: [{ selector: 'chat', value: [{ username: 'Player', message: 'Message' }] }] })],
+        }).compileComponents();
         service = TestBed.inject(BrowserManagerService);
+        store = TestBed.inject(MockStore);
         service.socketService = socketService;
         socketService.connect();
     });
@@ -52,6 +60,7 @@ describe('BrowserManagerService', () => {
     });
 
     it('onloadHandler should send browser reconnection event when the socket cookie is not undefined', () => {
+        localStorage.setItem('chatMessages', '[]');
         const fakeSend = () => {
             return;
         };
@@ -61,6 +70,32 @@ describe('BrowserManagerService', () => {
         document.cookie = 'socket=' + expectedOldId + '; path=/';
         service.onBrowserLoad();
         expect(sendSpy).toHaveBeenCalledOnceWith('browser reconnection', expectedOldId);
+    });
+
+    it('storeSelectors should store the data selector in localStorage', () => {
+        const providedMessage = { username: 'Player', message: 'Message' };
+        // eslint-disable-next-line dot-notation
+        service['storeSelectors']();
+        expect(localStorage.getItem('chatMessages')).toEqual(JSON.stringify([providedMessage]));
+    });
+
+    it('retrieveSelectors should get the local storage stored under the chatMessages key and dispatch restoreMessages', () => {
+        const expectedMessage = JSON.stringify([{ username: 'Player1', message: 'HelloWorld' }]);
+        localStorage.setItem('chatMessages', expectedMessage);
+        // eslint-disable-next-line dot-notation
+        service['retrieveSelectors']();
+        const expectedAction = cold('a', { a: restoreMessages({ oldMessages: JSON.parse(expectedMessage) }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('retrieveSelectors should not dispatch restoreMessages if no chatMessages key exist in LocalStorage', () => {
+        localStorage.removeItem('chatMessages');
+        // eslint-disable-next-line dot-notation
+        service['retrieveSelectors']();
+        const dispatchSpy = spyOn(store, 'dispatch').and.callFake(() => {
+            return;
+        });
+        expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
     it('readCookieSocket should return the value of cookie stored with the key socket', () => {
