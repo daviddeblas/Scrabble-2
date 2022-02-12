@@ -5,7 +5,7 @@ import { createServer, Server } from 'http';
 import * as sinon from 'sinon';
 import io from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { BrowserService } from './browser.service';
 import { RoomsManager } from './rooms-manager.service';
 
