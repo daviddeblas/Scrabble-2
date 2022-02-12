@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLetters, placeWord, skipTurn } from '@app/actions/player.actions';
+import { placeWord, skipTurn } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { stringToLetters } from '@app/classes/letter';
 import { boardPositionToVec2 } from '@app/classes/vec2';
@@ -42,7 +42,8 @@ export class ChatService {
                 }
                 case '!échanger': {
                     if (this.validateExchangeCommand(command)) {
-                        this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
+                        this.handleExchangeCommand(command);
+                        // this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
                     } else {
                         this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -65,6 +66,11 @@ export class ChatService {
             }
             this.store.dispatch(receivedMessage({ username, message }));
         }
+    }
+
+    handleExchangeCommand(command: string[]): void {
+        const commandLine = command[0].slice(1, command[0].length) + ' ' + command[1];
+        this.socketService.send('command', commandLine);
     }
 
     private validatePlaceCommand(command: string[]): boolean {

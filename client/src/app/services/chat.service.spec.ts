@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLetters, placeWord, skipTurn } from '@app/actions/player.actions';
+import { placeWord, skipTurn } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { stringToLetters } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
@@ -130,11 +130,18 @@ describe('ChatService', () => {
         service.messageWritten(username, exampleMessage);
         expect(dispatchSpy).toHaveBeenCalledWith(skipTurn());
     });
-    it('should dispatch "[Players] Exchange Letters" with the letters to exchange if the command is valid', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
+    it('should call handleExchangeCommand with the command to exchange if the command is valid', () => {
+        const exchangeCommandSpy = spyOn(service, 'handleExchangeCommand');
         const exampleMessage = '!échanger aerev';
         service.messageWritten(username, exampleMessage);
-        expect(dispatchSpy).toHaveBeenCalledWith(exchangeLetters({ letters: stringToLetters('aerev') }));
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!échanger', 'aerev']);
+    });
+
+    it('handleExchangeCommand should call socketService send with namespace command', () => {
+        const exampleCommand = ['!échanger', 'aerev'];
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.handleExchangeCommand(exampleCommand);
+        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
     });
 
     it('validatePlaceCommand should return true when the command is properly called', () => {
