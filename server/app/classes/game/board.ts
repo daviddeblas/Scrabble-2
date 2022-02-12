@@ -72,11 +72,11 @@ export class Board {
             }
             switch (multi.type) {
                 case MultiplierType.Letter:
-                    score += letterPoints * multi.amt;
+                    score += letterPoints * multi.amount;
                     break;
                 case MultiplierType.Word:
                     score += letterPoints;
-                    multiplier = multiplier < multi.amt ? multi.amt : multiplier;
+                    multiplier = multiplier < multi.amount ? multi.amount : multiplier;
                     break;
             }
         });

@@ -1,10 +1,10 @@
 /* eslint-disable dot-notation */
-import { GameConfigService } from '@app/services/game-config.service';
-import { expect } from 'chai';
-import Container from 'typedi';
 import { Letter, stringToLetters } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
+import { GameConfigService } from '@app/services/game-config.service';
+import { expect } from 'chai';
+import Container from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';
 
 describe('game', () => {
@@ -17,7 +17,9 @@ describe('game', () => {
     it('constructor', () => {
         expect(game.players.length).to.eq(2);
         expect(game.activePlayer === 0 || game.activePlayer === 1).to.eq(true);
-        expect(game.bag.letters.length).to.eq(game.config.letters.map((l) => l.amt).reduce((sum, amt) => sum + amt) - MAX_LETTERS_IN_EASEL * 2);
+        expect(game.bag.letters.length).to.eq(
+            game.config.letters.map((l) => l.amount).reduce((sum, amount) => sum + amount) - MAX_LETTERS_IN_EASEL * 2,
+        );
         expect(game.turnsSkipped).to.eq(0);
     });
 
