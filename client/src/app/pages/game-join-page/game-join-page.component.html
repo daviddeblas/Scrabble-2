@@ -20,8 +20,8 @@
                     <input [attr.disabled]="true" matInput formControlName="name" placeholder="Nom" />
                 </mat-form-field>
                 <mat-card-actions>
-                    <button *ngIf="(pendingRooms$ | async) === undefined; else elseCancelButton" (click)="joinGame()"
-                        mat-raised-button matStepperNext color="primary" id="confirm-name"
+                    <button *ngIf="(pendingRoom$ | async) === undefined; else elseCancelButton" (click)="joinGame()"
+                        mat-raised-button matStepperNext color="primary" id="confirm-name" [disabled]="!formGroup.valid"
                         class="centered">Confirmer</button>
                 </mat-card-actions>
                 <ng-template #elseCancelButton>
