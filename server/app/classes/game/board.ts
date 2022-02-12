@@ -14,6 +14,7 @@ export class Board {
     blanks: Vec2[];
 
     constructor(private config: GameConfig) {
+        // initialize position to all null
         this.board = new Array(config.boardSize.x);
         this.multipliers = new Array(config.boardSize.x);
         for (let i = 0; i < config.boardSize.x; i++) {
@@ -111,6 +112,7 @@ export class Board {
         letters.forEach((l) => {
             tempBoard.board[l.position.x][l.position.y] = l.letter;
         });
+
         const words: PlacedLetter[][] = [];
         letters.forEach((l) => {
             ALLOWED_DIRECTIONS.forEach((d) => {
@@ -125,18 +127,22 @@ export class Board {
                 if (index < 0) words.push(word);
             });
         });
+
         return words;
     }
 
     private getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {
         let checkingPosition = new Vec2(pos.x, pos.y);
         const word: PlacedLetter[] = [];
+
         while (this.letterAt(checkingPosition) !== null) checkingPosition = checkingPosition.sub(direction);
         checkingPosition = checkingPosition.add(direction);
+
         while (this.letterAt(checkingPosition) !== null) {
             word.push(new PlacedLetter(this.letterAt(checkingPosition) as Letter, checkingPosition.copy()));
             checkingPosition = checkingPosition.add(direction);
         }
+
         return word;
     }
 }

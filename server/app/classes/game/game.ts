@@ -87,10 +87,12 @@ export class Game {
         });
     }
 
-    private determineWinner(): string {
-        if (this.players.filter((p) => p.score === this.players[0].score).length === this.players.length) return '';
-        return this.players.reduce((winningPlayer, currentPlayer) => (currentPlayer.score > winningPlayer.score ? currentPlayer : winningPlayer))
-            .name;
+    private determineWinner(): string | null {
+        if (this.players.filter((p) => p.score === this.players[0].score).length === this.players.length) return null;
+        const winningPlayer = this.players.reduce((playerWithMostPoints, currentPlayer) =>
+            currentPlayer.score > playerWithMostPoints.score ? currentPlayer : playerWithMostPoints,
+        );
+        return winningPlayer.name;
     }
 
     private checkMove(letters: Letter[], player: number): void {
