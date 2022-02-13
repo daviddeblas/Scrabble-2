@@ -3,7 +3,7 @@ import { Letter } from '@app/classes/letter';
 import { Word } from '@app/classes/word';
 import { createAction, props } from '@ngrx/store';
 
-export const placeWord = createAction('[Players] Place Word', props<{ word: Word }>());
+export const placeWord = createAction('[Players] Place Word', props<{ position: string; letters: string }>());
 
 export const placeWordSuccess = createAction('[Players] Place Word Success', props<{ word: Word; newLetters?: Letter[]; newScore?: number }>());
 
