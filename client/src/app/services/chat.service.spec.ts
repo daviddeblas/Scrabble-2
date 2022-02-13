@@ -64,7 +64,7 @@ describe('ChatService', () => {
         const exampleMessage = '!Bonjour';
         service.messageWritten(username, exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: ' ', message: 'Commande impossible à réalisée', errorName: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -72,21 +72,21 @@ describe('ChatService', () => {
     it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
         const exampleMessage = '!passer ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command placer is not valid', () => {
         const exampleMessage = '!placer nfpe ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command échanger is not valid', () => {
         const exampleMessage = '!échanger n_fpe38';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
