@@ -36,7 +36,7 @@ export class ChatService {
                         this.handlePlaceCommand(command);
                         this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
@@ -45,7 +45,7 @@ export class ChatService {
                         this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
                         this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
@@ -54,12 +54,12 @@ export class ChatService {
                         this.store.dispatch(skipTurn());
                         this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
                 default:
-                    this.store.dispatch(receivedMessage({ username: ' ', message: 'Commande impossible à réalisée', errorName: 'Error' }));
+                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }));
                     return;
             }
             this.store.dispatch(receivedMessage({ username, message, errorName: '' }));

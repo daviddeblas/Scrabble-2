@@ -4,7 +4,6 @@ import { ChatMessage } from '@app/classes/chat-message';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'app-chat-box',
@@ -17,7 +16,7 @@ export class ChatBoxComponent implements OnInit {
     username: string;
     constructor(private store: Store<{ chat: ChatMessage[] }>, private playerStore: Store<{ players: Players }>) {
         this.chat$ = store.select('chat');
-        this.playerStore.pipe(take(1)).subscribe((us) => (this.username = us.players.player.name));
+        this.playerStore.subscribe((us) => (this.username = us.players.player.name));
     }
     ngOnInit(): void {
         this.store.dispatch(chatActions.initiateChatting());
