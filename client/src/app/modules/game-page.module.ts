@@ -15,6 +15,7 @@ import { ChatEffects } from '@app/effects/chat.effects';
 import { PlayerEffects } from '@app/effects/player.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import * as boardReducer from '@app/reducers/board.reducer';
 import * as chatReducer from '@app/reducers/chat.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
@@ -35,6 +36,7 @@ import { StoreModule } from '@ngrx/store';
         ChatBoxComponent,
         EaselComponent,
         SurrenderGameButtonComponent,
+        BoardToListPipe,
     ],
     imports: [
         AppMaterialModule,
