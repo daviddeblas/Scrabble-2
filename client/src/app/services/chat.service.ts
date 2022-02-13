@@ -26,7 +26,7 @@ export class ChatService {
 
     messageWritten(username: string, message: string) {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message }));
+            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
             this.broadcastMsg(username, message);
         } else {
             const command = message.split(' ');
@@ -35,7 +35,7 @@ export class ChatService {
                     if (this.validatePlaceCommand(command)) {
                         this.handlePlaceCommand(command);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
@@ -43,7 +43,7 @@ export class ChatService {
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
@@ -51,15 +51,15 @@ export class ChatService {
                     if (command.length === 1) {
                         this.store.dispatch(skipTurn());
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
                 default:
-                    this.store.dispatch(receivedMessage({ username: 'Error', message: 'Commande impossible à réalisée' }));
+                    this.store.dispatch(receivedMessage({ username: ' ', message: 'Commande impossible à réalisée', errorName: 'Error' }));
                     return;
             }
-            this.store.dispatch(receivedMessage({ username, message }));
+            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
         }
     }
 

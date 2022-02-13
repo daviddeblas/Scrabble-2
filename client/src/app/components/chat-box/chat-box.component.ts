@@ -12,7 +12,7 @@ import { take } from 'rxjs/operators';
     styleUrls: ['./chat-box.component.scss'],
 })
 export class ChatBoxComponent implements OnInit {
-    @ViewChild('chatMessage') chatMessage: ElementRef<HTMLInputElement>;
+    @ViewChild('chatMessage', { static: true }) chatMessage: ElementRef<HTMLInputElement>;
     chat$: Observable<ChatMessage[]>;
     username: string;
     constructor(private store: Store<{ chat: ChatMessage[] }>, private playerStore: Store<{ players: Players }>) {
@@ -21,7 +21,7 @@ export class ChatBoxComponent implements OnInit {
     }
     ngOnInit(): void {
         this.store.dispatch(chatActions.initiateChatting());
-        document.getElementsByTagName('input')[0].focus();
+        this.chatMessage.nativeElement.focus();
     }
 
     submitMessage(): void {
