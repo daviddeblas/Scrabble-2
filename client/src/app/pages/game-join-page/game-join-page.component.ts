@@ -39,7 +39,7 @@ export class GameJoinPageComponent {
         formBuilder: FormBuilder,
         roomStore: Store<{ room: RoomState }>,
         private store: Store,
-        private effects: RoomEffects,
+        effects: RoomEffects,
         dialogRef: MatDialogRef<GameJoinPageComponent>,
     ) {
         this.formGroup = formBuilder.group({ name: new FormControl({ value: '', disabled: this.isFormDisabled }) });
@@ -47,7 +47,7 @@ export class GameJoinPageComponent {
         this.roomList$ = roomStore.select('room', 'roomList');
         this.pendingRoom$ = roomStore.select('room', 'pendingRoom');
         this.store.dispatch(loadRooms());
-        this.effects.dialogRef = dialogRef;
+        effects.dialogRef = dialogRef;
     }
 
     selectRoom(roomInfo: RoomInfo): void {
@@ -60,12 +60,14 @@ export class GameJoinPageComponent {
     }
 
     joinGame(): void {
-        if (this.selectedRoom) this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo: this.selectedRoom }));
+        if (!this.selectedRoom) return;
+        this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo: this.selectedRoom }));
         this.formGroup.controls.name.disable();
     }
 
     cancelJoin(): void {
-        if (this.selectedRoom) this.store.dispatch(cancelJoinRoom({ roomInfo: this.selectedRoom }));
+        if (!this.selectedRoom) return;
+        this.store.dispatch(cancelJoinRoom({ roomInfo: this.selectedRoom }));
         this.selectedRoom = undefined;
         this.formGroup.controls.name.enable();
         this.stepper.reset();
