@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BoardComponent } from '@app/components/board/board.component';
 import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
@@ -40,6 +41,7 @@ import { StoreModule } from '@ngrx/store';
     ],
     imports: [
         AppMaterialModule,
+        CommonModule,
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
         StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),
