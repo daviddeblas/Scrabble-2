@@ -48,18 +48,11 @@
             </ng-container>
         </ng-container>
 
-<<<<<<< HEAD
-        <ng-container *ngFor="let letterArray of board$ | async; let i = index">
-            <g *ngFor="let letter of letterArray; let j = index" app-letter [letter]="letter" [pos]="{ x: i, y: j }"
-                [value]="(pointsPerLetter$ | async)?.get(letter)"></g>
-        </ng-container>
-=======
         <g
             *ngFor="let letter of board$ | async | boardToList"
             app-letter
             [pos]="letter.position"
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
         ></g>
->>>>>>> 2346f38cca01486366d18237403995c4240c7f6a
     </g>
 </svg>
