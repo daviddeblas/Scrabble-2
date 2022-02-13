@@ -38,9 +38,4 @@ describe('bag constructor', () => {
         player.addLetters(lettersToAdd);
         expect(player.canRemoveLetters(lettersToAdd)).to.eq(true);
     });
-
-    it('canRemoveLetter returns true when the letters are present in easel', () => {
-        const lettersToAdd: Letter[] = ['A', 'A', 'A', 'A'];
-        expect(player.canRemoveLetters(lettersToAdd)).to.eq(false);
-    });
 });
