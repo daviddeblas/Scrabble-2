@@ -17,7 +17,7 @@ describe('PlayerEffects', () => {
                 provideMockActions(() => actions$),
                 {
                     provide: PlayerService,
-                    useValue: jasmine.createSpyObj('PlayerService', ['surrenderGame']),
+                    useValue: jasmine.createSpyObj('PlayerService', ['surrenderGame', 'placeWord']),
                 },
             ],
         });
@@ -33,6 +33,13 @@ describe('PlayerEffects', () => {
         actions$ = of({ type: '[Players] Surrender' });
         effects.surrenderEffect$.subscribe();
         expect(service.surrenderGame).toHaveBeenCalledWith();
+        done();
+    });
+
+    it('placeWordEffect$ should call the function placeWord from player service', (done) => {
+        actions$ = of({ type: '[Players] Place Word' });
+        effects.placeWordEffect$.subscribe();
+        expect(service.placeWord).toHaveBeenCalled();
         done();
     });
 });
