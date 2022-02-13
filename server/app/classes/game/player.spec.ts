@@ -22,10 +22,9 @@ describe('bag constructor', () => {
     });
 
     it('remove letters removes letters on correct call', () => {
-        const lettersToAdd: Letter[] = ['A', 'A', 'A', 'A'];
-        player.addLetters(lettersToAdd);
-        player.removeLetters(lettersToAdd);
-        expect(player.easel).to.deep.eq([]);
+        player.addLetters(['A', 'A', 'B', 'C', 'A', 'A']);
+        player.removeLetters(['A', 'A', 'B', 'A']);
+        expect(player.easel).to.deep.eq(['C', 'A']);
     });
 
     it('remove letters throws on incorrect call', () => {
