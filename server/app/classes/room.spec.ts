@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
@@ -7,6 +8,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
+import { MAX_LETTERS_IN_EASEL } from './game/game';
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
     beforeEach(() => {
@@ -64,6 +66,42 @@ describe('room', () => {
         });
     });
 
+    describe('Command parsing functions and validations', () => {
+        let room: Room;
+        let socket: io.Socket;
+        let gameOptions: GameOptions;
+        beforeEach(() => {
+            socket = {
+                once: () => {
+                    return;
+                },
+                on: () => {
+                    return;
+                },
+                id: '1',
+                emit: () => {
+                    return;
+                },
+            } as unknown as io.Socket;
+            gameOptions = new GameOptions('a', 'b');
+
+            room = new Room(socket, roomsManager, gameOptions);
+            room.join(socket, 'player 2');
+            room.inviteAccepted(socket);
+        });
+
+        it('game status getter returns specific information given to the player', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const info = room['gameStatusGetter'](0) as any;
+            expect(info.playerNames).to.deep.eq(['a', 'player 2']);
+            expect(info.thisPlayer).to.eq(0);
+            expect(info.playerEasel.length).to.eq(MAX_LETTERS_IN_EASEL);
+            expect(info.board).to.deep.eq(room.game?.board);
+            expect(info.activePlayer).to.eq(room.game?.activePlayer);
+            expect(info.letterPotLength).to.eq(room.game?.bag.letters.length);
+        });
+    });
+
     describe('Room events', () => {
         let hostSocket: Socket;
         let clientSocket: Socket;
@@ -93,6 +131,7 @@ describe('room', () => {
 
         describe('Emitting', () => {
             let room: Room;
+
             beforeEach(() => {
                 const gameOptions = new GameOptions('a', 'b');
                 server.on('connection', (socket) => {
@@ -105,6 +144,7 @@ describe('room', () => {
                     });
                 });
             });
+
             it('join emits player joining event', (done) => {
                 hostSocket.on('player joining', (name) => {
                     expect(name).to.eq('player 2');
@@ -112,6 +152,7 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+
             it('client should receive refused if host refuses', (done) => {
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('refuse');
@@ -122,6 +163,7 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+
             it('client should receive accepted if host accepts', (done) => {
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
@@ -131,6 +173,7 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+
             it('client should receive message if host emits send message', (done) => {
                 const message = { username: 'Hostname', message: 'Host Message' };
                 hostSocket.on('player joining', () => {
