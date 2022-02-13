@@ -45,7 +45,7 @@ export class PlayerService {
                 this.boardStore.dispatch(syncBoard());
             }, WORD_VALIDATION_DELAY);
         });
-        let board: Letter[][] = [];
+        let board: (Letter | null)[][] = [];
         this.boardStore.pipe(take(1)).subscribe((us) => (board = us.board.board));
         const word = stringToLetters(letters);
         const column = parseInt(position.slice(1, position.length), 10);
