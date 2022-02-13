@@ -7,7 +7,7 @@ import Container from 'typedi';
 import { GameConfigService } from '@app/services/game-config.service';
 import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
-import { stringToLetter } from './letter';
+import { stringToLetter, stringToLetters } from './letter';
 
 export class Room {
     started: boolean;
@@ -83,7 +83,11 @@ export class Room {
             socket.emit('game status', this.gameStatusGetter(playerNumber));
         });
         socket.on('command', (command) => {
-            this.processCommand(command, playerNumber);
+            try {
+                this.processCommand(command, playerNumber);
+            } catch (error) {
+                socket.emit('error', (error as Error).message);
+            }
         });
     }
 
@@ -91,10 +95,40 @@ export class Room {
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
             case 'place':
-                if (!this.validatePlace(args)) throw Error('malformed arguments for place');
-                this.game?.place(this.parsePlaceCall(args), playerNumber);
+                this.processPlace(args, playerNumber);
+                break;
+            case 'échanger':
+                this.processDraw(args, playerNumber);
+                break;
+            case 'passer':
+                this.processSkip(args, playerNumber);
                 break;
         }
+    }
+
+    private processPlace(args: string[], playerNumber: number): void {
+        if (!this.validatePlace(args)) throw Error('malformed arguments for place');
+        this.game?.place(this.parsePlaceCall(args), playerNumber);
+        this.sockets.forEach((s) => {
+            s.emit('place success', { args, playerNumber });
+        });
+    }
+
+    private processDraw(args: string[], playerNumber: number): void {
+        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
+        this.game?.draw(stringToLetters(args[0]), playerNumber);
+        this.sockets.forEach((s, i) => {
+            if (i === playerNumber) s.emit('draw success', { letters: args[0], playerNumber });
+            else s.emit('draw success', { letters: args[0].split('').map(() => '#'), playerNumber });
+        });
+    }
+
+    private processSkip(args: string[], playerNumber: number): void {
+        if (args.length > 0) throw new Error('malformed argument for pass');
+        this.game?.skip(playerNumber);
+        this.sockets.forEach((s) => {
+            s.emit('skip success', playerNumber);
+        });
     }
 
     private validatePlace(args: string[]): boolean {
