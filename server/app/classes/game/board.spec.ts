@@ -11,6 +11,11 @@ import { Board, createEmptyMatrix } from './board';
 describe('board', () => {
     let board: Board;
     const gameConfig = Container.get(GameConfigService).configs.configs[0];
+    const correctLettersToPlace = [
+        new PlacedLetter('C', new Vec2(6, 7)),
+        new PlacedLetter('O', new Vec2(7, 7)),
+        new PlacedLetter('N', new Vec2(8, 7)),
+    ];
 
     beforeEach(() => {
         board = new Board(gameConfig);
@@ -41,49 +46,43 @@ describe('board', () => {
     it('getAffectedWordFromSinglePlacement should be correct', () => {
         // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        board.place(lettersToPlace);
+        board.place(correctLettersToPlace);
         // eslint-disable-next-line dot-notation
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWords should be correct', () => {
-        // place word 'con' across the 3 middle boxes
-        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         // eslint-disable-next-line dot-notation
-        const words = board['getAffectedWords'](lettersToPlace);
-        words[0].forEach((l, index) => expect(l.equals(lettersToPlace[index])).to.eq(true));
+        const words = board['getAffectedWords'](correctLettersToPlace);
+        words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
     });
 
     it('scorePositions should score accordingly on correct placement without any multiplier', () => {
         // place word 'con' across the 3 middle boxes
-        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        board.place(lettersToPlace);
+        board.place(correctLettersToPlace);
 
-        const expectedPoints = lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
-        expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(expectedPoints);
+        const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
+        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints);
     });
 
     it('scorePositions should score accordingly on correct placement with a single letter multiplier', () => {
-        // place word 'con' across the 3 middle boxes
-        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         // place a new multiplier
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Letter);
-        board.place(lettersToPlace);
+        board.place(correctLettersToPlace);
 
-        const expectedPoints = lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
+        const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const bonusFromMultiplier = 1;
-        expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(expectedPoints + bonusFromMultiplier);
+        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints + bonusFromMultiplier);
     });
 
     it('scorePositions should score accordingly on correct placement with a single word multiplier', () => {
         // place word 'con' across the 3 middle boxes
-        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
-        board.place(lettersToPlace);
+        board.place(correctLettersToPlace);
 
-        const expectedPoints = lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
+        const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 2;
-        expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
+        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
     });
 
     it('place throws on wrong word', () => {
@@ -107,14 +106,13 @@ describe('board', () => {
     });
 
     it('scorePositions should score accordingly on correct placement with multiple word multiplier', () => {
-        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
-        board.place(lettersToPlace);
+        board.place(correctLettersToPlace);
 
-        const expectedPoints = lettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
+        const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 3;
-        expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
+        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
     });
 
     it('letterAt should return the same as if taken directly', () => {

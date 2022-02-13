@@ -18,9 +18,11 @@ describe('game', () => {
     it('constructor', () => {
         expect(game.players.length).to.eq(2);
         expect(game.activePlayer === 0 || game.activePlayer === 1).to.eq(true);
-        expect(game.bag.letters.length).to.eq(
-            game.config.letters.map((l) => l.amount).reduce((sum, amount) => sum + amount) - MAX_LETTERS_IN_EASEL * 2,
-        );
+        const amountOfEachLetters = game.config.letters.map((l) => l.amount);
+        const totalLetters = amountOfEachLetters.reduce((sum, amount) => sum + amount);
+        const totalLettersInEachPlayerEasel = MAX_LETTERS_IN_EASEL;
+        const totalAmountOfPlayers = 2;
+        expect(game.bag.letters.length).to.eq(totalLetters - totalLettersInEachPlayerEasel * totalAmountOfPlayers);
         expect(game.turnsSkipped).to.eq(0);
     });
 
@@ -164,6 +166,8 @@ describe('game', () => {
     it('determineWinner should return highest scoring players name', () => {
         game.players[0].score++;
         expect(game['determineWinner']()).to.eq('player 1');
+        game.players[1].score += 2;
+        expect(game['determineWinner']()).to.eq('player 2');
     });
 
     it('checkMove should throw when it is not this players turn', () => {

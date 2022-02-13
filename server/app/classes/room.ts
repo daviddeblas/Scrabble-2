@@ -1,13 +1,13 @@
+import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
-import { Game } from './game/game';
-import { GameOptions } from './game-options';
-import { RoomInfo } from './room-info';
 import Container from 'typedi';
-import { GameConfigService } from '@app/services/game-config.service';
 import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
 import { stringToLetter, stringToLetters } from './letter';
+import { GameOptions } from './game-options';
+import { Game } from './game/game';
+import { RoomInfo } from './room-info';
 
 export class Room {
     started: boolean;

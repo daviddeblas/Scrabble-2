@@ -105,42 +105,35 @@ describe('Rooms Manager Service', () => {
 
         it('emitting create room should call the createRoom function', (done) => {
             const room: RoomInfo = new RoomInfo('RoomID', {} as GameOptions);
-            const createRoomStub = stub(roomsManager, 'createRoom').callsFake(() => {
+            stub(roomsManager, 'createRoom').callsFake(() => {
+                done();
                 return room;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
-                clientSocket.on('create room success', () => {
-                    expect(createRoomStub.calledOnce).to.equal(true);
-                    done();
-                });
             });
             clientSocket.emit('create room');
         });
 
         it('emitting request list should call the getRooms function', (done) => {
             const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
-            const getRoomsStub = stub(roomsManager, 'getRooms').callsFake(() => {
+            stub(roomsManager, 'getRooms').callsFake(() => {
+                done();
                 return rooms;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
-                clientSocket.on('get list', () => {
-                    expect(getRoomsStub.calledOnce).to.equal(true);
-                    done();
-                });
             });
             clientSocket.emit('request list');
         });
 
         it('emitting join room should call the joinRoom function', (done) => {
-            const joinStub = stub(roomsManager, 'joinRoom').callsFake(() => {
+            stub(roomsManager, 'joinRoom').callsFake(() => {
                 return;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
                 clientSocket.on('player joining', () => {
-                    expect(joinStub.calledOnce).to.equal(true);
                     done();
                 });
             });
