@@ -164,6 +164,8 @@ describe('game', () => {
     it('determineWinner should return highest scoring players name', () => {
         game.players[0].score++;
         expect(game['determineWinner']()).to.eq('player 1');
+        game.players[1].score += 2;
+        expect(game['determineWinner']()).to.eq('player 2');
     });
 
     it('checkMove should throw when it is not this players turn', () => {
