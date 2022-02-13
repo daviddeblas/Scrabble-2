@@ -86,8 +86,13 @@ describe('board', () => {
         expect(board.scorePositions(lettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
     });
 
-    it('place throws on invalid placement', () => {
+    it('place throws on wrong word', () => {
         const lettersToPlace = [new PlacedLetter('O', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        expect(() => board.place(lettersToPlace)).to.throw();
+    });
+
+    it('place throws on invalid placement', () => {
+        const lettersToPlace = [new PlacedLetter('N', new Vec2(100, 7))];
         expect(() => board.place(lettersToPlace)).to.throw();
     });
 

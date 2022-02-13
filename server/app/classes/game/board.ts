@@ -38,6 +38,8 @@ export class Board {
     }
 
     place(letters: PlacedLetter[]): number {
+        if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
+            throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
         words.forEach((w) => {
             if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
