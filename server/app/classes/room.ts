@@ -50,14 +50,13 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
                 const game = this.game as Game;
-                const opponentEasel = [...game.players[(index + 1) % 2].easel];
-                game.players[(index + 1) % 2].easel = [];
+                const opponent = { ...game.players[(index + 1) % 2] };
+                opponent.easel = [];
                 socket.emit('game status', {
                     status: { activePlayer: game.activePlayer, letterPotLength: game.bag.letters.length },
-                    players: { player: game.players[index], opponent: game.players[(index + 1) % 2] },
+                    players: { player: game.players[index], opponent },
                     board: game.board,
                 });
-                game.players[(index + 1) % 2].easel = opponentEasel;
             });
         });
     }
