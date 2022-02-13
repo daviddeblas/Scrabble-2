@@ -11,7 +11,7 @@ export const boardFeatureKey = 'board';
 export const boardSize = 15;
 
 export interface BoardState {
-    board: Letter[][];
+    board: (Letter | null)[][];
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
 }
