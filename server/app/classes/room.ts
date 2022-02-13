@@ -110,6 +110,7 @@ export class Room {
         const maxColumnNumber = (this.game as Game).config.boardSize.x;
         commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
         if (args[1].length > 1) {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             commandIsCorrect &&= /^[vh]$/.test(args[0].slice(-1));
         }
         return commandIsCorrect;
@@ -121,6 +122,7 @@ export class Room {
         let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
 
         let direction = new Vec2(1, 0);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (args[1].length > 1 && args[0].slice(-1) === 'v') direction = new Vec2(0, 1);
 
         const placableLetters: PlacedLetter[] = [];
