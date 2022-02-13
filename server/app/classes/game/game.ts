@@ -6,6 +6,7 @@ import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
+import { Vec2 } from '@app/classes/vec2';
 
 const MAX_TURNS_SKIPPED = 5;
 export const MAX_LETTERS_IN_EASEL = 7;
@@ -17,6 +18,7 @@ export class Game {
     activePlayer: number;
     bag: Bag;
     turnsSkipped: number;
+    placeCounter: number;
 
     constructor(public config: GameConfig, playerNames: string[]) {
         this.bag = new Bag(config);
@@ -26,6 +28,7 @@ export class Game {
         playerNames.forEach((name) => this.players.push(new Player(name)));
         this.turnsSkipped = 0;
         this.players.forEach((p) => p.addLetters(this.bag.getLetters(MAX_LETTERS_IN_EASEL)));
+        this.placeCounter = 0;
     }
 
     place(letters: PlacedLetter[], player: number): void {
@@ -34,6 +37,10 @@ export class Game {
             player,
         );
 
+        const lettersInCenter = letters.filter((l) =>
+            l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
+        );
+        if (lettersInCenter.length === 0) throw new Error('bad starting move');
         this.getActivePlayer().score += this.board.place(letters);
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(letters.map((l) => l.letter));
@@ -41,6 +48,7 @@ export class Game {
         if (this.gameEnded()) this.getActivePlayer().score += this.endGameBonus();
         this.nextTurn();
         this.turnsSkipped = 0;
+        this.placeCounter++;
     }
 
     draw(letters: Letter[], player: number): void {
