@@ -87,18 +87,4 @@ export class ChatService {
         // Verifier que seulement des lettres sont présente dans la commande
         return /^[a-z]*$/.test(command[1]) && command.length === 2;
     }
-
-    /* private handlePlaceCommand(command: string[]): void {
-        let placedWord: Word;
-        if (/^[vh]$/.test(command[1].slice(POSITION_LAST_CHAR))) {
-            placedWord = new Word(
-                stringToLetters(command[2]),
-                boardPositionToVec2(command[1].slice(0, POSITION_LAST_CHAR)),
-                command[1].slice(POSITION_LAST_CHAR) === 'h' ? Direction.HORIZONTAL : Direction.VERTICAL,
-            );
-        } else {
-            placedWord = new Word(stringToLetters(command[2]), boardPositionToVec2(command[1]));
-        }
-        this.store.dispatch(placeWord({ word: placedWord }));
-    }*/
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
+import { receivedMessage } from '@app/actions/chat.actions';
 import { Letter, stringToLetters } from '@app/classes/letter';
-import { ASCII_ALPHABET_POSITION, POSITION_LAST_CHAR } from '@app/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
+import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
-import { take } from 'rxjs/operators';
 import { SocketClientService } from './socket-client.service';
 
 const WORD_VALIDATION_DELAY = 3000;
@@ -14,7 +15,7 @@ const WORD_VALIDATION_DELAY = 3000;
 export class PlayerService {
     constructor(
         private socketService: SocketClientService,
-        // private playerStore: Store<{ players: Players }>,
+        private playerStore: Store<{ players: Players }>,
         private boardStore: Store<{ board: BoardState }>,
     ) {}
 
@@ -24,7 +25,7 @@ export class PlayerService {
 
     placeWord(position: string, letters: string): void {
         const command = 'placer';
-        // if (!this.lettersInEasel(letters)) return;
+        if (!this.lettersInEasel(letters)) return;
         let boardPosition: string;
         let direction: string;
         if (/^[vh]$/.test(position.slice(POSITION_LAST_CHAR))) {
@@ -34,7 +35,10 @@ export class PlayerService {
             boardPosition = position;
             direction = '';
         }
-        // if (!this.wordPlacementCorrect(boardPosition, direction, letters)) return;
+        if (!this.wordPlacementCorrect(boardPosition, direction, letters)) {
+            this.playerStore.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+            return;
+        }
         this.setUpBoardWithWord(boardPosition, direction, letters);
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
     }
@@ -46,33 +50,33 @@ export class PlayerService {
             }, WORD_VALIDATION_DELAY);
         });
         let board: (Letter | null)[][] = [];
-        this.boardStore.pipe(take(1)).subscribe((us) => (board = us.board.board));
+        this.boardStore.select('board').subscribe((us) => (board = us.board));
         const word = stringToLetters(letters);
-        const column = parseInt(position.slice(1, position.length), 10);
+        const column = parseInt(position.slice(1, position.length), 10) - 1;
         const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
         const tempBoard = JSON.parse(JSON.stringify(board));
         const directionValue = direction === 'h' ? column : line;
         for (let i = directionValue; i < word.length + directionValue; ++i) {
             switch (direction) {
                 case 'h':
-                    tempBoard[column + i][line] = word[i - directionValue];
+                    tempBoard[line][i] = word[i - directionValue];
                     break;
                 case 'v':
-                    tempBoard[column][line + i] = word[i - directionValue];
+                    tempBoard[i][column] = word[i - directionValue];
                     break;
             }
         }
         this.boardStore.dispatch(syncBoardSuccess({ newBoard: tempBoard }));
     }
 
-    /* private lettersInEasel(letters: string): boolean {
+    lettersInEasel(letters: string): boolean {
         let easelLetters: Letter[] = [];
-        this.playerStore.pipe(take(1)).subscribe((us) => (easelLetters = us.players.player.easel));
+        this.playerStore.select('players').subscribe((us) => (easelLetters = us.player.easel));
         for (const letter of letters) {
             let letterExist = false;
             for (const element of easelLetters) {
                 if (element.toString().toLowerCase() === letter || (element.toString() === '*' && letter === letter.toUpperCase())) {
-                    easelLetters.slice(easelLetters.indexOf(element), 1);
+                    easelLetters.splice(easelLetters.indexOf(element), 1);
                     letterExist = true;
                     break;
                 }
@@ -85,34 +89,40 @@ export class PlayerService {
         return true;
     }
 
-    private wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
-        const column = parseInt(position.slice(1, position.length), 10);
+    wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
+        const column = parseInt(position.slice(1, position.length), 10) - 1;
         const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-
         let isPlacable = false;
-        for (let i = direction === 'h' ? column : line; i < letters.length; ++i) {
-            switch (direction) {
-                case Direction.HORIZONTAL:
-                    isPlacable ||= this.checkNearSpaces(column + i, line, stringToLetter(letters[i]));
-                    break;
-                case Direction.VERTICAL:
-                    isPlacable ||= this.checkNearSpaces(column, line + i, stringToLetter(letters[i]));
-                    break;
+        let board: (Letter | null)[][] = [];
+        this.boardStore.select('board').subscribe((us) => (board = us.board));
+        for (let i = 0; i < letters.length; ++i) {
+            if (direction === 'h') {
+                isPlacable ||= this.checkNearSpaces(line, column + i, board);
+            } else {
+                isPlacable ||= this.checkNearSpaces(line + i, column, board);
             }
-            if (isPlacable) break;
+            const letterBoard = direction === 'h' ? board[line][column + i] : board[line + i][column];
+            if (letterBoard !== null) {
+                if (letterBoard.toString() !== letters[i].toUpperCase()) {
+                    return false;
+                } else {
+                    isPlacable = true;
+                }
+            }
         }
         return isPlacable;
     }
 
-    private checkNearSpaces(column: number, line: number, letterPlaced: Letter): boolean {
-        let board: Letter[][] = [];
-        this.boardStore.pipe(take(1)).subscribe((us) => (board = us.board.board));
+    private checkNearSpaces(column: number, line: number, board: (Letter | null)[][]): boolean {
         let isPlacable = false;
-        isPlacable ||= board[column][line] === letterPlaced;
-        isPlacable ||= board[column + 1][line] != null;
-        isPlacable ||= board[column][line + 1] != null;
-        isPlacable ||= board[column - 1][line] != null;
-        isPlacable ||= board[column][line - 1] != null;
+        const center = 7;
+        if (board[center][center] === null) {
+            return column === center && line === center;
+        }
+        if (column < BOARD_SIZE - 1) isPlacable ||= board[line][column + 1] != null;
+        if (line < BOARD_SIZE - 1) isPlacable ||= board[line + 1][column] != null;
+        if (column > 0) isPlacable ||= board[line][column - 1] != null;
+        if (line > 0) isPlacable ||= board[line - 1][column] != null;
         return isPlacable;
-    }*/
+    }
 }
