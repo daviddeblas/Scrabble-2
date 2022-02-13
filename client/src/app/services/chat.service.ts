@@ -34,6 +34,7 @@ export class ChatService {
                 case '!placer':
                     if (this.validatePlaceCommand(command)) {
                         this.handlePlaceCommand(command);
+                        this.broadcastMsg(username, message);
                     } else {
                         this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
@@ -42,6 +43,7 @@ export class ChatService {
                 case '!échanger':
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
+                        this.broadcastMsg(username, message);
                     } else {
                         this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
@@ -50,6 +52,7 @@ export class ChatService {
                 case '!passer':
                     if (command.length === 1) {
                         this.store.dispatch(skipTurn());
+                        this.broadcastMsg(username, message);
                     } else {
                         this.store.dispatch(receivedMessage({ username: ' ', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
