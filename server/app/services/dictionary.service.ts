@@ -1,6 +1,6 @@
 import dictionaryJson from '@app/../assets/dictionary.json';
 import { Dictionary } from '@app/classes/dictionary';
-import { Letter, lettersToString } from '@app/classes/letter';
+import { BLANK_LETTER, Letter, lettersToString } from '@app/classes/letter';
 import io from 'socket.io';
 import { Service } from 'typedi';
 // TODO pouvoir changer de dictionnaire
@@ -17,6 +17,32 @@ export class DictionaryService {
 
     isWord(word: Letter[]): boolean {
         // TODO remplacer cette recherche lineaire qui est trop longue
-        return this.dictionary.words.find((w) => new RegExp(lettersToString(word).toLowerCase().replace('*', '.')).test(w)) === undefined;
+        return this.getMatchingWords(word).length > 0;
+    }
+
+    getMatchingWords(word: Letter[]): string[] {
+        return this.dictionary.words.filter((w) => new RegExp('^'.concat(lettersToString(word).toLowerCase().replace('*', '.').concat('$'))).test(w));
+    }
+
+    determineLetterFromBlanks(letters: Letter[][]): Letter {
+        const indexesOfBlank: number[] = [];
+        const possibleWords: string[][] = [];
+        letters.forEach((word) => {
+            indexesOfBlank.push(word.findIndex((l) => l === BLANK_LETTER));
+            possibleWords.push(this.getMatchingWords(word));
+        });
+
+        const possibleLetters: Letter[][] = [];
+
+        possibleWords.forEach((words, index) => {
+            possibleLetters.push([]);
+            words.forEach((word) => {
+                possibleLetters[index].push(word[indexesOfBlank[index]] as Letter);
+            });
+        });
+
+        return possibleLetters[0].filter((l) => {
+            return possibleLetters.filter((arr) => arr.findIndex((letter) => letter === l) >= 0).length > 0;
+        })[0];
     }
 }

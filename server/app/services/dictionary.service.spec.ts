@@ -12,14 +12,23 @@ describe('Dictionary Service', () => {
 
     it('isWord should return true if the word exists', async () => {
         const aa = stringToLetters('aa');
-        expect(service.isWord(aa));
+        expect(service.isWord(aa)).to.eq(true);
         const zythums = stringToLetters('zythums');
-        expect(service.isWord(zythums));
+        expect(service.isWord(zythums)).to.eq(true);
     });
+
     it('isWord should return false if the word does not exist', async () => {
         const ax = stringToLetters('ax');
-        expect(!service.isWord(ax));
+        expect(service.isWord(ax)).to.eq(false);
         const zzzzz = stringToLetters('zzzzz');
-        expect(service.isWord(zzzzz));
+        expect(service.isWord(zzzzz)).to.eq(false);
+    });
+
+    it('getMatchingWords should return the correct words without blanks', async () => {
+        expect(service.getMatchingWords(stringToLetters('co*')).find((w) => w === 'con')).to.not.eq(undefined);
+    });
+
+    it('getMatchingWordsFromBlank', () => {
+        expect(service.determineLetterFromBlanks([stringToLetters('co*'), stringToLetters('co*')])).to.eq('b');
     });
 });

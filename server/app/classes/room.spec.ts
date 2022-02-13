@@ -6,7 +6,6 @@ import { createServer, Server } from 'http';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
-import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
@@ -123,7 +122,6 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
-
             it('client should receive accepted if host accepts', (done) => {
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
@@ -156,6 +154,33 @@ describe('room', () => {
                 hostSocket.on('receive message', (data) => {
                     expect(data.username).to.equal(message.username);
                     expect(data.message).to.equal(message.message);
+                    done();
+                });
+                hostSocket.emit('create room');
+            });
+        });
+
+        describe('getGameInfo', () => {
+            it('client should receive game info when requested', (done) => {
+                let room: Room;
+                const gameOptions = new GameOptions('a', 'b');
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        room = new Room(socket, roomsManager, gameOptions);
+                        clientSocket.emit('join');
+                    });
+                    socket.on('join', () => {
+                        room.join(socket, 'player 2');
+                    });
+                });
+
+                clientSocket.on('accepted', () => {
+                    clientSocket.emit('get game status');
+                });
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('game status', () => {
                     done();
                 });
                 hostSocket.emit('create room');
@@ -221,33 +246,6 @@ describe('room', () => {
                     clientSocket.emit('quit');
                 });
                 hostSocket.emit('create room');
-            });
-
-            it('should receive end game namespace with given info', (done) => {
-                const finishStatus = new GameFinishStatus([], null);
-                let room: Room;
-                const gameOptions = new GameOptions('a', 'b');
-                server.on('connection', (socket) => {
-                    socket.on('create room', () => {
-                        room = new Room(socket, roomsManager, gameOptions);
-                    });
-                    socket.on('join', () => {
-                        room.join(socket, 'player 2');
-                    });
-                });
-                hostSocket.on('end game', (receivedStatus: GameFinishStatus) => {
-                    expect(receivedStatus).to.deep.eq(finishStatus);
-                    done();
-                });
-                hostSocket.on('player joining', () => {
-                    hostSocket.emit('accept');
-                });
-                clientSocket.on('game status', () => {
-                    room.endGame(finishStatus);
-                });
-                hostSocket.emit('create room');
-                clientSocket.emit('join');
-                clientSocket.emit('get game status');
             });
         });
     });

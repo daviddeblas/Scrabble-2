@@ -1,8 +1,8 @@
+import { Letter } from '@app/classes/letter';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
-import { Container } from 'typedi';
 import { describe } from 'mocha';
-import { Letter } from '@app/classes/letter';
+import { Container } from 'typedi';
 
 describe('Letter config service', () => {
     let service: GameConfigService;
@@ -17,7 +17,8 @@ describe('Letter config service', () => {
         expect(letterConfigItem).to.not.eq(undefined);
         expect(letterConfigItem?.letter).to.eq('A' as Letter);
         expect(letterConfigItem?.points).to.eq(1);
-        expect(letterConfigItem?.amt).to.eq(9);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(letterConfigItem?.amount).to.eq(9);
     });
 
     it('getConfigFromName with invalid input should throw', () => {
