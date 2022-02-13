@@ -2,9 +2,12 @@
 import { GameOptions } from '@app/classes/game-options';
 import { Room } from '@app/classes/room';
 import { RoomInfo } from '@app/classes/room-info';
+import { PORT } from '@app/environnement.json';
 import { expect } from 'chai';
+import { createServer, Server } from 'http';
 import { stub } from 'sinon';
-import { Socket } from 'socket.io';
+import { Server as MainServer, Socket } from 'socket.io';
+import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { RoomsManager } from './rooms-manager.service';
 
@@ -151,5 +154,64 @@ describe('Rooms Manager Service', () => {
         expectedRoom.clients[0] = opponentSocket;
         roomsManager.rooms.push(expectedRoom);
         expect(roomsManager.getRoom(opponentSocket.id)).to.equal(expectedRoom);
+    });
+    describe('Setup connection events', () => {
+        let server: MainServer;
+        let httpServer: Server;
+        let clientSocket: ClientSocket;
+        before((done) => {
+            httpServer = createServer();
+            httpServer.listen(PORT);
+            server = new MainServer(httpServer);
+            httpServer.on('listening', () => done());
+        });
+        beforeEach(() => {
+            clientSocket = Client('http://localhost:3000');
+        });
+        afterEach(() => {
+            server.removeAllListeners();
+        });
+
+        after(() => {
+            server.close();
+            httpServer.close();
+        });
+
+        it('emitting create room should call the createRoom function', (done) => {
+            const room: RoomInfo = new RoomInfo('RoomID', {} as GameOptions);
+            stub(roomsManager, 'createRoom').callsFake(() => {
+                done();
+                return room;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            clientSocket.emit('create room');
+        });
+
+        it('emitting request list should call the getRooms function', (done) => {
+            const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
+            stub(roomsManager, 'getRooms').callsFake(() => {
+                done();
+                return rooms;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            clientSocket.emit('request list');
+        });
+
+        it('emitting join room should call the joinRoom function', (done) => {
+            stub(roomsManager, 'joinRoom').callsFake(() => {
+                return;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+                clientSocket.on('player joining', () => {
+                    done();
+                });
+            });
+            clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
+        });
     });
 });

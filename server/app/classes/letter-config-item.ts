@@ -1,5 +1,5 @@
 import { Letter } from '@app/classes/letter';
 
 export class LetterConfigItem {
-    constructor(public letter: Letter, public points: number, public amt: number) {}
+    constructor(public letter: Letter, public points: number, public amount: number) {}
 }

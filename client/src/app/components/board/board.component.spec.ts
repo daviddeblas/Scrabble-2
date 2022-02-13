@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import { StoreModule } from '@ngrx/store';
 import { BoardComponent } from './board.component';
 
@@ -8,7 +9,7 @@ describe('BoardComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [BoardComponent],
+            declarations: [BoardComponent, BoardToListPipe],
             imports: [StoreModule.forRoot({})],
         }).compileComponents();
     });
@@ -21,5 +22,22 @@ describe('BoardComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('numberSequence should be equal', () => {
+        const sequenceLength = 5;
+        /* eslint-disable-next-line @typescript-eslint/no-magic-numbers */
+        const expectedSequence = [1, 2, 3, 4, 5];
+
+        const numberSequence: number[] = component.numberSequence(sequenceLength);
+        expect(numberSequence).toEqual(expectedSequence);
+    });
+
+    it('letterSequence should be equal', () => {
+        const sequenceLength = 5;
+        const expectedSequence = ['A', 'B', 'C', 'D', 'E'];
+
+        const letterSequence: string[] = component.letterSequence(sequenceLength);
+        expect(letterSequence).toEqual(expectedSequence);
     });
 });

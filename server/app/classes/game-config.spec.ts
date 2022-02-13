@@ -9,5 +9,6 @@ describe('GameConfig', () => {
         expect(config.letters).to.deep.eq([]);
         expect(config.boardSize).to.deep.eq(new Vec2(0, 0));
         expect(config.name).to.eq('default');
+        expect(config.dictionary.dictionary.title).to.eq('Mon dictionnaire');
     });
 });

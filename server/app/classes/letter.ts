@@ -28,6 +28,8 @@ export type Letter =
     // BLANK
     | '*';
 
+export const BLANK_LETTER = '*' as Letter;
+
 export const stringToLetter = (string: string): Letter => {
     const error = new Error(`Invalid string input: ${string}`);
     if (string.length !== 1) throw error;

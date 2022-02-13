@@ -1,15 +1,16 @@
+import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
-import { ClassicGame } from './classic-game';
-import { GameFinishStatus } from './game-finish-status';
+import Container from 'typedi';
 import { GameOptions } from './game-options';
+import { Game } from './game/game';
 import { RoomInfo } from './room-info';
 
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
     clientName: string | null;
-    game: ClassicGame | null;
+    game: Game | null;
 
     sockets: io.Socket[];
     // TODO supprimer des rooms
@@ -46,28 +47,21 @@ export class Room {
         this.initChatting();
     }
 
-    endGame(info: GameFinishStatus): void {
-        this.sockets.forEach((socket) => {
-            socket.emit('end game', info);
-        });
-    }
-
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
-        this.game = new ClassicGame(this.endGame);
+        this.game = new Game(Container.get(GameConfigService).configs.configs[0], [this.gameOptions.hostname, this.clientName as string]);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
-                if (this.game === null) throw new Error();
-                const opponentEasel = [...this.game.players[(index + 1) % 2].easel];
-                this.game.players[(index + 1) % 2].easel = [];
+                const game = this.game as Game;
+                const opponent = { ...game.players[(index + 1) % 2] };
+                opponent.easel = [];
                 socket.emit('game status', {
-                    status: { activePlayer: this.game.activePlayer, letterPotLength: this.game.letterPot.length },
-                    players: { player: this.game.players[index], opponent: this.game.players[(index + 1) % 2] },
-                    board: { board: this.game.board, multipliers: this.game.multipliers, pointsPerLetter: this.game.pointPerLetter },
+                    status: { activePlayer: game.activePlayer, letterPotLength: game.bag.letters.length },
+                    players: { player: game.players[index], opponent },
+                    board: game.board,
                 });
-                this.game.players[(index + 1) % 2].easel = opponentEasel;
             });
         });
     }
@@ -81,12 +75,13 @@ export class Room {
     }
 
     surrenderGame(looserId: string) {
-        if (!this.game?.players) throw new Error('Game does not exist');
-        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
-            this.game.players,
-            looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
-        );
-        this.endGame(gameFinishStatus);
+        looserId;
+        // if (!this.game?.players) throw new Error('Game does not exist');
+        // const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
+        //     this.game.players,
+        //     looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
+        // );
+        // this.endGame(gameFinishStatus);
     }
 
     initChatting(): void {
