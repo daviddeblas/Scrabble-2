@@ -22,10 +22,11 @@
                 <mat-card-actions>
                     <button *ngIf="(pendingRoom$ | async) === undefined; else elseCancelButton" (click)="joinGame()"
                         mat-raised-button matStepperNext color="primary" id="confirm-name" [disabled]="!formGroup.valid"
-                        class="centered">Confirmer</button>
+                        class="button centered">Confirmer</button>
                 </mat-card-actions>
                 <ng-template #elseCancelButton>
-                    <button mat-raised-button matStepperNext color="warn" class="button" (click)="cancelJoin()">
+                    <button mat-raised-button matStepperNext color="warn" class="button centered"
+                        (click)="cancelJoin()">
                         <mat-spinner diameter="25" class="spinner"></mat-spinner><span class="cancel">Annuler</span>
                     </button>
                 </ng-template>
