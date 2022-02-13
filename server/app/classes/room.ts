@@ -1,10 +1,10 @@
+import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
-import { Game } from './game/game';
-import { GameOptions } from './game-options';
-import { RoomInfo } from './room-info';
 import Container from 'typedi';
-import { GameConfigService } from '@app/services/game-config.service';
+import { GameOptions } from './game-options';
+import { Game } from './game/game';
+import { RoomInfo } from './room-info';
 
 export class Room {
     started: boolean;
@@ -50,15 +50,14 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
                 const game = this.game as Game;
+                const opponentEasel = [...game.players[(index + 1) % 2].easel];
+                game.players[(index + 1) % 2].easel = [];
                 socket.emit('game status', {
-                    playerNames: [game.players[0].name, game.players[1].name],
-                    thisPlayer: index,
-                    playerEasel: game.players[index].easel,
+                    status: { activePlayer: game.activePlayer, letterPotLength: game.bag.letters.length },
+                    players: { player: game.players[index], opponent: game.players[(index + 1) % 2] },
                     board: game.board,
-                    activePlayer: game.activePlayer,
-                    letterPotLength: game.bag.letters.length,
-                    pointsPerLetter: game.board.pointsPerLetter,
                 });
+                game.players[(index + 1) % 2].easel = opponentEasel;
             });
         });
     }
