@@ -1,8 +1,13 @@
 <div class="sidebar">
-    <mat-card>
+    <mat-card class="player-card active">
         <h2>{{ (players$ | async)?.opponent?.name }}</h2>
+        <h3>Temps restant 0:30</h3>
+        <p>{{ (players$ | async)?.opponent?.score }}pts</p>
     </mat-card>
-    <mat-card>
+
+    <mat-card class="player-card">
+        <p>{{ (players$ | async)?.player?.score }}pts</p>
+        <h3>En attente</h3>
         <h2>{{ (players$ | async)?.player?.name }}</h2>
     </mat-card>
 </div>

@@ -5,3 +5,23 @@
     flex-direction: column;
     justify-content: space-between;
 }
+
+.player-card {
+    * {
+        margin-bottom: 0;
+    }
+}
+
+.active {
+    animation: active-animation 2s infinite;
+    animation-direction: alternate;
+}
+
+@keyframes active-animation {
+    0% {
+        background-color: white;
+    }
+    100% {
+        background-color: #ccccff;
+    }
+}
