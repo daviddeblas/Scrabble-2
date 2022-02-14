@@ -15,10 +15,14 @@ export const initialState: LocalSettings = { zoom: 1 };
 
 export const reducer = createReducer(
     initialState,
-    on(zoomIn, (state) => {
-        return { ...state, zoom: state.zoom + ZOOM_STEP > ZOOM_MAX ? ZOOM_MAX : state.zoom + ZOOM_STEP };
-    }),
-    on(zoomOut, (state) => {
-        return { ...state, zoom: state.zoom - ZOOM_STEP < ZOOM_MIN ? ZOOM_MIN : state.zoom - ZOOM_STEP };
-    }),
+
+    on(zoomIn, (state) => ({
+        ...state,
+        zoom: state.zoom + ZOOM_STEP > ZOOM_MAX ? ZOOM_MAX : state.zoom + ZOOM_STEP,
+    })),
+
+    on(zoomOut, (state) => ({
+        ...state,
+        zoom: state.zoom - ZOOM_STEP < ZOOM_MIN ? ZOOM_MIN : state.zoom - ZOOM_STEP,
+    })),
 );
