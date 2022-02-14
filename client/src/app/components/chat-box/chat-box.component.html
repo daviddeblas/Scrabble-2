@@ -7,8 +7,8 @@
                     <strong>{{ line.username }}</strong> : {{ line.message }}
                 </mat-card>
                 <ng-template #errorMessage>
-                    <section *ngIf="line.username === 'Error'; else opponentMessage" id="error-message">
-                        <strong>{{ line.username }}</strong> : {{ line.message }}
+                    <section *ngIf="line.errorName === 'Error'; else opponentMessage" id="error-message">
+                        <strong>{{ line.errorName }}</strong> : {{ line.message }}
                     </section>
                 </ng-template>
                 <ng-template #opponentMessage>
@@ -22,7 +22,7 @@
     <form class="chat-box-form" onsubmit="return false;">
         <mat-form-field id="chat-input" appearance="fill">
             <mat-label>Message</mat-label>
-            <input matInput #chatMessage maxlength="512" placeholder="Aide: !info" autocomplete="off" />
+            <input matInput #chatMessage maxlength="512" placeholder="Discuter!" autocomplete="off" />
             <mat-hint align="start"><strong>Parlez avec l'adversaire</strong> </mat-hint>
             <mat-hint align="end">{{ chatMessage.value.length }} / 512</mat-hint>
         </mat-form-field>

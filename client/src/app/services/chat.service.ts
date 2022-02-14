@@ -18,7 +18,7 @@ export class ChatService {
         this.socketService.send('send message', { username, message });
     }
 
-    acceptNewMessages() {
+    acceptNewMessages(): void {
         this.socketService.on('receive message', (chatMessage: ChatMessage) => {
             this.store.dispatch(receivedMessage(chatMessage));
         });
@@ -26,44 +26,43 @@ export class ChatService {
 
     messageWritten(username: string, message: string) {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message }));
+            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
             this.broadcastMsg(username, message);
         } else {
             const command = message.split(' ');
             switch (command[0]) {
-                case '!placer': {
+                case '!placer':
                     if (this.validatePlaceCommand(command)) {
                         this.handlePlaceCommand(command);
+                        this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
-                }
-                case '!échanger': {
+                case '!échanger':
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
+                        this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
-                }
-                case '!passer': {
+                case '!passer':
                     if (command.length === 1) {
                         this.store.dispatch(skipTurn());
+                        this.broadcastMsg(username, message);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                         return;
                     }
                     break;
-                }
-                default: {
-                    this.store.dispatch(receivedMessage({ username: 'Error', message: 'Commande impossible à réalisée' }));
+                default:
+                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }));
                     return;
-                }
             }
-            this.store.dispatch(receivedMessage({ username, message }));
+            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
         }
     }
 
@@ -74,7 +73,7 @@ export class ChatService {
         commandIsCorrect = true;
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
-        commandIsCorrect &&= /^[a-z*]*$/.test(command[2]);
+        commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
         const columnNumber = parseInt(command[1].replace(/^\D+/g, ''), 10); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
