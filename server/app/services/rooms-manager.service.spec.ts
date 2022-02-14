@@ -5,9 +5,9 @@ import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
 import { RoomInfo } from '@app/classes/room-info';
 import { PORT } from '@app/environnement.json';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { createServer, Server } from 'http';
-import { restore, stub } from 'sinon';
+import { restore, spy, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -84,16 +84,17 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
 
-    it('getAvailableRooms should return only not started games', () => {
+    it('sendAvailableRooms should send only not started games', () => {
         roomsManager.createRoom(socket, options);
+        const spyOnSocket = spy(socket, 'emit');
         const expectedResult = [new RoomInfo(socket.id, options)];
-        expect(roomsManager.getAvailableRooms()).to.deep.equal(expectedResult);
+        roomsManager.sendAvailableRooms(socket);
+        assert(spyOnSocket.calledWith('get list', expectedResult));
 
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
-        // eslint-disable-next-line dot-notation
         roomsManager.rooms[1].game = new Game(new GameConfig(), ['']);
-        expect(roomsManager.getAvailableRooms()).to.deep.equal(expectedResult);
+        assert(spyOnSocket.calledWith('get list', expectedResult));
     });
 
     describe('switchPlayerSocket', () => {
@@ -239,7 +240,7 @@ describe('Rooms Manager Service', () => {
 
         it('emitting request list should call the getRooms function', (done) => {
             const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
-            const getRoomsStub = stub(roomsManager, 'getAvailableRooms').callsFake(() => {
+            const getRoomsStub = stub(roomsManager, 'sendAvailableRooms').callsFake(() => {
                 return rooms;
             });
             server.on('connection', (serverSocket) => {
@@ -267,5 +268,11 @@ describe('Rooms Manager Service', () => {
                 done();
             }, RESPONSE_DELAY);
         });
+    });
+
+    it('removeSocketFromJoiningList should remove socket from joining list', () => {
+        roomsManager.joiningSockets = [socket];
+        roomsManager.removeSocketFromJoiningList(socket);
+        expect(roomsManager.joiningSockets).to.equal([]);
     });
 });

@@ -49,9 +49,14 @@ export class Room {
 
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
+
         this.game = new Game(Container.get(GameConfigService).configs.configs[0], [this.gameOptions.hostname, this.clientName as string]);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
+
+        this.manager.removeSocketFromJoiningList(this.sockets[1]);
+        this.manager.notifyAvailableRoomsChange();
+
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
                 const game = this.game as Game;
