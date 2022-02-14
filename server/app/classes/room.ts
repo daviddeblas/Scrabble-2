@@ -55,7 +55,7 @@ export class Room {
                 socket.emit('game status', {
                     status: { activePlayer: game.activePlayer, letterPotLength: game.bag.letters.length },
                     players: { player: game.players[index], opponent },
-                    board: game.board,
+                    board: { board: game.board.board, pointsPerLetter: game.board.pointsPerLetter, multipliers: game.board.multipliers },
                 });
             });
         });
