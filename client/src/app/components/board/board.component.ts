@@ -19,7 +19,7 @@ export class BoardComponent {
     readonly boardSize = BOARD_SIZE;
 
     board$: Observable<(Letter | null)[][]>;
-    pointsPerLetter$: Observable<Map<Letter, number>>;
+    pointsPerLetter$: Observable<[Letter, number][]>;
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 

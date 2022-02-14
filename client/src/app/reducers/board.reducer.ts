@@ -12,11 +12,11 @@ export const boardSize = 15;
 
 export interface BoardState {
     board: (Letter | null)[][];
-    pointsPerLetter: Map<Letter, number>;
+    pointsPerLetter: [Letter, number][];
     multipliers: (Multiplier | null)[][];
 }
 
-export const initialState: BoardState = { board: [], pointsPerLetter: new Map(), multipliers: [] };
+export const initialState: BoardState = { board: [], pointsPerLetter: [], multipliers: [] };
 
 export const reducer = createReducer(
     initialState,
