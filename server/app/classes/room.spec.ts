@@ -1,12 +1,12 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { Room } from '@app/classes/room';
+import { Room, MILLISECONDS_PER_SEC } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
@@ -174,6 +174,15 @@ describe('room', () => {
             expect(info.board.multipliers).to.eq(room.game?.board.multipliers);
             expect(info.status.letterPotLength).to.eq(room.game?.bag.letters.length);
             expect(info.players.player).to.deep.eq(room.game?.players[0]);
+        });
+
+        it('post command emits turn ended', (done) => {
+            const clk = useFakeTimers();
+            room.sockets.pop();
+            room['processSkip'] = () => done();
+            room['postCommand']();
+            clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+            clk.restore();
         });
     });
 

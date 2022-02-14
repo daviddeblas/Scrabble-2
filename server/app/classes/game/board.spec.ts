@@ -92,7 +92,7 @@ describe('board', () => {
     });
 
     it('place should add a blank to the blanks field', () => {
-        const lettersToPlace = [new PlacedLetter('*', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.place(lettersToPlace, [new Vec2(6, 7)]);
         expect(board.blanks.length).to.eq(1);
     });

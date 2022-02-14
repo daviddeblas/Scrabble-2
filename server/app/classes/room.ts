@@ -11,11 +11,13 @@ import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
 import { Vec2 } from './vec2';
 
+export const MILLISECONDS_PER_SEC = 1000;
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
     clientName: string | null;
     game: Game | null;
+    currentTimer: NodeJS.Timeout;
 
     sockets: io.Socket[];
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
@@ -133,7 +135,12 @@ export class Room {
     }
 
     private postCommand(): void {
+        clearTimeout(this.currentTimer);
         this.sockets.forEach((s) => s.emit('turn ended'));
+        this.currentTimer = setTimeout(() => {
+            this.processSkip([], this.game?.activePlayer as number);
+            this.sockets.forEach((s) => s.emit('turn ended'));
+        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
