@@ -120,6 +120,16 @@ describe('PlayerService', () => {
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
     });
 
+    it('exchangeLetters should not call socketService send if letters are not in easel', () => {
+        const letters = 'aerev';
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return false;
+        });
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.exchangeLetters(letters);
+        expect(sendSpy).not.toHaveBeenCalled();
+    });
+
     it('lettersInEasel should return true if all letters are in easel', () => {
         expect(service.lettersInEasel('abcG')).toBeTrue();
     });

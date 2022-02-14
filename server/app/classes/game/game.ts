@@ -36,10 +36,12 @@ export class Game {
             letters.map((l) => l.letter),
             player,
         );
-        const lettersInCenter = letters.filter((l) =>
-            l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
-        );
-        if (lettersInCenter.length === 0) throw new Error('bad starting move');
+        if (this.placeCounter === 0) {
+            const lettersInCenter = letters.filter((l) =>
+                l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
+            );
+            if (lettersInCenter.length === 0) throw new Error('bad starting move');
+        }
         this.getActivePlayer().score += this.board.place(letters, blanks);
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(letters.map((l) => l.letter));

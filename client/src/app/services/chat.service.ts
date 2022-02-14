@@ -30,7 +30,7 @@ export class ChatService {
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('skip success', (username: string) => {
-            const chatMessage = { username, message: '!passer ', errorName: '' };
+            const chatMessage = { username, message: '!passer', errorName: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('turn ended', () => {
@@ -42,7 +42,7 @@ export class ChatService {
         });
     }
 
-    messageWritten(username: string, message: string) {
+    messageWritten(username: string, message: string): void {
         if (message[0] !== '!') {
             this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
             this.broadcastMsg(username, message);

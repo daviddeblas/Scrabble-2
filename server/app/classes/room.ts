@@ -189,7 +189,7 @@ export class Room {
         commandIsCorrect = true;
         commandIsCorrect &&= /^[a-o]*$/.test(args[0][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(args[0]);
-        commandIsCorrect &&= /^[a-z*]*$/.test(args[1]);
+        commandIsCorrect &&= /^[a-zA-Z]*$/.test(args[1]);
         const columnNumber = parseInt((args[0].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = (this.game as Game).config.boardSize.x;
@@ -204,7 +204,7 @@ export class Room {
     private parsePlaceCall(args: string[]): [PlacedLetter[], Vec2[]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
-        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0) - 1;
+        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
         const yPositionFromNumber = parseInt(positionNumber, 10) - 1;
 
         let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
