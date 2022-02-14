@@ -153,7 +153,8 @@ export class Room {
 
     private processPlace(args: string[], playerNumber: number): void {
         if (!this.validatePlace(args)) throw Error('malformed arguments for place');
-        this.game?.place(this.parsePlaceCall(args), playerNumber);
+        const argsForParsePlaceCall = this.parsePlaceCall(args);
+        this.game?.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
         this.sockets.forEach((s) => {
             s.emit('place success', { args, username: playerNumber === 0 ? this.gameOptions.hostname : this.clientName });
         });
@@ -200,7 +201,7 @@ export class Room {
         return commandIsCorrect;
     }
 
-    private parsePlaceCall(args: string[]): PlacedLetter[] {
+    private parsePlaceCall(args: string[]): [PlacedLetter[], Vec2[]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
         const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0) - 1;
@@ -213,12 +214,14 @@ export class Room {
         if (args[1].length > 1 && args[0].slice(-1) === 'v') direction = new Vec2(0, 1);
 
         const placableLetters: PlacedLetter[] = [];
+        const blanks: Vec2[] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (this.game?.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
             placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
             iterationVector = iterationVector.add(direction);
+            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push(iterationVector.copy());
         }
-        return placableLetters;
+        return [placableLetters, blanks];
     }
 
     private gameStatusGetter(playerNumber: number): unknown {

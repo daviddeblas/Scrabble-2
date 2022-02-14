@@ -1,6 +1,6 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
-import { BLANK_LETTER, Letter } from '@app/classes/letter';
+import { Letter } from '@app/classes/letter';
 import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
@@ -37,7 +37,7 @@ export class Board {
         this.blanks = [];
     }
 
-    place(letters: PlacedLetter[]): number {
+    place(letters: PlacedLetter[], blanks: Vec2[]): number {
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
             throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
@@ -47,8 +47,9 @@ export class Board {
 
         letters.forEach((l) => {
             this.board[l.position.x][l.position.y] = l.letter;
-            if (l.letter === BLANK_LETTER) this.blanks.push(new Vec2(l.position.x, l.position.y));
         });
+
+        blanks.forEach((v) => this.blanks.push(v));
 
         let score = 0;
         words.forEach((w) => {

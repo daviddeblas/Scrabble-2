@@ -47,7 +47,7 @@ describe('board', () => {
     it('getAffectedWordFromSinglePlacement should be correct', () => {
         // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        board.place(correctLettersToPlace);
+        board.place(correctLettersToPlace, []);
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
@@ -57,7 +57,7 @@ describe('board', () => {
     });
 
     it('scorePositions should score accordingly on correct placement without any multiplier', () => {
-        board.place(correctLettersToPlace);
+        board.place(correctLettersToPlace, []);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints);
@@ -65,7 +65,7 @@ describe('board', () => {
 
     it('scorePositions should score accordingly on correct placement with a single letter multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Letter);
-        board.place(correctLettersToPlace);
+        board.place(correctLettersToPlace, []);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const bonusFromMultiplier = 1;
@@ -74,7 +74,7 @@ describe('board', () => {
 
     it('scorePositions should score accordingly on correct placement with a single word multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
-        board.place(correctLettersToPlace);
+        board.place(correctLettersToPlace, []);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 2;
@@ -83,17 +83,17 @@ describe('board', () => {
 
     it('place throws on wrong word', () => {
         const lettersToPlace = [new PlacedLetter('O', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        expect(() => board.place(lettersToPlace)).to.throw();
+        expect(() => board.place(lettersToPlace, [])).to.throw();
     });
 
     it('place throws on invalid placement', () => {
         const lettersToPlace = [new PlacedLetter('N', new Vec2(100, 7))];
-        expect(() => board.place(lettersToPlace)).to.throw();
+        expect(() => board.place(lettersToPlace, [])).to.throw();
     });
 
     it('place should add a blank to the blanks field', () => {
         const lettersToPlace = [new PlacedLetter('*', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        board.place(lettersToPlace);
+        board.place(lettersToPlace, [new Vec2(6, 7)]);
         expect(board.blanks.length).to.eq(1);
     });
 
@@ -104,7 +104,7 @@ describe('board', () => {
     it('scorePositions should score accordingly on correct placement with multiple word multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
-        board.place(correctLettersToPlace);
+        board.place(correctLettersToPlace, []);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 3;

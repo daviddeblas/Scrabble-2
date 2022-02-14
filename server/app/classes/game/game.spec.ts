@@ -39,6 +39,7 @@ describe('game', () => {
             // place 'con' across in the middle
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
+                [],
                 game.activePlayer,
             );
         }).to.not.throw();
@@ -60,6 +61,7 @@ describe('game', () => {
 
         game.place(
             oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
+            [],
             game.activePlayer,
         );
 
@@ -77,6 +79,7 @@ describe('game', () => {
         game.bag.letters = [];
         game.place(
             oldEasel.map((letter, index) => new PlacedLetter(letter, new Vec2(index + 6, 7))),
+            [],
             game.activePlayer,
         );
 
@@ -100,6 +103,7 @@ describe('game', () => {
         expect(() => {
             game.place(
                 oldEasel.map((letter, index) => new PlacedLetter(letter, new Vec2(index + 0, 7))),
+                [],
                 game.activePlayer,
             );
         }).to.throw();

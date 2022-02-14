@@ -160,7 +160,7 @@ describe('room', () => {
         it('parse place call returns the right placed characters', () => {
             const commandArgs = ['h7h', 'con'];
             const placedLetters = room['parsePlaceCall'](commandArgs);
-            placedLetters.forEach((l, index) => {
+            placedLetters[0].forEach((l, index) => {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 6)));
             });
