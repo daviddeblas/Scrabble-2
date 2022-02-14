@@ -6,7 +6,7 @@ import { Players } from './player.reducer';
 
 describe('[Game Status] Game Status Received', () => {
     const gameStatusStub: GameStatus = {
-        activePlayer: 0,
+        activePlayer: '',
         letterPotLength: 0,
     };
 
