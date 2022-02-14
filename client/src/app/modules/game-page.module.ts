@@ -37,11 +37,11 @@ import { StoreModule } from '@ngrx/store';
         EaselComponent,
         SurrenderGameButtonComponent,
         BoardToListPipe,
+        ChatBoxComponent,
     ],
     imports: [
         AppMaterialModule,
         CommonModule,
-        AppMaterialModule,
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
         StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),

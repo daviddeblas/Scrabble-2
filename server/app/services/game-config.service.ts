@@ -1,11 +1,19 @@
 import configsJson from '@app/../assets/game-config.json';
 import { GameConfigs } from '@app/classes/game-configs';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import { GameConfig } from '@app/classes/game-config';
+import { DictionaryService } from './dictionary.service';
 
 @Service()
 export class GameConfigService {
-    configs: GameConfigs = Object.assign(new GameConfigs(), configsJson);
+    configs: GameConfigs;
+
+    constructor() {
+        this.configs = Object.assign(new GameConfigs(), configsJson);
+        this.configs.configs.forEach((config) => {
+            config.dictionary = Container.get(DictionaryService);
+        });
+    }
 
     getConfigFromName(name: string): GameConfig {
         const config = this.configs.configs.find((c) => c.name === name);

@@ -28,7 +28,7 @@ describe('[Players] Reducer', () => {
         };
 
         const gameStatusStub: GameStatus = {
-            activePlayer: 0,
+            activePlayer: '',
             letterPotLength: 0,
         };
 

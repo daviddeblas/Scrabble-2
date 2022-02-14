@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { initiateChatting, restoreMessages } from '@app/actions/chat.actions';
+import { getGameStatus } from '@app/actions/game-status.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
@@ -37,6 +38,7 @@ export class BrowserManagerService {
     }
 
     private retrieveSelectors(): void {
+        this.store.dispatch(getGameStatus());
         const oldMessages = localStorage.getItem('chatMessages');
         localStorage.removeItem('chatMessages');
         if (!oldMessages) return;

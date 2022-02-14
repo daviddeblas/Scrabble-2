@@ -5,6 +5,7 @@ describe('[Chat] Received message', () => {
     const chatMessageStub: ChatMessage = {
         username: 'Brian',
         message: 'is in the kitchen',
+        errorName: 'Error',
     };
     it('should receive the message', () => {
         const action = chatAction.receivedMessage(chatMessageStub);
