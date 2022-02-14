@@ -273,6 +273,6 @@ describe('Rooms Manager Service', () => {
     it('removeSocketFromJoiningList should remove socket from joining list', () => {
         roomsManager.joiningSockets = [socket];
         roomsManager.removeSocketFromJoiningList(socket);
-        expect(roomsManager.joiningSockets).to.equal([]);
+        expect(roomsManager.joiningSockets).to.deep.equal([]);
     });
 });

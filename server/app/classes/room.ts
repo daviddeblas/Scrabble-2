@@ -29,7 +29,7 @@ export class Room {
         const client = socket;
         this.host.once('accept', () => this.inviteAccepted(client));
         this.host.once('refuse', () => this.inviteRefused(client));
-        client.once('quit', () => this.quitRoomClient());
+        client.once('cancel join room', () => this.quitRoomClient());
     }
 
     quitRoomHost(): void {
@@ -39,6 +39,18 @@ export class Room {
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initiateRoomEvents();
+    }
+
+    inviteRefused(client: io.Socket): void {
+        client.emit('refused');
+        this.clients[0] = null;
+        this.clientName = null;
+    }
+
+    quitRoomClient(): void {
+        this.host.emit('player joining cancel');
+        this.clients[0] = null;
+        this.clientName = null;
     }
 
     initiateRoomEvents() {
@@ -97,16 +109,6 @@ export class Room {
         this.clients[0]?.on('send message', ({ username, message }) => {
             this.host.emit('receive message', { username, message });
         });
-    }
-
-    inviteRefused(client: io.Socket): void {
-        client.emit('refused');
-        this.clients[0] = null;
-        this.clientName = null;
-    }
-
-    quitRoomClient(): void {
-        this.manager.removeRoom(this);
     }
 
     getRoomInfo(): RoomInfo {

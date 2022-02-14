@@ -25,6 +25,7 @@ export const reducer = createReducer(
     on(roomActions.closeRoom, () => initialState),
     on(roomActions.joinInviteReceived, (state, { playerName }) => ({ ...state, pendingPlayer: playerName })),
     on(roomActions.refuseInvite, (state) => ({ ...state, pendingPlayer: undefined })),
+    on(roomActions.joinInviteCanceled, (state) => ({ ...state, pendingPlayer: undefined })),
 
     // For joining
     on(roomActions.loadRoomsSuccess, (state, { rooms }) => ({ ...state, roomList: rooms })),

@@ -11,6 +11,7 @@ export const closeRoom = createAction('[Room] Close Room');
 export const joinInviteReceived = createAction('[Room] Join Invite Received', props<{ playerName: string }>());
 export const acceptInvite = createAction('[Room] Accept Invite');
 export const refuseInvite = createAction('[Room] Refuse Invite');
+export const joinInviteCanceled = createAction('[Room] Join Invite Canceled');
 
 // Joiner
 export const loadRooms = createAction('[Room] Load Rooms');
