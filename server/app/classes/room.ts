@@ -4,6 +4,7 @@ import io from 'socket.io';
 import Container from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
+import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
 import { stringToLetter, stringToLetters } from './letter';
 import { PlacedLetter } from './placed-letter';
@@ -17,7 +18,6 @@ export class Room {
     clients: (io.Socket | null)[];
     clientName: string | null;
     game: Game | null;
-    // currentTimer: NodeJS.Timeout;
 
     sockets: io.Socket[];
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
@@ -118,30 +118,30 @@ export class Room {
                 this.processCommand(command, playerNumber);
                 this.postCommand();
             } catch (error) {
+                const delayForInvalidWord = 3000;
                 socket.emit('error', (error as Error).message);
+                if (error === GameErrorType.InvalidWord) {
+                    setTimeout(() => {
+                        this.postCommand();
+                    }, delayForInvalidWord);
+                }
             }
             if (this.game?.gameEnded()) {
                 this.sockets.forEach((s) => {
-                    s.emit('game ended', this.game?.endGame());
+                    s.emit('end game', this.game?.endGame());
                 });
             }
         });
     }
 
     private postCommand(): void {
-        // clearTimeout(this.currentTimer);
         this.sockets.forEach((s) => s.emit('turn ended'));
-        /* this.currentTimer = setTimeout(() => {
-            this.processSkip([], this.game?.activePlayer as number);
-            this.sockets.forEach((s) => s.emit('turn ended'));
-        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
-        */
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
-            case 'place':
+            case 'placer':
                 this.processPlace(args, playerNumber);
                 break;
             case 'échanger':
@@ -157,16 +157,21 @@ export class Room {
         if (!this.validatePlace(args)) throw Error('malformed arguments for place');
         this.game?.place(this.parsePlaceCall(args), playerNumber);
         this.sockets.forEach((s) => {
-            s.emit('place success', { args, playerNumber });
+            s.emit('place success', { args, username: playerNumber === 0 ? this.gameOptions.hostname : this.clientName });
         });
     }
 
     private processDraw(args: string[], playerNumber: number): void {
         if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
         this.game?.draw(stringToLetters(args[0]), playerNumber);
+        const username = playerNumber === 0 ? this.gameOptions.hostname : this.clientName;
         this.sockets.forEach((s, i) => {
-            if (i === playerNumber) s.emit('draw success', { letters: args[0], playerNumber });
-            else s.emit('draw success', { letters: args[0].split('').map(() => '#'), playerNumber });
+            if (i === playerNumber) s.emit('draw success', { letters: args[0], username });
+            else
+                s.emit('draw success', {
+                    letters: args[0].split('').map(() => '#'),
+                    username,
+                });
         });
     }
 
@@ -174,7 +179,7 @@ export class Room {
         if (args.length > 0) throw new Error('malformed argument for pass');
         this.game?.skip(playerNumber);
         this.sockets.forEach((s) => {
-            s.emit('skip success', playerNumber);
+            s.emit('skip success', playerNumber === 0 ? this.gameOptions.hostname : this.clientName);
         });
     }
 
@@ -201,7 +206,7 @@ export class Room {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
         const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0) - 1;
-        const yPositionFromNumber = parseInt(positionNumber, 10);
+        const yPositionFromNumber = parseInt(positionNumber, 10) - 1;
 
         let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
 

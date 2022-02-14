@@ -1,12 +1,12 @@
 import { GameConfig } from '@app/classes/game-config';
+import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Letter } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { GameFinishStatus } from '@app/classes/game-finish-status';
+import { Vec2 } from '@app/classes/vec2';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
-import { Vec2 } from '@app/classes/vec2';
 
 const MAX_TURNS_SKIPPED = 5;
 export const MAX_LETTERS_IN_EASEL = 7;
@@ -36,7 +36,6 @@ export class Game {
             letters.map((l) => l.letter),
             player,
         );
-
         const lettersInCenter = letters.filter((l) =>
             l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
         );
@@ -55,7 +54,7 @@ export class Game {
         if (this.bag.letters.length < MAX_LETTERS_IN_EASEL) throw new GameError(GameErrorType.NotEnoughLetters);
         this.checkMove(letters, player);
         this.getActivePlayer().removeLetters(letters);
-        this.bag.exchangeLetters(letters);
+        this.getActivePlayer().addLetters(this.bag.exchangeLetters(letters));
         this.nextTurn();
         this.turnsSkipped = 0;
     }
