@@ -5,6 +5,20 @@
         <p>{{ (players$ | async)?.opponent?.score }}pts</p>
     </mat-card>
 
+    <div class="info">
+        <mat-card>
+            <p>Réserve: {{ (gameStatus$ | async)?.letterPotLength }}</p>
+        </mat-card>
+        <div class="actions">
+            <button mat-mini-fab color="primary">
+                <mat-icon aria-hidden="false" aria-label="Augmenter la taille des lettres">zoom_in</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary">
+                <mat-icon aria-hidden="false" aria-label="Diminuer la taille des lettres">zoom_out</mat-icon>
+            </button>
+        </div>
+    </div>
+
     <mat-card class="player-card">
         <p>{{ (players$ | async)?.player?.score }}pts</p>
         <h3>En attente</h3>
