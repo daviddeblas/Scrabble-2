@@ -162,7 +162,7 @@ describe('room', () => {
             const placedLetters = room['parsePlaceCall'](commandArgs);
             placedLetters.forEach((l, index) => {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 7)));
+                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 6)));
             });
         });
 
@@ -226,7 +226,7 @@ describe('room', () => {
                 room['processPlace'] = () => {
                     done();
                 };
-                const fullCommand = 'place h3h h';
+                const fullCommand = 'placer h3h h';
                 room['processCommand'](fullCommand, game.activePlayer);
             });
 
