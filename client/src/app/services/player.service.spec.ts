@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { syncBoardSuccess } from '@app/actions/board.actions';
+import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { Letter } from '@app/classes/letter';
 import { BOARD_SIZE } from '@app/constants';
@@ -226,29 +226,29 @@ describe('PlayerService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    // it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word horizontally', () => {
-    //     position = 'h8';
-    //     const direction = 'h';
-    //     word = 'ze';
-    //     board[CENTER_BOARD][CENTER_BOARD] = 'Z';
-    //     board[CENTER_BOARD][CENTER_BOARD + 1] = 'E';
-    //     service.setUpBoardWithWord(position, direction, word);
-    //     const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
-    //     expect(store.scannedActions$).toBeObservable(expectedAction);
-    // });
+    it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word horizontally', () => {
+        position = 'h8';
+        const direction = 'h';
+        word = 'ze';
+        board[CENTER_BOARD][CENTER_BOARD] = 'Z';
+        board[CENTER_BOARD][CENTER_BOARD + 1] = 'E';
+        service.setUpBoardWithWord(position, direction, word);
+        const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
 
-    // it('setUpBoardWithWord should dispatch syncBoard when error event received ', (done) => {
-    //     // eslint-disable-next-line dot-notation
-    //     const dispatchSpy = spyOn(service['boardStore'], 'dispatch').and.callThrough();
-    //     position = 'h8';
-    //     const direction = 'h';
-    //     word = 'ze';
-    //     service.setUpBoardWithWord(position, direction, word);
-    //     socketService.peerSideEmit('error');
-    //     const refreshBoardTimer = 3300;
-    //     setTimeout(() => {
-    //         expect(dispatchSpy).toHaveBeenCalledWith(syncBoard());
-    //         done();
-    //     }, refreshBoardTimer);
-    // });
+    it('setUpBoardWithWord should dispatch syncBoard when error event received ', (done) => {
+        // eslint-disable-next-line dot-notation
+        const dispatchSpy = spyOn(service['boardStore'], 'dispatch').and.callThrough();
+        position = 'h8';
+        const direction = 'h';
+        word = 'ze';
+        service.setUpBoardWithWord(position, direction, word);
+        socketService.peerSideEmit('error');
+        const refreshBoardTimer = 3300;
+        setTimeout(() => {
+            expect(dispatchSpy).toHaveBeenCalledWith(syncBoard());
+            done();
+        }, refreshBoardTimer);
+    });
 });

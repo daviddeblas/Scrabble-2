@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLetters, placeWord, skipTurn } from '@app/actions/player.actions';
+import { placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
-import { stringToLetters } from '@app/classes/letter';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { Store } from '@ngrx/store';
 import { SocketClientService } from './socket-client.service';
@@ -32,7 +31,6 @@ export class ChatService {
                 case '!placer':
                     if (this.validatePlaceCommand(command)) {
                         this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
-                        this.socketService.send('command', 'placer' + ' ' + command[1] + ' ' + command[2]);
                     } else {
                         this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -40,7 +38,7 @@ export class ChatService {
                     break;
                 case '!échanger':
                     if (this.validateExchangeCommand(command)) {
-                        this.store.dispatch(exchangeLetters({ letters: stringToLetters(command[1]) }));
+                        this.handleExchangeCommand(command);
                     } else {
                         this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -48,7 +46,7 @@ export class ChatService {
                     break;
                 case '!passer':
                     if (command.length === 1) {
-                        this.store.dispatch(skipTurn());
+                        this.handleSkipCommand(command);
                     } else {
                         this.store.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
                         return;
@@ -59,6 +57,16 @@ export class ChatService {
                     return;
             }
         }
+    }
+
+    handleExchangeCommand(command: string[]): void {
+        const commandLine = command[0].slice(1, command[0].length) + ' ' + command[1];
+        this.socketService.send('command', commandLine);
+    }
+
+    handleSkipCommand(command: string[]): void {
+        const commandLine = command[0].slice(1, command[0].length);
+        this.socketService.send('command', commandLine);
     }
 
     private validatePlaceCommand(command: string[]): boolean {
@@ -72,9 +80,9 @@ export class ChatService {
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
-        if (command[1][POSITION_LAST_CHAR] === 'h') {
+        if (command[1].slice(POSITION_LAST_CHAR) === 'h') {
             commandIsCorrect &&= columnNumber + command[2].length <= BOARD_SIZE;
-        } else if (command[1][POSITION_LAST_CHAR] === 'v') {
+        } else if (command[1].slice(POSITION_LAST_CHAR) === 'v') {
             commandIsCorrect &&= command[1][0].charCodeAt(0) - ASCII_ALPHABET_POSITION + command[2].length <= BOARD_SIZE;
         }
         if (command[2].length > 1) {

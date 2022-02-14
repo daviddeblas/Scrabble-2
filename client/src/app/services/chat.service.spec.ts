@@ -1,9 +1,8 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLetters, skipTurn } from '@app/actions/player.actions';
+import { placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
-import { stringToLetters } from '@app/classes/letter';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
@@ -85,53 +84,41 @@ describe('ChatService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    /* it('should call handlePlaceCommand when typing a valid place command', () => {
+    it('should dispatch "[Players] Place Word" when typing a valid place command', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleMessage = '!placer a11h abcpzoe';
-        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
-        const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.HORIZONTAL);
+        const exampleMessage = '!placer a1h abcpzoe';
+        const position = 'a1h';
+        const letters = 'abcpzoe';
         service.messageWritten(username, exampleMessage);
-        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
+        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ position, letters }));
     });
 
-    it('should dispatch "[Players] Place Word" with a h direction when the place command is valid and has a h direction', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleCommand = ['!placer', 'a11h', 'abcpzoe'];
-        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
-        const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.HORIZONTAL);
-        service['handlePlaceCommand'](exampleCommand);
-        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
-    });
-
-    it('should dispatch "[Players] Place Word" with a v direction when the place command is valid and has a v direction', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleCommand = ['!placer', 'a11v', 'abcpzoe'];
-        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
-        const expectedWord: Word = new Word(stringToLetters('abcpzoe'), position, Direction.VERTICAL);
-        service['handlePlaceCommand'](exampleCommand);
-        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
-    });
-
-    it('should dispatch "[Players] Place Word" without a direction when the command is valid and no direction is given', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleCommand = ['!placer', 'a11', 's'];
-        const position: Vec2 = { x: 'a'.charCodeAt(0) - ASCII_ALPHABET_POSITION, y: 10 };
-        const expectedWord: Word = new Word(stringToLetters('s'), position);
-        service['handlePlaceCommand'](exampleCommand);
-        expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ word: expectedWord }));
-    });*/
-
-    it('should dispatch "[Players] Skip Turn" if a valid !passer command is given', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
+    it('should dispatch handleSkipCommand with the command to skip if the command is valid', () => {
+        const exchangeCommandSpy = spyOn(service, 'handleSkipCommand');
         const exampleMessage = '!passer';
         service.messageWritten(username, exampleMessage);
-        expect(dispatchSpy).toHaveBeenCalledWith(skipTurn());
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!passer']);
     });
-    it('should dispatch "[Players] Exchange Letters" with the letters to exchange if the command is valid', () => {
-        const dispatchSpy = spyOn(service['store'], 'dispatch');
+
+    it('should call handleExchangeCommand with the command to exchange if the command is valid', () => {
+        const exchangeCommandSpy = spyOn(service, 'handleExchangeCommand');
         const exampleMessage = '!échanger aerev';
         service.messageWritten(username, exampleMessage);
-        expect(dispatchSpy).toHaveBeenCalledWith(exchangeLetters({ letters: stringToLetters('aerev') }));
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!échanger', 'aerev']);
+    });
+
+    it('handleExchangeCommand should call socketService send with namespace command', () => {
+        const exampleCommand = ['!échanger', 'aerev'];
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.handleExchangeCommand(exampleCommand);
+        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
+    });
+
+    it('handleSkipCommand should call socketService send with namespace command', () => {
+        const exampleCommand = ['!passer'];
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.handleSkipCommand(exampleCommand);
+        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'passer');
     });
 
     it('validatePlaceCommand should return true when the command is properly called', () => {
@@ -141,46 +128,56 @@ describe('ChatService', () => {
 
     it('validatePlaceCommand should return false when the word extends the column size', () => {
         const exampleCommand = ['!placer', 'a11h', 'abcpzoe'];
-        expect(service['validatePlaceCommand'](exampleCommand)).toBeTrue();
+        expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
     it('validatePlaceCommand should return false when the word extends the line size', () => {
         const exampleCommand = ['!placer', 'm11v', 'abcpzoe'];
-        expect(service['validatePlaceCommand'](exampleCommand)).toBeTrue();
+        expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return false when there are more than 3 parts to the command', () => {
+    it('validatePlaceCommand should return false when there are more than 3 parts to the command', () => {
         const exampleCommand = ['!placer', 'a11h', 'abcpzoe', 'last part'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return false when the line letter is not from a to o', () => {
+    it('validatePlaceCommand should return false when the line letter is not from a to o', () => {
         const exampleCommand = ['!placer', 'v11h', 'abcpzoe'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return false when the direction char is not h or v', () => {
+    it('validatePlaceCommand should return false when the direction char is not h or v', () => {
         const exampleCommand = ['!placer', 'a11i', 'abcpzoe'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return false when the last part is not only letters', () => {
+    it('validatePlaceCommand should return false when the last part is not only letters', () => {
         const exampleCommand = ['!placer', 'a11h', 'a_cp8oe'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return true if there is no direction letter but only 1 letter is placed', () => {
+    it('validatePlaceCommand should return true if there is no direction letter but only 1 letter is placed', () => {
         const exampleCommand = ['!placer', 'a11', 'a'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeTrue();
     });
 
-    it('validateExchangeCommand should return false if the number is greater than 15', () => {
+    it('validatePlaceCommand should return false if the number is greater than 15', () => {
         const exampleCommand = ['!placer', 'a16v', 'abcpzoe'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
-    it('validateExchangeCommand should return false if there is not only letters and numbers in the second part', () => {
+    it('validatePlaceCommand should return false if there is not only letters and numbers in the second part', () => {
         const exampleCommand = ['!placer', 'a1.6v_', 'abcpzoe'];
+        expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
+    });
+
+    it('validatePlaceCommand should return false if the word goes out of the board horizontally', () => {
+        const exampleCommand = ['!placer', 'h15h', 'abcp'];
+        expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
+    });
+
+    it('validatePlaceCommand should return false if the word goes out of the board vertically', () => {
+        const exampleCommand = ['!placer', 'o5v', 'abcp'];
         expect(service['validatePlaceCommand'](exampleCommand)).toBeFalse();
     });
 
