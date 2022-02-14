@@ -57,7 +57,24 @@ export class Room {
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
         this.sockets.forEach((socket, index) => {
+<<<<<<< HEAD
             this.setupSocket(socket, index);
+=======
+            socket.on('get game status', () => {
+                const game = this.game as Game;
+                const opponent = { ...game.players[(index + 1) % 2] };
+                opponent.easel = [];
+                socket.emit('game status', {
+                    status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
+                    players: { player: game.players[index], opponent },
+                    board: {
+                        board: game.board.board,
+                        pointsPerLetter: Array.from(game.board.pointsPerLetter),
+                        multipliers: game.board.multipliers,
+                    },
+                });
+            });
+>>>>>>> dev
         });
     }
 

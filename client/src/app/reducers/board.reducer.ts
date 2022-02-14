@@ -22,7 +22,11 @@ export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
 
-    on(gameStatusReceived, (state, { board }) => board),
+    on(gameStatusReceived, (state, { board }) => ({
+        ...board,
+        // transformer le array de tuple en map
+        pointsPerLetter: new Map(board.pointsPerLetter as unknown as [Letter, number][]),
+    })),
 
     on(placeWordSuccess, (state, { word }) => {
         for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {
