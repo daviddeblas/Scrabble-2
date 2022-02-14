@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
+import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 import { SocketClientService } from './socket-client.service';
 
@@ -10,13 +12,32 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class ChatService {
-    constructor(private store: Store, private socketService: SocketClientService) {}
+    constructor(private store: Store, private socketService: SocketClientService, private gameStore: Store<{ gameStatus: GameStatus }>) {}
     broadcastMsg(username: string, message: string) {
         this.socketService.send('send message', { username, message });
     }
 
-    acceptNewMessages(): void {
+    acceptNewAction(): void {
         this.socketService.on('receive message', (chatMessage: ChatMessage) => {
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
+        this.socketService.on('place success', (data: { args: string[]; username: string }) => {
+            const chatMessage = { username: data.username, message: '!placer ' + data.args.join(' '), errorName: '' };
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
+        this.socketService.on('draw success', (data: { letters: string; username: string }) => {
+            const chatMessage = { username: data.username, message: '!échanger ' + data.letters, errorName: '' };
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
+        this.socketService.on('skip success', (username: string) => {
+            const chatMessage = { username, message: '!passer ', errorName: '' };
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
+        this.socketService.on('turn ended', () => {
+            this.store.dispatch(getGameStatus());
+        });
+        this.socketService.on('error', (errorMessage: string) => {
+            const chatMessage = { username: '', message: errorMessage, errorName: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
     }
@@ -26,6 +47,14 @@ export class ChatService {
             this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
             this.broadcastMsg(username, message);
         } else {
+            let activePlayer;
+            this.gameStore.select('gameStatus').subscribe((status) => {
+                activePlayer = status.activePlayer;
+            });
+            if (username !== activePlayer) {
+                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", errorName: 'Error' }));
+                return;
+            }
             const command = message.split(' ');
             switch (command[0]) {
                 case '!placer':
@@ -56,7 +85,6 @@ export class ChatService {
                     this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }));
                     return;
             }
-            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
         }
     }
 
