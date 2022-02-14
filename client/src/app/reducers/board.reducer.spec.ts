@@ -1,6 +1,8 @@
 import * as boardActions from '@app/actions/board.actions';
+import { gameStatusReceived } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
 import { Multiplier } from '@app/classes/multiplier';
+import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
 import { boardSize, BoardState, reducer } from './board.reducer';
 
@@ -33,6 +35,20 @@ describe('[Board] Reducer', () => {
             const action = boardActions.syncBoardSuccess({ newBoard: boardStub.board });
 
             stateStub.multipliers[0][0] = new Multiplier(multiplierValue);
+            const result = reducer(stateStub, action);
+
+            expect(result).toEqual(boardStub);
+        });
+    });
+
+    describe('[Board] Sync Board', () => {
+        it('should set the board state com', () => {
+            const action = gameStatusReceived({
+                status: { activePlayer: 0, letterPotLength: 0 },
+                players: { player: new Player(''), opponent: new Player('') },
+                board: boardStub,
+            });
+
             const result = reducer(stateStub, action);
 
             expect(result).toEqual(boardStub);
