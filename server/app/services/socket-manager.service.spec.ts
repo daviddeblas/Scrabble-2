@@ -40,6 +40,7 @@ describe('SocketManager service tests', () => {
         setTimeout(() => {
             assert(roomManagerSpy.calledOnce);
             assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
+            roomManagerSpy.restore();
             done();
         }, RESPONSE_DELAY);
     });

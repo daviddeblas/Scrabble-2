@@ -5,7 +5,7 @@ import { RoomInfo } from '@app/classes/room-info';
 import { PORT } from '@app/environnement.json';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { stub } from 'sinon';
+import { restore, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -87,8 +87,15 @@ describe('Rooms Manager Service', () => {
         let newPlayerSocket: Socket;
 
         beforeEach(() => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            oldPlayerSocket = { id: 'Old Player', once: () => {} } as unknown as Socket;
+            oldPlayerSocket = {
+                id: 'Old Player',
+                once: () => {
+                    return;
+                },
+                removeAllListeners: () => {
+                    return oldPlayerSocket;
+                },
+            } as unknown as Socket;
             newPlayerSocket = { id: 'New Player' } as unknown as Socket;
         });
 
@@ -119,7 +126,7 @@ describe('Rooms Manager Service', () => {
         it('switchPlayerSocket should switch the client if the ids match and call initiateRoom', () => {
             const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
             testRoom.clients[0] = socket;
-            const initiateRoomStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
+            const initiateRoomEventsStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
                 return;
             });
             const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
@@ -128,7 +135,8 @@ describe('Rooms Manager Service', () => {
             roomsManager.switchPlayerSocket(socket, newPlayerSocket);
             expect(getRoomStub.calledOnceWith(socket.id)).to.deep.equal(true);
             expect(testRoom.clients[0]).to.deep.equal(newPlayerSocket);
-            expect(initiateRoomStub.calledOnce).to.deep.equal(true);
+            expect(initiateRoomEventsStub.calledOnce).to.equal(true);
+            initiateRoomEventsStub.restore();
             getRoomStub.restore();
         });
     });
@@ -159,6 +167,7 @@ describe('Rooms Manager Service', () => {
         let server: MainServer;
         let httpServer: Server;
         let clientSocket: ClientSocket;
+        const RESPONSE_DELAY = 200;
         before((done) => {
             httpServer = createServer();
             httpServer.listen(PORT);
@@ -169,7 +178,9 @@ describe('Rooms Manager Service', () => {
             clientSocket = Client('http://localhost:3000');
         });
         afterEach(() => {
+            clientSocket.removeAllListeners();
             server.removeAllListeners();
+            restore();
         });
 
         after(() => {
@@ -191,27 +202,31 @@ describe('Rooms Manager Service', () => {
 
         it('emitting request list should call the getRooms function', (done) => {
             const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
-            stub(roomsManager, 'getRooms').callsFake(() => {
-                done();
+            const getRoomsStub = stub(roomsManager, 'getRooms').callsFake(() => {
                 return rooms;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
             });
             clientSocket.emit('request list');
+            setTimeout(() => {
+                expect(getRoomsStub.calledOnce).to.equal(true);
+                done();
+            }, RESPONSE_DELAY);
         });
 
         it('emitting join room should call the joinRoom function', (done) => {
-            stub(roomsManager, 'joinRoom').callsFake(() => {
+            const joinRoomStub = stub(roomsManager, 'joinRoom').callsFake(() => {
                 return;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
-                clientSocket.on('player joining', () => {
-                    done();
-                });
             });
             clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
+            setTimeout(() => {
+                expect(joinRoomStub.calledOnce).to.equal(true);
+                done();
+            }, RESPONSE_DELAY);
         });
     });
 });
