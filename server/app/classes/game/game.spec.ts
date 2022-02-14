@@ -93,6 +93,17 @@ describe('game', () => {
         expect(thisPlayerScore).to.eq(expectedPoints);
     });
 
+    it('place should throw if initial place is not in the center', () => {
+        const activePlayer = game.activePlayer;
+        game.players[activePlayer].easel = stringToLetters('aa');
+        const oldEasel = [...game.players[activePlayer].easel];
+        expect(() => {
+            game.place(
+                oldEasel.map((letter, index) => new PlacedLetter(letter, new Vec2(index + 0, 7))),
+                game.activePlayer,
+            );
+        }).to.throw();
+    });
     it('draw should not throw on correct call', () => {
         const ogActivePlayer = game.activePlayer;
 
