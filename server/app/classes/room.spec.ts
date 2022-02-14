@@ -1,11 +1,11 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { MILLISECONDS_PER_SEC, Room } from '@app/classes/room';
+import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
+import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
@@ -158,8 +158,6 @@ describe('room', () => {
             game = room.game as Game;
         });
 
-        afterEach(() => clearTimeout(room.currentTimer));
-
         it('post command emits turn ended', (done) => {
             room.sockets.pop();
             socket.emit = (namespace: string): boolean => {
@@ -168,7 +166,7 @@ describe('room', () => {
             };
             room['postCommand']();
         });
-
+        /*
         it('post command emits turn ended', (done) => {
             const clk = useFakeTimers();
             room.sockets.pop();
@@ -177,7 +175,7 @@ describe('room', () => {
             clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
             clk.restore();
         });
-
+*/
         describe('process command', () => {
             it('string with place calls processPlace', (done) => {
                 room['processPlace'] = () => {
