@@ -93,7 +93,7 @@ describe('PlayerService', () => {
         });
         position = 'b2';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -117,16 +117,6 @@ describe('PlayerService', () => {
         const sendSpy = spyOn(service['socketService'], 'send');
         service.exchangeLetters(letters);
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
-    });
-
-    it('exchangeLetters should dispatch a syntax error if letters are not in easel', () => {
-        const letters = 'aerev';
-        spyOn(service, 'lettersInEasel').and.callFake(() => {
-            return false;
-        });
-        service.exchangeLetters(letters);
-        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('lettersInEasel should return true if all letters are in easel', () => {

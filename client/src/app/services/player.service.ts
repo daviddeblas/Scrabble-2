@@ -44,7 +44,7 @@ export class PlayerService {
             direction = '';
         }
         if (!this.wordPlacementCorrect(boardPosition, direction, letters)) {
-            this.playerStore.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
             return;
         }
         this.setUpBoardWithWord(boardPosition, direction, letters);
@@ -92,7 +92,7 @@ export class PlayerService {
                 }
             }
             if (!letterExist) {
-                this.playerStore.dispatch(receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }));
+                this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
                 return false;
             }
         }

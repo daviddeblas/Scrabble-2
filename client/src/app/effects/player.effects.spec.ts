@@ -10,7 +10,7 @@ describe('PlayerEffects', () => {
     let service: jasmine.SpyObj<PlayerService>;
 
     beforeEach(() => {
-        service = jasmine.createSpyObj('PlayerService', ['surrenderGame, placeWord, exchangeLetters']);
+        service = jasmine.createSpyObj('PlayerService', ['surrenderGame', 'placeWord', 'exchangeLetters']);
         TestBed.configureTestingModule({
             providers: [
                 PlayerEffects,
