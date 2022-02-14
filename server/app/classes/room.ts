@@ -2,6 +2,7 @@ import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import Container from 'typedi';
+import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { Game } from './game/game';
 import { RoomInfo } from './room-info';
@@ -75,13 +76,14 @@ export class Room {
     }
 
     surrenderGame(looserId: string) {
-        looserId;
-        // if (!this.game?.players) throw new Error('Game does not exist');
-        // const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
-        //     this.game.players,
-        //     looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
-        // );
-        // this.endGame(gameFinishStatus);
+        if (!this.game?.players) throw new Error('Game does not exist');
+        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
+            this.game.players,
+            looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
+        );
+        this.sockets.forEach((socket) => {
+            socket.emit('end game', gameFinishStatus);
+        });
     }
 
     initChatting(): void {
