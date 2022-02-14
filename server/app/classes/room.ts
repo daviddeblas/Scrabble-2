@@ -11,8 +11,6 @@ import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
 import { Vec2 } from './vec2';
 
-// const MILLISECONDS_PER_SEC = 1000;
-
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
