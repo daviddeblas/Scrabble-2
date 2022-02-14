@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { exchangeLettersSuccess } from '@app/actions/player.actions';
 import { Letter, stringToLetters } from '@app/classes/letter';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -23,6 +24,13 @@ export class PlayerService {
         this.socketService.send('surrender game');
     }
 
+    exchangeLetters(letters: string): void {
+        if (this.lettersInEasel(letters)) {
+            const commandLine = 'échanger ' + letters;
+            this.socketService.send('command', commandLine);
+        }
+    }
+
     placeWord(position: string, letters: string): void {
         const command = 'placer';
         if (!this.lettersInEasel(letters)) return;
@@ -40,10 +48,11 @@ export class PlayerService {
             return;
         }
         this.setUpBoardWithWord(boardPosition, direction, letters);
+        this.playerStore.dispatch(exchangeLettersSuccess({ oldLetters: stringToLetters(letters), newLetters: [] }));
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
     }
 
-    setUpBoardWithWord(position: string, direction: string, letters: string) {
+    setUpBoardWithWord(position: string, direction: string, letters: string): void {
         this.socketService.on('error', () => {
             setTimeout(() => {
                 this.boardStore.dispatch(syncBoard());
@@ -70,8 +79,9 @@ export class PlayerService {
     }
 
     lettersInEasel(letters: string): boolean {
-        let easelLetters: Letter[] = [];
-        this.playerStore.select('players').subscribe((us) => (easelLetters = us.player.easel));
+        let playerEasel: Letter[] = [];
+        this.playerStore.select('players').subscribe((us) => (playerEasel = us.player.easel));
+        const easelLetters = JSON.parse(JSON.stringify(playerEasel));
         for (const letter of letters) {
             let letterExist = false;
             for (const element of easelLetters) {

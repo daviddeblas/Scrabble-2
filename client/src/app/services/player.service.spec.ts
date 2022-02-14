@@ -108,6 +108,27 @@ describe('PlayerService', () => {
         expect(sendSpy).not.toHaveBeenCalled();
     });
 
+    it('exchangeLetters should call socketService send with namespace command if letters are in easel', () => {
+        const letters = 'aerev';
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        // eslint-disable-next-line dot-notation
+        const sendSpy = spyOn(service['socketService'], 'send');
+        service.exchangeLetters(letters);
+        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
+    });
+
+    it('exchangeLetters should dispatch a syntax error if letters are not in easel', () => {
+        const letters = 'aerev';
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return false;
+        });
+        service.exchangeLetters(letters);
+        const expectedAction = cold('a', { a: receivedMessage({ username: 'Error', message: 'Erreur de syntaxe' }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
     it('lettersInEasel should return true if all letters are in easel', () => {
         expect(service.lettersInEasel('abcG')).toBeTrue();
     });

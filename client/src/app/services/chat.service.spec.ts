@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { placeWord } from '@app/actions/player.actions';
+import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -101,17 +101,10 @@ describe('ChatService', () => {
     });
 
     it('should call handleExchangeCommand with the command to exchange if the command is valid', () => {
-        const exchangeCommandSpy = spyOn(service, 'handleExchangeCommand');
+        const dispatchSpy = spyOn(service['store'], 'dispatch');
         const exampleMessage = '!échanger aerev';
         service.messageWritten(username, exampleMessage);
-        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!échanger', 'aerev']);
-    });
-
-    it('handleExchangeCommand should call socketService send with namespace command', () => {
-        const exampleCommand = ['!échanger', 'aerev'];
-        const sendSpy = spyOn(service['socketService'], 'send');
-        service.handleExchangeCommand(exampleCommand);
-        expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
+        expect(dispatchSpy).toHaveBeenCalledWith(exchangeLetters({ letters: 'aerev' }));
     });
 
     it('handleSkipCommand should call socketService send with namespace command', () => {
