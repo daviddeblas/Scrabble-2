@@ -1,5 +1,7 @@
 /* eslint-disable import/no-deprecated */
+import { GameConfig } from '@app/classes/game-config';
 import { GameOptions } from '@app/classes/game-options';
+import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
 import { RoomInfo } from '@app/classes/room-info';
 import { PORT } from '@app/environnement.json';
@@ -80,6 +82,18 @@ describe('Rooms Manager Service', () => {
     it('getRooms should return empty list if no rooms are created', () => {
         const expectedResult: Room[] = [];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
+    });
+
+    it('getAvailableRooms should return only not started games', () => {
+        roomsManager.createRoom(socket, options);
+        const expectedResult = [new RoomInfo(socket.id, options)];
+        expect(roomsManager.getAvailableRooms()).to.deep.equal(expectedResult);
+
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        roomsManager.createRoom(socket, otherOption);
+        // eslint-disable-next-line dot-notation
+        roomsManager.rooms[1].game = new Game(new GameConfig(), ['']);
+        expect(roomsManager.getAvailableRooms()).to.deep.equal(expectedResult);
     });
 
     describe('switchPlayerSocket', () => {
@@ -225,13 +239,15 @@ describe('Rooms Manager Service', () => {
 
         it('emitting request list should call the getRooms function', (done) => {
             const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
-            const getRoomsStub = stub(roomsManager, 'getRooms').callsFake(() => {
+            const getRoomsStub = stub(roomsManager, 'getAvailableRooms').callsFake(() => {
                 return rooms;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
             });
+
             clientSocket.emit('request list');
+
             setTimeout(() => {
                 expect(getRoomsStub.calledOnce).to.equal(true);
                 done();

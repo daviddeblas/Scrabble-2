@@ -3,16 +3,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { createRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-const MAX_TIME = 300;
-const MIN_TIME = 30;
-const DEFAULT_TIMER = 60;
-const TIMER_INCREMENT = 30;
-const MIN_NAME_LENGTH = 3;
-const MAX_NAME_LENGTH = 20;
+export const MAX_TIME = 300;
+export const MIN_TIME = 30;
+export const DEFAULT_TIMER = 60;
+export const TIMER_INCREMENT = 30;
 
 @Component({
     selector: 'app-multi-config-window',

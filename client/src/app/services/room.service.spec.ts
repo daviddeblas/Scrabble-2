@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { createRoomSuccess, joinInviteReceived, loadRoomsSuccess } from '@app/actions/room.actions';
+import { createRoomSuccess, joinInviteReceived, joinRoomAccepted, joinRoomDeclined, loadRoomsSuccess } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -123,22 +123,32 @@ describe('RoomService', () => {
             expect(onSpy).toHaveBeenCalledTimes(2);
         });
 
-        // it('should dispatch "[Room] Join Room Accepted" when receiving accept', () => {
-        //     service.joinRoom(roomList[0], playerName);
+        it('should send a request to join a room and wait for an answer', () => {
+            const sendSpy = spyOn(socketService, 'emit');
+            const onSpy = spyOn(socketService, 'on');
 
-        //     socketService.peerSideEmit('accept');
+            service.joinRoom(roomList[0], playerName);
 
-        //     const expectedAction = cold('a', { a: joinRoomAccepted({ roomInfo: roomList[0], playerName }) });
-        //     expect(store.scannedActions$).toBeObservable(expectedAction);
-        // });
+            expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
+            expect(onSpy).toHaveBeenCalledTimes(2);
+        });
 
-        // it('should dispatch "[Room] Join Room Declined" when receiving accept', () => {
-        //     service.joinRoom(roomList[0], playerName);
+        it('should dispatch "[Room] Join Room Accepted" when receiving accept', () => {
+            service.joinRoom(roomList[0], playerName);
 
-        //     socketService.peerSideEmit('refuse');
+            socketService.peerSideEmit('accepted');
 
-        //     const expectedAction = cold('a', { a: joinRoomDeclined({ roomInfo: roomList[0], playerName }) });
-        //     expect(store.scannedActions$).toBeObservable(expectedAction);
-        // });
+            const expectedAction = cold('a', { a: joinRoomAccepted({ roomInfo: roomList[0], playerName }) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('should dispatch "[Room] Join Room Declined" when receiving accept', () => {
+            service.joinRoom(roomList[0], playerName);
+
+            socketService.peerSideEmit('refused');
+
+            const expectedAction = cold('a', { a: joinRoomDeclined({ roomInfo: roomList[0], playerName }) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
     });
 });

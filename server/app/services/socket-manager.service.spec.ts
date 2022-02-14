@@ -59,7 +59,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and call getRooms', (done) => {
-        const roomManagerSpy = sinon.spy(service.roomManager, 'getRooms');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'getAvailableRooms');
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms) => {
             expect(listOfRooms).to.deep.equal([]);

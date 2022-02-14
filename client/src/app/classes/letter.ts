@@ -25,15 +25,12 @@ export type Letter =
     | 'X'
     | 'Y'
     | 'Z'
-    | { blankValue: Letter };
+    | '*';
 
 export const stringToLetter = (string: string): Letter => {
     const error = new Error(`Invalid string input: ${string}`);
     if (string.length !== 1) throw error;
     const char = string.charAt(0).toUpperCase();
-    if (string.charAt(0) === char) {
-        return { blankValue: char as Letter };
-    }
     if (!char.match(/[A-Z]|\*/)) throw error;
     return char as Letter;
 };
