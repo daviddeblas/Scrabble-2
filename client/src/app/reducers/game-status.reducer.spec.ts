@@ -18,7 +18,7 @@ describe('[Game Status] Game Status Received', () => {
     const boardState: BoardState = {
         board: [],
         multipliers: [],
-        pointsPerLetter: new Map(),
+        pointsPerLetter: [],
     };
 
     it('should set the game status', () => {
