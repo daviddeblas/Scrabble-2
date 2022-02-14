@@ -10,10 +10,10 @@
             <p>Réserve: {{ (gameStatus$ | async)?.letterPotLength }}</p>
         </mat-card>
         <div class="actions">
-            <button mat-mini-fab color="primary">
+            <button mat-mini-fab color="primary" (click)="zoomIn()">
                 <mat-icon aria-hidden="false" aria-label="Augmenter la taille des lettres">zoom_in</mat-icon>
             </button>
-            <button mat-mini-fab color="primary">
+            <button mat-mini-fab color="primary" (click)="zoomOut()">
                 <mat-icon aria-hidden="false" aria-label="Diminuer la taille des lettres">zoom_out</mat-icon>
             </button>
         </div>
