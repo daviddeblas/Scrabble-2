@@ -1,9 +1,9 @@
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { createReducer, on } from '@ngrx/store';
 
-const ZOOM_MAX = 1.5;
-const ZOOM_MIN = 1.0;
-const ZOOM_STEP = 0.1;
+export const ZOOM_MAX = 1.5;
+export const ZOOM_MIN = 1.0;
+export const ZOOM_STEP = 0.1;
 
 export const localSettingsFeatureKey = 'localSettings';
 
