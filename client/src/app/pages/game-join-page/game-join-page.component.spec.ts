@@ -2,9 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { RoomEffects } from '@app/effects/room.effects';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { forbiddenNameValidator, GameJoinPageComponent } from './game-join-page.component';
@@ -20,7 +22,7 @@ describe('GameJoinPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameJoinPageComponent],
-            imports: [ReactiveFormsModule, FormsModule],
+            imports: [ReactiveFormsModule, FormsModule, AppMaterialModule, BrowserAnimationsModule],
             providers: [
                 provideMockStore(),
                 {
