@@ -8,22 +8,22 @@ import { ChatEffects } from './chat.effects';
 describe('ChatEffects', () => {
     let actions$: Observable<unknown>;
     let effects: ChatEffects;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let service: any;
+    let service: jasmine.SpyObj<ChatService>;
 
     beforeEach(() => {
+        service = jasmine.createSpyObj('ChatService', ['acceptNewMessages', 'messageWritten']);
+
         TestBed.configureTestingModule({
             providers: [
                 ChatEffects,
                 provideMockActions(() => actions$),
                 {
                     provide: ChatService,
-                    useValue: jasmine.createSpyObj('ChatService', ['acceptNewMessages', 'messageWritten']),
+                    useValue: service,
                 },
             ],
         });
         effects = TestBed.inject(ChatEffects);
-        service = TestBed.inject(ChatService);
     });
 
     it('should be created', () => {
