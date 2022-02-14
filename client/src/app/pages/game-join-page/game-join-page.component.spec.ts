@@ -7,7 +7,7 @@ import { RoomInfo } from '@app/classes/room-info';
 import { RoomEffects } from '@app/effects/room.effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
-import { GameJoinPageComponent } from './game-join-page.component';
+import { forbiddenNameValidator, GameJoinPageComponent } from './game-join-page.component';
 
 describe('GameJoinPageComponent', () => {
     let component: GameJoinPageComponent;
@@ -96,5 +96,25 @@ describe('GameJoinPageComponent', () => {
 
         const expectedAction = cold('a', { a: loadRooms() });
         expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('unselect should call re-setup the validator with no host names', () => {
+        const spyOnSetupValidator = spyOn(component, 'setupNameValidators');
+
+        component.unSelectRoom();
+
+        expect(spyOnSetupValidator).toHaveBeenCalledWith('');
+    });
+
+    it('Our custom forbidden name custom validator should return a validation error only if hostname === player name', () => {
+        const hostName = 'host';
+        const customValidator = forbiddenNameValidator(hostName);
+        const nameControl = component.formGroup.controls.name;
+
+        nameControl.setValue(hostName);
+        expect(customValidator(nameControl)).toEqual({ forbiddenName: { value: hostName } });
+
+        nameControl.setValue('a new player');
+        expect(customValidator(nameControl)).toBeNull();
     });
 });
