@@ -211,16 +211,7 @@ describe('room', () => {
             };
             room['postCommand']();
         });
-        /*
-        it('post command emits turn ended', (done) => {
-            const clk = useFakeTimers();
-            room.sockets.pop();
-            room['processSkip'] = () => done();
-            room['postCommand']();
-            clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
-            clk.restore();
-        });
-*/
+
         describe('process command', () => {
             it('string with place calls processPlace', (done) => {
                 room['processPlace'] = () => {
