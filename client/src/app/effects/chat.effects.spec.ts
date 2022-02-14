@@ -11,7 +11,7 @@ describe('ChatEffects', () => {
     let service: jasmine.SpyObj<ChatService>;
 
     beforeEach(() => {
-        service = jasmine.createSpyObj('ChatService', ['acceptNewMessages', 'messageWritten']);
+        service = jasmine.createSpyObj('ChatService', ['acceptNewAction', 'messageWritten']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -30,10 +30,10 @@ describe('ChatEffects', () => {
         expect(effects).toBeTruthy();
     });
 
-    it('initiateChattingEffect$ should call the function acceptNewMessages from chat service', (done) => {
+    it('initiateChattingEffect$ should call the function accepacceptNewActiontNewMessages from chat service', (done) => {
         actions$ = of({ type: '[Chat] Initiate chatting' });
         effects.initiateChattingEffect$.subscribe();
-        expect(service.acceptNewMessages).toHaveBeenCalledWith();
+        expect(service.acceptNewAction).toHaveBeenCalledWith();
         done();
     });
 
