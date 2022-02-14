@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -16,12 +17,23 @@ describe('ChatService', () => {
     let socketHelper: SocketTestHelper;
     const RESPONSE_TIME = 200;
     beforeEach(async () => {
+        username = 'My name';
         socketHelper = new SocketTestHelper();
-        await TestBed.configureTestingModule({ providers: [provideMockStore()] }).compileComponents();
+        await TestBed.configureTestingModule({
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameStatus',
+                            value: { activePlayer: username, letterPotLength: 0 },
+                        },
+                    ],
+                }),
+            ],
+        }).compileComponents();
         service = TestBed.inject(ChatService);
         store = TestBed.inject(MockStore);
         service['socketService'].socket = socketHelper as unknown as Socket;
-        username = 'My name';
     });
 
     it('should be created', () => {
@@ -38,10 +50,65 @@ describe('ChatService', () => {
         }, RESPONSE_TIME);
     });
 
-    it('acceptNewMessages should be able to receive message and dispatch "[Chat] Received message"', (done) => {
-        const expectedMessage: ChatMessage = { username: 'My Name', message: 'Coucou', errorName: '' };
-        service.acceptNewMessages();
+    it('acceptNewAction should be able to receive message and dispatch "[Chat] Received message"', (done) => {
+        const expectedMessage: ChatMessage = { username, message: 'Hello World', errorName: '' };
+        service.acceptNewAction();
         socketHelper.peerSideEmit('receive message', expectedMessage);
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive place success and dispatch "[Chat] Received message"', (done) => {
+        const expectedMessage: ChatMessage = { username, message: '!placer h8v tres', errorName: '' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('place success', { args: ['h8v', 'tres'], username });
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive draw success and dispatch "[Chat] Received message"', (done) => {
+        const expectedMessage: ChatMessage = { username, message: '!échanger tres', errorName: '' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('draw success', { letters: 'tres', username });
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive skip success and dispatch "[Chat] Received message"', (done) => {
+        const expectedMessage: ChatMessage = { username, message: '!passer', errorName: '' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('skip success', username);
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive turn ended and dispatch "[Game Status] Get Game"', (done) => {
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('turn ended');
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: getGameStatus() });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message"', (done) => {
+        const errorMessage = 'Bad command';
+        const expectedMessage: ChatMessage = { username: '', message: errorMessage, errorName: 'Error' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('error', errorMessage);
         setTimeout(() => {
             const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
             expect(store.scannedActions$).toBeObservable(expectedAction);
@@ -69,6 +136,14 @@ describe('ChatService', () => {
         const exampleMessage = '!passer ,z4,e';
         service.messageWritten(username, exampleMessage);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch "[Chat] Received message" with a turn Error if the activePlayer is not the player typing the command', () => {
+        const exampleMessage = '!passer';
+        const otherPlayer = 'Other Player';
+        service.messageWritten(otherPlayer, exampleMessage);
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: "Ce n'est pas votre tour", errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
