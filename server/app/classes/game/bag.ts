@@ -1,5 +1,5 @@
-import { Letter } from '@app/classes/letter';
 import { GameConfig } from '@app/classes/game-config';
+import { Letter } from '@app/classes/letter';
 
 export class Bag {
     letters: Letter[];
@@ -7,7 +7,7 @@ export class Bag {
     constructor(config: GameConfig) {
         this.letters = [];
         config.letters.forEach((l) => {
-            for (let i = 0; i < l.amt; i++) this.letters.push(l.letter);
+            for (let i = 0; i < l.amount; i++) this.letters.push(l.letter);
         });
     }
 
@@ -16,9 +16,10 @@ export class Bag {
         return this.getLetters(old.length);
     }
 
-    getLetters(amt: number): Letter[] {
+    getLetters(amount: number): Letter[] {
         const val: Letter[] = [];
-        for (let i = 0; i < amt && this.letters.length > 0; i++) val.push(this.letters.splice(Math.round(Math.random() * this.letters.length), 1)[0]);
+        for (let i = 0; i < amount && this.letters.length > 0; i++)
+            val.push(this.letters.splice(Math.floor(Math.random() * this.letters.length), 1)[0]);
         return val;
     }
 }
