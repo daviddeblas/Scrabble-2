@@ -1,14 +1,19 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { Room } from '@app/classes/room';
+import { MILLISECONDS_PER_SEC, Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
-import { MAX_LETTERS_IN_EASEL } from './game/game';
+import { Game, MAX_LETTERS_IN_EASEL } from './game/game';
+import { stringToLetter } from './letter';
+import { PlacedLetter } from './placed-letter';
+import { Vec2 } from './vec2';
+
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
     beforeEach(() => {
@@ -90,6 +95,31 @@ describe('room', () => {
             room.inviteAccepted(socket);
         });
 
+        it('validate place validates correct arguments with one single letter placement', () => {
+            let commandArgs = ['i7h', 'c'];
+            expect(room['validatePlace'](commandArgs)).to.eq(true);
+            commandArgs = ['i7v', 'c'];
+            expect(room['validatePlace'](commandArgs)).to.eq(true);
+            commandArgs = ['i7', 'c'];
+            expect(room['validatePlace'](commandArgs)).to.eq(true);
+        });
+
+        it('validate place validates correct arguments', () => {
+            let commandArgs = ['h7h', 'con'];
+            expect(room['validatePlace'](commandArgs)).to.eq(true);
+            commandArgs = ['h11h', 'con'];
+            expect(room['validatePlace'](commandArgs)).to.eq(true);
+        });
+
+        it('parse place call returns the right placed characters', () => {
+            const commandArgs = ['h7h', 'con'];
+            const placedLetters = room['parsePlaceCall'](commandArgs);
+            placedLetters.forEach((l, index) => {
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 7)));
+            });
+        });
+
         it('game status getter returns specific information given to the player', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const info = room['gameStatusGetter'](0) as any;
@@ -99,6 +129,101 @@ describe('room', () => {
             expect(info.board).to.deep.eq(room.game?.board);
             expect(info.activePlayer).to.eq(room.game?.activePlayer);
             expect(info.letterPotLength).to.eq(room.game?.bag.letters.length);
+        });
+    });
+
+    describe('commands', () => {
+        let room: Room;
+        let socket: io.Socket;
+        let gameOptions: GameOptions;
+        let game: Game;
+        beforeEach(() => {
+            socket = {
+                once: () => {
+                    return;
+                },
+                on: () => {
+                    return;
+                },
+                id: '1',
+                emit: () => {
+                    return;
+                },
+            } as unknown as io.Socket;
+            gameOptions = new GameOptions('a', 'b');
+
+            room = new Room(socket, roomsManager, gameOptions);
+            room.join(socket, 'player 2');
+            room.inviteAccepted(socket);
+            game = room.game as Game;
+        });
+
+        afterEach(() => clearTimeout(room.currentTimer));
+
+        it('post command emits turn ended', (done) => {
+            room.sockets.pop();
+            socket.emit = (namespace: string): boolean => {
+                if (namespace === 'turn ended') done();
+                return true;
+            };
+            room['postCommand']();
+        });
+
+        it('post command emits turn ended', (done) => {
+            const clk = useFakeTimers();
+            room.sockets.pop();
+            room['processSkip'] = () => done();
+            room['postCommand']();
+            clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+            clk.restore();
+        });
+
+        describe('process command', () => {
+            it('string with place calls processPlace', (done) => {
+                room['processPlace'] = () => {
+                    done();
+                };
+                const fullCommand = 'place h3h h';
+                room['processCommand'](fullCommand, game.activePlayer);
+            });
+
+            it('string with draw calls processDraw', (done) => {
+                room['processDraw'] = () => {
+                    done();
+                };
+                const fullCommand = 'échanger abc';
+                room['processCommand'](fullCommand, game.activePlayer);
+            });
+
+            it('string with skip calls processSkip', (done) => {
+                room['processSkip'] = () => {
+                    done();
+                };
+                const fullCommand = 'passer';
+                room['processCommand'](fullCommand, game.activePlayer);
+            });
+        });
+
+        it('process place calls game place on correctly formed arguments', (done) => {
+            game.place = () => {
+                done();
+            };
+            const commandArgs = ['h7h', 'con'];
+            room['processPlace'](commandArgs, game.activePlayer);
+        });
+
+        it('process draw calls game draw on correctly formed arguments', (done) => {
+            game.draw = () => {
+                done();
+            };
+            room['processDraw'](['a'], game.activePlayer);
+        });
+
+        it('process skip calls game skip on correctly formed arguments', (done) => {
+            game.skip = () => {
+                done();
+            };
+            room['processSkip']([], game.activePlayer);
         });
     });
 
