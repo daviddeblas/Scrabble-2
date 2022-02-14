@@ -9,6 +9,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
+import { Game } from './game/game';
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
     beforeEach(() => {
@@ -68,16 +69,6 @@ describe('room', () => {
             expect(room.clients[0]).to.deep.equal(socket);
         });
 
-        // it('surrenderGame should call endGame if the game is not null', () => {
-        //     const room = new Room(socket, roomsManager, gameOptions);
-        //     const endGameStub = stub(room, 'endGame').callsFake(() => {
-        //         return;
-        //     });
-        //     room.game = { players: ['player1', 'player2'] } as unknown as Game;
-        //     room.surrenderGame(socket.id);
-        //     expect(endGameStub.calledOnce).to.deep.equal(true);
-        // });
-
         it('surrenderGame should throw error if the game is null', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             try {
@@ -85,6 +76,30 @@ describe('room', () => {
             } catch (error) {
                 expect(error.message).to.deep.equal('Game does not exist');
             }
+        });
+
+        it('surrenderGame should emit endGame if the game is not null', (done) => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            let clientReceived = false;
+            const clientSocket = {
+                emit: () => {
+                    clientReceived = true;
+                },
+            } as unknown as io.Socket;
+            let hostReceived = false;
+            const hostSocket = {
+                emit: () => {
+                    hostReceived = true;
+                },
+            } as unknown as io.Socket;
+            room.game = { players: ['player1', 'player2'] } as unknown as Game;
+            room.sockets = [clientSocket, hostSocket];
+            room.surrenderGame(socket.id);
+            room.surrenderGame('player2');
+            setTimeout(() => {
+                expect(clientReceived && hostReceived).to.deep.equal(true);
+                done();
+            }, RESPONSE_DELAY * 3);
         });
 
         it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
@@ -225,6 +240,30 @@ describe('room', () => {
                     done();
                 }, RESPONSE_DELAY);
             });
+
+            /* it('surrenderGame should emit endGame if the game is not null', (done) => {
+                hostSocket.on('player joining', () => {
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('accepted', () => {
+                    hostSocket.emit('surrender game');
+                });
+                room.game = { players: ['player1', 'player2'] } as unknown as Game;
+                let clientReceived = false;
+                let hostReceived = false;
+                hostSocket.on('end game', (data) => {
+                    hostReceived = true;
+                    expect(data.winner).to.equal('player2');
+                });
+                clientSocket.on('end game', (data) => {
+                    clientReceived = true;
+                    expect(data.winner).to.equal('player2');
+                });
+                setTimeout(() => {
+                    expect(clientReceived && hostReceived).to.deep.equal(true);
+                    done();
+                }, RESPONSE_DELAY * 3);
+            });*/
         });
 
         describe('getGameInfo', () => {

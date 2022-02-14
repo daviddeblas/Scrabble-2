@@ -85,7 +85,6 @@ describe('Rooms Manager Service', () => {
     describe('switchPlayerSocket', () => {
         let oldPlayerSocket: Socket;
         let newPlayerSocket: Socket;
-
         beforeEach(() => {
             oldPlayerSocket = {
                 id: 'Old Player',
@@ -99,6 +98,10 @@ describe('Rooms Manager Service', () => {
             newPlayerSocket = { id: 'New Player' } as unknown as Socket;
         });
 
+        afterEach(() => {
+            restore();
+        });
+
         it('switchPlayerSocket should not call initiateRoomEvents if the room is undefined', () => {
             const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
                 return undefined;
@@ -108,7 +111,7 @@ describe('Rooms Manager Service', () => {
             getRoomStub.restore();
         });
 
-        it('switchPlayerSocket should switch the host if the ids match and call initiateRoom', () => {
+        it('switchPlayerSocket should switch the host if the ids match and call initiateRoomEvents', () => {
             const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
             const initiateRoomStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
                 return;
@@ -123,7 +126,7 @@ describe('Rooms Manager Service', () => {
             getRoomStub.restore();
         });
 
-        it('switchPlayerSocket should switch the client if the ids match and call initiateRoom', () => {
+        it('switchPlayerSocket should switch the client if the ids match and call initiateRoomEvents', () => {
             const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
             testRoom.clients[0] = socket;
             const initiateRoomEventsStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
@@ -136,6 +139,26 @@ describe('Rooms Manager Service', () => {
             expect(getRoomStub.calledOnceWith(socket.id)).to.deep.equal(true);
             expect(testRoom.clients[0]).to.deep.equal(newPlayerSocket);
             expect(initiateRoomEventsStub.calledOnce).to.equal(true);
+            initiateRoomEventsStub.restore();
+            getRoomStub.restore();
+        });
+
+        it('switchPlayerSocket should switch the host if the ids match and call removeUnneededListeners if client exist', () => {
+            const testRoom = new Room(oldPlayerSocket, roomsManager, {} as GameOptions);
+            testRoom.clients[0] = socket;
+            const initiateRoomEventsStub = stub(testRoom, 'initiateRoomEvents').callsFake(() => {
+                return;
+            });
+            const getRoomStub = stub(roomsManager, 'getRoom').callsFake(() => {
+                return testRoom;
+            });
+            const removeListenersStub = stub(testRoom, 'removeUnneededListeners').callsFake(() => {
+                return;
+            });
+            roomsManager.switchPlayerSocket(oldPlayerSocket, newPlayerSocket);
+            expect(getRoomStub.calledOnceWith(oldPlayerSocket.id)).to.deep.equal(true);
+            expect(initiateRoomEventsStub.calledOnce).to.equal(true);
+            expect(removeListenersStub.calledOnce).to.equal(true);
             initiateRoomEventsStub.restore();
             getRoomStub.restore();
         });
