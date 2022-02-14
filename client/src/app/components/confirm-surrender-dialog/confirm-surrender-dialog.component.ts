@@ -18,9 +18,5 @@ export class ConfirmSurrenderDialogComponent {
     surrenderGame(): void {
         this.store.dispatch(surrender());
         this.closeDialog();
-        // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-        window.onpopstate = function () {
-            window.history.forward();
-        };
     }
 }
