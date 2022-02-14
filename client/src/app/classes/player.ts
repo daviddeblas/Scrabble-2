@@ -2,6 +2,13 @@ import { Letter } from './letter';
 
 export const EASEL_CAPACITY = 7;
 
+export const copyPlayer = (player: Player) => {
+    const playerCopy = new Player(player.name);
+    playerCopy.easel = player.easel;
+    playerCopy.score = player.score;
+    return playerCopy;
+};
+
 export class Player {
     easel: Letter[];
     score: number;

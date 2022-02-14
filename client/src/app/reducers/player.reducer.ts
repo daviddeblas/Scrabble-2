@@ -1,6 +1,6 @@
 import { gameStatusReceived } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
-import { Player } from '@app/classes/player';
+import { copyPlayer, Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
 
 export const playerFeatureKey = 'players';
@@ -21,18 +21,20 @@ export const reducer = createReducer(
     on(gameStatusReceived, (state, { players }) => players),
 
     on(placeWordSuccess, (state, { word, newLetters, newScore }) => {
-        state.player.removeLettersFromEasel(word.letters);
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        nextState.player.removeLettersFromEasel(word.letters);
 
-        if (newLetters) state.player.addLettersToEasel(newLetters);
-        if (newScore) state.player.score = newScore;
+        if (newLetters) nextState.player.addLettersToEasel(newLetters);
+        if (newScore) nextState.player.score = newScore;
 
-        return state;
+        return nextState;
     }),
 
     on(exchangeLettersSuccess, (state, { oldLetters, newLetters }) => {
-        state.player.removeLettersFromEasel(oldLetters);
-        state.player.addLettersToEasel(newLetters);
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        nextState.player.removeLettersFromEasel(oldLetters);
+        nextState.player.addLettersToEasel(newLetters);
 
-        return state;
+        return nextState;
     }),
 );
