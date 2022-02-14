@@ -9,7 +9,7 @@ import { SocketClientService } from './socket-client.service';
 export class DictionaryService {
     constructor(private socketService: SocketClientService, private store: Store) {}
 
-    getDictionaries() {
+    getDictionaries(): void {
         this.socketService.send('get dictionaries');
 
         this.socketService.on('receive dictionaries', (dictionaries: string[]) => {

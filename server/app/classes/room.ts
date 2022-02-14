@@ -2,6 +2,7 @@ import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import Container from 'typedi';
+import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { Game } from './game/game';
 import { RoomInfo } from './room-info';
@@ -13,7 +14,6 @@ export class Room {
     game: Game | null;
 
     sockets: io.Socket[];
-    // TODO supprimer des rooms
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
@@ -38,7 +38,12 @@ export class Room {
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
+        this.initiateRoomEvents();
+    }
+
+    initiateRoomEvents() {
         this.initGame();
+        this.initSurrenderGame();
         this.initChatting();
     }
 
@@ -58,6 +63,25 @@ export class Room {
                     board: { board: game.board.board, pointsPerLetter: game.board.pointsPerLetter, multipliers: game.board.multipliers },
                 });
             });
+        });
+    }
+
+    initSurrenderGame(): void {
+        this.sockets.forEach((socket) => {
+            socket.on('surrender game', () => {
+                this.surrenderGame(socket.id);
+            });
+        });
+    }
+
+    surrenderGame(looserId: string) {
+        if (!this.game?.players) throw new Error('Game does not exist');
+        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
+            this.game.players,
+            looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
+        );
+        this.sockets.forEach((socket) => {
+            socket.emit('end game', gameFinishStatus);
         });
     }
 
@@ -82,5 +106,9 @@ export class Room {
 
     getRoomInfo(): RoomInfo {
         return new RoomInfo(this.host.id, this.gameOptions);
+    }
+
+    removeUnneededListeners(socket: io.Socket): void {
+        socket.removeAllListeners('send message').removeAllListeners('surrender game').removeAllListeners('get game status');
     }
 }

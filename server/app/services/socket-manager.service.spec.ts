@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { Server } from 'app/server';
@@ -17,14 +18,13 @@ describe('SocketManager service tests', () => {
     beforeEach(async () => {
         server = Container.get(Server);
         server.init();
-        // eslint-disable-next-line dot-notation
         service = server['socketService'];
         clientSocket = ioClient(urlString);
     });
 
     afterEach(() => {
+        service.roomManager.rooms = [];
         clientSocket.close();
-        // eslint-disable-next-line dot-notation
         service['sio'].close();
         sinon.restore();
     });
@@ -36,6 +36,7 @@ describe('SocketManager service tests', () => {
         setTimeout(() => {
             assert(roomManagerSpy.calledOnce);
             assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
+            roomManagerSpy.restore();
             done();
         }, RESPONSE_DELAY);
     });
@@ -58,7 +59,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and call getRooms', (done) => {
-        const roomManagerSpy = sinon.spy(service.roomManager, 'getRooms');
+        const roomManagerSpy = sinon.spy(service.roomManager, 'getAvailableRooms');
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms) => {
             expect(listOfRooms).to.deep.equal([]);
@@ -90,17 +91,6 @@ describe('SocketManager service tests', () => {
         });
     });
 
-    it('should handle join room event and call joinRoom', (done) => {
-        const roomsManagerStub = sinon.stub(service.roomManager);
-        const data = { roomId: 0, playerName: 'Second Player' };
-        clientSocket.emit('join room', data);
-        setTimeout(() => {
-            assert(roomsManagerStub.joinRoom.calledOnce);
-            done();
-        }, RESPONSE_DELAY);
-        done();
-    });
-
     it('isOpen should return true when set to default value', (done) => {
         const isOpen: boolean = service.isOpen();
         assert(isOpen === true);
@@ -108,7 +98,6 @@ describe('SocketManager service tests', () => {
     });
 
     it('isOpen should return false when max listener count is 0', (done) => {
-        // eslint-disable-next-line dot-notation
         service['sio'].setMaxListeners(0);
         const isOpen: boolean = service.isOpen();
         assert(isOpen === false);

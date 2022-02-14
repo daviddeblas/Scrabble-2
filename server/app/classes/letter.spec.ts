@@ -20,9 +20,10 @@ describe('stringToLetters', () => {
 describe('lettersToString', () => {
     it('should be equal to its equivalent string', () => {
         expect(lettersToString(['A' as Letter])).to.eq('A');
+
         expect(lettersToString(stringToLetters('zythums'))).to.eq('ZYTHUMS');
-        expect(lettersToString(['Z' as Letter, 'Y' as Letter, 'T' as Letter, 'H' as Letter, 'U' as Letter, 'M' as Letter, 'S' as Letter])).to.eq(
-            'ZYTHUMS',
-        );
+
+        const letter: Letter[] = ['Z', 'Y', 'T', 'H', 'U', 'M', 'S'];
+        expect(lettersToString(letter)).to.eq('ZYTHUMS');
     });
 });
