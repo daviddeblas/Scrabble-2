@@ -192,14 +192,12 @@ export class Room {
 
     private gameStatusGetter(playerNumber: number): unknown {
         const game = this.game as Game;
+        const opponent = { ...game.players[(playerNumber + 1) % 2] };
+        opponent.easel = [];
         return {
-            playerNames: [game.players[0].name, game.players[1].name],
-            thisPlayer: playerNumber,
-            playerEasel: game.players[playerNumber].easel,
-            board: game.board,
-            activePlayer: game.activePlayer,
-            letterPotLength: game.bag.letters.length,
-            pointsPerLetter: game.board.pointsPerLetter,
+            status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
+            players: { player: game.players[playerNumber], opponent },
+            board: { board: game.board.board, pointsPerLetter: game.board.pointsPerLetter, multipliers: game.board.multipliers },
         };
     }
 }

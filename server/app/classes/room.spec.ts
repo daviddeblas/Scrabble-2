@@ -9,7 +9,7 @@ import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
-import { Game, MAX_LETTERS_IN_EASEL } from './game/game';
+import { Game } from './game/game';
 import { stringToLetter } from './letter';
 import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
@@ -123,12 +123,11 @@ describe('room', () => {
         it('game status getter returns specific information given to the player', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const info = room['gameStatusGetter'](0) as any;
-            expect(info.playerNames).to.deep.eq(['a', 'player 2']);
-            expect(info.thisPlayer).to.eq(0);
-            expect(info.playerEasel.length).to.eq(MAX_LETTERS_IN_EASEL);
-            expect(info.board).to.deep.eq(room.game?.board);
-            expect(info.activePlayer).to.eq(room.game?.activePlayer);
-            expect(info.letterPotLength).to.eq(room.game?.bag.letters.length);
+            expect(info.status.activePlayer).to.eq(room.game?.players[room.game?.activePlayer].name);
+            expect(info.board.board).to.eq(room.game?.board.board);
+            expect(info.board.multipliers).to.eq(room.game?.board.multipliers);
+            expect(info.status.letterPotLength).to.eq(room.game?.bag.letters.length);
+            expect(info.players.player).to.deep.eq(room.game?.players[0]);
         });
     });
 
