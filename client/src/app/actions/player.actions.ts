@@ -9,7 +9,7 @@ export const placeWordSuccess = createAction('[Players] Place Word Success', pro
 
 export const placeWordFailed = createAction('[Players] Place Word Failed', props<{ error: Error | WordValidationError }>());
 
-export const exchangeLetters = createAction('[Players] Exchange Letters', props<{ letters: Letter[] }>());
+export const exchangeLetters = createAction('[Players] Exchange Letters', props<{ letters: string }>());
 
 export const exchangeLettersSuccess = createAction('[Players] Exchange Letters Success', props<{ oldLetters: Letter[]; newLetters: Letter[] }>());
 
