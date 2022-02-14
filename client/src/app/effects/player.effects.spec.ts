@@ -7,22 +7,21 @@ import { PlayerEffects } from './player.effects';
 describe('PlayerEffects', () => {
     let actions$: Observable<unknown>;
     let effects: PlayerEffects;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let service: any;
+    let service: jasmine.SpyObj<PlayerService>;
 
     beforeEach(() => {
+        service = jasmine.createSpyObj('PlayerService', ['surrenderGame']);
         TestBed.configureTestingModule({
             providers: [
                 PlayerEffects,
                 provideMockActions(() => actions$),
                 {
                     provide: PlayerService,
-                    useValue: jasmine.createSpyObj('PlayerService', ['surrenderGame']),
+                    useValue: service,
                 },
             ],
         });
         effects = TestBed.inject(PlayerEffects);
-        service = TestBed.inject(PlayerService);
     });
 
     it('should be created', () => {

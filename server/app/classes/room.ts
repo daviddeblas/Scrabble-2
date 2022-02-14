@@ -14,7 +14,6 @@ export class Room {
     game: Game | null;
 
     sockets: io.Socket[];
-    // TODO supprimer des rooms
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;

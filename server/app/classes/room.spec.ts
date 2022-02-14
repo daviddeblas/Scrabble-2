@@ -240,30 +240,6 @@ describe('room', () => {
                     done();
                 }, RESPONSE_DELAY);
             });
-
-            /* it('surrenderGame should emit endGame if the game is not null', (done) => {
-                hostSocket.on('player joining', () => {
-                    hostSocket.emit('accept');
-                });
-                clientSocket.on('accepted', () => {
-                    hostSocket.emit('surrender game');
-                });
-                room.game = { players: ['player1', 'player2'] } as unknown as Game;
-                let clientReceived = false;
-                let hostReceived = false;
-                hostSocket.on('end game', (data) => {
-                    hostReceived = true;
-                    expect(data.winner).to.equal('player2');
-                });
-                clientSocket.on('end game', (data) => {
-                    clientReceived = true;
-                    expect(data.winner).to.equal('player2');
-                });
-                setTimeout(() => {
-                    expect(clientReceived && hostReceived).to.deep.equal(true);
-                    done();
-                }, RESPONSE_DELAY * 3);
-            });*/
         });
 
         describe('getGameInfo', () => {
@@ -353,75 +329,6 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
-
-            // it('should handle surrender game from client and call endGame', (done) => {
-            //     let room: Room;
-            //     const gameOptions = new GameOptions('player 1', 'b');
-            //     server.on('connection', (socket) => {
-            //         socket.on('create room', () => {
-            //             room = new Room(socket, roomsManager, gameOptions);
-            //             const endGameSpy = spy(room, 'endGame');
-            //             setTimeout(() => {
-            //                 expect(endGameSpy.called).to.equal(true);
-            //                 done();
-            //             }, RESPONSE_DELAY);
-            //             clientSocket.emit('join');
-            //         });
-            //         socket.on('join', () => {
-            //             room.join(socket, 'player 2');
-            //             room.inviteAccepted(socket);
-            //             clientSocket.emit('surrender game');
-            //         });
-            //     });
-            //     hostSocket.emit('create room');
-            // });
-            // it('should handle surrender game from host and call endGame', (done) => {
-            //     let room: Room;
-            //     const gameOptions = new GameOptions('player 1', 'b');
-            //     server.on('connection', (socket) => {
-            //         socket.on('create room', () => {
-            //             room = new Room(socket, roomsManager, gameOptions);
-            //             const endGameSpy = spy(room, 'endGame');
-            //             setTimeout(() => {
-            //                 expect(endGameSpy.called).to.equal(true);
-            //                 done();
-            //             }, RESPONSE_DELAY);
-            //             clientSocket.emit('join');
-            //         });
-            //         socket.on('join', () => {
-            //             room.join(socket, 'player 2');
-            //             room.inviteAccepted(socket);
-            //             hostSocket.emit('surrender game');
-            //         });
-            //     });
-            //     hostSocket.emit('create room');
-            // });
-            // it('should receive end game namespace with given info', (done) => {
-            //     const finishStatus = new GameFinishStatus([], null);
-            //     let room: Room;
-            //     const gameOptions = new GameOptions('a', 'b');
-            //     server.on('connection', (socket) => {
-            //         socket.on('create room', () => {
-            //             room = new Room(socket, roomsManager, gameOptions);
-            //         });
-            //         socket.on('join', () => {
-            //             room.join(socket, 'player 2');
-            //         });
-            //     });
-            //     hostSocket.on('end game', (receivedStatus: GameFinishStatus) => {
-            //         expect(receivedStatus).to.deep.eq(finishStatus);
-            //         done();
-            //     });
-            //     hostSocket.on('player joining', () => {
-            //         hostSocket.emit('accept');
-            //     });
-            //     clientSocket.on('game status', () => {
-            //         room.endGame(finishStatus);
-            //     });
-            //     hostSocket.emit('create room');
-            //     clientSocket.emit('join');
-            //     clientSocket.emit('get game status');
-            // });
         });
     });
 });

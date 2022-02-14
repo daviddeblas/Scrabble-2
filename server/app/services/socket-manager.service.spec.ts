@@ -8,8 +8,6 @@ import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { SocketService } from './socket-manager.service';
 
-// eslint-disable dot-notation
-
 const RESPONSE_DELAY = 200;
 describe('SocketManager service tests', () => {
     let service: SocketService;
@@ -20,7 +18,6 @@ describe('SocketManager service tests', () => {
     beforeEach(async () => {
         server = Container.get(Server);
         server.init();
-        // eslint-disable-next-line dot-notation
         service = server['socketService'];
         clientSocket = ioClient(urlString);
     });
@@ -28,7 +25,6 @@ describe('SocketManager service tests', () => {
     afterEach(() => {
         service.roomManager.rooms = [];
         clientSocket.close();
-        // eslint-disable-next-line dot-notation
         service['sio'].close();
         sinon.restore();
     });
@@ -102,7 +98,6 @@ describe('SocketManager service tests', () => {
     });
 
     it('isOpen should return false when max listener count is 0', (done) => {
-        // eslint-disable-next-line dot-notation
         service['sio'].setMaxListeners(0);
         const isOpen: boolean = service.isOpen();
         assert(isOpen === false);
