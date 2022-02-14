@@ -18,7 +18,7 @@ export class ChatService {
         this.socketService.send('send message', { username, message });
     }
 
-    acceptNewMessages() {
+    acceptNewMessages(): void {
         this.socketService.on('receive message', (chatMessage: ChatMessage) => {
             this.store.dispatch(receivedMessage(chatMessage));
         });
