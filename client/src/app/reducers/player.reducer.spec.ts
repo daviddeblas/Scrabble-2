@@ -35,7 +35,7 @@ describe('[Players] Reducer', () => {
         const boardState: BoardState = {
             board: [],
             multipliers: [],
-            pointsPerLetter: [],
+            pointsPerLetter: new Map(),
         };
 
         it('should return the loaded players', () => {

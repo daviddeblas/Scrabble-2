@@ -12,17 +12,20 @@ export const boardSize = 15;
 
 export interface BoardState {
     board: (Letter | null)[][];
-    pointsPerLetter: [Letter, number][];
+    pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
 }
 
-export const initialState: BoardState = { board: [], pointsPerLetter: [], multipliers: [] };
+export const initialState: BoardState = { board: [], pointsPerLetter: new Map(), multipliers: [] };
 
 export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
 
-    on(gameStatusReceived, (state, { board }) => board),
+    on(gameStatusReceived, (state, { board }) => {
+        // transformer le array de tuple en map
+        return { ...board, pointsPerLetter: new Map(board.pointsPerLetter as unknown as [Letter, number][]) };
+    }),
 
     on(placeWordSuccess, (state, { word }) => {
         for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {

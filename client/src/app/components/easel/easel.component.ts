@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./easel.component.scss'],
 })
 export class EaselComponent {
-    pointsPerLetter$: Observable<[Letter, number][]>;
+    pointsPerLetter$: Observable<Map<Letter, number>>;
     players$: Observable<Players>;
 
     constructor(store: Store<{ board: BoardState; players: Players }>) {
