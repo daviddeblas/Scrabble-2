@@ -203,7 +203,7 @@ export class Room {
     private parsePlaceCall(args: string[]): PlacedLetter[] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
-        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0) - 1;
+        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
         const yPositionFromNumber = parseInt(positionNumber, 10) - 1;
 
         let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
