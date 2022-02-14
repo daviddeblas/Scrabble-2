@@ -2,21 +2,21 @@ import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import io from 'socket.io';
 import Container from 'typedi';
-import { PlacedLetter } from './placed-letter';
-import { Vec2 } from './vec2';
-import { stringToLetter, stringToLetters } from './letter';
 import { GameOptions } from './game-options';
 import { Game } from './game/game';
+import { stringToLetter, stringToLetters } from './letter';
+import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
+import { Vec2 } from './vec2';
 
-const MILLISECONDS_PER_SEC = 1000;
+// const MILLISECONDS_PER_SEC = 1000;
 
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
     clientName: string | null;
     game: Game | null;
-    currentTimer: NodeJS.Timeout;
+    // currentTimer: NodeJS.Timeout;
 
     sockets: io.Socket[];
     // TODO supprimer des rooms
@@ -101,12 +101,13 @@ export class Room {
     }
 
     private postCommand(): void {
-        clearTimeout(this.currentTimer);
+        // clearTimeout(this.currentTimer);
         this.sockets.forEach((s) => s.emit('turn ended'));
-        this.currentTimer = setTimeout(() => {
+        /* this.currentTimer = setTimeout(() => {
             this.processSkip([], this.game?.activePlayer as number);
             this.sockets.forEach((s) => s.emit('turn ended'));
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        */
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
