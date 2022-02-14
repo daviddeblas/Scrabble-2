@@ -1,33 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { GameSelectionPageComponent } from './game-selection-page.component';
+import { SurrenderGameButtonComponent } from './surrender-game-button.component';
 
-describe('GameSelectionPageComponent', () => {
-    let component: GameSelectionPageComponent;
-    let fixture: ComponentFixture<GameSelectionPageComponent>;
+describe('SurrenderGameComponent', () => {
+    let component: SurrenderGameButtonComponent;
+    let fixture: ComponentFixture<SurrenderGameButtonComponent>;
     const mockDialogSpy: { open: jasmine.Spy } = {
         open: jasmine.createSpy('open'),
     };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameSelectionPageComponent],
-            imports: [AppMaterialModule, BrowserAnimationsModule],
+            declarations: [SurrenderGameButtonComponent],
+            imports: [AppMaterialModule],
             providers: [
                 {
                     provide: MatDialog,
                     useValue: mockDialogSpy,
                 },
-                FormBuilder,
             ],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(GameSelectionPageComponent);
+        fixture = TestBed.createComponent(SurrenderGameButtonComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -36,8 +33,14 @@ describe('GameSelectionPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should open the window when the begin button is clicked', () => {
-        component.openGamePreparationPage();
+    it('openConfirmSurrenderDialog should open the window when the begin button is clicked', () => {
+        component.openConfirmSurrenderDialog();
         expect(mockDialogSpy.open).toHaveBeenCalled();
+    });
+
+    it('surrender button should call openConfirmSurrenderDialog', () => {
+        const spy = spyOn(component, 'openConfirmSurrenderDialog');
+        document.getElementsByTagName('button')[0].click();
+        expect(spy).toHaveBeenCalled();
     });
 });

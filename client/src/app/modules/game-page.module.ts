@@ -9,7 +9,10 @@ import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-wor
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { EaselComponent } from '@app/components/easel/easel.component';
 import { LetterComponent } from '@app/components/letter/letter.component';
+import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
+import { BrowserEffects } from '@app/effects/browser.effects';
 import { ChatEffects } from '@app/effects/chat.effects';
+import { PlayerEffects } from '@app/effects/player.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
@@ -33,16 +36,17 @@ import { StoreModule } from '@ngrx/store';
         ChatBoxComponent,
         EaselComponent,
         BoardToListPipe,
+        ChatBoxComponent,
+        SurrenderGameButtonComponent,
     ],
     imports: [
         AppMaterialModule,
         CommonModule,
-        AppMaterialModule,
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
         StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),
         StoreModule.forFeature(chatReducer.chatFeatureKey, chatReducer.reducer),
-        EffectsModule.forFeature([ChatEffects]),
+        EffectsModule.forFeature([ChatEffects, PlayerEffects, BrowserEffects]),
     ],
 })
 export class GamePageModule {}

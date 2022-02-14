@@ -14,6 +14,7 @@ import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
@@ -35,6 +36,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         AppComponent,
         MainPageComponent,
         MaterialPageComponent,
+        ConfirmSurrenderDialogComponent,
         GameSelectionPageComponent,
         MultiConfigWindowComponent,
         GamePreparationPageComponent,

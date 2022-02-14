@@ -1,12 +1,15 @@
+/* eslint-disable max-lines */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
+import { fail } from 'assert';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
+import { Game } from './game/game';
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
     beforeEach(() => {
@@ -24,6 +27,9 @@ describe('room', () => {
                 id: '1',
                 emit: () => {
                     return;
+                },
+                removeAllListeners: () => {
+                    return socket;
                 },
             } as unknown as io.Socket;
             gameOptions = new GameOptions('a', 'b');
@@ -61,6 +67,48 @@ describe('room', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             room.join(socket, 'Player 2');
             expect(room.clients[0]).to.deep.equal(socket);
+        });
+
+        it('surrenderGame should throw error if the game is null', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            try {
+                room.surrenderGame(socket.id);
+            } catch (error) {
+                expect(error.message).to.deep.equal('Game does not exist');
+            }
+        });
+
+        it('surrenderGame should emit endGame if the game is not null', (done) => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            let clientReceived = false;
+            const clientSocket = {
+                emit: () => {
+                    clientReceived = true;
+                },
+            } as unknown as io.Socket;
+            let hostReceived = false;
+            const hostSocket = {
+                emit: () => {
+                    hostReceived = true;
+                },
+            } as unknown as io.Socket;
+            room.game = { players: ['player1', 'player2'] } as unknown as Game;
+            room.sockets = [clientSocket, hostSocket];
+            room.surrenderGame(socket.id);
+            room.surrenderGame('player2');
+            setTimeout(() => {
+                expect(clientReceived && hostReceived).to.deep.equal(true);
+                done();
+            }, RESPONSE_DELAY * 3);
+        });
+
+        it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const socketStub = stub(socket, 'removeAllListeners').callThrough();
+            room.removeUnneededListeners(socket);
+            expect(socketStub.calledWith('send message')).to.equal(true);
+            expect(socketStub.calledWith('surrender game')).to.equal(true);
+            expect(socketStub.calledWith('get game status')).to.equal(true);
         });
     });
 
@@ -158,6 +206,40 @@ describe('room', () => {
                 });
                 hostSocket.emit('create room');
             });
+
+            it('initSurrenderGame should enable the surrender event which calls surrenderGame', (done) => {
+                let surrenderGameStub: SinonStub;
+                hostSocket.on('player joining', () => {
+                    surrenderGameStub = stub(room, 'surrenderGame').callsFake(() => {
+                        return;
+                    });
+                    hostSocket.emit('accept');
+                });
+                clientSocket.on('accepted', () => {
+                    hostSocket.emit('surrender game');
+                });
+                hostSocket.emit('create room');
+                setTimeout(() => {
+                    expect(surrenderGameStub.called).to.equal(true);
+                    surrenderGameStub.restore();
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
+            it('initChatting should not initiate the client socket if clients[0] is null', (done) => {
+                hostSocket.on('player joining', () => {
+                    room.clients[0] = null;
+                    room.initChatting();
+                    hostSocket.emit('send message', { username: 'player', message: 'message' });
+                });
+                clientSocket.on('receive message', () => {
+                    fail('Client should not receive message');
+                });
+                hostSocket.emit('create room');
+                setTimeout(() => {
+                    done();
+                }, RESPONSE_DELAY);
+            });
         });
 
         describe('getGameInfo', () => {
@@ -189,7 +271,7 @@ describe('room', () => {
 
         describe('Receiving', () => {
             it('quit should call quitRoomHost() when emitted', (done) => {
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('player 1', 'b');
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         const room = new Room(socket, roomsManager, gameOptions);
@@ -206,7 +288,7 @@ describe('room', () => {
 
             it('accept should call inviteAccepted()', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('player 1', 'b');
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -224,7 +306,7 @@ describe('room', () => {
 
             it('client quit should call quitRoomClient', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('player 1', 'b');
                 roomsManager.removeRoom.callsFake(() => {
                     return;
                 });

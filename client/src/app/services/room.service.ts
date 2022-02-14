@@ -11,7 +11,7 @@ import { SocketClientService } from './socket-client.service';
 export class RoomService {
     constructor(private socketService: SocketClientService, private store: Store) {}
 
-    createRoom(gameOptions: GameOptions) {
+    createRoom(gameOptions: GameOptions): void {
         this.socketService.send('create room', gameOptions);
 
         this.socketService.on('create room success', (roomInfo: RoomInfo) => {
@@ -20,32 +20,32 @@ export class RoomService {
         });
     }
 
-    waitForInvitations() {
+    waitForInvitations(): void {
         this.socketService.on('player joining', (playerName: string) => {
             this.store.dispatch(joinInviteReceived({ playerName }));
         });
     }
 
-    refuseInvite() {
+    refuseInvite(): void {
         this.socketService.send('refuse');
     }
 
-    acceptInvite() {
+    acceptInvite(): void {
         this.socketService.send('accept');
     }
 
-    closeRoom() {
+    closeRoom(): void {
         this.socketService.send('quit');
     }
 
-    fetchRoomList() {
+    fetchRoomList(): void {
         this.socketService.send('request list');
         this.socketService.on('get list', (roomInfo: RoomInfo[]) => {
             this.store.dispatch(loadRoomsSuccess({ rooms: roomInfo }));
         });
     }
 
-    joinRoom(roomInfo: RoomInfo, playerName: string) {
+    joinRoom(roomInfo: RoomInfo, playerName: string): void {
         this.socketService.send('join room', { roomId: roomInfo.roomId, playerName });
         this.socketService.on('accepted', () => {
             this.store.dispatch(joinRoomAccepted({ roomInfo, playerName }));

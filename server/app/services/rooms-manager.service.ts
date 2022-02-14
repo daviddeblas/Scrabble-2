@@ -48,4 +48,21 @@ export class RoomsManager {
     getAvailableRooms(): RoomInfo[] {
         return this.rooms.filter((r) => r.game === null).map((r) => r.getRoomInfo());
     }
+
+    switchPlayerSocket(oldSocket: io.Socket, newSocket: io.Socket): void {
+        const room = this.getRoom(oldSocket.id);
+        if (!room) return;
+        if (room.host.id === oldSocket.id) {
+            room.host = newSocket;
+            if (room.clients[0]) room.removeUnneededListeners(room.clients[0]);
+        } else {
+            room.clients[0] = newSocket;
+            room.removeUnneededListeners(room.host);
+        }
+        room.initiateRoomEvents();
+    }
+
+    getRoom(playerServerId: string): Room | undefined {
+        return this.rooms.find((r) => r.host.id === playerServerId || r.clients[0]?.id === playerServerId);
+    }
 }
