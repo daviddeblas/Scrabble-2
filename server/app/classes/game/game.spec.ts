@@ -73,6 +73,7 @@ describe('game', () => {
     it('place should score according to scorePositions added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
         const activePlayer = game.activePlayer;
         game.players[activePlayer].easel = stringToLetters('aa');
+        game.placeCounter = 1;
         const oldEasel = [...game.players[activePlayer].easel];
         game.bag.letters = [];
         game.place(
@@ -104,6 +105,7 @@ describe('game', () => {
             );
         }).to.throw();
     });
+
     it('draw should not throw on correct call', () => {
         const ogActivePlayer = game.activePlayer;
 

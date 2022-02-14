@@ -162,7 +162,7 @@ describe('room', () => {
             const placedLetters = room['parsePlaceCall'](commandArgs);
             placedLetters.forEach((l, index) => {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 6)));
+                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(7 + index, 6)));
             });
         });
 
