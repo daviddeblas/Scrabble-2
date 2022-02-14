@@ -4,12 +4,12 @@ import { createReducer, on } from '@ngrx/store';
 export const gameStatusFeatureKey = 'gameStatus';
 
 export interface GameStatus {
-    activePlayer: number;
+    activePlayer: string;
     letterPotLength: number;
 }
 
 export const initialState: GameStatus = {
-    activePlayer: 0,
+    activePlayer: '',
     letterPotLength: 0,
 };
 
