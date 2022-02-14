@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
@@ -113,7 +115,6 @@ describe('PlayerService', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        // eslint-disable-next-line dot-notation
         const sendSpy = spyOn(service['socketService'], 'send');
         service.exchangeLetters(letters);
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'échanger aerev');
@@ -129,46 +130,38 @@ describe('PlayerService', () => {
 
     it('checkNearSpaces should return true if the position is close to another letter', () => {
         board[CENTER_BOARD][CENTER_BOARD] = 'A';
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](CENTER_BOARD - 1, CENTER_BOARD, board)).toBeTrue();
     });
 
     it('checkNearSpaces should return true if the position in the center even if no letters are placed', () => {
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](CENTER_BOARD, CENTER_BOARD, board)).toBeTrue();
     });
 
     it('checkNearSpaces should return false if there is no letters placed and the position is not the center', () => {
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](0, 0, board)).toBeFalse();
     });
 
     it('checkNearSpaces should return false if there is no letters in the nearby spaces', () => {
         board[CENTER_BOARD][CENTER_BOARD] = 'A';
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](0, 0, board)).toBeFalse();
     });
 
     it('checkNearSpaces should return false if there is no letters in the nearby spaces', () => {
         board[CENTER_BOARD][CENTER_BOARD] = 'A';
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](2, 2, board)).toBeFalse();
     });
 
     it('checkNearSpaces should return false if there is no letters in the nearby spaces and not crash with min column and line attributes', () => {
         board[CENTER_BOARD][CENTER_BOARD] = 'A';
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](0, 0, board)).toBeFalse();
     });
 
     it('checkNearSpaces should return false if there is no letters in the nearby spaces and not crash with max column and line attributes', () => {
         board[CENTER_BOARD][CENTER_BOARD] = 'A';
-        // eslint-disable-next-line dot-notation
         expect(service['checkNearSpaces'](BOARD_SIZE - 1, BOARD_SIZE - 1, board)).toBeFalse();
     });
 
     it('wordPlacementCorrect should return true if the word is placed correctly close to another letter', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'checkNearSpaces').and.callFake(() => {
             return true;
         });
@@ -180,7 +173,6 @@ describe('PlayerService', () => {
     });
 
     it('wordPlacementCorrect should return true if the word is placed on another letter corresponding to the word', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'checkNearSpaces').and.callFake(() => {
             return false;
         });
@@ -192,7 +184,6 @@ describe('PlayerService', () => {
     });
 
     it('wordPlacementCorrect should return false if no letter are close or on the path vertically', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'checkNearSpaces').and.callFake(() => {
             return false;
         });
@@ -204,7 +195,6 @@ describe('PlayerService', () => {
     });
 
     it('wordPlacementCorrect should return false if no letter are close or on the path horizontally', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'checkNearSpaces').and.callFake(() => {
             return false;
         });
@@ -215,7 +205,6 @@ describe('PlayerService', () => {
     });
 
     it('wordPlacementCorrect should return false a letter is on the space but is different from the one in the word', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'checkNearSpaces').and.callFake(() => {
             return false;
         });
@@ -249,7 +238,6 @@ describe('PlayerService', () => {
     });
 
     it('setUpBoardWithWord should dispatch syncBoard when error event received ', (done) => {
-        // eslint-disable-next-line dot-notation
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch').and.callThrough();
         position = 'h8';
         const direction = 'h';

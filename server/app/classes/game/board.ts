@@ -62,14 +62,13 @@ export class Board {
         let score = 0;
         let multiplier = 1;
         pos.forEach((vec) => {
-            // get current letter
             const letter = this.board[vec.x][vec.y];
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
-            // prendre le nombre de points associe a cette lettre
+            // prends le nombre de points associe a cette lettre
             const letterPoints = this.pointsPerLetter.get(letter) as number;
-            // annuler s'il s'agit d'un blank
+            // annule s'il s'agit d'un blank
             if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
-            // obtenir le multiplieur a cette position
+            // obtient le multiplieur a cette position
             const multi = this.multipliers[vec.x][vec.y];
             if (multi === null) {
                 score += letterPoints;
@@ -123,7 +122,7 @@ export class Board {
             ALLOWED_DIRECTIONS.forEach((d) => {
                 const word = tempBoard.getAffectedWordFromSinglePlacement(d, l.position);
                 if (word.length < 2) return;
-                // ajouter s'il nexiste pas
+                // ajoute s'il n'existe pas
                 const index = words.findIndex((w) => {
                     let bool = true;
                     for (let i = 0; i < w.length && i < word.length; i++) bool &&= w[i].equals(word[i]);

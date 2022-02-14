@@ -7,22 +7,21 @@ import { BrowserEffects } from './browser.effects';
 describe('BrowserEffects', () => {
     let actions$: Observable<unknown>;
     let effects: BrowserEffects;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let service: any;
+    let service: jasmine.SpyObj<BrowserManagerService>;
 
     beforeEach(() => {
+        service = jasmine.createSpyObj('BrowserManagerService', ['onBrowserLoad', 'onBrowserClosed']);
         TestBed.configureTestingModule({
             providers: [
                 BrowserEffects,
                 provideMockActions(() => actions$),
                 {
                     provide: BrowserManagerService,
-                    useValue: jasmine.createSpyObj('PlayerService', ['onBrowserLoad', 'onBrowserClosed']),
+                    useValue: service,
                 },
             ],
         });
         effects = TestBed.inject(BrowserEffects);
-        service = TestBed.inject(BrowserManagerService);
     });
 
     it('should be created', () => {

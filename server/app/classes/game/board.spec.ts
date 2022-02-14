@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { Multiplier, MultiplierType } from '@app/classes/multiplier';
@@ -47,18 +48,15 @@ describe('board', () => {
         // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.place(correctLettersToPlace);
-        // eslint-disable-next-line dot-notation
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWords should be correct', () => {
-        // eslint-disable-next-line dot-notation
         const words = board['getAffectedWords'](correctLettersToPlace);
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
     });
 
     it('scorePositions should score accordingly on correct placement without any multiplier', () => {
-        // place word 'con' across the 3 middle boxes
         board.place(correctLettersToPlace);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
@@ -66,7 +64,6 @@ describe('board', () => {
     });
 
     it('scorePositions should score accordingly on correct placement with a single letter multiplier', () => {
-        // place a new multiplier
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Letter);
         board.place(correctLettersToPlace);
 
@@ -76,7 +73,6 @@ describe('board', () => {
     });
 
     it('scorePositions should score accordingly on correct placement with a single word multiplier', () => {
-        // place word 'con' across the 3 middle boxes
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.place(correctLettersToPlace);
 
