@@ -57,4 +57,22 @@ describe('SidebarComponent', () => {
         const player = new Player('John');
         expect(component.isActivePlayer(player)).toBeFalse();
     });
+
+    it('should return time from countdown', () => {
+        component.countdown = 83;
+        expect(component.timerToString()).toBe('1:23');
+    });
+
+    it('should decrement a second from countdown', () => {
+        const expected = 6;
+        component.countdown = 7;
+        component.decrementCountdown()();
+        expect(component.countdown).toBe(expected);
+    });
+
+    it('should not be negative', () => {
+        component.countdown = 0;
+        component.decrementCountdown()();
+        expect(component.countdown).toBe(0);
+    });
 });
