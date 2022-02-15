@@ -75,7 +75,7 @@ describe('game', () => {
     it('place should score according to scorePositions added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
         const activePlayer = game.activePlayer;
         game.players[activePlayer].easel = stringToLetters('aa');
-        game.placeCounter = 1;
+        game.placeCounter = 0;
         const oldEasel = [...game.players[activePlayer].easel];
         game.bag.letters = [];
         game.place(
