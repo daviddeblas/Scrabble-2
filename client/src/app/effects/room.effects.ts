@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { acceptInvite, closeRoom, createRoom, joinRoom, joinRoomAccepted, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import { acceptInvite, cancelJoinRoom, closeRoom, createRoom, joinRoom, joinRoomAccepted, loadRooms, refuseInvite } from '@app/actions/room.actions';
 import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { RoomService } from '@app/services/room.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
@@ -82,6 +82,17 @@ export class RoomEffects {
                 tap(() => {
                     this.router.navigateByUrl('game');
                     this.dialogRef.close();
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    cancelJoinRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(cancelJoinRoom),
+                tap(() => {
+                    this.roomService.cancelJoinRoom();
                 }),
             ),
         { dispatch: false },

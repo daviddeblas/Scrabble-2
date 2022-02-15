@@ -3,6 +3,7 @@ import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { assert, expect } from 'chai';
 import { createServer, Server } from 'http';
 import * as sinon from 'sinon';
+import { stub } from 'sinon';
 import io from 'socket.io';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -31,6 +32,7 @@ describe('Browser service tests', () => {
         });
         service = new BrowserService();
         clientSocket = ioClient(urlString);
+        roomsManager.rooms = [];
     });
 
     afterEach(() => {
@@ -75,6 +77,28 @@ describe('Browser service tests', () => {
         clientSocket.emit('browser reconnection', oldClientId);
     });
 
+    it('closed browser should call room.quitRoomHost', (done) => {
+        const room = {
+            game: null,
+            quitRoomHost: () => {
+                return;
+            },
+            surrenderGame: () => {
+                return;
+            },
+        } as unknown as Room;
+        const spyOnQuitRoomHost = stub(room, 'quitRoomHost');
+        roomsManager.rooms.push(room);
+        const userId = '123';
+        stub(roomsManager, 'getRoom').callsFake(() => room);
+        // service.roomsManager.getRoom = roomMangerStub;
+        clientSocket.emit('closed browser', userId);
+        setTimeout(() => {
+            expect(spyOnQuitRoomHost.calledOnce).to.equal(true);
+            done();
+        }, RESPONSE_DELAY);
+    });
+
     it('closed browser should assign a new tempClientSocketId and tempServerSocket', (done) => {
         const userId = '123';
         clientSocket.emit('closed browser', userId);
@@ -90,6 +114,9 @@ describe('Browser service tests', () => {
         const fakeRoom = {
             surrenderGame: () => {
                 done();
+            },
+            quitRoomHost: () => {
+                return;
             },
         } as unknown as Room;
         sinon.stub(roomsManager, 'getRoom').callsFake(() => {
