@@ -34,7 +34,7 @@ export class Game {
     place(letters: PlacedLetter[], blanks: [Vec2, number][], player: number): void {
         this.checkMove(
             letters.map((l, index) => {
-                if (blanks.filter((b) => b[1] === index)) return '*' as Letter;
+                if (blanks.filter((b) => b[1] === index).length > 0) return '*' as Letter;
                 return l.letter;
             }),
             player,
