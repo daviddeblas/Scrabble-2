@@ -31,6 +31,7 @@ describe('PlayerService', () => {
                 board[i][j] = null;
             }
         }
+        board[1][1] = 'A';
 
         socketService = new SocketTestHelper();
         const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [] };
@@ -78,6 +79,16 @@ describe('PlayerService', () => {
         expect(sendSpy).toHaveBeenCalled();
     });
 
+    it('placeWord should call setUpBoardWithWord if the placement is acceptable with a letter already in place', () => {
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        const sendSpy = spyOn(service, 'setUpBoardWithWord');
+        position = 'a2v';
+        service.placeWord(position, word);
+        expect(sendSpy).toHaveBeenCalled();
+    });
+
     it('placeWord should call setUpBoardWithWord if the placement is acceptable without direction', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
@@ -93,7 +104,7 @@ describe('PlayerService', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        position = 'b2';
+        position = 'c3';
         service.placeWord(position, word);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
@@ -245,5 +256,15 @@ describe('PlayerService', () => {
         service.setUpBoardWithWord(position, direction, word);
         const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('letterOnBoard should return a string if a letter exists on the board at the given position', () => {
+        const letterAPosition = 1;
+        expect(service.letterOnBoard(letterAPosition, letterAPosition)).toEqual('a');
+    });
+
+    it('letterOnBoard should return a undefined if a letter does not exists on the board at the given position', () => {
+        const noLetterPosition = 9;
+        expect(service.letterOnBoard(noLetterPosition, noLetterPosition)).toBeUndefined();
     });
 });

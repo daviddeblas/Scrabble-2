@@ -104,13 +104,27 @@ describe('ChatService', () => {
         }, RESPONSE_TIME);
     });
 
-    it('acceptNewAction should be able to receive error and dispatch "[Game Status] Get Game"', (done) => {
+    it('acceptNewAction should be able to receive error and dispatch "[Game Status] Get Game" if it is not a invalid word error', (done) => {
         const errorMessage = 'Bad command';
         service.acceptNewAction();
         socketHelper.peerSideEmit('error', errorMessage);
         setTimeout(() => {
             const expectedAction = cold('a', { a: getGameStatus() });
             expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message" and not "[Game Status] Get Game"', (done) => {
+        const errorMessage = 'This letter placement creates an invalid word';
+        const expectedMessage = { username: '', message: errorMessage, errorName: 'Error' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('error', errorMessage);
+        const dispatchSpy = spyOn(service['store'], 'dispatch');
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            expect(dispatchSpy).not.toHaveBeenCalledWith(getGameStatus());
             done();
         }, RESPONSE_TIME);
     });
