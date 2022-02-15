@@ -230,7 +230,7 @@ export class Room {
         for (let i = 0; i < args[1].length; i++) {
             while (this.game?.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
             placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
-            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push(i);
+            if (/^[A-Z]*$/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);
         }
         return [placableLetters, blanks];
