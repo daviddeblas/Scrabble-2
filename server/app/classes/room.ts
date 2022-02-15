@@ -80,6 +80,7 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             this.setupSocket(socket, index);
         });
+        this.initTimer();
     }
 
     initSurrenderGame(): void {
@@ -124,7 +125,6 @@ export class Room {
             socket.emit('game status', this.gameStatusGetter(playerNumber));
         });
         socket.on('command', (command) => this.onCommand(socket, command, playerNumber));
-        this.initTimer();
     }
 
     private onCommand(socket: io.Socket, command: string, playerNumber: number) {
@@ -149,11 +149,10 @@ export class Room {
     }
 
     private initTimer(): void {
-        this.currentTimer = setTimeout(this.actionAfterTimeout(), this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        this.currentTimer = setTimeout(this.actionAfterTimeout(this), this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
-    private actionAfterTimeout(): () => void {
-        const self = this;
+    private actionAfterTimeout(self: Room): () => void {
         const game = self.game as Game;
         return () => {
             self.processSkip([], game.activePlayer as number);
