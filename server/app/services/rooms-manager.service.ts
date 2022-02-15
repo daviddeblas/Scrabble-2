@@ -7,13 +7,16 @@ import { Service } from 'typedi';
 @Service()
 export class RoomsManager {
     rooms: Room[] = [];
+    joiningSockets: io.Socket[] = [];
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('create room', (options) => {
             socket.emit('create room success', this.createRoom(socket, options));
         });
+
         socket.on('request list', () => {
-            socket.emit('get list', this.getAvailableRooms());
+            this.joiningSockets.push(socket);
+            this.sendAvailableRooms(socket);
         });
 
         socket.on('join room', (data) => {
@@ -25,28 +28,31 @@ export class RoomsManager {
     createRoom(socket: io.Socket, options: GameOptions): RoomInfo {
         const newRoom = new Room(socket, this, options);
         this.rooms.push(newRoom);
+        this.notifyAvailableRoomsChange();
         return newRoom.getRoomInfo();
     }
 
     removeRoom(room: Room): void {
         this.rooms.splice(this.rooms.indexOf(room), 1);
+        this.notifyAvailableRoomsChange();
     }
 
     joinRoom(roomId: string, socket: io.Socket, name: string): void {
-        const room = this.rooms.find((r) => r.getRoomInfo().roomId === roomId);
+        const room = this.getRoom(roomId);
         if (room) {
             room.join(socket, name);
-        } else {
-            throw new Error('Game not found');
-        }
+        } else throw new Error('Game not found');
     }
 
     getRooms(): RoomInfo[] {
         return this.rooms.map((r) => r.getRoomInfo());
     }
 
-    getAvailableRooms(): RoomInfo[] {
-        return this.rooms.filter((r) => r.game === null).map((r) => r.getRoomInfo());
+    sendAvailableRooms(socket: io.Socket) {
+        socket.emit(
+            'get list',
+            this.rooms.filter((r) => r.game === null).map((r) => r.getRoomInfo()),
+        );
     }
 
     switchPlayerSocket(oldSocket: io.Socket, newSocket: io.Socket): void {
@@ -63,6 +69,14 @@ export class RoomsManager {
     }
 
     getRoom(playerServerId: string): Room | undefined {
-        return this.rooms.find((r) => r.host.id === playerServerId || r.clients[0]?.id === playerServerId);
+        return this.rooms.find((r) => r.getRoomInfo().roomId === playerServerId || r.clients[0]?.id === playerServerId);
+    }
+
+    notifyAvailableRoomsChange() {
+        this.joiningSockets.forEach((socket) => this.sendAvailableRooms(socket));
+    }
+
+    removeSocketFromJoiningList(clientSocket: io.Socket) {
+        this.joiningSockets.splice(this.joiningSockets.indexOf(clientSocket), 1);
     }
 }

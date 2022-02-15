@@ -2,6 +2,8 @@ import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { createAction, props } from '@ngrx/store';
 
+export const resetRoomState = createAction('[Room] Reset Room State');
+
 // Host
 export const createRoom = createAction('[Room] Create Room', props<{ gameOptions: GameOptions }>());
 export const createRoomSuccess = createAction('[Room] Create Room Success', props<{ roomInfo: RoomInfo }>());
@@ -11,6 +13,7 @@ export const closeRoom = createAction('[Room] Close Room');
 export const joinInviteReceived = createAction('[Room] Join Invite Received', props<{ playerName: string }>());
 export const acceptInvite = createAction('[Room] Accept Invite');
 export const refuseInvite = createAction('[Room] Refuse Invite');
+export const joinInviteCanceled = createAction('[Room] Join Invite Canceled');
 
 // Joiner
 export const loadRooms = createAction('[Room] Load Rooms');

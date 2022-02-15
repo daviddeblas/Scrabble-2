@@ -30,4 +30,8 @@ export class SocketTestHelper {
             callback(params);
         }
     }
+
+    removeAllListeners() {
+        return;
+    }
 }

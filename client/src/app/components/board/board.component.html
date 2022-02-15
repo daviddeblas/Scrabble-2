@@ -31,6 +31,7 @@
     </text>
 
     <g transform="translate(50, 50)">
+        <g app-cell-star [pos]="{ x: (boardSize - 1) / 2, y: (boardSize - 1) / 2 }"></g>
         <ng-container *ngFor="let multipliersColumn of multipliers$ | async; let i = index">
             <ng-container *ngFor="let multiplier of multipliersColumn; let j = index">
                 <g *ngIf="multiplier?.amount === 2 && multiplier?.type === multiplierType.Letter" app-cell-letter-x2 [pos]="{ x: i, y: j }"></g>
