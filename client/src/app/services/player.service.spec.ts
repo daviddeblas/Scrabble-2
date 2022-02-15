@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
+import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { Letter } from '@app/classes/letter';
 import { BOARD_SIZE } from '@app/constants';
@@ -31,6 +31,7 @@ describe('PlayerService', () => {
                 board[i][j] = null;
             }
         }
+        board[1][1] = 'A';
 
         socketService = new SocketTestHelper();
         const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [] };
@@ -78,6 +79,16 @@ describe('PlayerService', () => {
         expect(sendSpy).toHaveBeenCalled();
     });
 
+    it('placeWord should call setUpBoardWithWord if the placement is acceptable with a letter already in place', () => {
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        const sendSpy = spyOn(service, 'setUpBoardWithWord');
+        position = 'a2v';
+        service.placeWord(position, word);
+        expect(sendSpy).toHaveBeenCalled();
+    });
+
     it('placeWord should call setUpBoardWithWord if the placement is acceptable without direction', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
@@ -93,7 +104,7 @@ describe('PlayerService', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        position = 'b2';
+        position = 'c3';
         service.placeWord(position, word);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
@@ -226,9 +237,9 @@ describe('PlayerService', () => {
     });
 
     it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word vertically', () => {
-        position = 'h8';
+        position = 'h9';
         const direction = 'v';
-        word = 'ze';
+        word = 'e';
         board[CENTER_BOARD][CENTER_BOARD] = 'Z';
         board[CENTER_BOARD + 1][CENTER_BOARD] = 'E';
         service.setUpBoardWithWord(position, direction, word);
@@ -237,27 +248,23 @@ describe('PlayerService', () => {
     });
 
     it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word horizontally', () => {
-        position = 'h8';
+        position = 'h9';
         const direction = 'h';
-        word = 'ze';
+        word = 'e';
         board[CENTER_BOARD][CENTER_BOARD] = 'Z';
-        board[CENTER_BOARD][CENTER_BOARD + 1] = 'E';
+        board[CENTER_BOARD + 1][CENTER_BOARD] = 'E';
         service.setUpBoardWithWord(position, direction, word);
         const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    it('setUpBoardWithWord should dispatch syncBoard when error event received ', (done) => {
-        const dispatchSpy = spyOn(service['boardStore'], 'dispatch').and.callThrough();
-        position = 'h8';
-        const direction = 'h';
-        word = 'ze';
-        service.setUpBoardWithWord(position, direction, word);
-        socketService.peerSideEmit('error');
-        const refreshBoardTimer = 3300;
-        setTimeout(() => {
-            expect(dispatchSpy).toHaveBeenCalledWith(syncBoard());
-            done();
-        }, refreshBoardTimer);
+    it('letterOnBoard should return a string if a letter exists on the board at the given position', () => {
+        const letterAPosition = 1;
+        expect(service.letterOnBoard(letterAPosition, letterAPosition)).toEqual('a');
+    });
+
+    it('letterOnBoard should return a undefined if a letter does not exists on the board at the given position', () => {
+        const noLetterPosition = 9;
+        expect(service.letterOnBoard(noLetterPosition, noLetterPosition)).toBeUndefined();
     });
 });

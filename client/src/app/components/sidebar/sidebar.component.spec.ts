@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { Store } from '@ngrx/store';
 import { SidebarComponent } from './sidebar.component';
 
@@ -12,6 +13,7 @@ describe('SidebarComponent', () => {
         store = jasmine.createSpyObj<Store>('store', ['dispatch', 'select']);
 
         await TestBed.configureTestingModule({
+            imports: [AppMaterialModule],
             declarations: [SidebarComponent],
             providers: [
                 {
