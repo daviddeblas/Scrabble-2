@@ -48,6 +48,7 @@ export class Game {
         this.getActivePlayer().score += this.board.place(
             letters,
             blanks.map((b) => b[0]),
+            this.placeCounter === 0,
         );
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(letters.map((l) => l.letter));
