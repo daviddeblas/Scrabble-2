@@ -102,11 +102,12 @@ export class Room {
     }
 
     initChatting(): void {
-        this.host.on('send message', ({ username, message }) => {
-            this.clients[0]?.emit('receive message', { username, message });
-        });
-        this.clients[0]?.on('send message', ({ username, message }) => {
-            this.host.emit('receive message', { username, message });
+        this.sockets.forEach((s, index) => {
+            s.on('send message', ({ username, message }) => {
+                this.sockets.forEach((socket, i) => {
+                    if (i !== index) socket.emit('receive message', { username, message });
+                });
+            });
         });
     }
 
@@ -198,7 +199,7 @@ export class Room {
         const game = this.game as Game;
         game.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
         this.sockets.forEach((s) => {
-            s.emit('place success', { args, username: playerNumber === 0 ? this.gameOptions.hostname : this.clientName });
+            s.emit('place success', { args, username: game.players[playerNumber].name });
         });
     }
 
@@ -206,14 +207,8 @@ export class Room {
         const game = this.game as Game;
         if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
         game.draw(stringToLetters(args[0]), playerNumber);
-        const username = playerNumber === 0 ? this.gameOptions.hostname : this.clientName;
-        this.sockets.forEach((s, i) => {
-            if (i === playerNumber) s.emit('draw success', { letters: args[0], username });
-            else
-                s.emit('draw success', {
-                    letters: args[0].split('').map(() => '#'),
-                    username,
-                });
+        this.sockets.forEach((s) => {
+            s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
         });
     }
 
@@ -222,7 +217,7 @@ export class Room {
         if (args.length > 0) throw new Error('malformed argument for pass');
         game.skip(playerNumber);
         this.sockets.forEach((s) => {
-            s.emit('skip success', playerNumber === 0 ? this.gameOptions.hostname : this.clientName);
+            s.emit('skip success', game.players[playerNumber].name);
         });
     }
 
