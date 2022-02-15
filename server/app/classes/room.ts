@@ -120,7 +120,7 @@ export class Room {
             } catch (error) {
                 const delayForInvalidWord = 3000;
                 socket.emit('error', (error as Error).message);
-                if (error === GameErrorType.InvalidWord) {
+                if (error.message === GameErrorType.InvalidWord) {
                     clearTimeout(this.currentTimer);
                     setTimeout(() => {
                         this.postCommand();
