@@ -46,6 +46,7 @@
             *ngFor="let letter of board$ | async | boardToList"
             app-letter
             [pos]="letter.position"
+            [letter]="letter.letter"
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
         ></g>
     </g>

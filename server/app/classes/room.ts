@@ -215,7 +215,7 @@ export class Room {
 
     private parsePlaceCall(args: string[]): [PlacedLetter[], number[]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
+        const positionNumber = (args[0].match(/\d+/) as RegExpMatchArray)[0];
         const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
         const yPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
 

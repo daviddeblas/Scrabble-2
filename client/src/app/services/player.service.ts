@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
+import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { exchangeLettersSuccess } from '@app/actions/player.actions';
 import { Letter, stringToLetters } from '@app/classes/letter';
@@ -9,7 +9,6 @@ import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { SocketClientService } from './socket-client.service';
 
-const WORD_VALIDATION_DELAY = 3000;
 @Injectable({
     providedIn: 'root',
 })
@@ -33,7 +32,29 @@ export class PlayerService {
 
     placeWord(position: string, letters: string): void {
         const command = 'placer';
+        let lettersToPlace = '';
+        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], 10) - 1;
+        let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
         if (!this.lettersInEasel(letters)) return;
+        let letterPlaced = 0;
+        if (letters.length > 1) {
+            while (letterPlaced < letters.length) {
+                const letter = this.letterOnBoard(column, line);
+                if (letter) {
+                    lettersToPlace += letter;
+                } else {
+                    lettersToPlace += letters[letterPlaced].toLowerCase();
+                    letterPlaced++;
+                }
+                if (position.slice(POSITION_LAST_CHAR) === 'h') {
+                    column += 1;
+                } else {
+                    line += 1;
+                }
+            }
+        } else {
+            lettersToPlace = letters;
+        }
         let boardPosition: string;
         let direction: string;
         if (/^[vh]$/.test(position.slice(POSITION_LAST_CHAR))) {
@@ -41,23 +62,18 @@ export class PlayerService {
             direction = position.slice(POSITION_LAST_CHAR);
         } else {
             boardPosition = position;
-            direction = '';
+            direction = 'h';
         }
-        if (!this.wordPlacementCorrect(boardPosition, direction, letters)) {
+        if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
             this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
             return;
         }
-        this.setUpBoardWithWord(boardPosition, direction, letters);
+        this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
         this.playerStore.dispatch(exchangeLettersSuccess({ oldLetters: stringToLetters(letters), newLetters: [] }));
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
     }
 
     setUpBoardWithWord(position: string, direction: string, letters: string): void {
-        this.socketService.on('error', () => {
-            setTimeout(() => {
-                this.boardStore.dispatch(syncBoard());
-            }, WORD_VALIDATION_DELAY);
-        });
         let board: (Letter | null)[][] = [];
         this.boardStore.select('board').subscribe((us) => (board = us.board));
         const word = stringToLetters(letters);
@@ -68,10 +84,10 @@ export class PlayerService {
         for (let i = directionValue; i < word.length + directionValue; ++i) {
             switch (direction) {
                 case 'h':
-                    tempBoard[line][i] = word[i - directionValue];
+                    tempBoard[i][line] = word[i - directionValue];
                     break;
                 case 'v':
-                    tempBoard[i][column] = word[i - directionValue];
+                    tempBoard[column][i] = word[i - directionValue];
                     break;
             }
         }
@@ -99,6 +115,12 @@ export class PlayerService {
         return true;
     }
 
+    letterOnBoard(column: number, line: number): string | undefined {
+        let board: (Letter | null)[][] = [];
+        this.boardStore.select('board').subscribe((us) => (board = us.board));
+        return board[column][line]?.toString().toLowerCase();
+    }
+
     wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
         const column = parseInt(position.slice(1, position.length), 10) - 1;
         const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
@@ -107,11 +129,11 @@ export class PlayerService {
         this.boardStore.select('board').subscribe((us) => (board = us.board));
         for (let i = 0; i < letters.length; ++i) {
             if (direction === 'h') {
-                isPlacable ||= this.checkNearSpaces(line, column + i, board);
+                isPlacable ||= this.checkNearSpaces(column + i, line, board);
             } else {
-                isPlacable ||= this.checkNearSpaces(line + i, column, board);
+                isPlacable ||= this.checkNearSpaces(column, line + i, board);
             }
-            const letterBoard = direction === 'h' ? board[line][column + i] : board[line + i][column];
+            const letterBoard = direction === 'h' ? board[column + i][line] : board[column][line + i];
             if (letterBoard !== null) {
                 if (letterBoard.toString() !== letters[i].toUpperCase()) {
                     return false;
@@ -129,10 +151,10 @@ export class PlayerService {
         if (board[center][center] === null) {
             return column === center && line === center;
         }
-        if (column < BOARD_SIZE - 1) isPlacable ||= board[line][column + 1] != null;
-        if (line < BOARD_SIZE - 1) isPlacable ||= board[line + 1][column] != null;
-        if (column > 0) isPlacable ||= board[line][column - 1] != null;
-        if (line > 0) isPlacable ||= board[line - 1][column] != null;
+        if (column < BOARD_SIZE - 1) isPlacable ||= board[column + 1][line] != null;
+        if (line < BOARD_SIZE - 1) isPlacable ||= board[column][line + 1] != null;
+        if (column > 0) isPlacable ||= board[column - 1][line] != null;
+        if (line > 0) isPlacable ||= board[column][line - 1] != null;
         return isPlacable;
     }
 }

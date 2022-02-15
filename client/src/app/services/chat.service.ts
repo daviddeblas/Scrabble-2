@@ -39,6 +39,9 @@ export class ChatService {
         this.socketService.on('error', (errorMessage: string) => {
             const chatMessage = { username: '', message: errorMessage, errorName: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
+            if (errorMessage !== 'This letter placement creates an invalid word') {
+                this.store.dispatch(getGameStatus());
+            }
         });
     }
 
@@ -100,7 +103,7 @@ export class ChatService {
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
-        const columnNumber = parseInt(command[1].replace(/^\D+/g, ''), 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
