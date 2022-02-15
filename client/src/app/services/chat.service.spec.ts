@@ -104,13 +104,12 @@ describe('ChatService', () => {
         }, RESPONSE_TIME);
     });
 
-    it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message"', (done) => {
+    it('acceptNewAction should be able to receive error and dispatch "[Game Status] Get Game"', (done) => {
         const errorMessage = 'Bad command';
-        const expectedMessage: ChatMessage = { username: '', message: errorMessage, errorName: 'Error' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('error', errorMessage);
         setTimeout(() => {
-            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            const expectedAction = cold('a', { a: getGameStatus() });
             expect(store.scannedActions$).toBeObservable(expectedAction);
             done();
         }, RESPONSE_TIME);
@@ -149,6 +148,8 @@ describe('ChatService', () => {
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command placer is not valid', () => {
         const exampleMessage = '!placer nfpe ,z4,e';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(service as any, 'validatePlaceCommand').and.callFake(() => false);
         service.messageWritten(username, exampleMessage);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
