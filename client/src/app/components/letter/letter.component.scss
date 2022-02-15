@@ -1,6 +1,5 @@
 .letter {
     text-anchor: middle;
-    dominant-baseline: middle;
     fill: black;
     font-size: 1.5em;
     font-weight: bold;
@@ -9,5 +8,5 @@
 .value {
     text-anchor: end;
     fill: black;
-    font-size: 1rem;
+    font-size: min(1em, 1.1rem);
 }
