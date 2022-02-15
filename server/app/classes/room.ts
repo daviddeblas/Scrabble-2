@@ -5,6 +5,7 @@ import Container from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { Game } from './game/game';
+import { Letter } from './letter';
 import { RoomInfo } from './room-info';
 
 export class Room {
@@ -75,11 +76,15 @@ export class Room {
             socket.on('get game status', () => {
                 const game = this.game as Game;
                 const opponent = { ...game.players[(index + 1) % 2] };
-                opponent.easel = [];
+                opponent.easel = opponent.easel.map(() => '*' as Letter);
                 socket.emit('game status', {
                     status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
                     players: { player: game.players[index], opponent },
-                    board: { board: game.board.board, pointsPerLetter: game.board.pointsPerLetter, multipliers: game.board.multipliers },
+                    board: {
+                        board: game.board.board,
+                        pointsPerLetter: Array.from(game.board.pointsPerLetter),
+                        multipliers: game.board.multipliers,
+                    },
                 });
             });
         });
