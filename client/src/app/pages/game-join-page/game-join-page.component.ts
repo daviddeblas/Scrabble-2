@@ -17,8 +17,6 @@ export const forbiddenNameValidator = (name: string) => {
     };
 };
 
-const STEPPER_WAIT = 100;
-
 @Component({
     selector: 'app-game-join-page',
     templateUrl: './game-join-page.component.html',
@@ -62,7 +60,7 @@ export class GameJoinPageComponent implements OnDestroy {
         this.selectedRoom = roomInfo;
         this.setupNameValidators(roomInfo.gameOptions.hostname);
         setTimeout(() => {
-            this.stepper.next(), STEPPER_WAIT;
+            this.stepper.next();
         });
     }
 
@@ -104,6 +102,6 @@ export class GameJoinPageComponent implements OnDestroy {
     }
 
     onStepChange() {
-        if (this.stepper.selected?.editable) this.cancelJoin();
+        if (!this.stepper.selected?.editable) this.cancelJoin();
     }
 }
