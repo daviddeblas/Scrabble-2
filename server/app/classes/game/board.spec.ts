@@ -91,6 +91,11 @@ describe('board', () => {
         expect(() => board.place(lettersToPlace, [], true)).to.throw();
     });
 
+    it('place throws on invalid input', () => {
+        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        expect(() => board.place(lettersToPlace, [], false)).to.throw();
+    });
+
     it('place should add a blank to the blanks field', () => {
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.place(lettersToPlace, [1], true);
