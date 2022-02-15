@@ -113,30 +113,40 @@ export class Room {
         socket.on('get game status', () => {
             socket.emit('game status', this.gameStatusGetter(playerNumber));
         });
-        socket.on('command', (command) => {
-            try {
-                this.processCommand(command, playerNumber);
-                this.postCommand();
-            } catch (error) {
-                const delayForInvalidWord = 3000;
-                socket.emit('error', (error as Error).message);
-                if (error.message === GameErrorType.InvalidWord) {
-                    clearTimeout(this.currentTimer);
-                    setTimeout(() => {
-                        this.postCommand();
-                    }, delayForInvalidWord);
-                }
-            }
-            if (this.game?.gameEnded()) {
-                this.sockets.forEach((s) => {
-                    s.emit('end game', this.game?.endGame());
-                });
-            }
-        });
+        socket.on('command', (command) => this.onCommand(socket, command, playerNumber));
+        this.initTimer();
+    }
+
+    private onCommand(socket: io.Socket, command: string, playerNumber: number) {
+        try {
+            this.processCommand(command, playerNumber);
+            this.postCommand();
+        } catch (error) {
+            this.errorOnCommand(socket, error);
+        }
+        if (this.game?.gameEnded()) {
+            this.sockets.forEach((s) => {
+                s.emit('end game', this.game?.endGame());
+            });
+        }
+    }
+
+    private initTimer(): void {
         this.currentTimer = setTimeout(() => {
             this.processSkip([], this.game?.activePlayer as number);
             this.postCommand();
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+    }
+
+    private errorOnCommand(socket: io.Socket, error: Error): void {
+        const delayForInvalidWord = 3000;
+        socket.emit('error', (error as Error).message);
+        if (error.message === GameErrorType.InvalidWord) {
+            clearTimeout(this.currentTimer);
+            setTimeout(() => {
+                this.postCommand();
+            }, delayForInvalidWord);
+        }
     }
 
     private postCommand(): void {
