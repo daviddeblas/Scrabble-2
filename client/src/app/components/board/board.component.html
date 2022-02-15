@@ -44,11 +44,12 @@
 
     <g transform="translate(50, 50)" style="font-size: 20px" [style.font-size]="(localSettings$ | async)?.zoom + 'em'">
         <g
-            *ngFor="let letter of board$ | async | boardToList"
+            *ngFor="let letter of boardState$ | async | boardToList"
             app-letter
             [pos]="letter.position"
             [letter]="letter.letter"
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
+            [blank]="letter.blank"
         ></g>
     </g>
 </svg>
