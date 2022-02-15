@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { messageWritten } from '@app/actions/chat.actions';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { SkipTurnButtonComponent } from './skip-turn-button.component';
@@ -12,6 +13,7 @@ describe('SkipTurnButtonComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SkipTurnButtonComponent],
+            imports: [AppMaterialModule],
             providers: [provideMockStore()],
         }).compileComponents();
 
