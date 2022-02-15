@@ -11,11 +11,16 @@ export class BrowserService {
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('closed browser', (userId) => {
+            const room = this.roomsManager.getRoom(socket.id);
+            if (room?.game === null) {
+                room?.quitRoomHost();
+                return;
+            }
+
             this.tempClientSocketId = userId;
             this.tempServerSocket = socket;
             const maxTimeForReload = 5000;
             this.timeoutId = setTimeout(() => {
-                const room = this.roomsManager.getRoom(socket.id);
                 room?.surrenderGame(socket.id);
             }, maxTimeForReload);
         });
