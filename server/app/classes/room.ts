@@ -124,11 +124,16 @@ export class Room {
         } catch (error) {
             this.errorOnCommand(socket, error);
         }
-        if (this.game?.gameEnded()) {
-            this.sockets.forEach((s) => {
-                s.emit('end game', this.game?.endGame());
-            });
+        if (this.game?.needsToEnd()) {
+            this.endGame();
         }
+    }
+
+    private endGame(): void {
+        this.sockets.forEach((s) => {
+            s.emit('end game', this.game?.endGame());
+        });
+        clearTimeout(this.currentTimer);
     }
 
     private initTimer(): void {
@@ -159,6 +164,7 @@ export class Room {
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
+        if (this.game?.gameFinished) throw new Error('game is finished');
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
             case 'placer':

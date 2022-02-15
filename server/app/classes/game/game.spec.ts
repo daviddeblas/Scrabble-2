@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { Letter, stringToLetters } from '@app/classes/letter';
+import { BLANK_LETTER, Letter, stringToLetters } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
@@ -10,9 +10,11 @@ import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game'
 
 describe('game', () => {
     let game: Game;
+    let activePlayer: number;
 
     beforeEach(() => {
         game = new Game(Container.get(GameConfigService).configs.configs[0], ['player 1', 'player 2']);
+        activePlayer = game.activePlayer;
     });
 
     it('constructor', () => {
@@ -27,7 +29,6 @@ describe('game', () => {
     });
 
     it('place should score according to scorePositions on correct placement', () => {
-        const activePlayer = game.activePlayer;
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
         // put letters in player easel so placement is possible
@@ -53,9 +54,53 @@ describe('game', () => {
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
+    it('place should score according to scorePositions on correct placement with a blank letter', () => {
+        const lettersToPlace: Letter[] = ['C', 'O', 'N'];
+
+        // put letters in player easel so placement is possible
+        lettersToPlace.slice(1, 3).forEach((l) => {
+            game['getActivePlayer']().easel.push(l);
+        });
+
+        game['getActivePlayer']().easel.push(BLANK_LETTER);
+
+        expect(() => {
+            // place 'con' across in the middle
+            game.place(
+                lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
+                [0],
+                game.activePlayer,
+            );
+        }).to.not.throw();
+
+        const thisPlayerScore = game.players[activePlayer].score;
+        const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
+        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
+        expect(thisPlayerScore).to.eq(expectedPoints);
+
+        // this is no longer this players turn
+        expect(game.activePlayer).to.not.eq(activePlayer);
+    });
+
+    it('place should throw on correct placement as second placement if not connected to other words', () => {
+        const lettersToPlace: Letter[] = ['C', 'O', 'N'];
+        game.placeCounter = 1;
+        // put letters in player easel so placement is possible
+        lettersToPlace.forEach((l) => {
+            game['getActivePlayer']().easel.push(l);
+        });
+
+        expect(() => {
+            // place 'con' across in the middle
+            game.place(
+                lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
+                [],
+                game.activePlayer,
+            );
+        }).to.throw();
+    });
     // eslint-disable-next-line max-len
     it('place should score according to scorePositions added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
-        const activePlayer = game.activePlayer;
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
 
@@ -73,9 +118,7 @@ describe('game', () => {
 
     // eslint-disable-next-line max-len
     it('place should score according to scorePositions added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
-        const activePlayer = game.activePlayer;
         game.players[activePlayer].easel = stringToLetters('aa');
-        game.placeCounter = 0;
         const oldEasel = [...game.players[activePlayer].easel];
         game.bag.letters = [];
         game.place(
@@ -98,7 +141,6 @@ describe('game', () => {
     });
 
     it('place should throw if initial place is not in the center', () => {
-        const activePlayer = game.activePlayer;
         game.players[activePlayer].easel = stringToLetters('aa');
         const oldEasel = [...game.players[activePlayer].easel];
         expect(() => {
@@ -133,20 +175,25 @@ describe('game', () => {
     });
 
     it('gameEnded should be true when one players easel is empty', () => {
-        expect(game.gameEnded()).to.eq(false);
+        expect(game.needsToEnd()).to.eq(false);
 
         game.bag.letters = [];
         game.players[0].easel = [];
 
-        expect(game.gameEnded()).to.eq(true);
+        expect(game.needsToEnd()).to.eq(true);
     });
 
-    it('gameEnded should be true when exceeding MAX_TURNS_SKIPPED', () => {
-        expect(game.gameEnded()).to.eq(false);
+    it('needsToEnd should be true when exceeding MAX_TURNS_SKIPPED', () => {
+        expect(game.needsToEnd()).to.eq(false);
 
         game.turnsSkipped = 10;
 
-        expect(game.gameEnded()).to.eq(true);
+        expect(game.needsToEnd()).to.eq(true);
+    });
+
+    it('needsToEnd should return false if the game is finished', () => {
+        game.gameFinished = true;
+        expect(game.needsToEnd()).to.eq(false);
     });
 
     it('endGame should always return the same as getGameEndStatus', () => {

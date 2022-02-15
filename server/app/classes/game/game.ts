@@ -19,6 +19,7 @@ export class Game {
     bag: Bag;
     turnsSkipped: number;
     placeCounter: number;
+    gameFinished: boolean;
 
     constructor(public config: GameConfig, playerNames: string[]) {
         this.bag = new Bag(config);
@@ -29,6 +30,7 @@ export class Game {
         this.turnsSkipped = 0;
         this.players.forEach((p) => p.addLetters(this.bag.getLetters(MAX_LETTERS_IN_EASEL)));
         this.placeCounter = 0;
+        this.gameFinished = false;
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): void {
@@ -47,7 +49,7 @@ export class Game {
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);
         this.getActivePlayer().addLetters(this.bag.getLetters(letters.length));
-        if (this.gameEnded()) this.getActivePlayer().score += this.endGameBonus();
+        if (this.needsToEnd()) this.getActivePlayer().score += this.endGameBonus();
         this.nextTurn();
         this.turnsSkipped = 0;
         this.placeCounter++;
@@ -68,7 +70,8 @@ export class Game {
         this.turnsSkipped++;
     }
 
-    gameEnded(): boolean {
+    needsToEnd(): boolean {
+        if (this.gameFinished) return false;
         if (this.turnsSkipped >= MAX_TURNS_SKIPPED) return true;
         if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) return true;
         return false;
@@ -76,6 +79,7 @@ export class Game {
 
     endGame(): GameFinishStatus {
         this.endGameScoreAdjustment();
+        this.gameFinished = true;
         return this.getGameEndStatus();
     }
 
