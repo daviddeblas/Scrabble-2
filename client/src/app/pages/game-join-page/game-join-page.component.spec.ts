@@ -1,3 +1,4 @@
+import { CdkStep } from '@angular/cdk/stepper';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -13,9 +14,11 @@ describe('GameJoinPageComponent', () => {
     let component: GameJoinPageComponent;
     let fixture: ComponentFixture<GameJoinPageComponent>;
     let store: MockStore;
-    let stepperMock: jasmine.SpyObj<MatStepper>;
+    const stepperMock: jasmine.SpyObj<MatStepper> = jasmine.createSpyObj<MatStepper>('stepper', ['next', 'reset']);
 
     const roomInfoStub: RoomInfo = { roomId: 'id', gameOptions: { dictionaryType: 'dict', hostname: 'host', timePerRound: 60 } };
+
+    const FIXTURE_COOLDOWN = 10;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -36,7 +39,12 @@ describe('GameJoinPageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameJoinPageComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        component.stepper = stepperMock;
+        setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
+    });
+
+    afterEach(() => {
+        component.selectedRoom = undefined;
     });
 
     it('should create', () => {
@@ -53,7 +61,7 @@ describe('GameJoinPageComponent', () => {
         expect(component.selectedRoom).toBe(roomInfoStub);
     });
 
-    it('joinRoom should dispatch "[Room] Join Room" with the selected room and disable the name field', () => {
+    it('joinRoom should dispatch "[Room] Join Room" with the selected room', () => {
         component.selectRoom(roomInfoStub);
         const username = 'username';
         component.formGroup.controls.name.setValue(username);
@@ -62,8 +70,6 @@ describe('GameJoinPageComponent', () => {
 
         const expectedAction = cold('a', { a: joinRoom({ playerName: username, roomInfo: roomInfoStub }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
-
-        expect(component.formGroup.controls.name.enabled).toBeFalsy();
     });
 
     it('joinRoom should not dispatch "[Room] Join Room" if the selected room is undefined', () => {
@@ -78,8 +84,6 @@ describe('GameJoinPageComponent', () => {
     it('cancelJoin should dispatch "[Room] Cancel Join Room", unselect the room and reenable the name field', () => {
         component.selectRoom(roomInfoStub);
         component.formGroup.controls.name.disable();
-        stepperMock = jasmine.createSpyObj<MatStepper>('Stepper', ['reset']);
-        component.stepper = stepperMock;
 
         component.cancelJoin();
 
@@ -116,5 +120,21 @@ describe('GameJoinPageComponent', () => {
 
         nameControl.setValue('a new player');
         expect(customValidator(nameControl)).toBeNull();
+    });
+
+    it('onStepChange should closeRoom if stepper is selecting the first page', () => {
+        let stepper = { selected: { editable: true } as CdkStep } as MatStepper;
+        component.stepper = stepper;
+
+        const spyOnCloseRoom = spyOn(component, 'cancelJoin');
+
+        component.onStepChange();
+        expect(spyOnCloseRoom).not.toHaveBeenCalled();
+
+        stepper = { selected: { editable: false } as CdkStep } as MatStepper;
+        component.stepper = stepper;
+
+        component.onStepChange();
+        expect(spyOnCloseRoom).toHaveBeenCalled();
     });
 });

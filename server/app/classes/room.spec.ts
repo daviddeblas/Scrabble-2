@@ -57,10 +57,11 @@ describe('room', () => {
             expect(room.clients[0]).to.deep.equal(null);
         });
 
-        it('quitRoomClient should call RoomsManager.removeRoom', (done) => {
-            roomsManager.removeRoom.callsFake(() => done());
+        it('quitRoomClient should call RoomsManager.removeRoom', () => {
             const room = new Room(socket, roomsManager, gameOptions);
+            room.clients[0] = socket;
             room.quitRoomClient();
+            expect(room.clients[0]).to.equal(null);
         });
 
         it('join should add the client to the clients list', () => {
@@ -325,7 +326,7 @@ describe('room', () => {
                     });
                 });
                 hostSocket.on('player joining', () => {
-                    clientSocket.emit('quit');
+                    clientSocket.emit('cancel join room');
                 });
                 hostSocket.emit('create room');
             });

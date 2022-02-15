@@ -30,16 +30,30 @@ export class Room {
         const client = socket;
         this.host.once('accept', () => this.inviteAccepted(client));
         this.host.once('refuse', () => this.inviteRefused(client));
-        client.once('quit', () => this.quitRoomClient());
+        client.once('cancel join room', () => this.quitRoomClient());
     }
 
     quitRoomHost(): void {
+        if (this.clients[0]) this.inviteRefused(this.clients[0]);
         this.manager.removeRoom(this);
+        this.manager.notifyAvailableRoomsChange();
     }
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initiateRoomEvents();
+    }
+
+    inviteRefused(client: io.Socket): void {
+        client.emit('refused');
+        this.clients[0] = null;
+        this.clientName = null;
+    }
+
+    quitRoomClient(): void {
+        this.host.emit('player joining cancel');
+        this.clients[0] = null;
+        this.clientName = null;
     }
 
     initiateRoomEvents() {
@@ -50,9 +64,14 @@ export class Room {
 
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
+
         this.game = new Game(Container.get(GameConfigService).configs.configs[0], [this.gameOptions.hostname, this.clientName as string]);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
+
+        this.manager.removeSocketFromJoiningList(this.sockets[1]);
+        this.manager.notifyAvailableRoomsChange();
+
         this.sockets.forEach((socket, index) => {
             socket.on('get game status', () => {
                 const game = this.game as Game;
@@ -97,16 +116,6 @@ export class Room {
         this.clients[0]?.on('send message', ({ username, message }) => {
             this.host.emit('receive message', { username, message });
         });
-    }
-
-    inviteRefused(client: io.Socket): void {
-        client.emit('refused');
-        this.clients[0] = null;
-        this.clientName = null;
-    }
-
-    quitRoomClient(): void {
-        this.manager.removeRoom(this);
     }
 
     getRoomInfo(): RoomInfo {
