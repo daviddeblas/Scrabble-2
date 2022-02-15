@@ -106,7 +106,7 @@ describe('PlayerService', () => {
         });
         position = 'c3';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
