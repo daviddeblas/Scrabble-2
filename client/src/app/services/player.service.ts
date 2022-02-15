@@ -53,7 +53,7 @@ export class PlayerService {
                 }
             }
         } else {
-            lettersToPlace = letters;
+            lettersToPlace = letters.toLowerCase();
         }
         let boardPosition: string;
         let direction: string;
