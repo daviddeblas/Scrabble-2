@@ -32,6 +32,7 @@ export class SocketClientService implements OnDestroy {
     }
 
     on<T>(event: string, action: (data: T) => void): void {
+        this.socket.removeAllListeners(event);
         this.socket.on(event, action);
     }
 
