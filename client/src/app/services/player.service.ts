@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { syncBoard, syncBoardSuccess } from '@app/actions/board.actions';
+import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { exchangeLettersSuccess } from '@app/actions/player.actions';
 import { Letter, stringToLetters } from '@app/classes/letter';
@@ -9,7 +9,6 @@ import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { SocketClientService } from './socket-client.service';
 
-const WORD_VALIDATION_DELAY = 3000;
 @Injectable({
     providedIn: 'root',
 })
@@ -34,21 +33,28 @@ export class PlayerService {
     placeWord(position: string, letters: string): void {
         const command = 'placer';
         let lettersToPlace = '';
-        let column = parseInt(position.slice(1, position.length), 10) - 1;
+        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], 10) - 1;
         let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
+        if (!this.lettersInEasel(letters)) return;
+        let letterPlaced = 0;
         if (letters.length > 1) {
-            for (const letter of letters) {
-                if (!this.letterOnBoard(letter, column, line)) {
+            while (letterPlaced < letters.length) {
+                const letter = this.letterOnBoard(column, line);
+                if (letter) {
                     lettersToPlace += letter;
+                } else {
+                    lettersToPlace += letters[letterPlaced].toLowerCase();
+                    letterPlaced++;
+                }
+                if (position.slice(POSITION_LAST_CHAR) === 'h') {
+                    column += 1;
+                } else {
+                    line += 1;
                 }
             }
-            if (position.slice(POSITION_LAST_CHAR) === 'h') {
-                column += 1;
-            } else {
-                line += 1;
-            }
+        } else {
+            lettersToPlace = letters;
         }
-        if (!this.lettersInEasel(lettersToPlace)) return;
         let boardPosition: string;
         let direction: string;
         if (/^[vh]$/.test(position.slice(POSITION_LAST_CHAR))) {
@@ -56,23 +62,18 @@ export class PlayerService {
             direction = position.slice(POSITION_LAST_CHAR);
         } else {
             boardPosition = position;
-            direction = '';
+            direction = 'h';
         }
-        if (!this.wordPlacementCorrect(boardPosition, direction, letters)) {
+        if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
             this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
             return;
         }
-        this.setUpBoardWithWord(boardPosition, direction, letters);
+        this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
         this.playerStore.dispatch(exchangeLettersSuccess({ oldLetters: stringToLetters(letters), newLetters: [] }));
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
     }
 
     setUpBoardWithWord(position: string, direction: string, letters: string): void {
-        this.socketService.on('error', () => {
-            setTimeout(() => {
-                this.boardStore.dispatch(syncBoard());
-            }, WORD_VALIDATION_DELAY);
-        });
         let board: (Letter | null)[][] = [];
         this.boardStore.select('board').subscribe((us) => (board = us.board));
         const word = stringToLetters(letters);
@@ -114,10 +115,10 @@ export class PlayerService {
         return true;
     }
 
-    letterOnBoard(letter: string, column: number, line: number) {
+    letterOnBoard(column: number, line: number): string | undefined {
         let board: (Letter | null)[][] = [];
         this.boardStore.select('board').subscribe((us) => (board = us.board));
-        return board[column][line] === letter.toUpperCase();
+        return board[column][line]?.toString().toLowerCase();
     }
 
     wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
