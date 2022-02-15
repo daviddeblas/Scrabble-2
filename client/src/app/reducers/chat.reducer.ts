@@ -8,6 +8,6 @@ export const initialState: ChatMessage[] = [];
 
 export const reducer = createReducer(
     initialState,
-    on(chatActions.receivedMessage, (state, { username, message, errorName }) => [...state, { username, message, errorName }]),
+    on(chatActions.receivedMessage, (state, { username, message, messageType }) => [...state, { username, message, messageType }]),
     on(chatActions.restoreMessages, (state, { oldMessages }) => oldMessages),
 );

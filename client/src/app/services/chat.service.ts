@@ -22,22 +22,22 @@ export class ChatService {
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('place success', (data: { args: string[]; username: string }) => {
-            const chatMessage = { username: data.username, message: '!placer ' + data.args.join(' '), errorName: '' };
+            const chatMessage = { username: data.username, message: '!placer ' + data.args.join(' '), messageType: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('draw success', (data: { letters: string; username: string }) => {
-            const chatMessage = { username: data.username, message: '!échanger ' + data.letters, errorName: '' };
+            const chatMessage = { username: data.username, message: '!échanger ' + data.letters, messageType: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('skip success', (username: string) => {
-            const chatMessage = { username, message: '!passer', errorName: '' };
+            const chatMessage = { username, message: '!passer', messageType: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('turn ended', () => {
             this.store.dispatch(getGameStatus());
         });
         this.socketService.on('error', (errorMessage: string) => {
-            const chatMessage = { username: '', message: errorMessage, errorName: 'Error' };
+            const chatMessage = { username: '', message: errorMessage, messageType: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
             if (errorMessage !== 'This letter placement creates an invalid word') {
                 this.store.dispatch(getGameStatus());
@@ -47,7 +47,7 @@ export class ChatService {
 
     messageWritten(username: string, message: string): void {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message, errorName: '' }));
+            this.store.dispatch(receivedMessage({ username, message, messageType: '' }));
             this.broadcastMsg(username, message);
         } else {
             let activePlayer;
@@ -55,7 +55,7 @@ export class ChatService {
                 activePlayer = status.activePlayer;
             });
             if (username !== activePlayer) {
-                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", errorName: 'Error' }));
+                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
                 return;
             }
             const command = message.split(' ');
@@ -64,7 +64,7 @@ export class ChatService {
                     if (this.validatePlaceCommand(command)) {
                         this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
                         return;
                     }
                     break;
@@ -72,7 +72,7 @@ export class ChatService {
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: command[1] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
                         return;
                     }
                     break;
@@ -80,12 +80,12 @@ export class ChatService {
                     if (command.length === 1) {
                         this.handleSkipCommand(command);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }));
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
                         return;
                     }
                     break;
                 default:
-                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }));
+                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
                     return;
             }
         }
