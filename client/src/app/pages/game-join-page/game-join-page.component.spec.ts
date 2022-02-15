@@ -123,7 +123,7 @@ describe('GameJoinPageComponent', () => {
     });
 
     it('onStepChange should closeRoom if stepper is selecting the first page', () => {
-        let stepper = { selected: { editable: false } as CdkStep } as MatStepper;
+        let stepper = { selected: { editable: true } as CdkStep } as MatStepper;
         component.stepper = stepper;
 
         const spyOnCloseRoom = spyOn(component, 'cancelJoin');
@@ -131,7 +131,7 @@ describe('GameJoinPageComponent', () => {
         component.onStepChange();
         expect(spyOnCloseRoom).not.toHaveBeenCalled();
 
-        stepper = { selected: { editable: true } as CdkStep } as MatStepper;
+        stepper = { selected: { editable: false } as CdkStep } as MatStepper;
         component.stepper = stepper;
 
         component.onStepChange();
