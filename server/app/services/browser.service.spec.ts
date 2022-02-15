@@ -91,6 +91,9 @@ describe('Browser service tests', () => {
             surrenderGame: () => {
                 done();
             },
+            quitRoomHost: () => {
+                return;
+            },
         } as unknown as Room;
         sinon.stub(roomsManager, 'getRoom').callsFake(() => {
             return fakeRoom;

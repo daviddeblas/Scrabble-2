@@ -34,6 +34,7 @@ export class Room {
     }
 
     quitRoomHost(): void {
+        if (this.game) return;
         if (this.clients[0]) this.inviteRefused(this.clients[0]);
         this.manager.removeRoom(this);
         this.manager.notifyAvailableRoomsChange();
