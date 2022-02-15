@@ -56,6 +56,7 @@ export class Room {
     }
 
     quitRoomClient(): void {
+        if (this.game !== null) return;
         this.host.emit('player joining cancel');
         this.clients[0] = null;
         this.clientName = null;

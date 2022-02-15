@@ -9,8 +9,8 @@ import { Store } from '@ngrx/store';
 })
 export class AppComponent {
     constructor(private store: Store) {
-        window.addEventListener('beforeunload', this.catchBrowserReload);
-        window.addEventListener('load', this.catchBrowserLoad);
+        window.addEventListener('beforeunload', (event) => this.catchBrowserReload(event));
+        window.addEventListener('load', (event) => this.catchBrowserLoad(event));
     }
 
     catchBrowserReload(event: Event) {
