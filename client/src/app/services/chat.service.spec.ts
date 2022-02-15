@@ -51,7 +51,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive message and dispatch "[Chat] Received message"', (done) => {
-        const expectedMessage: ChatMessage = { username, message: 'Hello World', errorName: '' };
+        const expectedMessage: ChatMessage = { username, message: 'Hello World', messageType: '' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('receive message', expectedMessage);
         setTimeout(() => {
@@ -62,7 +62,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive place success and dispatch "[Chat] Received message"', (done) => {
-        const expectedMessage: ChatMessage = { username, message: '!placer h8v tres', errorName: '' };
+        const expectedMessage: ChatMessage = { username, message: '!placer h8v tres', messageType: '' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('place success', { args: ['h8v', 'tres'], username });
         setTimeout(() => {
@@ -73,7 +73,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive draw success and dispatch "[Chat] Received message"', (done) => {
-        const expectedMessage: ChatMessage = { username, message: '!échanger tres', errorName: '' };
+        const expectedMessage: ChatMessage = { username, message: '!échanger tres', messageType: '' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('draw success', { letters: 'tres', username });
         setTimeout(() => {
@@ -84,7 +84,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive skip success and dispatch "[Chat] Received message"', (done) => {
-        const expectedMessage: ChatMessage = { username, message: '!passer', errorName: '' };
+        const expectedMessage: ChatMessage = { username, message: '!passer', messageType: '' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('skip success', username);
         setTimeout(() => {
@@ -117,7 +117,7 @@ describe('ChatService', () => {
 
     it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message" and not "[Game Status] Get Game"', (done) => {
         const errorMessage = 'This letter placement creates an invalid word';
-        const expectedMessage = { username: '', message: errorMessage, errorName: 'Error' };
+        const expectedMessage = { username: '', message: errorMessage, messageType: 'Error' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('error', errorMessage);
         const dispatchSpy = spyOn(service['store'], 'dispatch');
@@ -132,7 +132,7 @@ describe('ChatService', () => {
     it('should dispatch "[Chat] Received message" with the username and message when the message does not start by !', () => {
         const exampleMessage = 'Bonjour';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username, message: exampleMessage, errorName: '' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username, message: exampleMessage, messageType: '' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -140,7 +140,7 @@ describe('ChatService', () => {
         const exampleMessage = '!Bonjour';
         service.messageWritten(username, exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', errorName: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -148,7 +148,7 @@ describe('ChatService', () => {
     it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
         const exampleMessage = '!passer ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -156,7 +156,7 @@ describe('ChatService', () => {
         const exampleMessage = '!passer';
         const otherPlayer = 'Other Player';
         service.messageWritten(otherPlayer, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: "Ce n'est pas votre tour", errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -165,14 +165,14 @@ describe('ChatService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'validatePlaceCommand').and.callFake(() => false);
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command échanger is not valid', () => {
         const exampleMessage = '!échanger n_fpe38';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', errorName: 'Error' }) });
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 

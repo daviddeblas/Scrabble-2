@@ -7,8 +7,8 @@
                     <strong>{{ line.username }}</strong> : {{ line.message }}
                 </mat-card>
                 <ng-template #errorMessage>
-                    <section *ngIf="line.errorName === 'Error'; else opponentMessage" id="error-message">
-                        <strong>{{ line.errorName }}</strong> : {{ line.message }}
+                    <section *ngIf="line.messageType === 'Error'; else opponentMessage" id="error-message">
+                        <strong>{{ line.messageType }}</strong> : {{ line.message }}
                     </section>
                 </ng-template>
                 <ng-template #opponentMessage>
