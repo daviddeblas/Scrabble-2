@@ -216,10 +216,10 @@ export class Room {
     private parsePlaceCall(args: string[]): [PlacedLetter[], [Vec2, number][]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
-        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
-        const yPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const yPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
 
-        let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
+        let iterationVector = new Vec2(xPositionFromNumber, yPositionFromLetter);
 
         let direction = new Vec2(1, 0);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers

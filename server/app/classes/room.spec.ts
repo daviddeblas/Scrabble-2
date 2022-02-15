@@ -162,7 +162,16 @@ describe('room', () => {
             const placedLetters = room['parsePlaceCall'](commandArgs);
             placedLetters[0].forEach((l, index) => {
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(7 + index, 6)));
+                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 7)));
+            });
+        });
+
+        it('parse place call returns the right placed characters vertical edition', () => {
+            const commandArgs = ['g8v', 'con'];
+            const placedLetters = room['parsePlaceCall'](commandArgs);
+            placedLetters[0].forEach((l, index) => {
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(7, 6 + index)));
             });
         });
 
