@@ -6,7 +6,7 @@ import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
-import { stringToLetter, stringToLetters } from './letter';
+import { BLANK_LETTER, stringToLetter, stringToLetters } from './letter';
 import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
 import { Vec2 } from './vec2';
@@ -141,18 +141,24 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
+        const info = game.endGame();
         this.sockets.forEach((s) => {
-            s.emit('end game', game.endGame());
+            s.emit('end game', info);
         });
         clearTimeout(this.currentTimer);
     }
 
     private initTimer(): void {
-        const game = this.game as Game;
-        this.currentTimer = setTimeout(() => {
-            this.processSkip([], game.activePlayer as number);
-            this.postCommand();
-        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        this.currentTimer = setTimeout(this.actionAfterTimeout(), this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+    }
+
+    private actionAfterTimeout(): () => void {
+        const self = this;
+        const game = self.game as Game;
+        return () => {
+            self.processSkip([], game.activePlayer as number);
+            self.postCommand();
+        };
     }
 
     private errorOnCommand(socket: io.Socket, error: Error): void {
@@ -168,12 +174,10 @@ export class Room {
 
     private postCommand(): void {
         clearTimeout(this.currentTimer);
-        this.sockets.forEach((s) => s.emit('turn ended'));
-        this.currentTimer = setTimeout(() => {
-            const game = this.game as Game;
-            this.processSkip([], game.activePlayer as number);
-            this.postCommand();
-        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        this.initTimer();
+        this.sockets.forEach((s) => {
+            s.emit('turn ended');
+        });
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
@@ -267,7 +271,7 @@ export class Room {
     private gameStatusGetter(playerNumber: number): unknown {
         const game = this.game as Game;
         const opponent = { ...game.players[(playerNumber + 1) % 2] };
-        opponent.easel = [];
+        opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
             status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
             players: { player: game.players[playerNumber], opponent },
