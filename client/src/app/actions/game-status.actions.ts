@@ -10,4 +10,4 @@ export const gameStatusReceived = createAction(
     props<{ status: GameStatus; players: Players; board: BoardState }>(),
 );
 
-export const endGame = createAction('[Game Status] End Game', props<{ players: Players; winner: string }>());
+export const endGame = createAction('[Game Status] End Game', props<{ players: Players; remainingLetters: number; winner: string }>());

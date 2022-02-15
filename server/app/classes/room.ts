@@ -95,6 +95,7 @@ export class Room {
         if (!this.game?.players) throw new Error('Game does not exist');
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
             this.game.players,
+            this.game.bag.letters.length,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
         this.sockets.forEach((socket, index) => {
@@ -142,9 +143,7 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-        this.sockets.forEach((s, i) => {
-            s.emit('end game', game.endGame().toEndGameStatus(i));
-        });
+        this.sockets.forEach((s, i) => s.emit('end game', game.endGame().toEndGameStatus(i)));
         clearTimeout(this.currentTimer);
     }
 

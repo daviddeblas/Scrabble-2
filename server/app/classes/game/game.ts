@@ -84,7 +84,7 @@ export class Game {
     }
 
     private getGameEndStatus(): GameFinishStatus {
-        return new GameFinishStatus(this.players, this.determineWinner());
+        return new GameFinishStatus(this.players, this.bag.letters.length, this.determineWinner());
     }
 
     private endGameBonus(): number {

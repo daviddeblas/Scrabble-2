@@ -11,7 +11,7 @@ import { SocketClientService } from './socket-client.service';
 })
 export class GameManagerService {
     constructor(private socketService: SocketClientService, private store: Store) {
-        this.socketService.on('end game', (status: { players: Players; winner: string }) => {
+        this.socketService.on('end game', (status: { players: Players; remainingLetters: number; winner: string }) => {
             this.store.dispatch(endGame(status));
         });
     }
