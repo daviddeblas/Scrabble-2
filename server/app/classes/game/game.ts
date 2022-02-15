@@ -78,7 +78,7 @@ export class Game {
     }
 
     endGame(): GameFinishStatus {
-        this.endGameScoreAdjustment();
+        if (!this.gameFinished) this.endGameScoreAdjustment();
         this.gameFinished = true;
         return this.getGameEndStatus();
     }

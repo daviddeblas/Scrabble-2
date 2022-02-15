@@ -97,8 +97,8 @@ export class Room {
             this.game.players,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
-        this.sockets.forEach((socket) => {
-            socket.emit('end game', gameFinishStatus);
+        this.sockets.forEach((socket, index) => {
+            socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
     }
 
@@ -142,8 +142,8 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-        this.sockets.forEach((s) => {
-            s.emit('end game', game.endGame());
+        this.sockets.forEach((s, i) => {
+            s.emit('end game', game.endGame().toEndGameStatus(i));
         });
         clearTimeout(this.currentTimer);
     }
