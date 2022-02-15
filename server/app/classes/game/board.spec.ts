@@ -51,6 +51,18 @@ describe('board', () => {
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
+    it('getAffectedWordFromSinglePlacement should not throw on border placements', () => {
+        // place word 'con' across the 3 middle boxes
+        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 0)), new PlacedLetter('O', new Vec2(7, 0)), new PlacedLetter('N', new Vec2(8, 0))];
+        lettersToPlace.forEach((l) => (board.board[l.position.x][l.position.y] = l.letter));
+        expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0))).to.deep.eq(lettersToPlace);
+    });
+
+    it('getAffectedWordFromSinglePlacement should pass over ', () => {
+        // place word 'con' across the 3 middle boxes
+        expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0)));
+    });
+
     it('getAffectedWords should be correct', () => {
         const words = board['getAffectedWords'](correctLettersToPlace);
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
@@ -89,6 +101,12 @@ describe('board', () => {
     it('place throws on invalid placement', () => {
         const lettersToPlace = [new PlacedLetter('N', new Vec2(100, 7))];
         expect(() => board.place(lettersToPlace, [], true)).to.throw();
+    });
+
+    it('place should add a blank to the blanks field', () => {
+        const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
+        board.place(lettersToPlace, [1], true);
+        expect(board.blanks.length).to.eq(1);
     });
 
     it('place should add a blank to the blanks field', () => {

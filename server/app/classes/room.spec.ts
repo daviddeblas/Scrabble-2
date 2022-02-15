@@ -220,7 +220,6 @@ describe('room', () => {
             room.inviteAccepted(socket);
             game = room.game as Game;
         });
-
         it('post command emits turn ended', (done) => {
             room.sockets.pop();
             socket.emit = (namespace: string): boolean => {

@@ -142,7 +142,9 @@ export class Board {
         let checkingPosition = new Vec2(pos.x, pos.y);
         const word: PlacedLetter[] = [];
 
-        while (this.letterAt(checkingPosition) !== null) checkingPosition = checkingPosition.sub(direction);
+        while (!this.positionOutOfBound(checkingPosition) && this.letterAt(checkingPosition) !== null) {
+            checkingPosition = checkingPosition.sub(direction);
+        }
         checkingPosition = checkingPosition.add(direction);
 
         while (this.letterAt(checkingPosition) !== null) {
@@ -151,5 +153,9 @@ export class Board {
         }
 
         return word;
+    }
+
+    private positionOutOfBound(pos: Vec2): boolean {
+        return pos.x < 0 || pos.y < 0 || pos.x > this.config.boardSize.x - 1 || pos.y > this.config.boardSize.y - 1;
     }
 }
