@@ -210,8 +210,13 @@ export class Room {
         const game = this.game as Game;
         if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
         game.draw(stringToLetters(args[0]), playerNumber);
-        this.sockets.forEach((s) => {
-            s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
+        const lettersToSendEveryone: string[] = [];
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < args[0].length; i++) lettersToSendEveryone.push('#');
+
+        this.sockets.forEach((s, index) => {
+            if (index === playerNumber) s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
+            else s.emit('draw success', { letters: lettersToSendEveryone, username: game.players[playerNumber].name });
         });
     }
 
