@@ -37,7 +37,7 @@ export class Board {
         this.blanks = [];
     }
 
-    place(letters: PlacedLetter[], blanks: Vec2[], firstMove: boolean): number {
+    place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number {
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
             throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
@@ -51,7 +51,7 @@ export class Board {
             this.board[l.position.x][l.position.y] = l.letter;
         });
 
-        blanks.forEach((v) => this.blanks.push(v));
+        blanks.forEach((v) => this.blanks.push(letters[v].position.copy()));
 
         let score = 0;
         words.forEach((w) => {

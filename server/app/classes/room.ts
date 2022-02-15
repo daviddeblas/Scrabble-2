@@ -213,7 +213,7 @@ export class Room {
         return commandIsCorrect;
     }
 
-    private parsePlaceCall(args: string[]): [PlacedLetter[], [Vec2, number][]] {
+    private parsePlaceCall(args: string[]): [PlacedLetter[], number[]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
         const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
@@ -226,12 +226,12 @@ export class Room {
         if (args[1].length > 1 && args[0].slice(-1) === 'v') direction = new Vec2(0, 1);
 
         const placableLetters: PlacedLetter[] = [];
-        const blanks: [Vec2, number][] = [];
+        const blanks: number[] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (this.game?.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
             placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
+            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);
-            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push([iterationVector.copy(), i]);
         }
         return [placableLetters, blanks];
     }
