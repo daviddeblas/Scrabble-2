@@ -1,8 +1,14 @@
 <div class="sidebar">
-    <mat-card class="player-card active">
+    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.opponent)">
         <h2>{{ (players$ | async)?.opponent?.name }}</h2>
-        <h3>Temps restant 0:30</h3>
+
+        <h3 *ngIf="isActivePlayer((players$ | async)?.opponent); else opponent_waiting">Temps restant 0:30</h3>
+        <ng-template #opponent_waiting>
+            <h3>En attente</h3>
+        </ng-template>
+
         <p>{{ (players$ | async)?.opponent?.score }}pts</p>
+        <p *ngIf="((players$ | async)?.opponent?.easel?.length ?? 0) < 7">{{ (players$ | async)?.opponent?.easel?.length }} lettres</p>
     </mat-card>
 
     <div class="info">
@@ -19,9 +25,15 @@
         </div>
     </div>
 
-    <mat-card class="player-card">
+    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.player)">
+        <p *ngIf="((players$ | async)?.player?.easel?.length ?? 0) < 7">{{ (players$ | async)?.player?.easel?.length }} lettres</p>
         <p>{{ (players$ | async)?.player?.score }}pts</p>
-        <h3>En attente</h3>
+
+        <h3 *ngIf="isActivePlayer((players$ | async)?.player); else player_waiting">Temps restant 0:30</h3>
+        <ng-template #player_waiting>
+            <h3>En attente</h3>
+        </ng-template>
+
         <h2>{{ (players$ | async)?.player?.name }}</h2>
     </mat-card>
 </div>

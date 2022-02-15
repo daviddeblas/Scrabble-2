@@ -35,16 +35,30 @@ export class Room {
         const client = socket;
         this.host.once('accept', () => this.inviteAccepted(client));
         this.host.once('refuse', () => this.inviteRefused(client));
-        client.once('quit', () => this.quitRoomClient());
+        client.once('cancel join room', () => this.quitRoomClient());
     }
 
     quitRoomHost(): void {
+        if (this.clients[0]) this.inviteRefused(this.clients[0]);
         this.manager.removeRoom(this);
+        this.manager.notifyAvailableRoomsChange();
     }
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
         this.initiateRoomEvents();
+    }
+
+    inviteRefused(client: io.Socket): void {
+        client.emit('refused');
+        this.clients[0] = null;
+        this.clientName = null;
+    }
+
+    quitRoomClient(): void {
+        this.host.emit('player joining cancel');
+        this.clients[0] = null;
+        this.clientName = null;
     }
 
     initiateRoomEvents() {
@@ -55,9 +69,14 @@ export class Room {
 
     initGame(): void {
         this.sockets = [this.host, this.clients[0] as io.Socket];
+
         this.game = new Game(Container.get(GameConfigService).configs.configs[0], [this.gameOptions.hostname, this.clientName as string]);
         this.game.players[0].name = this.gameOptions.hostname;
         this.game.players[1].name = this.clientName as string;
+
+        this.manager.removeSocketFromJoiningList(this.sockets[1]);
+        this.manager.notifyAvailableRoomsChange();
+
         this.sockets.forEach((socket, index) => {
             this.setupSocket(socket, index);
         });
@@ -91,16 +110,6 @@ export class Room {
         });
     }
 
-    inviteRefused(client: io.Socket): void {
-        client.emit('refused');
-        this.clients[0] = null;
-        this.clientName = null;
-    }
-
-    quitRoomClient(): void {
-        this.manager.removeRoom(this);
-    }
-
     getRoomInfo(): RoomInfo {
         return new RoomInfo(this.host.id, this.gameOptions);
     }
@@ -130,15 +139,17 @@ export class Room {
     }
 
     private endGame(): void {
+        const game = this.game as Game;
         this.sockets.forEach((s) => {
-            s.emit('end game', this.game?.endGame());
+            s.emit('end game', game.endGame());
         });
         clearTimeout(this.currentTimer);
     }
 
     private initTimer(): void {
+        const game = this.game as Game;
         this.currentTimer = setTimeout(() => {
-            this.processSkip([], this.game?.activePlayer as number);
+            this.processSkip([], game.activePlayer as number);
             this.postCommand();
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
@@ -158,13 +169,15 @@ export class Room {
         clearTimeout(this.currentTimer);
         this.sockets.forEach((s) => s.emit('turn ended'));
         this.currentTimer = setTimeout(() => {
-            this.processSkip([], this.game?.activePlayer as number);
+            const game = this.game as Game;
+            this.processSkip([], game.activePlayer as number);
             this.postCommand();
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
-        if (this.game?.gameFinished) throw new Error('game is finished');
+        const game = this.game as Game;
+        if (game.gameFinished) throw new Error('game is finished');
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
             case 'placer':
@@ -182,15 +195,17 @@ export class Room {
     private processPlace(args: string[], playerNumber: number): void {
         if (!this.validatePlace(args)) throw Error('malformed arguments for place');
         const argsForParsePlaceCall = this.parsePlaceCall(args);
-        this.game?.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
+        const game = this.game as Game;
+        game.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
         this.sockets.forEach((s) => {
             s.emit('place success', { args, username: playerNumber === 0 ? this.gameOptions.hostname : this.clientName });
         });
     }
 
     private processDraw(args: string[], playerNumber: number): void {
+        const game = this.game as Game;
         if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
-        this.game?.draw(stringToLetters(args[0]), playerNumber);
+        game.draw(stringToLetters(args[0]), playerNumber);
         const username = playerNumber === 0 ? this.gameOptions.hostname : this.clientName;
         this.sockets.forEach((s, i) => {
             if (i === playerNumber) s.emit('draw success', { letters: args[0], username });
@@ -203,8 +218,9 @@ export class Room {
     }
 
     private processSkip(args: string[], playerNumber: number): void {
+        const game = this.game as Game;
         if (args.length > 0) throw new Error('malformed argument for pass');
-        this.game?.skip(playerNumber);
+        game.skip(playerNumber);
         this.sockets.forEach((s) => {
             s.emit('skip success', playerNumber === 0 ? this.gameOptions.hostname : this.clientName);
         });
@@ -243,8 +259,9 @@ export class Room {
 
         const placableLetters: PlacedLetter[] = [];
         const blanks: number[] = [];
+        const game = this.game as Game;
         for (let i = 0; i < args[1].length; i++) {
-            while (this.game?.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
+            while (game.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
             placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
             if (/^[A-Z]*$/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);

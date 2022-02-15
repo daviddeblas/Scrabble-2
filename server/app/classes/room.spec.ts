@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { Room, MILLISECONDS_PER_SEC } from '@app/classes/room';
+import { MILLISECONDS_PER_SEC, Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { fail } from 'assert';
@@ -10,6 +10,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimer
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
+import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
 import { stringToLetter } from './letter';
 import { PlacedLetter } from './placed-letter';
@@ -62,10 +63,11 @@ describe('room', () => {
             expect(room.clients[0]).to.deep.equal(null);
         });
 
-        it('quitRoomClient should call RoomsManager.removeRoom', (done) => {
-            roomsManager.removeRoom.callsFake(() => done());
+        it('quitRoomClient should call RoomsManager.removeRoom', () => {
             const room = new Room(socket, roomsManager, gameOptions);
+            room.clients[0] = socket;
             room.quitRoomClient();
+            expect(room.clients[0]).to.equal(null);
         });
 
         it('join should add the client to the clients list', () => {
@@ -81,6 +83,82 @@ describe('room', () => {
             } catch (error) {
                 expect(error.message).to.deep.equal('Game does not exist');
             }
+        });
+
+        it('onCommand should call processCommand and postCommand', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const fakeSocket = {
+                on: () => {
+                    return;
+                },
+            } as unknown as io.Socket;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const processStub = stub(room as any, 'processCommand').callsFake(() => {
+                return;
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const postCommandStub = stub(room as any, 'postCommand').callsFake(() => {
+                return;
+            });
+            room['onCommand'](fakeSocket, 'passer', 0);
+            expect(processStub.calledOnce && postCommandStub.calledOnce).to.equal(true);
+        });
+
+        it('onCommand should call errorOnCommand if an error was thrown and gameEnded if game exists', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const fakeSocket = {
+                on: () => {
+                    return;
+                },
+            } as unknown as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const processStub = stub(room as any, 'processCommand').callsFake(() => {
+                throw new Error('Error de test');
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorOnCommandStub = stub(room as any, 'errorOnCommand').callsFake(() => {
+                return;
+            });
+            let gameEndedCalled = false;
+            room.game = {
+                needsToEnd: () => {
+                    gameEndedCalled = true;
+                    return false;
+                },
+            } as unknown as Game;
+            room['onCommand'](fakeSocket, 'passer', 0);
+            expect(processStub.calledOnce && gameEndedCalled && errorOnCommandStub.calledOnce).to.equal(true);
+        });
+
+        it('onCommand should call emit end game if gameEnded returns true', (done) => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const fakeSocket = {
+                emit: (event: string) => {
+                    expect(event === 'end game').to.equal(true);
+                    expect(processStub.calledOnce && errorOnCommandStub.calledOnce).to.equal(true);
+                    done();
+                    return;
+                },
+            } as unknown as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const processStub = stub(room as any, 'processCommand').callsFake(() => {
+                throw new Error('Error de test');
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const errorOnCommandStub = stub(room as any, 'errorOnCommand').callsFake(() => {
+                return;
+            });
+            room.game = {
+                needsToEnd: () => {
+                    return true;
+                },
+                endGame: () => {
+                    return;
+                },
+            } as unknown as Game;
+            room['onCommand'](fakeSocket, 'passer', 0);
         });
 
         it('surrenderGame should emit endGame if the game is not null', (done) => {
@@ -192,6 +270,42 @@ describe('room', () => {
             room['postCommand']();
             clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
             clk.restore();
+        });
+
+        it('init timer should wait the right amount of ', (done) => {
+            const clk = useFakeTimers();
+            room.sockets.pop();
+            room['processSkip'] = () => {
+                return;
+            };
+            room['postCommand'] = () => done();
+            room['initTimer']();
+            clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+            clk.restore();
+        });
+
+        it('errorCommand should start a timer and call postCommand', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    expect(event).to.equal('error');
+                },
+            } as unknown as io.Socket;
+            const clk = useFakeTimers();
+            room.sockets.pop();
+            room['postCommand'] = () => done();
+            room['errorOnCommand'](fakeSocket, new Error(GameErrorType.InvalidWord));
+            clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+            clk.restore();
+        });
+
+        it('errorOnCommand should emit error', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    expect(event).to.equal('error');
+                    done();
+                },
+            } as unknown as io.Socket;
+            room['errorOnCommand'](fakeSocket, new Error('error'));
         });
     });
 
@@ -496,7 +610,7 @@ describe('room', () => {
                     });
                 });
                 hostSocket.on('player joining', () => {
-                    clientSocket.emit('quit');
+                    clientSocket.emit('cancel join room');
                 });
                 hostSocket.emit('create room');
             });

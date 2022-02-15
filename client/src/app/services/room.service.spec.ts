@@ -1,5 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { createRoomSuccess, joinInviteReceived, joinRoomAccepted, joinRoomDeclined, loadRoomsSuccess } from '@app/actions/room.actions';
+import {
+    createRoomSuccess,
+    joinInviteCanceled,
+    joinInviteReceived,
+    joinRoomAccepted,
+    joinRoomDeclined,
+    loadRoomsSuccess,
+} from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -73,6 +80,15 @@ describe('RoomService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
+    it('should dispatch "[Room] Join Invite Canceled" when receiving invite cancellation', () => {
+        service.waitForInvitations();
+
+        socketService.peerSideEmit('player joining cancel');
+
+        const expectedAction = cold('a', { a: joinInviteCanceled() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
     it('should send refuse', () => {
         const sendSpy = spyOn(socketService, 'emit');
         service.refuseInvite();
@@ -89,6 +105,12 @@ describe('RoomService', () => {
         const sendSpy = spyOn(socketService, 'emit');
         service.closeRoom();
         expect(sendSpy).toHaveBeenCalledWith('quit');
+    });
+
+    it('should send cancel join room', () => {
+        const sendSpy = spyOn(socketService, 'emit');
+        service.cancelJoinRoom();
+        expect(sendSpy).toHaveBeenCalledWith('cancel join room');
     });
 
     it('should request the room list and wait for an answer', () => {
