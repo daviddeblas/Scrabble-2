@@ -31,9 +31,12 @@ export class Game {
         this.placeCounter = 0;
     }
 
-    place(letters: PlacedLetter[], blanks: Vec2[], player: number): void {
+    place(letters: PlacedLetter[], blanks: [Vec2, number][], player: number): void {
         this.checkMove(
-            letters.map((l) => l.letter),
+            letters.map((l, index) => {
+                if (blanks.filter((b) => b[1] === index).length > 0) return '*' as Letter;
+                return l.letter;
+            }),
             player,
         );
         if (this.placeCounter === 0) {
@@ -42,7 +45,11 @@ export class Game {
             );
             if (lettersInCenter.length === 0) throw new Error('bad starting move');
         }
-        this.getActivePlayer().score += this.board.place(letters, blanks);
+        this.getActivePlayer().score += this.board.place(
+            letters,
+            blanks.map((b) => b[0]),
+            this.placeCounter === 0,
+        );
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(letters.map((l) => l.letter));
         this.getActivePlayer().addLetters(this.bag.getLetters(letters.length));

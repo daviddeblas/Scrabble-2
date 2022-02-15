@@ -37,10 +37,12 @@ export class Board {
         this.blanks = [];
     }
 
-    place(letters: PlacedLetter[], blanks: Vec2[]): number {
+    place(letters: PlacedLetter[], blanks: Vec2[], firstMove: boolean): number {
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
             throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
+        const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
+        if (!firstMove && allPlacedLetters.length !== letters.length) throw new Error('word placement does not connect to other words');
         words.forEach((w) => {
             if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
         });

@@ -121,6 +121,7 @@ export class Room {
                 const delayForInvalidWord = 3000;
                 socket.emit('error', (error as Error).message);
                 if (error === GameErrorType.InvalidWord) {
+                    clearTimeout(this.currentTimer);
                     setTimeout(() => {
                         this.postCommand();
                     }, delayForInvalidWord);
@@ -132,6 +133,10 @@ export class Room {
                 });
             }
         });
+        this.currentTimer = setTimeout(() => {
+            this.processSkip([], this.game?.activePlayer as number);
+            this.postCommand();
+        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
     private postCommand(): void {
@@ -139,7 +144,7 @@ export class Room {
         this.sockets.forEach((s) => s.emit('turn ended'));
         this.currentTimer = setTimeout(() => {
             this.processSkip([], this.game?.activePlayer as number);
-            this.sockets.forEach((s) => s.emit('turn ended'));
+            this.postCommand();
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
@@ -208,25 +213,25 @@ export class Room {
         return commandIsCorrect;
     }
 
-    private parsePlaceCall(args: string[]): [PlacedLetter[], Vec2[]] {
+    private parsePlaceCall(args: string[]): [PlacedLetter[], [Vec2, number][]] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const positionNumber = args[0].slice(1, args[1].length > 1 ? -1 : 0);
-        const xPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
-        const yPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const yPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
 
-        let iterationVector = new Vec2(xPositionFromLetter, yPositionFromNumber);
+        let iterationVector = new Vec2(xPositionFromNumber, yPositionFromLetter);
 
         let direction = new Vec2(1, 0);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (args[1].length > 1 && args[0].slice(-1) === 'v') direction = new Vec2(0, 1);
 
         const placableLetters: PlacedLetter[] = [];
-        const blanks: Vec2[] = [];
+        const blanks: [Vec2, number][] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (this.game?.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
             placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
             iterationVector = iterationVector.add(direction);
-            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push(iterationVector.copy());
+            if (/[A-Z]/.test(args[1].charAt(i))) blanks.push([iterationVector.copy(), i]);
         }
         return [placableLetters, blanks];
     }
