@@ -39,6 +39,9 @@ export class ChatService {
         this.socketService.on('error', (errorMessage: string) => {
             const chatMessage = { username: '', message: errorMessage, errorName: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
+            if (errorMessage !== 'This letter placement creates an invalid word') {
+                this.store.dispatch(getGameStatus());
+            }
         });
     }
 
