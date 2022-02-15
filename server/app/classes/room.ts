@@ -33,7 +33,9 @@ export class Room {
     }
 
     quitRoomHost(): void {
+        if (this.clients[0]) this.inviteRefused(this.clients[0]);
         this.manager.removeRoom(this);
+        this.manager.notifyAvailableRoomsChange();
     }
 
     inviteAccepted(client: io.Socket): void {

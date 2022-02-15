@@ -1,5 +1,5 @@
-<mat-stepper linear #stepper>
-    <mat-step>
+<mat-stepper linear #stepper (selectionChange)="onStepChange()">
+    <mat-step [completed]="selectedRoom !== undefined" [editable]="true">
         <ng-template matStepLabel>Rejoindre une partie</ng-template>
         <h3>Rooms:</h3>
         <mat-list>
@@ -11,11 +11,11 @@
             </mat-list-item>
         </mat-list>
     </mat-step>
-    <mat-step [stepControl]="formGroup">
+    <mat-step [stepControl]="formGroup" [editable]="false">
         <mat-card>
             <form [formGroup]="formGroup">
                 <ng-template matStepLabel>Entrez votre nom</ng-template>
-                <mat-form-field class="parameter-container" appearance="fill">
+                <mat-form-field centered class="parameter-container" appearance="fill">
                     <mat-label>Veuillez saisir votre nom</mat-label>
                     <input [attr.disabled]="true" matInput formControlName="name" placeholder="Nom" />
                 </mat-form-field>
