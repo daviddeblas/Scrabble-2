@@ -2,6 +2,8 @@ import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { createAction, props } from '@ngrx/store';
 
+export const resetRoomState = createAction('[Room] Reset Room State');
+
 // Host
 export const createRoom = createAction('[Room] Create Room', props<{ gameOptions: GameOptions }>());
 export const createRoomSuccess = createAction('[Room] Create Room Success', props<{ roomInfo: RoomInfo }>());

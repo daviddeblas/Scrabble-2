@@ -20,6 +20,7 @@ export const initialState: RoomState = {
 
 export const reducer = createReducer(
     initialState,
+    on(roomActions.resetRoomState, () => initialState),
     // For hosting
     on(roomActions.createRoomSuccess, (state, { roomInfo }) => ({ ...state, roomInfo })),
     on(roomActions.closeRoom, () => initialState),
