@@ -32,13 +32,11 @@ export class Game {
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): void {
-        this.checkMove(
-            letters.map((l, index) => {
-                if (blanks.filter((b) => b === index).length > 0) return '*' as Letter;
-                return l.letter;
-            }),
-            player,
-        );
+        const easelLettersForMove = letters.map((l, index) => {
+            if (blanks.filter((b) => b === index).length > 0) return '*' as Letter;
+            return l.letter;
+        });
+        this.checkMove(easelLettersForMove, player);
         if (this.placeCounter === 0) {
             const lettersInCenter = letters.filter((l) =>
                 l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
@@ -47,7 +45,7 @@ export class Game {
         }
         this.getActivePlayer().score += this.board.place(letters, blanks, this.placeCounter === 0);
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
-        this.getActivePlayer().removeLetters(letters.map((l) => l.letter));
+        this.getActivePlayer().removeLetters(easelLettersForMove);
         this.getActivePlayer().addLetters(this.bag.getLetters(letters.length));
         if (this.gameEnded()) this.getActivePlayer().score += this.endGameBonus();
         this.nextTurn();

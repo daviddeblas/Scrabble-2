@@ -243,7 +243,12 @@ export class Room {
         return {
             status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
             players: { player: game.players[playerNumber], opponent },
-            board: { board: game.board.board, pointsPerLetter: Array.from(game.board.pointsPerLetter), multipliers: game.board.multipliers },
+            board: {
+                board: game.board.board,
+                pointsPerLetter: Array.from(game.board.pointsPerLetter),
+                multipliers: game.board.multipliers,
+                blanks: game.board.blanks,
+            },
         };
     }
 }
