@@ -132,6 +132,10 @@ export class Room {
                 });
             }
         });
+        this.currentTimer = setTimeout(() => {
+            this.processSkip([], this.game?.activePlayer as number);
+            this.postCommand();
+        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
     private postCommand(): void {
@@ -139,7 +143,7 @@ export class Room {
         this.sockets.forEach((s) => s.emit('turn ended'));
         this.currentTimer = setTimeout(() => {
             this.processSkip([], this.game?.activePlayer as number);
-            this.sockets.forEach((s) => s.emit('turn ended'));
+            this.postCommand();
         }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
