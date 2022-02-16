@@ -16,7 +16,7 @@ describe('GameManagerService', () => {
         player: new Player('Player 1'),
         opponent: new Player('Player 2'),
     };
-    const gameStatus: GameStatus = { activePlayer: '', letterPotLength: 10 };
+    const gameStatus: GameStatus = { activePlayer: '', gameEnded: false, letterPotLength: 10 };
     const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map() };
     const status = { status: gameStatus, players, board: boardState };
 
@@ -40,7 +40,7 @@ describe('GameManagerService', () => {
     });
 
     it('should dispatch "[Game Status] End Game"" when an end game call is received', () => {
-        const endGameStatus = { players, winner: 'player 1' };
+        const endGameStatus = { players, remainingLetters: 0, winner: 'player 1' };
 
         socketService.peerSideEmit('end game', endGameStatus);
 
