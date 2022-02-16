@@ -143,7 +143,10 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-        this.sockets.forEach((s, i) => s.emit('end game', game.endGame().toEndGameStatus(i)));
+        this.sockets.forEach((s, i) => {
+            const endGameStatus = game.endGame().toEndGameStatus(i);
+            s.emit('end game', endGameStatus);
+        });
         clearTimeout(this.currentTimer);
     }
 

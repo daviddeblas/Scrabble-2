@@ -12,7 +12,11 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class ChatService {
-    constructor(private store: Store, private socketService: SocketClientService, private gameStore: Store<{ gameStatus: GameStatus }>) {}
+    constructor(
+        private store: Store<{ gameStatus: GameStatus }>,
+        private socketService: SocketClientService,
+        private gameStore: Store<{ gameStatus: GameStatus }>,
+    ) {}
     broadcastMsg(username: string, message: string) {
         this.socketService.send('send message', { username, message });
     }
@@ -51,9 +55,15 @@ export class ChatService {
             this.broadcastMsg(username, message);
         } else {
             let activePlayer;
+            let gameEnded;
             this.gameStore.select('gameStatus').subscribe((status) => {
                 activePlayer = status.activePlayer;
+                gameEnded = status.gameEnded;
             });
+            if (gameEnded) {
+                this.store.dispatch(receivedMessage({ username: '', message: 'La partie est finie', messageType: 'Error' }));
+                return;
+            }
             if (username !== activePlayer) {
                 this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
                 return;
