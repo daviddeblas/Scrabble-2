@@ -10,6 +10,7 @@ import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { EaselComponent } from '@app/components/easel/easel.component';
 import { LetterComponent } from '@app/components/letter/letter.component';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { SkipTurnButtonComponent } from '@app/components/skip-turn-button/skip-turn-button.component';
 import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
 import { BrowserEffects } from '@app/effects/browser.effects';
 import { ChatEffects } from '@app/effects/chat.effects';
@@ -41,6 +42,8 @@ import { StoreModule } from '@ngrx/store';
         BoardToListPipe,
         SidebarComponent,
         ChatBoxComponent,
+        SurrenderGameButtonComponent,
+        SkipTurnButtonComponent,
     ],
     imports: [
         AppMaterialModule,
