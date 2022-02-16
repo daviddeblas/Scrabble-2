@@ -9,16 +9,18 @@ describe('SurrenderGameComponent', () => {
     let component: SurrenderGameButtonComponent;
     let fixture: ComponentFixture<SurrenderGameButtonComponent>;
     let mockDialogSpy: jasmine.SpyObj<MatDialog>;
+    let routerMock: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
         mockDialogSpy = jasmine.createSpyObj('dialog', ['open']);
+        routerMock = jasmine.createSpyObj('router', ['navigateByUrl']);
         await TestBed.configureTestingModule({
             declarations: [SurrenderGameButtonComponent],
             imports: [AppMaterialModule],
             providers: [
                 {
                     provide: Router,
-                    useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
+                    useValue: routerMock,
                 },
                 provideMockStore(),
                 {
@@ -42,5 +44,10 @@ describe('SurrenderGameComponent', () => {
     it('openConfirmSurrenderDialog should open the window when the begin button is clicked', () => {
         component.openConfirmSurrenderDialog();
         expect(mockDialogSpy.open).toHaveBeenCalled();
+    });
+
+    it('quitGamePage should open the window when the begin button is clicked', () => {
+        component.quitGamePage();
+        expect(routerMock.navigateByUrl).toHaveBeenCalled();
     });
 });

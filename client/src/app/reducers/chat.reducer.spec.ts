@@ -1,4 +1,5 @@
 import * as chatAction from '@app/actions/chat.actions';
+import { resetRoomState } from '@app/actions/room.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { initialState, reducer } from '@app/reducers/chat.reducer';
 describe('[Chat] Received message', () => {
@@ -22,5 +23,12 @@ describe('[Chat] Received message', () => {
 
         expect(result).toEqual([chatMessageStub]);
         expect(result).not.toBe([chatMessageStub]);
+    });
+
+    it('should reset to initial state', () => {
+        const action = resetRoomState();
+        const result = reducer([chatMessageStub], action);
+
+        expect(result).toEqual([]);
     });
 });

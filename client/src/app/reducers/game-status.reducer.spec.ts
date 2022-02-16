@@ -35,4 +35,16 @@ describe('[Game Status] Game Status Received', () => {
 
         expect(result).toEqual(gameStatusStub);
     });
+
+    it('should set the winner', () => {
+        const action = gameStatusActions.endGame({
+            players: playersStub,
+            winner: 'Player 1',
+            remainingLetters: 0,
+        });
+
+        const result = reducer(initialState, action);
+
+        expect(result).toEqual({ ...initialState, gameEnded: true, winner: 'Player 1' });
+    });
 });
