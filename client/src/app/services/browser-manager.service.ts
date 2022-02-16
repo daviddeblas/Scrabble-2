@@ -27,6 +27,7 @@ export class BrowserManagerService {
         if (!oldSocketId) return;
         this.socketService.send('browser reconnection', oldSocketId);
         this.store.dispatch(initiateChatting());
+        this.store.dispatch(getGameStatus());
         this.retrieveSelectors();
     }
 

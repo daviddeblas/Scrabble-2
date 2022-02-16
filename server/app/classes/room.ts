@@ -46,7 +46,9 @@ export class Room {
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
-        this.initiateRoomEvents();
+        this.initGame();
+        this.initSurrenderGame();
+        this.initChatting();
     }
 
     inviteRefused(client: io.Socket): void {
@@ -63,7 +65,10 @@ export class Room {
     }
 
     initiateRoomEvents() {
-        this.initGame();
+        this.sockets = [this.host, this.clients[0] as io.Socket];
+        this.sockets.forEach((s, i) => {
+            this.setupSocket(s, i);
+        });
         this.initSurrenderGame();
         this.initChatting();
     }
@@ -143,11 +148,11 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
+        clearTimeout(this.currentTimer);
         this.sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             s.emit('end game', endGameStatus);
         });
-        clearTimeout(this.currentTimer);
     }
 
     private initTimer(): void {
