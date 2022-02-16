@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { GamePageModule } from '@app/modules/game-page.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { EffectsRootModule } from '@ngrx/effects';
@@ -17,6 +18,10 @@ describe('GamePageComponent', () => {
         await TestBed.configureTestingModule({
             imports: [StoreModule.forRoot({}), GamePageModule, EffectsRootModule, BrowserAnimationsModule, AppMaterialModule],
             providers: [
+                {
+                    provide: Router,
+                    useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
+                },
                 provideMockActions(() => actions$),
                 {
                     provide: EffectsRootModule,

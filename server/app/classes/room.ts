@@ -143,15 +143,9 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-<<<<<<< HEAD
         this.sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             s.emit('end game', endGameStatus);
-=======
-        const info = game.endGame();
-        this.sockets.forEach((s) => {
-            s.emit('end game', info);
->>>>>>> origin/feature/7-placer-des-lettres-commande-seulement
         });
         clearTimeout(this.currentTimer);
     }

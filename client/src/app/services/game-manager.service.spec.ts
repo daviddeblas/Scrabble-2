@@ -39,8 +39,10 @@ describe('GameManagerService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should dispatch "[Game Status] End Game"" when an end game call is received', () => {
+    it('should dispatch "[Game Status] End Game" when an end game call is received', () => {
         const endGameStatus = { players, remainingLetters: 0, winner: 'player 1' };
+
+        service.getGameStatus();
 
         socketService.peerSideEmit('end game', endGameStatus);
 
