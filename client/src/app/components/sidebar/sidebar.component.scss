@@ -1,7 +1,40 @@
-.container {
-    height: auto;
-    min-height: 98vh;
-    border: 1px solid black;
-    padding: 0 5px 0 5px;
-    margin-right: 5px;
+.sidebar {
+    padding: 0.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.player-card {
+    * {
+        margin-bottom: 0;
+    }
+}
+
+.active {
+    animation: active-animation 2s infinite;
+    animation-direction: alternate;
+}
+
+@keyframes active-animation {
+    0% {
+        background-color: white;
+    }
+    100% {
+        background-color: #ccccff;
+    }
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: center;
 }

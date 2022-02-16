@@ -1,15 +1,44 @@
 .container {
-    height: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 2fr 250px;
+    grid-template-rows: 56px 1fr 75px;
+    width: 100vw;
+    height: 100vh;
 }
 
-.play-area-container {
-    overflow: auto;
+.game-toolbar {
+    grid-column: 1 / 4;
+    grid-row: 1;
+    height: 56px;
+    gap: 0.5rem;
+}
+
+.spacer {
     flex: 1 1 auto;
 }
 
-.play-area {
-    display: grid;
-    width: min-content;
-    outline: none;
+.game-board {
+    min-height: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+.game-rack {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+}
+
+.game-chatbox {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+}
+
+.game-sidebar {
+    grid-column: 3 / 4;
+    grid-row: 2 / 4;
 }

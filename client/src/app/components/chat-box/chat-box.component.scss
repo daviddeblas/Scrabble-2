@@ -1,0 +1,36 @@
+#chat-list {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 5vh;
+    margin-top: 2vh;
+    word-break: break-all;
+}
+
+#submit-message-button {
+    height: 4vh;
+    margin-left: 5px;
+}
+
+#user-message {
+    padding: 10px;
+    background-color: greenyellow;
+}
+
+#error-message {
+    padding: 10px;
+    color: red;
+}
+
+#opponent-message {
+    padding: 10px;
+    background-color: lightblue;
+}
+
+#chat-log-list {
+    margin-bottom: 2vh;
+    font-size: 10pt;
+    height: auto;
+}

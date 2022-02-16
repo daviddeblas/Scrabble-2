@@ -15,7 +15,10 @@
         "noUnusedLocals": true,
         "noImplicitReturns": true,
         "suppressImplicitAnyIndexErrors": true,
+        "resolveJsonModule": true,
         "strictNullChecks": true,
+        "esModuleInterop": true,
+
         "paths": {
             "@app/*": ["./app/*"]
         }

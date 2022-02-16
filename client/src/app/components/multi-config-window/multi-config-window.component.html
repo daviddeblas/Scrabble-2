@@ -1,0 +1,35 @@
+<mat-card>
+    <mat-dialog-content>
+        <div>
+            <h1>Configuration des paramètres de la partie</h1>
+        </div>
+        <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
+            <mat-form-field class="parameter-container" appearance="fill">
+                <mat-label>Veuillez saisir votre nom</mat-label>
+                <input matInput formControlName="name" placeholder="Nom" />
+            </mat-form-field>
+
+            <div id="timer-container">
+                <p class="text-container">Temps par tour</p>
+                <div id="timer2-container">
+                    <button class="timer-button" type="button" (click)="decrementTime()">-</button>
+                    <div #time id="time">{{ timer }}</div>
+                    <button class="timer-button" type="button" (click)="incrementTime()">+</button>
+                </div>
+            </div>
+
+            <mat-form-field class="parameter-container" appearance="fill">
+                <mat-label>Dictionnaire</mat-label>
+                <mat-select formControlName="selectedDictionary">
+                    <mat-option *ngFor="let dictionary of dictionaries$ | async; index as id" value="{{ dictionary }}">{{ dictionary }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-card-actions>
+                <button mat-raised-button matStepperNext color="primary" type="submit" id="confirm-settings" [disabled]="!settingsForm.valid">
+                    Confirmer paramètres
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-dialog-content>
+</mat-card>

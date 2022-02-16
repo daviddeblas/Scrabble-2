@@ -1,15 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
+import { GamePageModule } from '@app/modules/game-page.module';
+import { AppMaterialModule } from '@app/modules/material.module';
+import { EffectsRootModule } from '@ngrx/effects';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { StoreModule } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
+    let actions$: Observable<unknown>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GamePageComponent, SidebarComponent, PlayAreaComponent],
+            imports: [StoreModule.forRoot({}), GamePageModule, EffectsRootModule, BrowserAnimationsModule, AppMaterialModule],
+            providers: [
+                {
+                    provide: Router,
+                    useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
+                },
+                provideMockActions(() => actions$),
+                {
+                    provide: EffectsRootModule,
+                    useValue: {
+                        addEffects: jasmine.createSpy('addEffects'),
+                    },
+                },
+            ],
         }).compileComponents();
     });
 
