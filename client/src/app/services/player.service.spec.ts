@@ -34,7 +34,7 @@ describe('PlayerService', () => {
         board[1][1] = 'A';
 
         socketService = new SocketTestHelper();
-        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [] };
+        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [] };
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({

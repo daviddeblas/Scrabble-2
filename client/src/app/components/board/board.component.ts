@@ -18,13 +18,13 @@ export class BoardComponent {
     readonly multiplierType = MultiplierType;
     readonly boardSize = BOARD_SIZE;
 
-    board$: Observable<(Letter | null)[][]>;
+    boardState$: Observable<BoardState>;
     pointsPerLetter$: Observable<Map<Letter, number>>;
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 
     constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }>) {
-        this.board$ = store.select('board', 'board');
+        this.boardState$ = store.select('board');
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.multipliers$ = store.select('board', 'multipliers');
         this.localSettings$ = store.select('localSettings');

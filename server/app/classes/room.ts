@@ -6,7 +6,7 @@ import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
-import { stringToLetter, stringToLetters } from './letter';
+import { BLANK_LETTER, stringToLetter, stringToLetters } from './letter';
 import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
 import { Vec2 } from './vec2';
@@ -80,6 +80,7 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             this.setupSocket(socket, index);
         });
+        this.initTimer();
     }
 
     initSurrenderGame(): void {
@@ -124,7 +125,6 @@ export class Room {
             socket.emit('game status', this.gameStatusGetter(playerNumber));
         });
         socket.on('command', (command) => this.onCommand(socket, command, playerNumber));
-        this.initTimer();
     }
 
     private onCommand(socket: io.Socket, command: string, playerNumber: number) {
@@ -141,18 +141,23 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
+        const info = game.endGame();
         this.sockets.forEach((s) => {
-            s.emit('end game', game.endGame());
+            s.emit('end game', info);
         });
         clearTimeout(this.currentTimer);
     }
 
     private initTimer(): void {
-        const game = this.game as Game;
-        this.currentTimer = setTimeout(() => {
-            this.processSkip([], game.activePlayer as number);
-            this.postCommand();
-        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        this.currentTimer = setTimeout(this.actionAfterTimeout(this), this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+    }
+
+    private actionAfterTimeout(self: Room): () => void {
+        const game = self.game as Game;
+        return () => {
+            self.processSkip([], game.activePlayer as number);
+            self.postCommand();
+        };
     }
 
     private errorOnCommand(socket: io.Socket, error: Error): void {
@@ -168,12 +173,10 @@ export class Room {
 
     private postCommand(): void {
         clearTimeout(this.currentTimer);
-        this.sockets.forEach((s) => s.emit('turn ended'));
-        this.currentTimer = setTimeout(() => {
-            const game = this.game as Game;
-            this.processSkip([], game.activePlayer as number);
-            this.postCommand();
-        }, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        this.initTimer();
+        this.sockets.forEach((s) => {
+            s.emit('turn ended');
+        });
     }
 
     private processCommand(fullCommand: string, playerNumber: number): void {
@@ -207,8 +210,13 @@ export class Room {
         const game = this.game as Game;
         if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
         game.draw(stringToLetters(args[0]), playerNumber);
-        this.sockets.forEach((s) => {
-            s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
+        const lettersToSendEveryone: string[] = [];
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < args[0].length; i++) lettersToSendEveryone.push('#');
+
+        this.sockets.forEach((s, index) => {
+            if (index === playerNumber) s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
+            else s.emit('draw success', { letters: lettersToSendEveryone, username: game.players[playerNumber].name });
         });
     }
 
@@ -267,7 +275,7 @@ export class Room {
     private gameStatusGetter(playerNumber: number): unknown {
         const game = this.game as Game;
         const opponent = { ...game.players[(playerNumber + 1) % 2] };
-        opponent.easel = [];
+        opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
             status: { activePlayer: game.players[game.activePlayer].name, letterPotLength: game.bag.letters.length },
             players: { player: game.players[playerNumber], opponent },

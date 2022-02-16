@@ -147,7 +147,7 @@ export class Board {
         }
         checkingPosition = checkingPosition.add(direction);
 
-        while (this.letterAt(checkingPosition) !== null) {
+        while (!this.positionOutOfBound(checkingPosition) && this.letterAt(checkingPosition) !== null) {
             word.push(new PlacedLetter(this.letterAt(checkingPosition) as Letter, checkingPosition.copy()));
             checkingPosition = checkingPosition.add(direction);
         }

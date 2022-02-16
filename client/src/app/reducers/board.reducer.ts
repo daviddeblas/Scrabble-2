@@ -3,6 +3,7 @@ import { gameStatusReceived } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { Multiplier } from '@app/classes/multiplier';
+import { Vec2 } from '@app/classes/vec2';
 import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
 
@@ -14,9 +15,10 @@ export interface BoardState {
     board: (Letter | null)[][];
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
+    blanks: Vec2[];
 }
 
-export const initialState: BoardState = { board: [], pointsPerLetter: new Map(), multipliers: [] };
+export const initialState: BoardState = { board: [], pointsPerLetter: new Map(), multipliers: [], blanks: [] };
 
 export const reducer = createReducer(
     initialState,
