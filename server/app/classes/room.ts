@@ -92,7 +92,7 @@ export class Room {
     }
 
     surrenderGame(looserId: string) {
-        if (!this.game?.players) throw new Error('Game does not exist');
+        if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
             this.game.players,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,

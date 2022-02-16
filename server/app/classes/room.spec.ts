@@ -86,11 +86,7 @@ describe('room', () => {
 
         it('surrenderGame should throw error if the game is null', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            try {
-                room.surrenderGame(socket.id);
-            } catch (error) {
-                expect(error.message).to.deep.equal('Game does not exist');
-            }
+            expect(() => room.surrenderGame(socket.id)).to.throw();
         });
 
         it('onCommand should call processCommand and postCommand', () => {
@@ -379,11 +375,7 @@ describe('room', () => {
             it('string with place calls processPlace', () => {
                 const fullCommand = 'placer h3h h';
                 game.gameFinished = true;
-                try {
-                    room['processCommand'](fullCommand, game.activePlayer);
-                } catch (error) {
-                    expect(error.message).to.deep.equal('game is finished');
-                }
+                expect(() => room['processCommand'](fullCommand, game.activePlayer)).to.throw();
             });
         });
 
@@ -399,27 +391,15 @@ describe('room', () => {
             room['validatePlace'] = () => {
                 return false;
             };
-            try {
-                room['processPlace'](['a'], 0);
-            } catch (error) {
-                expect(error.message).to.deep.equal('malformed arguments for place');
-            }
+            expect(() => room['processPlace'](['a'], 0)).to.throw();
         });
 
         it('processDraw with wrong arguments should throw an error', () => {
-            try {
-                room['processDraw'](['a8'], 0);
-            } catch (error) {
-                expect(error.message).to.deep.equal('malformed argument for exchange');
-            }
+            expect(() => room['processDraw'](['a8'], 0)).to.throw();
         });
 
         it('processSkip with arguments should throw an error', () => {
-            try {
-                room['processSkip'](['a', 'b'], 0);
-            } catch (error) {
-                expect(error.message).to.deep.equal('malformed argument for pass');
-            }
+            expect(() => room['processSkip'](['a', 'b'], 0)).to.throw();
         });
 
         it('ProcessSkip should emit skip success when player number is 0', (done) => {
