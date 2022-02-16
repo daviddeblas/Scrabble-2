@@ -58,6 +58,10 @@ export class Board {
             score += this.scorePositions(w.map((l) => l.position.copy()));
         });
 
+        letters.forEach((l) => {
+            this.multipliers[l.position.x][l.position.y] = null;
+        });
+
         return score;
     }
 
