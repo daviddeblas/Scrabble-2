@@ -25,7 +25,7 @@ describe('ChatService', () => {
                     selectors: [
                         {
                             selector: 'gameStatus',
-                            value: { activePlayer: username, letterPotLength: 0 },
+                            value: { activePlayer: username, letterPotLength: 0, gameEnded: false },
                         },
                     ],
                 }),
@@ -279,5 +279,38 @@ describe('ChatService', () => {
     it('validateExchangeCommand should return false if there is more than two parts to the command', () => {
         const exampleCommand = ['!échanger', 'abcpzoe', 'last part'];
         expect(service['validateExchangeCommand'](exampleCommand)).toBeFalse();
+    });
+});
+describe('ChatService', () => {
+    let service: ChatService;
+    let store: MockStore;
+    let username: string;
+    let socketHelper: SocketTestHelper;
+    beforeEach(async () => {
+        username = 'My name';
+        socketHelper = new SocketTestHelper();
+        await TestBed.configureTestingModule({
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameStatus',
+                            value: { activePlayer: username, letterPotLength: 0, gameEnded: true },
+                        },
+                    ],
+                }),
+            ],
+        }).compileComponents();
+        service = TestBed.inject(ChatService);
+        store = TestBed.inject(MockStore);
+        service['socketService'].socket = socketHelper as unknown as Socket;
+    });
+
+    it('should dispatch "[Chat] Received message" with a turn Error if the game has ended', () => {
+        const exampleMessage = '!passer';
+        const otherPlayer = 'Other Player';
+        service.messageWritten(otherPlayer, exampleMessage);
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'La partie est finie', messageType: 'Error' }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 });

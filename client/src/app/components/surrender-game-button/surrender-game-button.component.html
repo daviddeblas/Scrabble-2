@@ -1,4 +1,12 @@
-<button mat-raised-button aria-label="Surrender button with flag icon" id="surrend-button" color="warn" (click)="openConfirmSurrenderDialog()">
+<button *ngIf="(gameEnded$ | async) === false; else quitButton" mat-raised-button
+    aria-label="Surrender button with flag icon" id="surrend-button" color="warn"
+    (click)="openConfirmSurrenderDialog()">
     <mat-icon>flag</mat-icon>
     Abandonner
 </button>
+<ng-template #quitButton>
+    <button mat-raised-button aria-label="Quit" id="quit-button" color="black" (click)="quitGamePage()">
+        <mat-icon>exit_to_app</mat-icon>
+        Quitter
+    </button>
+</ng-template>

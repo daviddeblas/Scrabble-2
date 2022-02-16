@@ -56,6 +56,7 @@ export class Room {
     }
 
     quitRoomClient(): void {
+        if (this.game !== null) return;
         this.host.emit('player joining cancel');
         this.clients[0] = null;
         this.clientName = null;
@@ -95,10 +96,11 @@ export class Room {
         if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
             this.game.players,
+            this.game.bag.letters.length,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
-        this.sockets.forEach((socket) => {
-            socket.emit('end game', gameFinishStatus);
+        this.sockets.forEach((socket, index) => {
+            socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
     }
 
@@ -141,9 +143,9 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-        const info = game.endGame();
-        this.sockets.forEach((s) => {
-            s.emit('end game', info);
+        this.sockets.forEach((s, i) => {
+            const endGameStatus = game.endGame().toEndGameStatus(i);
+            s.emit('end game', endGameStatus);
         });
         clearTimeout(this.currentTimer);
     }

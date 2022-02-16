@@ -78,7 +78,7 @@ export class Game {
     }
 
     endGame(): GameFinishStatus {
-        this.endGameScoreAdjustment();
+        if (!this.gameFinished) this.endGameScoreAdjustment();
         this.gameFinished = true;
         return this.getGameEndStatus();
     }
@@ -88,7 +88,7 @@ export class Game {
     }
 
     private getGameEndStatus(): GameFinishStatus {
-        return new GameFinishStatus(this.players, this.determineWinner());
+        return new GameFinishStatus(this.players, this.bag.letters.length, this.determineWinner());
     }
 
     private endGameBonus(): number {
