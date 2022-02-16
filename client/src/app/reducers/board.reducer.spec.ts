@@ -1,10 +1,10 @@
 import * as boardActions from '@app/actions/board.actions';
-import { gameStatusReceived } from '@app/actions/game-status.actions';
+import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
 import { Multiplier } from '@app/classes/multiplier';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
-import { boardSize, BoardState, reducer } from './board.reducer';
+import { boardSize, BoardState, initialState, reducer } from './board.reducer';
 
 const createInitialBoard = () => {
     const initialBoard = new Array(boardSize);
@@ -79,5 +79,12 @@ describe('[Board] Reducer', () => {
                 expect(result.multipliers[0][y]).toBeNull();
             }
         });
+    });
+
+    it('should reset to initial state', () => {
+        const action = resetAllState();
+        const result = reducer(boardStub, action);
+
+        expect(result).toEqual(initialState);
     });
 });

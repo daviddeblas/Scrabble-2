@@ -1,4 +1,5 @@
 import * as gameActions from '@app/actions/game-status.actions';
+import { resetAllState } from '@app/actions/game-status.actions';
 import { createReducer, on } from '@ngrx/store';
 
 export const gameStatusFeatureKey = 'gameStatus';
@@ -25,4 +26,5 @@ export const reducer = createReducer(
         letterPotLength: status.letterPotLength,
     })),
     on(gameActions.endGame, (state, { winner }) => ({ ...state, gameEnded: true, winner })),
+    on(resetAllState, () => initialState),
 );

@@ -1,5 +1,6 @@
 import { loadDictionariesSuccess } from '@app/actions/dictionaries.actions';
-import { reducer, initialState } from './dictionaries.reducer';
+import { resetAllState } from '@app/actions/game-status.actions';
+import { initialState, reducer } from './dictionaries.reducer';
 
 describe('Dictionaries Reducer', () => {
     describe('an unknown action', () => {
@@ -11,5 +12,13 @@ describe('Dictionaries Reducer', () => {
 
             expect(result).toBe(dictionaries);
         });
+    });
+
+    it('should reset to initial state', () => {
+        const dictionaries = ['dict'];
+        const action = resetAllState();
+        const result = reducer(dictionaries, action);
+
+        expect(result).toEqual(initialState);
     });
 });
