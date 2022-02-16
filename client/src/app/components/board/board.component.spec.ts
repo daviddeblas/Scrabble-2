@@ -1,4 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
+import { CellLetterX3Component } from '@app/components/cells/cell-letter-x3/cell-letter-x3.component';
+import { CellStarComponent } from '@app/components/cells/cell-star/cell-star.component';
+import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-word-x2.component';
+import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
+import { LetterComponent } from '@app/components/letter/letter.component';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import { StoreModule } from '@ngrx/store';
 import { BoardComponent } from './board.component';
@@ -9,7 +15,16 @@ describe('BoardComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [BoardComponent, BoardToListPipe],
+            declarations: [
+                BoardComponent,
+                BoardToListPipe,
+                LetterComponent,
+                CellStarComponent,
+                CellLetterX2Component,
+                CellLetterX3Component,
+                CellWordX2Component,
+                CellWordX3Component,
+            ],
             imports: [StoreModule.forRoot({})],
         }).compileComponents();
     });
