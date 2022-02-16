@@ -103,6 +103,7 @@ describe('game', () => {
     it('place should score according to scorePositions added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
+        const multiplierBonusOnBoard = 1;
 
         game.place(
             oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
@@ -113,7 +114,7 @@ describe('game', () => {
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(3 + i, 7));
         const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
-        expect(thisPlayerScore).to.eq(expectedPoints + BONUS_POINTS_FOR_FULL_EASEL);
+        expect(thisPlayerScore).to.eq(expectedPoints + BONUS_POINTS_FOR_FULL_EASEL + multiplierBonusOnBoard);
     });
 
     // eslint-disable-next-line max-len

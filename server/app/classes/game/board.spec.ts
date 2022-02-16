@@ -77,20 +77,16 @@ describe('board', () => {
 
     it('scorePositions should score accordingly on correct placement with a single letter multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Letter);
-        board.place(correctLettersToPlace, [], true);
-
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const bonusFromMultiplier = 1;
-        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints + bonusFromMultiplier);
+        expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints + bonusFromMultiplier);
     });
 
     it('scorePositions should score accordingly on correct placement with a single word multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
-        board.place(correctLettersToPlace, [], true);
-
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 2;
-        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
+        expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
     });
 
     it('place throws on wrong word', () => {
@@ -127,11 +123,9 @@ describe('board', () => {
     it('scorePositions should score accordingly on correct placement with multiple word multiplier', () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
-        board.place(correctLettersToPlace, [], true);
-
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 3;
-        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints * wordMultiplier);
+        expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
     });
 
     it('letterAt should return the same as if taken directly', () => {

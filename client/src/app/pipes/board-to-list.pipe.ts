@@ -9,7 +9,7 @@ import { BoardState } from '@app/reducers/board.reducer';
 export class BoardToListPipe implements PipeTransform {
     transform(value: BoardState | null): PlacedLetter[] {
         const list: PlacedLetter[] = [];
-        if (!value?.board || !value?.blanks) return list;
+        if (!value) return list;
         for (let i = 0; i < value.board.length; i++) {
             for (let j = 0; j < value.board[i].length; j++) {
                 if (value.board[i][j]) {

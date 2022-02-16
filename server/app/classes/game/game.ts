@@ -83,6 +83,10 @@ export class Game {
         return this.getGameEndStatus();
     }
 
+    nextTurn(): void {
+        this.activePlayer = this.nextPlayer();
+    }
+
     private getGameEndStatus(): GameFinishStatus {
         return new GameFinishStatus(this.players, this.bag.letters.length, this.determineWinner());
     }
@@ -117,10 +121,6 @@ export class Game {
             if (index < 0) throw new GameError(GameErrorType.LettersAreNotInEasel);
             playerTempEasel.splice(index, 1);
         });
-    }
-
-    private nextTurn(): void {
-        this.activePlayer = this.nextPlayer();
     }
 
     private nextPlayer(): number {
