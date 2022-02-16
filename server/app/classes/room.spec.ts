@@ -155,7 +155,11 @@ describe('room', () => {
                     return true;
                 },
                 endGame: () => {
-                    return;
+                    return {
+                        toEndGameStatus: () => {
+                            return;
+                        },
+                    };
                 },
             } as unknown as Game;
             room['onCommand'](fakeSocket, 'passer', 0);
@@ -175,7 +179,7 @@ describe('room', () => {
                     hostReceived = true;
                 },
             } as unknown as io.Socket;
-            room.game = { players: ['player1', 'player2'] } as unknown as Game;
+            room.game = { players: ['player1', 'player2'], bag: { letters: [] } } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
             room.surrenderGame('player2');
