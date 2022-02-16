@@ -4,7 +4,7 @@ import io from 'socket.io';
 import Container from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
-import { GameErrorType } from './game.exception';
+import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
 import { BLANK_LETTER, stringToLetter, stringToLetters } from './letter';
 import { PlacedLetter } from './placed-letter';
@@ -92,7 +92,7 @@ export class Room {
     }
 
     surrenderGame(looserId: string) {
-        if (!this.game?.players) throw new Error('Game does not exist');
+        if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
             this.game.players,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
@@ -181,7 +181,7 @@ export class Room {
 
     private processCommand(fullCommand: string, playerNumber: number): void {
         const game = this.game as Game;
-        if (game.gameFinished) throw new Error('game is finished');
+        if (game.gameFinished) throw new GameError(GameErrorType.GameIsFinished);
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
             case 'placer':
@@ -197,7 +197,7 @@ export class Room {
     }
 
     private processPlace(args: string[], playerNumber: number): void {
-        if (!this.validatePlace(args)) throw Error('malformed arguments for place');
+        if (!this.validatePlace(args)) throw new GameError(GameErrorType.WrongPlaceArgument);
         const argsForParsePlaceCall = this.parsePlaceCall(args);
         const game = this.game as Game;
         game.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
@@ -208,7 +208,7 @@ export class Room {
 
     private processDraw(args: string[], playerNumber: number): void {
         const game = this.game as Game;
-        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw Error('malformed argument for exchange');
+        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -222,7 +222,7 @@ export class Room {
 
     private processSkip(args: string[], playerNumber: number): void {
         const game = this.game as Game;
-        if (args.length > 0) throw new Error('malformed argument for pass');
+        if (args.length > 0) throw new GameError(GameErrorType.WrongSkipArgument);
         game.skip(playerNumber);
         this.sockets.forEach((s) => {
             s.emit('skip success', game.players[playerNumber].name);
