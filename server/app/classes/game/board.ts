@@ -42,7 +42,7 @@ export class Board {
             throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
-        if (!firstMove && allPlacedLetters.length === letters.length) throw new Error('word placement does not connect to other words');
+        if (!firstMove && allPlacedLetters.length === letters.length) throw new GameError(GameErrorType.WordNotConnected);
         words.forEach((w) => {
             if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
         });
