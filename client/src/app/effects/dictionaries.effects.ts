@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this */
 import { Injectable } from '@angular/core';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { DictionaryService } from '@app/services/dictionary.service';

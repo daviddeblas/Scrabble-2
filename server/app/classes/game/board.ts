@@ -1,6 +1,6 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
-import { BLANK_LETTER, Letter } from '@app/classes/letter';
+import { Letter } from '@app/classes/letter';
 import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
@@ -37,18 +37,21 @@ export class Board {
         this.blanks = [];
     }
 
-    place(letters: PlacedLetter[]): number {
+    place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number {
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
             throw new Error('letter out of bound');
         const words = this.getAffectedWords(letters);
+        const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
+        if (!firstMove && allPlacedLetters.length === letters.length) throw new GameError(GameErrorType.WordNotConnected);
         words.forEach((w) => {
             if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
         });
 
         letters.forEach((l) => {
             this.board[l.position.x][l.position.y] = l.letter;
-            if (l.letter === BLANK_LETTER) this.blanks.push(new Vec2(l.position.x, l.position.y));
         });
+
+        blanks.forEach((v) => this.blanks.push(letters[v].position.copy()));
 
         let score = 0;
         words.forEach((w) => {
@@ -62,14 +65,13 @@ export class Board {
         let score = 0;
         let multiplier = 1;
         pos.forEach((vec) => {
-            // get current letter
             const letter = this.board[vec.x][vec.y];
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
-            // prendre le nombre de points associe a cette lettre
+            // prends le nombre de points associe a cette lettre
             const letterPoints = this.pointsPerLetter.get(letter) as number;
-            // annuler s'il s'agit d'un blank
+            // annule s'il s'agit d'un blank
             if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
-            // obtenir le multiplieur a cette position
+            // obtient le multiplieur a cette position
             const multi = this.multipliers[vec.x][vec.y];
             if (multi === null) {
                 score += letterPoints;
@@ -123,7 +125,7 @@ export class Board {
             ALLOWED_DIRECTIONS.forEach((d) => {
                 const word = tempBoard.getAffectedWordFromSinglePlacement(d, l.position);
                 if (word.length < 2) return;
-                // ajouter s'il nexiste pas
+                // ajoute s'il n'existe pas
                 const index = words.findIndex((w) => {
                     let bool = true;
                     for (let i = 0; i < w.length && i < word.length; i++) bool &&= w[i].equals(word[i]);
@@ -140,14 +142,20 @@ export class Board {
         let checkingPosition = new Vec2(pos.x, pos.y);
         const word: PlacedLetter[] = [];
 
-        while (this.letterAt(checkingPosition) !== null) checkingPosition = checkingPosition.sub(direction);
+        while (!this.positionOutOfBound(checkingPosition) && this.letterAt(checkingPosition) !== null) {
+            checkingPosition = checkingPosition.sub(direction);
+        }
         checkingPosition = checkingPosition.add(direction);
 
-        while (this.letterAt(checkingPosition) !== null) {
+        while (!this.positionOutOfBound(checkingPosition) && this.letterAt(checkingPosition) !== null) {
             word.push(new PlacedLetter(this.letterAt(checkingPosition) as Letter, checkingPosition.copy()));
             checkingPosition = checkingPosition.add(direction);
         }
 
         return word;
+    }
+
+    private positionOutOfBound(pos: Vec2): boolean {
+        return pos.x < 0 || pos.y < 0 || pos.x > this.config.boardSize.x - 1 || pos.y > this.config.boardSize.y - 1;
     }
 }

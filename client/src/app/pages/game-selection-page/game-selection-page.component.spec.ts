@@ -40,4 +40,9 @@ describe('GameSelectionPageComponent', () => {
         component.openGamePreparationPage();
         expect(mockDialogSpy.open).toHaveBeenCalled();
     });
+
+    it('should open the window when the begin button is clicked', () => {
+        component.openGameJoinPage();
+        expect(mockDialogSpy.open).toHaveBeenCalled();
+    });
 });

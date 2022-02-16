@@ -19,6 +19,7 @@ describe('[Game Status] Game Status Received', () => {
         board: [],
         multipliers: [],
         pointsPerLetter: new Map(),
+        blanks: [],
     };
 
     it('should set the game status', () => {

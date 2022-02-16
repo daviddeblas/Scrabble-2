@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this */
 import { Injectable } from '@angular/core';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { GameManagerService } from '@app/services/game-manager.service';

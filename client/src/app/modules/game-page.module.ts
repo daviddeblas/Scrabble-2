@@ -38,6 +38,7 @@ import { StoreModule } from '@ngrx/store';
         LetterComponent,
         ChatBoxComponent,
         EaselComponent,
+        SurrenderGameButtonComponent,
         BoardToListPipe,
         SidebarComponent,
         ChatBoxComponent,

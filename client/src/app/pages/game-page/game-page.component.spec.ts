@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GamePageModule } from '@app/modules/game-page.module';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { EffectsRootModule } from '@ngrx/effects';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { StoreModule } from '@ngrx/store';
@@ -14,7 +15,7 @@ describe('GamePageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [StoreModule.forRoot({}), GamePageModule, EffectsRootModule, BrowserAnimationsModule],
+            imports: [StoreModule.forRoot({}), GamePageModule, EffectsRootModule, BrowserAnimationsModule, AppMaterialModule],
             providers: [
                 provideMockActions(() => actions$),
                 {

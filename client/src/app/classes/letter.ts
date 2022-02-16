@@ -30,9 +30,10 @@ export type Letter =
 export const stringToLetter = (string: string): Letter => {
     const error = new Error(`Invalid string input: ${string}`);
     if (string.length !== 1) throw error;
-    const char = string.charAt(0).toUpperCase();
-    if (!char.match(/[A-Z]|\*/)) throw error;
-    return char as Letter;
+    const char = string.charAt(0);
+    if (!char.match(/[a-zA-Z]|\*/)) throw error;
+    if (char === char.toUpperCase()) return '*';
+    return char.toUpperCase() as Letter;
 };
 
 export const stringToLetters = (string: string): Letter[] => {

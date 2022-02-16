@@ -1,5 +1,5 @@
 export interface ChatMessage {
     username: string;
     message: string;
-    errorName: string;
+    messageType: string;
 }

@@ -123,44 +123,54 @@ describe('RoomService', () => {
         expect(onSpy).toHaveBeenCalled();
     });
 
-    const timer = 60;
-    const roomList: RoomInfo[] = [new RoomInfo('room-id', new GameOptions('host', 'dict', timer))];
-    const playerName = 'player 2';
+    describe('Room events', () => {
+        const timer = 60;
+        const roomList: RoomInfo[] = [new RoomInfo('room-id', new GameOptions('host', 'dict', timer))];
+        const playerName = 'player 2';
+        it('should dispatch "[Room] Load Rooms Success" for the create room success and wait for invitations', () => {
+            service.fetchRoomList();
+            socketService.peerSideEmit('get list', roomList);
 
-    it('should dispatch "[Room] Load Rooms Success" for the create room success and wait for invitations', () => {
-        service.fetchRoomList();
+            const expectedAction = cold('a', { a: loadRoomsSuccess({ rooms: roomList }) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
 
-        socketService.peerSideEmit('get list', roomList);
+        it('should send a request to join a room and wait for an answer', () => {
+            const sendSpy = spyOn(socketService, 'emit');
+            const onSpy = spyOn(socketService, 'on');
 
-        const expectedAction = cold('a', { a: loadRoomsSuccess({ rooms: roomList }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
+            service.joinRoom(roomList[0], playerName);
 
-    it('should send a request to join a room and wait for an answer', () => {
-        const sendSpy = spyOn(socketService, 'emit');
-        const onSpy = spyOn(socketService, 'on');
+            expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
+            expect(onSpy).toHaveBeenCalledTimes(2);
+        });
 
-        service.joinRoom(roomList[0], playerName);
+        it('should send a request to join a room and wait for an answer', () => {
+            const sendSpy = spyOn(socketService, 'emit');
+            const onSpy = spyOn(socketService, 'on');
 
-        expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
-        expect(onSpy).toHaveBeenCalledTimes(2);
-    });
+            service.joinRoom(roomList[0], playerName);
 
-    it('should dispatch "[Room] Join Room Accepted" when receiving accept', () => {
-        service.joinRoom(roomList[0], playerName);
+            expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
+            expect(onSpy).toHaveBeenCalledTimes(2);
+        });
 
-        socketService.peerSideEmit('accepted');
+        it('should dispatch "[Room] Join Room Accepted" when receiving accept', () => {
+            service.joinRoom(roomList[0], playerName);
 
-        const expectedAction = cold('a', { a: joinRoomAccepted({ roomInfo: roomList[0], playerName }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
+            socketService.peerSideEmit('accepted');
 
-    it('should dispatch "[Room] Join Room Declined" when receiving accept', () => {
-        service.joinRoom(roomList[0], playerName);
+            const expectedAction = cold('a', { a: joinRoomAccepted({ roomInfo: roomList[0], playerName }) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
 
-        socketService.peerSideEmit('refused');
+        it('should dispatch "[Room] Join Room Declined" when receiving accept', () => {
+            service.joinRoom(roomList[0], playerName);
 
-        const expectedAction = cold('a', { a: joinRoomDeclined({ roomInfo: roomList[0], playerName }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
+            socketService.peerSideEmit('refused');
+
+            const expectedAction = cold('a', { a: joinRoomDeclined({ roomInfo: roomList[0], playerName }) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
     });
 });

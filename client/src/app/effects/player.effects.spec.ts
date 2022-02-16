@@ -10,7 +10,7 @@ describe('PlayerEffects', () => {
     let service: jasmine.SpyObj<PlayerService>;
 
     beforeEach(() => {
-        service = jasmine.createSpyObj('PlayerService', ['surrenderGame']);
+        service = jasmine.createSpyObj('PlayerService', ['surrenderGame', 'placeWord', 'exchangeLetters']);
         TestBed.configureTestingModule({
             providers: [
                 PlayerEffects,
@@ -32,6 +32,20 @@ describe('PlayerEffects', () => {
         actions$ = of({ type: '[Players] Surrender' });
         effects.surrenderEffect$.subscribe();
         expect(service.surrenderGame).toHaveBeenCalledWith();
+        done();
+    });
+
+    it('placeWordEffect$ should call the function placeWord from player service', (done) => {
+        actions$ = of({ type: '[Players] Place Word' });
+        effects.placeWordEffect$.subscribe();
+        expect(service.placeWord).toHaveBeenCalled();
+        done();
+    });
+
+    it('exchangeLettersEffect$ should call the function exchangeLetters from player service', (done) => {
+        actions$ = of({ type: '[Players] Exchange Letters' });
+        effects.exchangeLettersEffect$.subscribe();
+        expect(service.exchangeLetters).toHaveBeenCalled();
         done();
     });
 });

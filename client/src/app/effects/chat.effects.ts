@@ -12,7 +12,7 @@ export class ChatEffects {
             this.actions$.pipe(
                 ofType(initiateChatting),
                 tap(() => {
-                    this.chatService.acceptNewMessages();
+                    this.chatService.acceptNewAction();
                 }),
             ),
         { dispatch: false },
