@@ -2,13 +2,13 @@
     <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.opponent)">
         <h2>{{ (players$ | async)?.opponent?.name }}</h2>
 
-        <ng-template *ngIf="(gameStatus$ | async)?.gameEnded === false">
+        <div *ngIf="!(gameStatus$ | async)?.gameEnded">
             <h3 *ngIf="isActivePlayer((players$ | async)?.opponent); else opponent_waiting">Temps restant {{
                 timerToString() }}</h3>
             <ng-template #opponent_waiting>
                 <h3>En attente</h3>
             </ng-template>
-        </ng-template>
+        </div>
 
         <p>{{ (players$ | async)?.opponent?.score }}pts</p>
         <p *ngIf="((players$ | async)?.opponent?.easel?.length ?? 0) < 7">{{ (players$ | async)?.opponent?.easel?.length
@@ -37,14 +37,14 @@
             lettres</p>
         <p>{{ (players$ | async)?.player?.score }}pts</p>
 
-        <ng-template *ngIf="(gameStatus$ | async)?.gameEnded === false">
+        <div *ngIf="!(gameStatus$ | async)?.gameEnded">
             <h3 *ngIf="isActivePlayer((players$ | async)?.player); else player_waiting">Temps restant {{ timerToString()
                 }}
             </h3>
             <ng-template #player_waiting>
                 <h3>En attente</h3>
             </ng-template>
-        </ng-template>
+        </div>
 
         <h2>{{ (players$ | async)?.player?.name }}</h2>
     </mat-card>
