@@ -166,6 +166,7 @@ export class Room {
         if (error.message === GameErrorType.InvalidWord) {
             clearTimeout(this.currentTimer);
             setTimeout(() => {
+                this.game?.nextTurn();
                 this.postCommand();
             }, delayForInvalidWord);
         }
