@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
-import { createRoom, resetRoomState } from '@app/actions/room.actions';
+import { resetAllState } from '@app/actions/game-status.actions';
+import { createRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
@@ -35,7 +36,7 @@ export class MultiConfigWindowComponent implements OnInit {
         dictionariesStore: Store<{ dictionaries: string[] }>,
         private store: Store,
     ) {
-        store.dispatch(resetRoomState());
+        store.dispatch(resetAllState());
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');
         store.dispatch(loadDictionaries());

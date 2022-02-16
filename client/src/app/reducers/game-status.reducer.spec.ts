@@ -47,4 +47,11 @@ describe('[Game Status] Game Status Received', () => {
 
         expect(result).toEqual({ ...initialState, gameEnded: true, winner: 'Player 1' });
     });
+
+    it('should reset to initial state', () => {
+        const action = gameStatusActions.resetAllState();
+        const result = reducer(gameStatusStub, action);
+
+        expect(result).toEqual(initialState);
+    });
 });

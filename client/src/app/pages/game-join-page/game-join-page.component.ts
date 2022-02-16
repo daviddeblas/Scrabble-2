@@ -2,7 +2,8 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { cancelJoinRoom, joinRoom, loadRooms, resetRoomState } from '@app/actions/room.actions';
+import { resetAllState } from '@app/actions/game-status.actions';
+import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomEffects } from '@app/effects/room.effects';
@@ -42,7 +43,7 @@ export class GameJoinPageComponent implements OnDestroy {
         effects: RoomEffects,
         dialogRef: MatDialogRef<GameJoinPageComponent>,
     ) {
-        this.store.dispatch(resetRoomState());
+        this.store.dispatch(resetAllState());
         this.formGroup = formBuilder.group({ name: new FormControl({ value: '', disabled: this.isFormDisabled }) });
 
         this.roomList$ = roomStore.select('room', 'roomList');

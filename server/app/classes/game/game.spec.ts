@@ -5,6 +5,7 @@ import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { spy } from 'sinon';
 import Container from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';
 
@@ -199,6 +200,14 @@ describe('game', () => {
 
     it('endGame should always return the same as getGameEndStatus', () => {
         expect(game.endGame()).to.deep.eq(game['getGameEndStatus']());
+    });
+
+    it('endGame should only call endGameScoreAdjustment once', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyOnScoreAjustment = spy(game as any, 'endGameScoreAdjustment');
+        game.endGame();
+        game.endGame();
+        expect(spyOnScoreAjustment.calledOnce).to.equal(true);
     });
 
     it('getGameEndStatus should return players and the winner as a string from determineWinner', () => {
