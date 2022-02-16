@@ -3,7 +3,6 @@
 import { MILLISECONDS_PER_SEC, Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
-import { fail } from 'assert';
 import { expect } from 'chai';
 import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
@@ -56,6 +55,15 @@ describe('room', () => {
             room.quitRoomHost();
         });
 
+        it('quitRoomHost should call RoomsManager.removeRoom', (done) => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            room.clients[0] = { id: '1' } as unknown as io.Socket;
+            stub(room, 'inviteRefused').callsFake(() => {
+                return done();
+            });
+            room.quitRoomHost();
+        });
+
         it('inviteRefused should set remove the client from the room', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             room.clients[0] = socket;
@@ -78,11 +86,7 @@ describe('room', () => {
 
         it('surrenderGame should throw error if the game is null', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            try {
-                room.surrenderGame(socket.id);
-            } catch (error) {
-                expect(error.message).to.deep.equal('Game does not exist');
-            }
+            expect(() => room.surrenderGame(socket.id)).to.throw();
         });
 
         it('onCommand should call processCommand and postCommand', () => {
@@ -371,6 +375,12 @@ describe('room', () => {
                 const fullCommand = 'passer';
                 room['processCommand'](fullCommand, game.activePlayer);
             });
+
+            it('string with place calls processPlace', () => {
+                const fullCommand = 'placer h3h h';
+                game.gameFinished = true;
+                expect(() => room['processCommand'](fullCommand, game.activePlayer)).to.throw();
+            });
         });
 
         it('process place calls game place on correctly formed arguments', (done) => {
@@ -381,11 +391,118 @@ describe('room', () => {
             room['processPlace'](commandArgs, game.activePlayer);
         });
 
+        it('processPlace not valid should emit an Error', () => {
+            room['validatePlace'] = () => {
+                return false;
+            };
+            expect(() => room['processPlace'](['a'], 0)).to.throw();
+        });
+
+        it('processDraw with wrong arguments should throw an error', () => {
+            expect(() => room['processDraw'](['a8'], 0)).to.throw();
+        });
+
+        it('processSkip with arguments should throw an error', () => {
+            expect(() => room['processSkip'](['a', 'b'], 0)).to.throw();
+        });
+
+        it('ProcessSkip should emit skip success when player number is 0', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    if (event === 'skip success') done();
+                    return;
+                },
+            } as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room.game as any, 'skip').callsFake(() => {
+                return;
+            });
+            room['processSkip']([], 0);
+        });
+
+        it('ProcessSkip should emit skip success when player number is 1', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    if (event === 'skip success') done();
+                    return;
+                },
+            } as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room.game as any, 'skip').callsFake(() => {
+                return;
+            });
+            room['processSkip']([], 1);
+        });
+
+        it('processPlace should emit place success playerNumber is 1', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    if (event === 'place success') done();
+                    return;
+                },
+            } as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'parsePlaceCall').callsFake(() => {
+                return ['a', 'b'];
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room.game as any, 'place').callsFake(() => {
+                return;
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'validatePlace').callsFake(() => {
+                return true;
+            });
+            room['processPlace']([], 1);
+        });
+
+        it('processPlace should emit place success when playerNumber is 0', (done) => {
+            const fakeSocket = {
+                emit: (event: string) => {
+                    if (event === 'place success') done();
+                    return;
+                },
+            } as io.Socket;
+            room.sockets = [fakeSocket];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'parsePlaceCall').callsFake(() => {
+                return ['a', 'b'];
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room.game as any, 'place').callsFake(() => {
+                return;
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'validatePlace').callsFake(() => {
+                return true;
+            });
+            room['processPlace']([], 0);
+        });
+
+        it('validatePlace should return false if there is not two arguments', () => {
+            expect(room['validatePlace'](['a'])).to.equal(false);
+        });
+
+        it('validatePlace should return false if there is not two arguments', () => {
+            const result = room['parsePlaceCall'](['h7h', 'Ab']);
+            expect(result[1].length).to.equal(1);
+        });
+
         it('process draw calls game draw on correctly formed arguments', (done) => {
             game.draw = () => {
                 done();
             };
-            room['processDraw'](['a'], game.activePlayer);
+            room['processDraw'](['a'], 0);
+        });
+
+        it('process draw calls game draw on correctly formed arguments with another player number', (done) => {
+            game.draw = () => {
+                done();
+            };
+            room['processDraw'](['a'], 1);
         });
 
         it('process skip calls game skip on correctly formed arguments', (done) => {
@@ -511,21 +628,6 @@ describe('room', () => {
                 setTimeout(() => {
                     expect(surrenderGameStub.called).to.equal(true);
                     surrenderGameStub.restore();
-                    done();
-                }, RESPONSE_DELAY);
-            });
-
-            it('initChatting should not initiate the client socket if clients[0] is null', (done) => {
-                hostSocket.on('player joining', () => {
-                    room.clients[0] = null;
-                    room.initChatting();
-                    hostSocket.emit('send message', { username: 'player', message: 'message' });
-                });
-                clientSocket.on('receive message', () => {
-                    fail('Client should not receive message');
-                });
-                hostSocket.emit('create room');
-                setTimeout(() => {
                     done();
                 }, RESPONSE_DELAY);
             });

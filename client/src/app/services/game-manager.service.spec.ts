@@ -17,7 +17,7 @@ describe('GameManagerService', () => {
         opponent: new Player('Player 2'),
     };
     const gameStatus: GameStatus = { activePlayer: '', gameEnded: false, letterPotLength: 10 };
-    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map() };
+    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map(), blanks: [] };
     const status = { status: gameStatus, players, board: boardState };
 
     let service: GameManagerService;

@@ -43,7 +43,7 @@ export class ChatService {
         this.socketService.on('error', (errorMessage: string) => {
             const chatMessage = { username: '', message: errorMessage, messageType: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
-            if (errorMessage !== 'This letter placement creates an invalid word') {
+            if (errorMessage !== 'Ce placement crée une mot invalide') {
                 this.store.dispatch(getGameStatus());
             }
         });

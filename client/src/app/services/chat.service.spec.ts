@@ -116,7 +116,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message" and not "[Game Status] Get Game"', (done) => {
-        const errorMessage = 'This letter placement creates an invalid word';
+        const errorMessage = 'Ce placement crée une mot invalide';
         const expectedMessage = { username: '', message: errorMessage, messageType: 'Error' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('error', errorMessage);

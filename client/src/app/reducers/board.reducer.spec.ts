@@ -12,7 +12,7 @@ const createInitialBoard = () => {
     return initialBoard;
 };
 
-const createInitialState = () => ({ board: createInitialBoard(), pointsPerLetter: new Map(), multipliers: createInitialBoard() });
+const createInitialState = () => ({ board: createInitialBoard(), pointsPerLetter: new Map(), multipliers: createInitialBoard(), blanks: [] });
 
 describe('[Board] Reducer', () => {
     let boardStub: BoardState;

@@ -37,6 +37,7 @@ describe('[Players] Reducer', () => {
             board: [],
             multipliers: [],
             pointsPerLetter: new Map(),
+            blanks: [],
         };
 
         it('should return the loaded players', () => {
