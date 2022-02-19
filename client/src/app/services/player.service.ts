@@ -39,6 +39,10 @@ export class PlayerService {
         let letterPlaced = 0;
         if (letters.length > 1) {
             while (letterPlaced < letters.length) {
+                if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
+                    this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                    return;
+                }
                 const letter = this.letterOnBoard(column, line);
                 if (letter) {
                     lettersToPlace += letter;

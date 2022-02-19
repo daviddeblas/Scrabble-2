@@ -15,7 +15,7 @@ import { SocketClientService } from './socket-client.service';
 
 const CENTER_BOARD = 7;
 
-describe('PlayerService', () => {
+fdescribe('PlayerService', () => {
     let service: PlayerService;
     let socketService: SocketTestHelper;
     let store: MockStore<{ board: BoardState }>;
@@ -32,6 +32,7 @@ describe('PlayerService', () => {
             }
         }
         board[1][1] = 'A';
+        board[14][14] = 'E';
 
         socketService = new SocketTestHelper();
         const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [] };
@@ -105,6 +106,26 @@ describe('PlayerService', () => {
             return true;
         });
         position = 'c3';
+        service.placeWord(position, word);
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('placeWord should dispatch receivedMessage if word is not placable because it extends out of the board horizontally', () => {
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        position = 'o12h';
+        service.placeWord(position, word);
+        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('placeWord should dispatch receivedMessage if word is not placable because it extends out of the board vertically', () => {
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        position = 'l15v';
         service.placeWord(position, word);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
