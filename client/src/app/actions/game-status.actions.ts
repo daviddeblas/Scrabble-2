@@ -3,6 +3,8 @@ import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { createAction, props } from '@ngrx/store';
 
+export const resetAllState = createAction('[Game Status] Reset All State');
+
 export const getGameStatus = createAction('[Game Status] Get Game');
 
 export const gameStatusReceived = createAction(
@@ -10,4 +12,4 @@ export const gameStatusReceived = createAction(
     props<{ status: GameStatus; players: Players; board: BoardState }>(),
 );
 
-export const endGame = createAction('[Game Status] End Game', props<{ players: Players; winner: string }>());
+export const endGame = createAction('[Game Status] End Game', props<{ players: Players; remainingLetters: number; winner: string }>());

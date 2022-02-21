@@ -1,4 +1,4 @@
-import { gameStatusReceived } from '@app/actions/game-status.actions';
+import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
 import { copyPlayer, Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
@@ -37,4 +37,6 @@ export const reducer = createReducer(
 
         return nextState;
     }),
+
+    on(resetAllState, () => initialState),
 );

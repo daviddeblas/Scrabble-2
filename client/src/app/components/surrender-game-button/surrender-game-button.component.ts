@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { ConfirmSurrenderDialogComponent } from '@app/components/confirm-surrender-dialog/confirm-surrender-dialog.component';
+import { GameStatus } from '@app/reducers/game-status.reducer';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-surrender-game-button',
@@ -8,9 +12,17 @@ import { ConfirmSurrenderDialogComponent } from '@app/components/confirm-surrend
     styleUrls: ['./surrender-game-button.component.scss'],
 })
 export class SurrenderGameButtonComponent {
-    constructor(public dialog: MatDialog) {}
+    gameEnded$: Observable<boolean>;
+
+    constructor(public dialog: MatDialog, store: Store<{ gameStatus: GameStatus }>, private router: Router) {
+        this.gameEnded$ = store.select('gameStatus', 'gameEnded');
+    }
 
     openConfirmSurrenderDialog(): void {
         this.dialog.open(ConfirmSurrenderDialogComponent);
+    }
+
+    quitGamePage(): void {
+        this.router.navigateByUrl('/');
     }
 }

@@ -1,4 +1,5 @@
 import * as chatActions from '@app/actions/chat.actions';
+import { resetAllState } from '@app/actions/game-status.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { createReducer, on } from '@ngrx/store';
 
@@ -10,4 +11,5 @@ export const reducer = createReducer(
     initialState,
     on(chatActions.receivedMessage, (state, { username, message, messageType }) => [...state, { username, message, messageType }]),
     on(chatActions.restoreMessages, (state, { oldMessages }) => oldMessages),
+    on(resetAllState, () => initialState),
 );

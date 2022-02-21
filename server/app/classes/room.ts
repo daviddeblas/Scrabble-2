@@ -46,7 +46,9 @@ export class Room {
 
     inviteAccepted(client: io.Socket): void {
         client.emit('accepted');
-        this.initiateRoomEvents();
+        this.initGame();
+        this.initSurrenderGame();
+        this.initChatting();
     }
 
     inviteRefused(client: io.Socket): void {
@@ -56,13 +58,17 @@ export class Room {
     }
 
     quitRoomClient(): void {
+        if (this.game !== null) return;
         this.host.emit('player joining cancel');
         this.clients[0] = null;
         this.clientName = null;
     }
 
     initiateRoomEvents() {
-        this.initGame();
+        this.sockets = [this.host, this.clients[0] as io.Socket];
+        this.sockets.forEach((s, i) => {
+            this.setupSocket(s, i);
+        });
         this.initSurrenderGame();
         this.initChatting();
     }
@@ -95,10 +101,11 @@ export class Room {
         if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
             this.game.players,
+            this.game.bag.letters.length,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
-        this.sockets.forEach((socket) => {
-            socket.emit('end game', gameFinishStatus);
+        this.sockets.forEach((socket, index) => {
+            socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
     }
 
@@ -141,11 +148,11 @@ export class Room {
 
     private endGame(): void {
         const game = this.game as Game;
-        const info = game.endGame();
-        this.sockets.forEach((s) => {
-            s.emit('end game', info);
-        });
         clearTimeout(this.currentTimer);
+        this.sockets.forEach((s, i) => {
+            const endGameStatus = game.endGame().toEndGameStatus(i);
+            s.emit('end game', endGameStatus);
+        });
     }
 
     private initTimer(): void {

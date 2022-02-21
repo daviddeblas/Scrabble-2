@@ -1,5 +1,5 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
-import { gameStatusReceived } from '@app/actions/game-status.actions';
+import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { Multiplier } from '@app/classes/multiplier';
@@ -45,4 +45,6 @@ export const reducer = createReducer(
         }
         return state;
     }),
+
+    on(resetAllState, () => initialState),
 );

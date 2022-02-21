@@ -1,3 +1,4 @@
+import { resetAllState } from '@app/actions/game-status.actions';
 import * as roomActions from '@app/actions/room.actions';
 import { RoomInfo } from '@app/classes/room-info';
 import { createReducer, on } from '@ngrx/store';
@@ -20,7 +21,7 @@ export const initialState: RoomState = {
 
 export const reducer = createReducer(
     initialState,
-    on(roomActions.resetRoomState, () => initialState),
+    on(resetAllState, () => initialState),
     // For hosting
     on(roomActions.createRoomSuccess, (state, { roomInfo }) => ({ ...state, roomInfo })),
     on(roomActions.closeRoom, () => initialState),

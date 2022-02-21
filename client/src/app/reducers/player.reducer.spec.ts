@@ -1,4 +1,4 @@
-import { gameStatusReceived } from '@app/actions/game-status.actions';
+import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { Player } from '@app/classes/player';
@@ -29,6 +29,8 @@ describe('[Players] Reducer', () => {
 
         const gameStatusStub: GameStatus = {
             activePlayer: '',
+            winner: null,
+            gameEnded: false,
             letterPotLength: 0,
         };
 
@@ -100,5 +102,12 @@ describe('[Players] Reducer', () => {
 
             expect(result).toEqual(expectedResult);
         });
+    });
+
+    it('should reset to initial state', () => {
+        const action = resetAllState();
+        const result = reducer(createInitialPlayersState(), action);
+
+        expect(result).toEqual(initialState);
     });
 });

@@ -159,7 +159,11 @@ describe('room', () => {
                     return true;
                 },
                 endGame: () => {
-                    return;
+                    return {
+                        toEndGameStatus: () => {
+                            return;
+                        },
+                    };
                 },
             } as unknown as Game;
             room['onCommand'](fakeSocket, 'passer', 0);
@@ -179,7 +183,7 @@ describe('room', () => {
                     hostReceived = true;
                 },
             } as unknown as io.Socket;
-            room.game = { players: ['player1', 'player2'] } as unknown as Game;
+            room.game = { players: ['player1', 'player2'], bag: { letters: [] } } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
             room.surrenderGame('player2');
@@ -310,6 +314,28 @@ describe('room', () => {
                 },
             } as unknown as io.Socket;
             room['errorOnCommand'](fakeSocket, new Error('error'));
+        });
+
+        it('quitRoomClient should not emit if game is not null', () => {
+            const emitStub = stub(socket, 'emit');
+            room.quitRoomClient();
+            expect(emitStub.called).to.equal(false);
+        });
+
+        it('initiateRoomEvents should call setupSocket, initSurrenderGame and initChatting', (done) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'setupSocket').callsFake(() => {
+                return;
+            });
+            stub(room, 'initSurrenderGame').callsFake(() => {
+                return;
+            });
+            stub(room, 'initChatting').callsFake(() => {
+                done();
+                return;
+            });
+            room.clients[0] = {} as io.Socket;
+            room.initiateRoomEvents();
         });
     });
 
