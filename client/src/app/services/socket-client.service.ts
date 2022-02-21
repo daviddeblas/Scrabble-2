@@ -19,8 +19,8 @@ export class SocketClientService implements OnDestroy {
         this.disconnect();
     }
 
-    isSocketAlive() {
-        return this.socket && this.socket?.connected;
+    isSocketAlive(): boolean {
+        return Boolean(this.socket?.connected);
     }
 
     connect() {
