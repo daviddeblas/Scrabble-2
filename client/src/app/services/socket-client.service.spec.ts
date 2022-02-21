@@ -25,6 +25,22 @@ describe('SocketClientService', () => {
         expect(spy).toHaveBeenCalled();
     });
 
+    it('should self disconnect when destroy', () => {
+        const spy = spyOn(service, 'disconnect');
+        service.ngOnDestroy();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should return if socket is alive', () => {
+        service.socket.connected = false;
+        expect(service.isSocketAlive()).toBeFalse();
+        service.socket.connected = true;
+        expect(service.isSocketAlive()).toBeTrue();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (service as any).socket = undefined;
+        expect(service.isSocketAlive()).toBeFalse();
+    });
+
     it('isSocketAlive should return true if the socket is still connected', () => {
         service.socket.connected = true;
         const isAlive = service.isSocketAlive();
