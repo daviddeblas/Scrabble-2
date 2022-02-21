@@ -15,7 +15,7 @@ import { SocketClientService } from './socket-client.service';
 
 const CENTER_BOARD = 7;
 
-fdescribe('PlayerService', () => {
+describe('PlayerService', () => {
     let service: PlayerService;
     let socketService: SocketTestHelper;
     let store: MockStore<{ board: BoardState }>;
