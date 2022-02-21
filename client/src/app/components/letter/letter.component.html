@@ -1,5 +1,5 @@
 <svg:g [attr.transform]="'translate(' + pos.x * 50 + ' ' + pos.y * 50 + ')'" [class.blank]="blank">
-    <rect x="2" y="2" width="46" height="46" rx="5" class="background" />
+    <rect x="2" y="2" width="46" height="46" rx="5" class="background" [attr.stroke]="color" />
     <text x="25" y="32" class="letter">{{ letter }}</text>
     <text *ngIf="!blank && value" x="46" y="46" class="value">{{ value }}</text>
 </svg:g>
