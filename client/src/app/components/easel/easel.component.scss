@@ -2,11 +2,26 @@
 
 @import '../../../theme.scss';
 
-.easel {
+.easel-container {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
     margin: 0 1rem;
     background-color: $primary;
+}
+
+.easel {
+    align-self: center;
+}
+
+#button-container {
+    margin-left: 10%;
+}
+#button-container button {
+    font-size: small;
+    display: inline-block;
+    margin-right: 0.5vw;
+    background-color: #008081;
+    color: #ececec;
 }
