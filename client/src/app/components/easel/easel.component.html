@@ -1,19 +1,21 @@
 <mat-card class="easel-container">
-    <svg
-        class="easel"
-        app-letter
-        *ngFor="let letter of (players$ | async)?.player?.easel; let i = index"
-        height="50"
-        width="50"
-        viewBox="0 0 50 50"
-        xmlns="http://www.w3.org/2000/svg"
-        [letter]="letter"
-        [value]="(pointsPerLetter$ | async)?.get(letter)"
-        (contextmenu)="selectLetterToSwitch($event, i)"
-        [color]="letterColor[i]"
-    ></svg>
-    <div *ngIf="letterSelected()" id="button-container">
+    <section class="letters-container">
+        <svg
+            class="letter"
+            app-letter
+            *ngFor="let letter of (players$ | async)?.player?.easel; let i = index"
+            height="50"
+            width="50"
+            viewBox="0 0 50 50"
+            xmlns="http://www.w3.org/2000/svg"
+            [letter]="letter"
+            [value]="(pointsPerLetter$ | async)?.get(letter)"
+            (contextmenu)="selectLetterToSwitch($event, i)"
+            [color]="letterColor[i]"
+        ></svg>
+    </section>
+    <section *ngIf="letterSelected()" id="button-container">
         <button mat-raised-button>Échanger</button>
         <button mat-raised-button>Annuler</button>
-    </div>
+    </section>
 </mat-card>
