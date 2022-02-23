@@ -1,4 +1,4 @@
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 
 export const EASEL_CAPACITY = 7;
 

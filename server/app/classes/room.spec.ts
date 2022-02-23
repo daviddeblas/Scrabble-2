@@ -4,6 +4,7 @@ import { MILLISECONDS_PER_SEC, Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
+import { stringToLetter } from 'common/classes/letter';
 import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
@@ -11,7 +12,6 @@ import { io as Client, Socket } from 'socket.io-client';
 import { GameOptions } from './game-options';
 import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
-import { stringToLetter } from './letter';
 import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
 

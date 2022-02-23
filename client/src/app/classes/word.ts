@@ -1,4 +1,4 @@
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 import { Vec2 } from './vec2';
 
 export enum Direction {

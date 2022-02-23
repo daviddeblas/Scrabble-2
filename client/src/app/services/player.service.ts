@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { exchangeLettersSuccess } from '@app/actions/player.actions';
-import { Letter, stringToLetters } from '@app/classes/letter';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
+import { Letter, stringToLetters } from 'common/classes/letter';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({

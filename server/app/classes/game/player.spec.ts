@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Letter } from '@app/classes/letter';
+import { Letter } from 'common/classes/letter';
 import { Player } from './player';
 
 describe('bag constructor', () => {

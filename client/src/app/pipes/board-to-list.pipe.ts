@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Letter } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
+import { Letter } from 'common/classes/letter';
 
 @Pipe({
     name: 'boardToList',

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { Letter } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
+import { Letter } from 'common/classes/letter';
 
 @Component({
     /* Nécessaire pour les composantes SVG */

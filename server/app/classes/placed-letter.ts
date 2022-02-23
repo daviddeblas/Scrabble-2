@@ -1,5 +1,5 @@
-import { Letter } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
+import { Letter } from 'common/classes/letter';
 
 export class PlacedLetter {
     constructor(public letter: Letter, public position: Vec2) {}

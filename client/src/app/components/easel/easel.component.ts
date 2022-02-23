@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { Letter } from '@app/classes/letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 import { Observable } from 'rxjs';
 
 @Component({

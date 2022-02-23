@@ -1,12 +1,12 @@
 import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
+import { BLANK_LETTER, stringToLetter, stringToLetters } from 'common/classes/letter';
 import io from 'socket.io';
 import Container from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameOptions } from './game-options';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
-import { BLANK_LETTER, stringToLetter, stringToLetters } from './letter';
 import { PlacedLetter } from './placed-letter';
 import { RoomInfo } from './room-info';
 import { Vec2 } from './vec2';

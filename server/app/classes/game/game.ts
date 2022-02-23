@@ -1,9 +1,9 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
-import { Letter } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
+import { Letter } from 'common/classes/letter';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';

@@ -1,8 +1,8 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
+import { Letter } from 'common/classes/letter';
 import { BoardState } from './board.reducer';
 import { GameStatus } from './game-status.reducer';
 import { initialState, Players, reducer } from './player.reducer';

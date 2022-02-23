@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 import { PlacedLetter } from './placed-letter';
 import { Vec2 } from './vec2';
 
