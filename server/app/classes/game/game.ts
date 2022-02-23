@@ -43,7 +43,7 @@ export class Game {
             const lettersInCenter = letters.filter((l) =>
                 l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
             );
-            if (lettersInCenter.length === 0) throw new Error('bad starting move');
+            if (lettersInCenter.length === 0) throw new GameError(GameErrorType.BadStartingMove);
         }
         this.getActivePlayer().score += this.board.place(letters, blanks, this.placeCounter === 0);
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;

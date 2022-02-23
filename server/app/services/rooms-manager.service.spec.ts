@@ -1,5 +1,6 @@
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
+import { GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
 import { PORT } from '@app/environnement.json';
@@ -59,7 +60,7 @@ describe('Rooms Manager Service', () => {
 
     it('joinRoom should throw Game not found error if the Room does not exist', () => {
         let errorMessage = 'Not the right message';
-        const expectedMessage = 'Game not found';
+        const expectedMessage = GameErrorType.GameNotExists;
         try {
             const playerName = 'Second player';
             roomsManager.joinRoom('1', socket, playerName);

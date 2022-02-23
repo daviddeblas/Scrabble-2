@@ -11,7 +11,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
-import { GameErrorType } from './game.exception';
+import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
 
@@ -301,7 +301,7 @@ describe('room', () => {
             const clk = useFakeTimers();
             room.sockets.pop();
             room['postCommand'] = () => done();
-            room['errorOnCommand'](fakeSocket, new Error(GameErrorType.InvalidWord));
+            room['errorOnCommand'](fakeSocket, new GameError(GameErrorType.InvalidWord));
             clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
             clk.restore();
         });

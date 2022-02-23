@@ -1,6 +1,5 @@
 import { Letter } from 'common/classes/letter';
-
-export const EASEL_CAPACITY = 7;
+import { EASEL_CAPACITY } from 'common/constants';
 
 export const copyPlayer = (player: Player) => {
     const playerCopy = new Player(player.name);
