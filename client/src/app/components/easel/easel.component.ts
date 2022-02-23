@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { exchangeLetters } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
 import { MAX_EASEL_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -38,6 +39,7 @@ export class EaselComponent {
     }
 
     disableExchange(): boolean {
+        const minLettersForExchange = 7;
         let activePlayer;
         let playerUsername;
         let lettersInPot = 0;
@@ -48,11 +50,30 @@ export class EaselComponent {
         this.store.select('players').subscribe((players) => {
             playerUsername = players.player.name;
         });
-        const lettersToExchange = this.letterColor.filter((color) => color === this.exchangeColor).length;
-        return !(activePlayer === playerUsername && lettersToExchange <= lettersInPot);
+        return !(activePlayer === playerUsername && minLettersForExchange <= lettersInPot);
     }
 
     letterSelected(): boolean {
         return this.letterColor.includes(this.exchangeColor);
+    }
+    exchangeLetters(): void {
+        let playerEasel: Letter[] = [];
+        this.store.select('players').subscribe((players) => {
+            playerEasel = players.player.easel;
+        });
+        let lettersToExchange = '';
+        for (let index = 0; index < playerEasel.length; index++) {
+            if (this.letterColor[index] === this.exchangeColor) {
+                lettersToExchange += playerEasel[index].toLowerCase();
+            }
+        }
+        this.store.dispatch(exchangeLetters({ letters: lettersToExchange }));
+        this.cancelSelection();
+    }
+
+    cancelSelection(): void {
+        this.letterColor.forEach((color, index) => {
+            if (color === this.exchangeColor) this.letterColor[index] = this.mainColor;
+        });
     }
 }

@@ -1,4 +1,4 @@
-<mat-card class="easel-container">
+<mat-card class="easel-container" tabindex="0" (focusout)="cancelSelection()">
     <section class="letters-container">
         <svg
             class="letter"
@@ -15,7 +15,7 @@
         ></svg>
     </section>
     <section *ngIf="letterSelected()" id="button-container">
-        <button mat-raised-button [disabled]="disableExchange()">Échanger</button>
-        <button mat-raised-button>Annuler</button>
+        <button mat-raised-button [disabled]="disableExchange()" (click)="exchangeLetters()">Échanger</button>
+        <button mat-raised-button (click)="cancelSelection()">Annuler</button>
     </section>
 </mat-card>
