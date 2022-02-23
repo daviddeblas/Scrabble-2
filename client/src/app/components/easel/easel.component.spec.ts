@@ -37,21 +37,31 @@ describe('EaselComponent', () => {
     });
 
     it('should call event.preventDefault when selectLetterToSwitch is called', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
         const spy = spyOn(mouseClickStub, 'preventDefault');
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should test if the letter selected has the main color', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
         component.letterColor[0] = component.exchangeColor;
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(component.letterColor[0]).toEqual(component.mainColor);
     });
 
     it('should test if the letter selected has the exchange color', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
         component.letterColor[0] = '';
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(component.letterColor[0]).toEqual(component.exchangeColor);
+    });
+
+    it('selectLetterToSwitch should call cancelSelection if gameEnded is true', () => {
+        store.overrideSelector('gameStatus', { gameEnded: true });
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        component.selectLetterToSwitch(mouseClickStub, 0);
+        expect(cancelSelectionSpy).toHaveBeenCalled();
     });
 
     it('should test if the letter color has exchange color', () => {
@@ -65,21 +75,28 @@ describe('EaselComponent', () => {
     });
 
     it('disableExchange should return false if it is the player turn and there is more than 7 letters in the pot', () => {
-        const gameStatus = { activePlayer: 'Player', letterPotLength: 50 } as GameStatus;
+        const gameStatus = { activePlayer: 'Player', letterPotLength: 50, gameEnded: false } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
         store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeFalsy();
     });
 
     it('disableExchange should return true if it is not the player turn', () => {
-        const gameStatus = { activePlayer: 'not Player', letterPotLength: 50 } as GameStatus;
+        const gameStatus = { activePlayer: 'not Player', letterPotLength: 50, gameEnded: false } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
         store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeTrue();
     });
 
-    it('disableExchange should return true there is less than 7 letters in the pot', () => {
-        const gameStatus = { activePlayer: 'Player', letterPotLength: 5 } as GameStatus;
+    it('disableExchange should return true if there is less than 7 letters in the pot', () => {
+        const gameStatus = { activePlayer: 'Player', letterPotLength: 5, gameEnded: false } as GameStatus;
+        store.overrideSelector('gameStatus', gameStatus);
+        store.overrideSelector('players', { player: { name: 'Player' } });
+        expect(component.disableExchange()).toBeTrue();
+    });
+
+    it('disableExchange should return true if the game is ended', () => {
+        const gameStatus = { activePlayer: 'Player', letterPotLength: 50, gameEnded: true } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
         store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeTrue();

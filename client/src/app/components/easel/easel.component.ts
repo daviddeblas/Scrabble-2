@@ -30,6 +30,14 @@ export class EaselComponent {
 
     selectLetterToSwitch(event: MouseEvent, letterIndex: number): void {
         event.preventDefault();
+        let gameEnded;
+        this.store.select('gameStatus').subscribe((status) => {
+            gameEnded = status.gameEnded;
+        });
+        if (gameEnded) {
+            this.cancelSelection();
+            return;
+        }
         const color = this.letterColor[letterIndex];
         if (color === this.exchangeColor) {
             this.letterColor[letterIndex] = this.mainColor;
@@ -50,12 +58,17 @@ export class EaselComponent {
         this.store.select('players').subscribe((players) => {
             playerUsername = players.player.name;
         });
-        return !(activePlayer === playerUsername && minLettersForExchange <= lettersInPot);
+        let gameEnded;
+        this.store.select('gameStatus').subscribe((status) => {
+            gameEnded = status.gameEnded;
+        });
+        return !(activePlayer === playerUsername && minLettersForExchange <= lettersInPot && !gameEnded);
     }
 
     letterSelected(): boolean {
         return this.letterColor.includes(this.exchangeColor);
     }
+
     exchangeLetters(): void {
         let playerEasel: Letter[] = [];
         this.store.select('players').subscribe((players) => {
