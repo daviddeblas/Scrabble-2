@@ -15,6 +15,8 @@ export const exchangeLettersSuccess = createAction('[Players] Exchange Letters S
 
 export const exchangeLettersFailure = createAction('[Players] Exchange Letters Failure', props<{ error: Error }>());
 
+export const switchLettersEasel = createAction('[Players] Switch Letters Easel', props<{ positionIndex: number; destinationIndex: number }>());
+
 export const skipTurn = createAction('[Players] Skip Turn');
 
 export const surrender = createAction('[Players] Surrender');
