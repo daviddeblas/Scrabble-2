@@ -29,6 +29,11 @@ export class EaselComponent {
         this.letterColor = new Array(this.maxEaselSize).fill(this.mainColor);
     }
 
+    cancelSelection(): void {
+        this.cancelExchangeSelection();
+        this.cancelManipulationSelection();
+    }
+
     gameIsEnded(): boolean {
         let gameEnded;
         this.store.select('gameStatus').subscribe((status) => {
@@ -49,6 +54,7 @@ export class EaselComponent {
             this.letterColor[letterIndex] = this.mainColor;
         } else {
             this.letterColor[letterIndex] = this.exchangeColor;
+            this.cancelManipulationSelection();
         }
     }
 
@@ -87,11 +93,19 @@ export class EaselComponent {
             }
         }
         this.store.dispatch(exchangeLetters({ letters: lettersToExchange }));
-        this.cancelSelection();
+        this.cancelExchangeSelection();
     }
 
-    cancelSelection(): void {
-        this.letterColor.fill(this.mainColor);
+    cancelExchangeSelection(): void {
+        this.letterColor.forEach((color, index) => {
+            if (color === this.exchangeColor) this.letterColor[index] = this.mainColor;
+        });
+    }
+
+    cancelManipulationSelection(): void {
+        const manipulationNotInArray = -1;
+        const indexManipulationLetter = this.letterColor.indexOf(this.manipulationColor);
+        if (indexManipulationLetter !== manipulationNotInArray) this.letterColor[indexManipulationLetter] = this.mainColor;
     }
 
     selectLetterForManipulation(letterIndex: number): void {

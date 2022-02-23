@@ -36,11 +36,11 @@ describe('EaselComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('gameIsEnded should return true if the game is ended and call cancelSelection', () => {
+    it('gameIsEnded should return true if the game is ended and call cancelExchangeSelection', () => {
         store.overrideSelector('gameStatus', { gameEnded: true });
-        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        const cancelExchangeSelectionSpy = spyOn(component, 'cancelExchangeSelection');
         expect(component.gameIsEnded()).toBeTruthy();
-        expect(cancelSelectionSpy).toHaveBeenCalled();
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalled();
     });
 
     it('gameIsEnded should return false if the game is not ended', () => {
@@ -62,11 +62,21 @@ describe('EaselComponent', () => {
         expect(component.letterColor[0]).toEqual(component.mainColor);
     });
 
-    it('should test if the letter selected has the exchange color', () => {
+    it('cancelSelection should call cancelExchangeSelection and cancelManipulationSelection', () => {
+        const exchangeSpy = spyOn(component, 'cancelExchangeSelection');
+        const manipulationSpy = spyOn(component, 'cancelManipulationSelection');
+        component.cancelSelection();
+        expect(exchangeSpy).toHaveBeenCalled();
+        expect(manipulationSpy).toHaveBeenCalled();
+    });
+
+    it('should test if the letter selected has the exchange color and call cancelManipulationSelection', () => {
+        const manipulationSpy = spyOn(component, 'cancelManipulationSelection');
         store.overrideSelector('gameStatus', { gameEnded: false });
         component.letterColor[0] = '';
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(component.letterColor[0]).toEqual(component.exchangeColor);
+        expect(manipulationSpy).toHaveBeenCalled();
     });
 
     it('selectLetterToSwitch should call cancelSelection if gameEnded is true', () => {
@@ -114,24 +124,35 @@ describe('EaselComponent', () => {
         expect(component.disableExchange()).toBeTrue();
     });
 
-    it('exchangeLetters should dispatch "[Players] Exchange Letters" and call cancelSelection with the selected letters', () => {
+    it('exchangeLetters should dispatch "[Players] Exchange Letters" and call cancelExchangeSelection with the selected letters', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
-        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        const cancelExchangeSelectionSpy = spyOn(component, 'cancelExchangeSelection');
         store.overrideSelector('players', { player: { easel: ['A', 'E', '*', 'Z'] } });
         const expectedAction = cold('a', { a: exchangeLetters({ letters: 'a*' }) });
         component.exchangeLetters();
         expect(store.scannedActions$).toBeObservable(expectedAction);
-        expect(cancelSelectionSpy).toHaveBeenCalled();
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalled();
     });
 
-    it('cancelSelection should restore the elements with exchangeColor to mainColor', () => {
+    it('cancelExchangeSelection should restore the elements with exchangeColor to mainColor', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
         component.letterColor[3] = 'otherColor';
-        component.cancelSelection();
-        for (const color of component.letterColor) {
-            expect(color).toEqual(component.mainColor);
+        component.cancelExchangeSelection();
+        for (let index = 0; index < component.letterColor.length; index++) {
+            if (index !== 3) expect(component.letterColor[index]).toEqual(component.mainColor);
+            else expect(component.letterColor[index]).toEqual('otherColor');
+        }
+    });
+
+    it('cancelManipulationSelection should restore the elements with manipulationColor to mainColor', () => {
+        component.letterColor[0] = component.manipulationColor;
+        component.letterColor[2] = component.exchangeColor;
+        component.cancelManipulationSelection();
+        for (let index = 0; index < component.letterColor.length; index++) {
+            if (index !== 2) expect(component.letterColor[index]).toEqual(component.mainColor);
+            else expect(component.letterColor[index]).toEqual(component.exchangeColor);
         }
     });
 
