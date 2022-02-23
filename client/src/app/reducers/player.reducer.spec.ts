@@ -3,6 +3,7 @@ import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.ac
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
 import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { BoardState } from './board.reducer';
 import { GameStatus } from './game-status.reducer';
 import { initialState, Players, reducer } from './player.reducer';
@@ -55,7 +56,7 @@ describe('[Players] Reducer', () => {
     });
 
     describe('[Players] Place Word Success', () => {
-        const word = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.VERTICAL);
+        const word = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.VERTICAL);
 
         it('should remove used letters and add new letters to easel', () => {
             const initialPlayers: Players = createInitialPlayersState();

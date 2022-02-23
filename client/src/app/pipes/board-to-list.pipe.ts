@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 
 @Pipe({
     name: 'boardToList',
@@ -16,7 +17,7 @@ export class BoardToListPipe implements PipeTransform {
                     const isBlank = !!value.blanks.find((v) => v.x === i && v.y === j);
                     list.push({
                         letter: value.board[i][j] as Letter,
-                        position: { x: i, y: j },
+                        position: new Vec2(i, j),
                         blank: isBlank,
                     });
                 }

@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 import Container from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 

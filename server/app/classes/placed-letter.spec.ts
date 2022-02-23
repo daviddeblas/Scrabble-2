@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { PlacedLetter } from './placed-letter';
-import { Vec2 } from './vec2';
 
 describe('placed letter', () => {
     let letter: PlacedLetter;

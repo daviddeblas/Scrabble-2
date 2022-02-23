@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { spy } from 'sinon';
 import Container from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';

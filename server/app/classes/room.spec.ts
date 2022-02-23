@@ -5,6 +5,7 @@ import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { stringToLetter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
@@ -13,7 +14,6 @@ import { GameOptions } from './game-options';
 import { GameErrorType } from './game.exception';
 import { Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
-import { Vec2 } from './vec2';
 
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;

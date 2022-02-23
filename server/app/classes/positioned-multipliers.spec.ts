@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 import { PositionedMultipliers } from './positioned-multipliers';
-import { Vec2 } from './vec2';
 
 describe('PositionedMultipliers', () => {
     it('constructor', () => {

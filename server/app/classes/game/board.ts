@@ -1,9 +1,9 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { Letter } from 'common/classes/letter';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 
 const ALLOWED_DIRECTIONS = [new Vec2(1, 0), new Vec2(0, 1)];
 
