@@ -3,3 +3,4 @@ export const POSITION_LAST_CHAR = -1;
 export const ASCII_ALPHABET_POSITION = 97;
 export const MIN_NAME_LENGTH = 3;
 export const MAX_NAME_LENGTH = 20;
+export const MAX_EASEL_SIZE = 7;
