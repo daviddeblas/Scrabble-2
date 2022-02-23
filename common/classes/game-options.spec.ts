@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { GameOptions } from './game-options';
+import { GameOptions } from 'common/classes/game-options';
 
 const DEFAULT_TIME = 60;
 

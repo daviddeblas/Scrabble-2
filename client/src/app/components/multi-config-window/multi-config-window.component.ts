@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { createRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
+import { GameOptions } from 'common/classes/game-options';
 import { Observable } from 'rxjs';
 
 export const MAX_TIME = 300;

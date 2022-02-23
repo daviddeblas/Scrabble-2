@@ -4,11 +4,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomEffects } from '@app/effects/room.effects';
 import { RoomState } from '@app/reducers/room.reducer';
 import { Store } from '@ngrx/store';
+import { RoomInfo } from 'common/classes/room-info';
 import { Observable } from 'rxjs';
 
 export const forbiddenNameValidator = (name: string) => {

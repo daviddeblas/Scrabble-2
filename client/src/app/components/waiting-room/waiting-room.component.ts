@@ -2,11 +2,11 @@ import { Component, Input, OnDestroy } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { acceptInvite, closeRoom, refuseInvite } from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { RoomState } from '@app/reducers/room.reducer';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
+import { RoomInfo } from 'common/classes/room-info';
 import { Observable } from 'rxjs';
 
 @Component({

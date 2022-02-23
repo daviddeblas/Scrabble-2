@@ -7,9 +7,9 @@ import {
     joinRoomDeclined,
     loadRoomsSuccess,
 } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
-import { RoomInfo } from '@app/classes/room-info';
 import { Store } from '@ngrx/store';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({

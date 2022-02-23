@@ -1,6 +1,6 @@
-import { GameOptions } from '@app/classes/game-options';
 import { Room } from '@app/classes/room';
-import { RoomInfo } from '@app/classes/room-info';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import io from 'socket.io';
 import { Service } from 'typedi';
 

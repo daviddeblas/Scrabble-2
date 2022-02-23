@@ -1,11 +1,11 @@
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
-import { GameOptions } from '@app/classes/game-options';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
-import { RoomInfo } from '@app/classes/room-info';
 import { PORT } from '@app/environnement.json';
 import { assert, expect } from 'chai';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import { createServer, Server } from 'http';
 import { restore, spy, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
