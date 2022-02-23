@@ -26,3 +26,7 @@
     background-color: #008081;
     color: #ececec;
 }
+
+#button-container button:disabled {
+    background-color: #7f7f7f;
+}
