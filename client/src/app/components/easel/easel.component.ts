@@ -33,7 +33,7 @@ export class EaselComponent {
         const color = this.letterColor[letterIndex];
         if (color === this.exchangeColor) {
             this.letterColor[letterIndex] = this.mainColor;
-        } else if (color === this.mainColor) {
+        } else {
             this.letterColor[letterIndex] = this.exchangeColor;
         }
     }
