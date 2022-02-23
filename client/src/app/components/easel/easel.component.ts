@@ -35,7 +35,7 @@ export class EaselComponent {
             gameEnded = status.gameEnded;
         });
         if (gameEnded) {
-            this.cancelExchangeSelection();
+            this.cancelSelection();
             return true;
         }
         return false;
@@ -87,18 +87,16 @@ export class EaselComponent {
             }
         }
         this.store.dispatch(exchangeLetters({ letters: lettersToExchange }));
-        this.cancelExchangeSelection();
+        this.cancelSelection();
     }
 
-    cancelExchangeSelection(): void {
-        this.letterColor.forEach((color, index) => {
-            if (color === this.exchangeColor) this.letterColor[index] = this.mainColor;
-        });
+    cancelSelection(): void {
+        this.letterColor.fill(this.mainColor);
     }
 
     selectLetterForManipulation(letterIndex: number): void {
         if (this.gameIsEnded()) return;
+        this.cancelSelection();
         this.letterColor[letterIndex] = this.manipulationColor;
-        this.cancelExchangeSelection();
     }
 }

@@ -59,7 +59,7 @@ describe('EaselComponent', () => {
 
     it('selectLetterToSwitch should call cancelSelection if gameEnded is true', () => {
         store.overrideSelector('gameStatus', { gameEnded: true });
-        const cancelSelectionSpy = spyOn(component, 'cancelExchangeSelection');
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(cancelSelectionSpy).toHaveBeenCalled();
     });
@@ -105,7 +105,7 @@ describe('EaselComponent', () => {
     it('exchangeLetters should dispatch "[Players] Exchange Letters" and call cancelSelection with the selected letters', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
-        const cancelSelectionSpy = spyOn(component, 'cancelExchangeSelection');
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
         store.overrideSelector('players', { player: { easel: ['A', 'E', '*', 'Z'] } });
         const expectedAction = cold('a', { a: exchangeLetters({ letters: 'a*' }) });
         component.exchangeLetters();
@@ -117,10 +117,9 @@ describe('EaselComponent', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
         component.letterColor[3] = 'otherColor';
-        component.cancelExchangeSelection();
-        for (let index = 0; index < component.letterColor.length; index++) {
-            if (index !== 3) expect(component.letterColor[index]).toEqual(component.mainColor);
-            else expect(component.letterColor[index]).toEqual('otherColor');
+        component.cancelSelection();
+        for (const color of component.letterColor) {
+            expect(color).toEqual(component.mainColor);
         }
     });
 });
