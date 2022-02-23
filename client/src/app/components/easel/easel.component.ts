@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 export class EaselComponent {
     readonly mainColor = '#fffcec';
     readonly exchangeColor = 'red';
+    readonly manipulationColor = 'url(#rainbowGradient)';
     readonly maxEaselSize = MAX_EASEL_SIZE;
     pointsPerLetter$: Observable<Map<Letter, number>>;
     players$: Observable<Players>;
