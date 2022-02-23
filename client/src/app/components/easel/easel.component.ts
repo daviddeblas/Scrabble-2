@@ -29,16 +29,21 @@ export class EaselComponent {
         this.letterColor = new Array(this.maxEaselSize).fill(this.mainColor);
     }
 
-    selectLetterToSwitch(event: MouseEvent, letterIndex: number): void {
-        event.preventDefault();
+    gameIsEnded(): boolean {
         let gameEnded;
         this.store.select('gameStatus').subscribe((status) => {
             gameEnded = status.gameEnded;
         });
         if (gameEnded) {
-            this.cancelSelection();
-            return;
+            this.cancelExchangeSelection();
+            return true;
         }
+        return false;
+    }
+
+    selectLetterToSwitch(event: MouseEvent, letterIndex: number): void {
+        event.preventDefault();
+        if (this.gameIsEnded()) return;
         const color = this.letterColor[letterIndex];
         if (color === this.exchangeColor) {
             this.letterColor[letterIndex] = this.mainColor;
@@ -66,7 +71,7 @@ export class EaselComponent {
         return !(activePlayer === playerUsername && minLettersForExchange <= lettersInPot && !gameEnded);
     }
 
-    letterSelected(): boolean {
+    exchangeLetterSelected(): boolean {
         return this.letterColor.includes(this.exchangeColor);
     }
 
@@ -82,12 +87,18 @@ export class EaselComponent {
             }
         }
         this.store.dispatch(exchangeLetters({ letters: lettersToExchange }));
-        this.cancelSelection();
+        this.cancelExchangeSelection();
     }
 
-    cancelSelection(): void {
+    cancelExchangeSelection(): void {
         this.letterColor.forEach((color, index) => {
             if (color === this.exchangeColor) this.letterColor[index] = this.mainColor;
         });
+    }
+
+    selectLetterForManipulation(letterIndex: number): void {
+        if (this.gameIsEnded()) return;
+        this.letterColor[letterIndex] = this.manipulationColor;
+        this.cancelExchangeSelection();
     }
 }

@@ -59,19 +59,19 @@ describe('EaselComponent', () => {
 
     it('selectLetterToSwitch should call cancelSelection if gameEnded is true', () => {
         store.overrideSelector('gameStatus', { gameEnded: true });
-        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        const cancelSelectionSpy = spyOn(component, 'cancelExchangeSelection');
         component.selectLetterToSwitch(mouseClickStub, 0);
         expect(cancelSelectionSpy).toHaveBeenCalled();
     });
 
     it('should test if the letter color has exchange color', () => {
         component.letterColor[0] = component.exchangeColor;
-        expect(component.letterSelected()).toBeTruthy();
+        expect(component.exchangeLetterSelected()).toBeTruthy();
     });
 
     it('should test if the letter color does not include exchange color', () => {
         component.letterColor[0] = '';
-        expect(component.letterSelected()).toBeFalsy();
+        expect(component.exchangeLetterSelected()).toBeFalsy();
     });
 
     it('disableExchange should return false if it is the player turn and there is more than 7 letters in the pot', () => {
@@ -105,7 +105,7 @@ describe('EaselComponent', () => {
     it('exchangeLetters should dispatch "[Players] Exchange Letters" and call cancelSelection with the selected letters', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
-        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        const cancelSelectionSpy = spyOn(component, 'cancelExchangeSelection');
         store.overrideSelector('players', { player: { easel: ['A', 'E', '*', 'Z'] } });
         const expectedAction = cold('a', { a: exchangeLetters({ letters: 'a*' }) });
         component.exchangeLetters();
@@ -117,7 +117,7 @@ describe('EaselComponent', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
         component.letterColor[3] = 'otherColor';
-        component.cancelSelection();
+        component.cancelExchangeSelection();
         for (let index = 0; index < component.letterColor.length; index++) {
             if (index !== 3) expect(component.letterColor[index]).toEqual(component.mainColor);
             else expect(component.letterColor[index]).toEqual('otherColor');
