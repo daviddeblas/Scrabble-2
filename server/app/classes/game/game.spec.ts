@@ -277,4 +277,14 @@ describe('game', () => {
     it('getActivePlayer', () => {
         expect(game['getActivePlayer']()).to.eq(game.players[game.activePlayer]);
     });
+
+    it('getGameStatus  returns specific information given to the player', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const info = game.getGameStatus(0) as any;
+        expect(info.status.activePlayer).to.eq(game?.players[game?.activePlayer].name);
+        expect(info.board.board).to.eq(game?.board.board);
+        expect(info.board.multipliers).to.eq(game?.board.multipliers);
+        expect(info.status.letterPotLength).to.eq(game?.bag.letters.length);
+        expect(info.players.player).to.deep.eq(game?.players[0]);
+    });
 });
