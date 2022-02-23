@@ -1,9 +1,9 @@
 import * as boardActions from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
-import { Multiplier } from '@app/classes/multiplier';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
+import { Multiplier } from 'common/classes/multiplier';
 import { boardSize, BoardState, initialState, reducer } from './board.reducer';
 
 const createInitialBoard = () => {

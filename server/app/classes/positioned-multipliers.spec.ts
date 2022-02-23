@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Multiplier, MultiplierType } from './multiplier';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { PositionedMultipliers } from './positioned-multipliers';
 import { Vec2 } from './vec2';
 

@@ -1,11 +1,11 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import Container from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
