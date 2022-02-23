@@ -36,6 +36,18 @@ describe('EaselComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('gameIsEnded should return true if the game is ended and call cancelSelection', () => {
+        store.overrideSelector('gameStatus', { gameEnded: true });
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        expect(component.gameIsEnded()).toBeTruthy();
+        expect(cancelSelectionSpy).toHaveBeenCalled();
+    });
+
+    it('gameIsEnded should return false if the game is not ended', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
+        expect(component.gameIsEnded()).toBeFalsy();
+    });
+
     it('should call event.preventDefault when selectLetterToSwitch is called', () => {
         store.overrideSelector('gameStatus', { gameEnded: false });
         const spy = spyOn(mouseClickStub, 'preventDefault');
@@ -121,5 +133,23 @@ describe('EaselComponent', () => {
         for (const color of component.letterColor) {
             expect(color).toEqual(component.mainColor);
         }
+    });
+
+    it('selectLetterForManipulation should call cancelSelection and change the color if game is not ended', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        component.letterColor[0] = 'otherColor';
+        component.selectLetterForManipulation(0);
+        expect(cancelSelectionSpy).toHaveBeenCalled();
+        expect(component.letterColor[0]).toEqual(component.manipulationColor);
+    });
+
+    it('selectLetterForManipulation should not call cancelSelection if game is ended', () => {
+        spyOn(component, 'gameIsEnded').and.callFake(() => {
+            return true;
+        });
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        component.selectLetterForManipulation(0);
+        expect(cancelSelectionSpy).toHaveBeenCalledTimes(0);
     });
 });
