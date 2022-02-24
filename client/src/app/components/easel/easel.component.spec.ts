@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { exchangeLetters } from '@app/actions/player.actions';
+import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -7,6 +7,7 @@ import { cold } from 'jasmine-marbles';
 import { EaselComponent } from './easel.component';
 
 describe('EaselComponent', () => {
+    const exampleEasel = ['A', 'B', 'C', 'D'];
     let component: EaselComponent;
     let fixture: ComponentFixture<EaselComponent>;
     let mouseClickStub: MouseEvent;
@@ -24,6 +25,7 @@ describe('EaselComponent', () => {
             },
         } as unknown as MouseEvent;
         store = TestBed.inject(MockStore);
+        store.overrideSelector('players', { player: { name: 'Player', easel: exampleEasel } });
     });
 
     beforeEach(() => {
@@ -96,31 +98,73 @@ describe('EaselComponent', () => {
         expect(component.exchangeLetterSelected()).toBeFalsy();
     });
 
+    it('switchColorPosition should switch two color position', () => {
+        component.letterColor[0] = 'FirstColor';
+        component.letterColor[1] = 'SecondColor';
+        component.switchColorPosition(0, 1);
+        expect(component.letterColor[0]).toEqual('SecondColor');
+        expect(component.letterColor[1]).toEqual('FirstColor');
+    });
+
+    it('handlePositionSwitch should call switchColorPosition and dispatch switchLettersEasel when movedRight', () => {
+        component.letterColor[0] = component.manipulationColor;
+        const switchColorSpy = spyOn(component, 'switchColorPosition');
+        const expectedAction = cold('a', { a: switchLettersEasel({ positionIndex: 0, destinationIndex: 1 }) });
+        component.handlePositionSwitch(true);
+        expect(switchColorSpy).toHaveBeenCalled();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('handlePositionSwitch should call switchColorPosition and dispatch switchLettersEasel when moved Left', () => {
+        component.letterColor[1] = component.manipulationColor;
+        const switchColorSpy = spyOn(component, 'switchColorPosition');
+        const expectedAction = cold('a', { a: switchLettersEasel({ positionIndex: 1, destinationIndex: 0 }) });
+        component.handlePositionSwitch(false);
+        expect(switchColorSpy).toHaveBeenCalled();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('handlePositionSwitch should call dispatch switchLettersEasel when moved left at the edge of easel', () => {
+        component.letterColor[0] = component.manipulationColor;
+        const expectedAction = cold('a', { a: switchLettersEasel({ positionIndex: 0, destinationIndex: exampleEasel.length - 1 }) });
+        component.handlePositionSwitch(false);
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('handlePositionSwitch should call dispatch switchLettersEasel when moved right at the edge of easel', () => {
+        component.letterColor[exampleEasel.length - 1] = component.manipulationColor;
+        const expectedAction = cold('a', { a: switchLettersEasel({ positionIndex: exampleEasel.length - 1, destinationIndex: 0 }) });
+        component.handlePositionSwitch(true);
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('handlePositionSwitch should not call dispatch switchLettersEasel when no letters are selected for manipulation', () => {
+        const dispatchSpy = spyOn(store, 'dispatch');
+        component.handlePositionSwitch(false);
+        expect(dispatchSpy).not.toHaveBeenCalled();
+    });
+
     it('disableExchange should return false if it is the player turn and there is more than 7 letters in the pot', () => {
         const gameStatus = { activePlayer: 'Player', letterPotLength: 50, gameEnded: false } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
-        store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeFalsy();
     });
 
     it('disableExchange should return true if it is not the player turn', () => {
         const gameStatus = { activePlayer: 'not Player', letterPotLength: 50, gameEnded: false } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
-        store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeTrue();
     });
 
     it('disableExchange should return true if there is less than 7 letters in the pot', () => {
         const gameStatus = { activePlayer: 'Player', letterPotLength: 5, gameEnded: false } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
-        store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeTrue();
     });
 
     it('disableExchange should return true if the game is ended', () => {
         const gameStatus = { activePlayer: 'Player', letterPotLength: 50, gameEnded: true } as GameStatus;
         store.overrideSelector('gameStatus', gameStatus);
-        store.overrideSelector('players', { player: { name: 'Player' } });
         expect(component.disableExchange()).toBeTrue();
     });
 
