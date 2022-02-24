@@ -38,6 +38,51 @@ describe('EaselComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('mouseWheel with positive delta should call handlePositionSwitch with true for right switch', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'handlePositionSwitch');
+        const wheelEvent = new WheelEvent('mousewheel', {
+            deltaY: 1,
+        });
+        window.dispatchEvent(wheelEvent);
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('mouseWheel with negative delta should call handlePositionSwitch with false for left switch', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'handlePositionSwitch');
+        const wheelEvent = new WheelEvent('mousewheel', {
+            deltaY: -1,
+        });
+        window.dispatchEvent(wheelEvent);
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(false);
+    });
+
+    it('mouseWheel with null delta should not call handlePositionSwitch', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'handlePositionSwitch');
+        const wheelEvent = new WheelEvent('mousewheel', {
+            deltaY: 0,
+        });
+        window.dispatchEvent(wheelEvent);
+        expect(cancelExchangeSelectionSpy).not.toHaveBeenCalled();
+    });
+
+    it('ArrowRight pressed should call handlePositionSwitch with true for right switch', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'handlePositionSwitch');
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowRight',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('ArrowLeft pressed should call handlePositionSwitch with false for left switch', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'handlePositionSwitch');
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowLeft',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(false);
+    });
+
     it('gameIsEnded should return true if the game is ended and call cancelExchangeSelection', () => {
         store.overrideSelector('gameStatus', { gameEnded: true });
         const cancelExchangeSelectionSpy = spyOn(component, 'cancelExchangeSelection');
