@@ -39,10 +39,13 @@ export const reducer = createReducer(
     }),
 
     on(switchLettersEasel, (state, { positionIndex, destinationIndex }) => {
-        const tempLetter = state.player.easel[positionIndex];
-        state.player.easel[positionIndex] = state.player.easel[destinationIndex];
-        state.player.easel[destinationIndex] = tempLetter;
-        return state;
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextEasel = JSON.parse(JSON.stringify(state.player.easel));
+        const tempLetter = nextEasel[positionIndex];
+        nextEasel[positionIndex] = nextEasel[destinationIndex];
+        nextEasel[destinationIndex] = tempLetter;
+        nextState.player.easel = nextEasel;
+        return nextState;
     }),
 
     on(resetAllState, () => initialState),
