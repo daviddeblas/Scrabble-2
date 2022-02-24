@@ -32,6 +32,14 @@ export class EaselComponent {
         });
         this.letterColor = new Array(MAX_EASEL_SIZE).fill(this.mainColor);
     }
+    @HostListener('window:mousewheel', ['$event'])
+    mouseWheelEvent(event: WheelEvent): void {
+        if (event.deltaY > 0) {
+            this.handlePositionSwitch(true);
+        } else if (event.deltaY < 0) {
+            this.handlePositionSwitch(false);
+        }
+    }
 
     @HostListener('keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
