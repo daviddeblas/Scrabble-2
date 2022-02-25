@@ -3,7 +3,7 @@
         <svg
             class="letter"
             app-letter
-            *ngFor="let letter of (players$ | async)?.player?.easel; let i = index"
+            *ngFor="let letter of easel; let i = index"
             height="50"
             width="50"
             viewBox="0 0 50 50"

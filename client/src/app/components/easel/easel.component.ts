@@ -20,14 +20,12 @@ export class EaselComponent {
     readonly manipulationColor = 'url(#rainbowGradient)';
     easel: Letter[];
     pointsPerLetter$: Observable<Map<Letter, number>>;
-    players$: Observable<Players>;
     letterColor: string[];
     playerIsActive: boolean = false;
 
     constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>) {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
-        this.players$ = store.select('players');
-        this.players$.subscribe((players) => {
+        store.select('players').subscribe((players) => {
             this.easel = players.player.easel;
         });
         this.letterColor = new Array(MAX_EASEL_SIZE).fill(this.mainColor);
