@@ -46,7 +46,7 @@ export class EaselComponent {
         } else if (event.key === 'ArrowLeft') {
             this.handlePositionSwitch(false);
         } else {
-            this.selectLetterWithKey(event);
+            this.selectLetterWithKey(event.key);
         }
     }
 
@@ -60,20 +60,20 @@ export class EaselComponent {
         this.switchColorPosition(manipulatedLetterIndex, nextPosition);
     }
 
-    selectLetterWithKey(keyEvent: KeyboardEvent) {
-        if (keyEvent.key.length !== 1 || !this.easel.includes(stringToLetter(keyEvent.key))) {
+    selectLetterWithKey(keyEvent: string) {
+        if (keyEvent.length !== 1 || !this.easel.includes(stringToLetter(keyEvent))) {
             this.cancelSelection();
             return;
         }
-        const keyPressed = stringToLetter(keyEvent.key);
-        const firstIndexLetter = this.easel.indexOf(keyPressed.toUpperCase() as Letter);
+        const keyPressed = keyEvent.toUpperCase() as Letter;
+        const firstIndexLetter = this.easel.indexOf(keyPressed);
         let manipulationIndex = this.letterColor.indexOf(this.manipulationColor);
         if (manipulationIndex < 0) manipulationIndex = this.easel.length - 1;
-        this.cancelManipulationSelection();
-        if (this.easel[manipulationIndex] !== stringToLetter(keyEvent.key)) {
+        this.cancelSelection();
+        if (this.easel[manipulationIndex] !== stringToLetter(keyEvent)) {
             this.letterColor[firstIndexLetter] = this.manipulationColor;
         } else {
-            const nextIndex = this.easel.indexOf(keyPressed.toUpperCase() as Letter, manipulationIndex + 1);
+            const nextIndex = this.easel.indexOf(keyPressed, manipulationIndex + 1);
             const nextIndexNotFound = -1;
             if (nextIndex === nextIndexNotFound) {
                 this.letterColor[firstIndexLetter] = this.manipulationColor;
