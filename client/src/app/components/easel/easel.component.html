@@ -16,7 +16,7 @@
         ></svg>
     </section>
     <section *ngIf="exchangeLetterSelected()" id="button-container">
-        <button mat-raised-button [disabled]="disableExchange()" (click)="exchangeLetters()">Échanger</button>
+        <button mat-raised-button [disabled]="disableExchange()" (click)="exchangeSelectedLetters()">Échanger</button>
         <button mat-raised-button (click)="cancelExchangeSelection()">Annuler</button>
     </section>
 </mat-card>

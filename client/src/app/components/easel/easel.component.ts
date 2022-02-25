@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
+import { Letter, stringToLetter } from '@app/classes/letter';
 import { MAX_EASEL_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
@@ -18,7 +18,7 @@ export class EaselComponent {
     readonly mainColor = '#fffcec';
     readonly exchangeColor = 'red';
     readonly manipulationColor = 'url(#rainbowGradient)';
-    easelSize: number;
+    easel: Letter[];
     pointsPerLetter$: Observable<Map<Letter, number>>;
     players$: Observable<Players>;
     letterColor: string[];
@@ -28,7 +28,7 @@ export class EaselComponent {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.players$ = store.select('players');
         this.players$.subscribe((players) => {
-            this.easelSize = players.player.easel.length;
+            this.easel = players.player.easel;
         });
         this.letterColor = new Array(MAX_EASEL_SIZE).fill(this.mainColor);
     }
@@ -47,6 +47,8 @@ export class EaselComponent {
             this.handlePositionSwitch(true);
         } else if (event.key === 'ArrowLeft') {
             this.handlePositionSwitch(false);
+        } else {
+            this.selectLetterWithKey(event);
         }
     }
 
@@ -54,10 +56,33 @@ export class EaselComponent {
         const manipulatedLetterIndex = this.letterColor.indexOf(this.manipulationColor);
         if (manipulatedLetterIndex === this.manipulationNotInArray) return;
         let nextPosition;
-        if (moveRight) nextPosition = manipulatedLetterIndex === this.easelSize - 1 ? 0 : manipulatedLetterIndex + 1;
-        else nextPosition = manipulatedLetterIndex === 0 ? this.easelSize - 1 : manipulatedLetterIndex - 1;
+        if (moveRight) nextPosition = manipulatedLetterIndex === this.easel.length - 1 ? 0 : manipulatedLetterIndex + 1;
+        else nextPosition = manipulatedLetterIndex === 0 ? this.easel.length - 1 : manipulatedLetterIndex - 1;
         this.store.dispatch(switchLettersEasel({ positionIndex: manipulatedLetterIndex, destinationIndex: nextPosition }));
         this.switchColorPosition(manipulatedLetterIndex, nextPosition);
+    }
+
+    selectLetterWithKey(keyEvent: KeyboardEvent) {
+        if (keyEvent.key.length !== 1 || !this.easel.includes(stringToLetter(keyEvent.key))) {
+            this.cancelSelection();
+            return;
+        }
+        const keyPressed = stringToLetter(keyEvent.key);
+        const firstIndexLetter = this.easel.indexOf(keyPressed.toUpperCase() as Letter);
+        let manipulationIndex = this.letterColor.indexOf(this.manipulationColor);
+        if (manipulationIndex < 0) manipulationIndex = this.easel.length - 1;
+        this.cancelManipulationSelection();
+        if (this.easel[manipulationIndex] !== stringToLetter(keyEvent.key)) {
+            this.letterColor[firstIndexLetter] = this.manipulationColor;
+        } else {
+            const nextIndex = this.easel.indexOf(keyPressed.toUpperCase() as Letter, manipulationIndex + 1);
+            const nextIndexNotFound = -1;
+            if (nextIndex === nextIndexNotFound) {
+                this.letterColor[firstIndexLetter] = this.manipulationColor;
+            } else {
+                this.letterColor[nextIndex] = this.manipulationColor;
+            }
+        }
     }
 
     switchColorPosition(positionIndex: number, destinationIndex: number) {
@@ -118,15 +143,11 @@ export class EaselComponent {
         return this.letterColor.includes(this.exchangeColor);
     }
 
-    exchangeLetters(): void {
-        let playerEasel: Letter[] = [];
-        this.store.select('players').subscribe((players) => {
-            playerEasel = players.player.easel;
-        });
+    exchangeSelectedLetters(): void {
         let lettersToExchange = '';
-        for (let index = 0; index < playerEasel.length; index++) {
+        for (let index = 0; index < this.easel.length; index++) {
             if (this.letterColor[index] === this.exchangeColor) {
-                lettersToExchange += playerEasel[index].toLowerCase();
+                lettersToExchange += this.easel[index].toLowerCase();
             }
         }
         this.store.dispatch(exchangeLetters({ letters: lettersToExchange }));
