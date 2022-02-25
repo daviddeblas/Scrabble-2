@@ -7,7 +7,7 @@ import { cold } from 'jasmine-marbles';
 import { EaselComponent } from './easel.component';
 
 describe('EaselComponent', () => {
-    const exampleEasel = ['A', 'B', 'C', 'D'];
+    const exampleEasel = ['A', 'B', '*', 'C', 'D'];
     let component: EaselComponent;
     let fixture: ComponentFixture<EaselComponent>;
     let mouseClickStub: MouseEvent;
@@ -213,13 +213,12 @@ describe('EaselComponent', () => {
         expect(component.disableExchange()).toBeTrue();
     });
 
-    it('exchangeLetters should dispatch "[Players] Exchange Letters" and call cancelExchangeSelection with the selected letters', () => {
+    it('exchangeSelectedLetters should dispatch "[Players] Exchange Letters" and call cancelExchangeSelection with the selected letters', () => {
         component.letterColor[0] = component.exchangeColor;
         component.letterColor[2] = component.exchangeColor;
         const cancelExchangeSelectionSpy = spyOn(component, 'cancelExchangeSelection');
-        store.overrideSelector('players', { player: { easel: ['A', 'E', '*', 'Z'] } });
         const expectedAction = cold('a', { a: exchangeLetters({ letters: 'a*' }) });
-        component.exchangeLetters();
+        component.exchangeSelectedLetters();
         expect(store.scannedActions$).toBeObservable(expectedAction);
         expect(cancelExchangeSelectionSpy).toHaveBeenCalled();
     });
