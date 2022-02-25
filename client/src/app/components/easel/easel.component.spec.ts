@@ -7,7 +7,7 @@ import { cold } from 'jasmine-marbles';
 import { EaselComponent } from './easel.component';
 
 describe('EaselComponent', () => {
-    const exampleEasel = ['A', 'B', '*', 'C', 'D'];
+    const exampleEasel = ['A', 'B', '*', 'C', 'D', 'A'];
     let component: EaselComponent;
     let fixture: ComponentFixture<EaselComponent>;
     let mouseClickStub: MouseEvent;
@@ -81,6 +81,53 @@ describe('EaselComponent', () => {
         });
         fixture.nativeElement.dispatchEvent(arrowPressed);
         expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(false);
+    });
+
+    it('an other key pressed should call selectLetterWithKey with the event key as parameter', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'selectLetterWithKey');
+        const keyPressed = new KeyboardEvent('keydown', {
+            key: 'a',
+        });
+        fixture.nativeElement.dispatchEvent(keyPressed);
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalledOnceWith(keyPressed.key);
+    });
+
+    it('selectLetterWithKey should call cancelSelection if the key is longer than a character', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'cancelSelection');
+        component.selectLetterWithKey('longKey');
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalled();
+    });
+
+    it('selectLetterWithKey should call cancelSelection if the key is not in easel', () => {
+        const cancelExchangeSelectionSpy = spyOn(component, 'cancelSelection');
+        component.selectLetterWithKey('f');
+        expect(cancelExchangeSelectionSpy).toHaveBeenCalled();
+    });
+
+    it('selectLetterWithKey should add the manipulation color to the corresponding position on the easel', () => {
+        component.selectLetterWithKey('a');
+        expect(component.letterColor[0]).toEqual(component.manipulationColor);
+    });
+
+    it('selectLetterWithKey should add the manipulation color to the corresponding position and remove it if a letter is selected', () => {
+        component.letterColor[0] = component.manipulationColor;
+        component.selectLetterWithKey('b');
+        expect(component.letterColor[0]).toEqual(component.mainColor);
+        expect(component.letterColor[1]).toEqual(component.manipulationColor);
+    });
+
+    it('selectLetterWithKey should add the manipulation color to the next corresponding letter if the given letter is already manipulated', () => {
+        component.letterColor[0] = component.manipulationColor;
+        component.selectLetterWithKey('a');
+        expect(component.letterColor[0]).toEqual(component.mainColor);
+        expect(component.letterColor[5]).toEqual(component.manipulationColor);
+    });
+
+    it('selectLetterWithKey should put the color on first appearance of letter if manipulated on last letter', () => {
+        component.letterColor[5] = component.manipulationColor;
+        component.selectLetterWithKey('a');
+        expect(component.letterColor[5]).toEqual(component.mainColor);
+        expect(component.letterColor[0]).toEqual(component.manipulationColor);
     });
 
     it('gameIsEnded should return true if the game is ended and call cancelExchangeSelection', () => {
