@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
+import { LetterComponent } from '@app/components/letter/letter.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -15,7 +16,7 @@ describe('EaselComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [EaselComponent],
+            declarations: [EaselComponent, LetterComponent],
             imports: [AppMaterialModule],
             providers: [provideMockStore()],
         }).compileComponents();
