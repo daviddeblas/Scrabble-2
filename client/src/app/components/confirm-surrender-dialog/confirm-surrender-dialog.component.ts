@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { surrender } from '@app/actions/player.actions';
+import { resetSocketConnection, surrender } from '@app/actions/player.actions';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -18,5 +18,6 @@ export class ConfirmSurrenderDialogComponent {
     surrenderGame(): void {
         this.store.dispatch(surrender());
         this.closeDialog();
+        this.store.dispatch(resetSocketConnection());
     }
 }
