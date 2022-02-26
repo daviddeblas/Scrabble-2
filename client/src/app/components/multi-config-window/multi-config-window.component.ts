@@ -4,7 +4,7 @@ import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { createRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
-import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
+import { MAX_NAME_LENGTH, MIN_NAME_LENGTH, SECONDS_IN_MINUTE } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -60,5 +60,13 @@ export class MultiConfigWindowComponent implements OnInit {
     onSubmit(): void {
         const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
         this.store.dispatch(createRoom({ gameOptions }));
+    }
+
+    timerToString(): string {
+        if (this.timer === MIN_TIME) {
+            return `${Math.floor(this.timer / SECONDS_IN_MINUTE)}:${(this.timer % SECONDS_IN_MINUTE).toString().padStart(2, '0')} sec`;
+        } else {
+            return `${Math.floor(this.timer / SECONDS_IN_MINUTE)}:${(this.timer % SECONDS_IN_MINUTE).toString().padStart(2, '0')} min`;
+        }
     }
 }

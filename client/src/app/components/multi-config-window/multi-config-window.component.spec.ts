@@ -149,4 +149,16 @@ describe('MultiConfigWindowComponent', () => {
         const expectedAction = cold('a', { a: createRoom({ gameOptions: expectedGameOptions }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
+
+    it('should return time in seconds if it is equal to 30 seconds', () => {
+        component.timer = 30;
+        expect(component.timerToString()).toBe('0:30 sec');
+        fixture.destroy();
+    });
+
+    it('should return the time in minutes', () => {
+        component.timer = 90;
+        expect(component.timerToString()).toBe('1:30 min');
+        fixture.destroy();
+    });
 });
