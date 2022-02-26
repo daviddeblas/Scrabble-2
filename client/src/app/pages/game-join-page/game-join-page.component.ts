@@ -78,6 +78,13 @@ export class GameJoinPageComponent implements OnDestroy {
         return roomLength;
     }
 
+    selectRandomRoom(): void {
+        this.roomList$.subscribe((roomList) => {
+            const randomNumber = Math.floor(Math.random() * roomList.length);
+            this.selectRoom(roomList[randomNumber]);
+        });
+    }
+
     joinGame(): void {
         if (!this.selectedRoom) return;
         this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo: this.selectedRoom }));
