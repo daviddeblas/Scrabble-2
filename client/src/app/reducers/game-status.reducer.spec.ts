@@ -10,6 +10,7 @@ describe('[Game Status] Game Status Received', () => {
         winner: null,
         gameEnded: false,
         letterPotLength: 0,
+        timer: 0,
     };
 
     const playersStub: Players = {

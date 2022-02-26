@@ -44,7 +44,7 @@ describe('[Board] Reducer', () => {
     describe('[Board] Sync Board', () => {
         it('should set the board state com', () => {
             const action = gameStatusReceived({
-                status: { activePlayer: '', winner: null, gameEnded: false, letterPotLength: 0 },
+                status: { activePlayer: '', winner: null, gameEnded: false, letterPotLength: 0, timer: 0 },
                 players: { player: new Player(''), opponent: new Player('') },
                 board: boardStub,
             });
