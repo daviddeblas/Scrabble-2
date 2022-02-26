@@ -70,6 +70,14 @@ export class GameJoinPageComponent implements OnDestroy {
         this.setupNameValidators('');
     }
 
+    roomListLength(): number {
+        let roomLength = 0;
+        this.roomList$.subscribe((roomList) => {
+            roomLength = roomList.length;
+        });
+        return roomLength;
+    }
+
     joinGame(): void {
         if (!this.selectedRoom) return;
         this.store.dispatch(joinRoom({ playerName: this.formGroup.controls.name.value, roomInfo: this.selectedRoom }));
