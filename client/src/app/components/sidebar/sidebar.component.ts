@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 
 const INTERVAL_MILLISECONDS = 1000;
 const SECONDS_IN_MINUTE = 60;
-const DEFAULT_TIMER = 60;
+// const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-sidebar',
@@ -28,7 +28,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.gameStatus$ = store.select('gameStatus');
         this.gameStatus$.subscribe((state) => {
             if (state) this.activePlayer = state.activePlayer;
-            this.countdown = DEFAULT_TIMER;
+            this.countdown = state.timer;
         });
     }
 
