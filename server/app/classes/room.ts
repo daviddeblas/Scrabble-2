@@ -124,7 +124,11 @@ export class Room {
     }
 
     removeUnneededListeners(socket: io.Socket): void {
-        socket.removeAllListeners('send message').removeAllListeners('surrender game').removeAllListeners('get game status');
+        socket
+            .removeAllListeners('send message')
+            .removeAllListeners('surrender game')
+            .removeAllListeners('get game status')
+            .removeAllListeners('command');
     }
 
     private setupSocket(socket: io.Socket, playerNumber: number): void {
