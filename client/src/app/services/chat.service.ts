@@ -74,7 +74,9 @@ export class ChatService {
                     if (this.validatePlaceCommand(command)) {
                         this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;
@@ -82,7 +84,9 @@ export class ChatService {
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: command[1] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;
@@ -90,7 +94,9 @@ export class ChatService {
                     if (command.length === 1) {
                         this.handleSkipCommand(command);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;

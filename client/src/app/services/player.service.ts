@@ -40,7 +40,9 @@ export class PlayerService {
         if (letters.length > 1) {
             while (letterPlaced < letters.length) {
                 if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
-                    this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                    this.playerStore.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+                    );
                     return;
                 }
                 const letter = this.letterOnBoard(column, line);
@@ -69,7 +71,9 @@ export class PlayerService {
             direction = 'h';
         }
         if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
-            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+            );
             return;
         }
         this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
@@ -112,7 +116,9 @@ export class PlayerService {
                 }
             }
             if (!letterExist) {
-                this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                this.playerStore.dispatch(
+                    receivedMessage({ username: '', message: 'Erreur de syntaxe: le chevalet ne contient pas ces lettres', messageType: 'Error' }),
+                );
                 return false;
             }
         }

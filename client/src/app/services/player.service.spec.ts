@@ -107,7 +107,9 @@ describe('PlayerService', () => {
         });
         position = 'c3';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -117,7 +119,9 @@ describe('PlayerService', () => {
         });
         position = 'o12h';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -127,7 +131,9 @@ describe('PlayerService', () => {
         });
         position = 'l15v';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 

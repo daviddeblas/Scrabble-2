@@ -148,7 +148,9 @@ describe('ChatService', () => {
     it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
         const exampleMessage = '!passer ,z4,e';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -165,14 +167,18 @@ describe('ChatService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'validatePlaceCommand').and.callFake(() => false);
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command échanger is not valid', () => {
         const exampleMessage = '!échanger n_fpe38';
         service.messageWritten(username, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
