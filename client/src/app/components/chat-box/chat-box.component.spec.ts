@@ -66,4 +66,18 @@ describe('ChatBoxComponent', () => {
         component.submitMessage();
         expect(component.chatMessage.nativeElement.value).toEqual('');
     });
+
+    it('should always focus the input if game ended', () => {
+        const focusSpy = spyOn(component.chatMessage.nativeElement, 'focus');
+        component.gameEnded = true;
+        component.chatBoxBlur();
+        expect(focusSpy).toHaveBeenCalled();
+    });
+
+    it('should not focus the input if game is not ended', () => {
+        const focusSpy = spyOn(component.chatMessage.nativeElement, 'focus');
+        component.gameEnded = false;
+        component.chatBoxBlur();
+        expect(focusSpy).not.toHaveBeenCalled();
+    });
 });
