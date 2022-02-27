@@ -280,7 +280,7 @@ describe('room', () => {
             clk.restore();
         });
 
-        it('init timer should wait the right amount of ', (done) => {
+        it('init timer should wait the right amount of time', (done) => {
             const clk = useFakeTimers();
             room.sockets.pop();
             room['processSkip'] = () => {
@@ -290,6 +290,28 @@ describe('room', () => {
             room['initTimer']();
             clk.tick(room.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
             clk.restore();
+        });
+
+        it('actionAfterTimeout should call end game if game is ended', () => {
+            const stubbedGame = {
+                needsToEnd: () => true,
+                skip: () => {
+                    return;
+                },
+            } as unknown as Game;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'processSkip').callsFake(() => {
+                return;
+            });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stub(room as any, 'postCommand').callsFake(() => {
+                return;
+            });
+            room.game = stubbedGame;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const endGame = stub(room as any, 'endGame');
+            room['actionAfterTimeout'](room)();
+            expect(endGame.calledOnce).to.equal(true);
         });
 
         it('errorCommand should start a timer and call postCommand', (done) => {
