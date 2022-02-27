@@ -124,7 +124,7 @@ export class ChatService {
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
         if (command[1].slice(POSITION_LAST_CHAR) === 'h') {
-            commandIsCorrect &&= columnNumber + command[2].length <= BOARD_SIZE;
+            commandIsCorrect &&= columnNumber - 1 + command[2].length <= BOARD_SIZE;
         } else if (command[1].slice(POSITION_LAST_CHAR) === 'v') {
             commandIsCorrect &&= command[1][0].charCodeAt(0) - ASCII_ALPHABET_POSITION + command[2].length <= BOARD_SIZE;
         }
