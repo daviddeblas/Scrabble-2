@@ -7,7 +7,7 @@ export interface Vec2 {
 
 export const boardPositionToVec2 = (position: string): Vec2 => {
     return {
-        x: position.slice(0).charCodeAt(0) - ASCII_ALPHABET_POSITION,
-        y: parseInt(position.substring(1), 10) - 1,
+        x: parseInt(position.substring(1), 10) - 1,
+        y: position.slice(0).charCodeAt(0) - ASCII_ALPHABET_POSITION,
     };
 };

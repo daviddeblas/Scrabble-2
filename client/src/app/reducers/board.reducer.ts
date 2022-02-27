@@ -31,19 +31,18 @@ export const reducer = createReducer(
     })),
 
     on(placeWordSuccess, (state, { word }) => {
-        for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {
+        const boardCopy = JSON.parse(JSON.stringify(state.board));
+        for (let i = 0; i < word.length(); ++i) {
             switch (word.direction) {
                 case Direction.HORIZONTAL:
-                    state.board[word.position.x + i][word.position.y] = word.letters[i];
-                    state.multipliers[word.position.x + i][word.position.y] = null;
+                    boardCopy[word.position.x + i][word.position.y] = word.letters[i];
                     break;
                 case Direction.VERTICAL:
-                    state.board[word.position.x][word.position.y + i] = word.letters[i];
-                    state.multipliers[word.position.x][word.position.y + i] = null;
+                    boardCopy[word.position.x][word.position.y + i] = word.letters[i];
                     break;
             }
         }
-        return state;
+        return { ...state, board: boardCopy };
     }),
 
     on(resetAllState, () => initialState),

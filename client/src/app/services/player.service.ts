@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLettersSuccess } from '@app/actions/player.actions';
+import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter, stringToLetters } from '@app/classes/letter';
+import { boardPositionToVec2 } from '@app/classes/vec2';
+import { Direction, Word } from '@app/classes/word';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
@@ -76,30 +77,13 @@ export class PlayerService {
             );
             return;
         }
-        this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
-        this.playerStore.dispatch(exchangeLettersSuccess({ oldLetters: stringToLetters(letters), newLetters: [] }));
+        const tempWordPlaced = new Word(
+            stringToLetters(letters),
+            boardPositionToVec2(boardPosition),
+            direction === 'h' ? Direction.HORIZONTAL : Direction.VERTICAL,
+        );
+        this.boardStore.dispatch(placeWordSuccess({ word: tempWordPlaced }));
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
-    }
-
-    setUpBoardWithWord(position: string, direction: string, letters: string): void {
-        let board: (Letter | null)[][] = [];
-        this.boardStore.select('board').subscribe((us) => (board = us.board));
-        const word = stringToLetters(letters);
-        const column = parseInt(position.slice(1, position.length), 10) - 1;
-        const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-        const tempBoard = JSON.parse(JSON.stringify(board));
-        const directionValue = direction === 'h' ? column : line;
-        for (let i = directionValue; i < word.length + directionValue; ++i) {
-            switch (direction) {
-                case 'h':
-                    tempBoard[i][line] = word[i - directionValue];
-                    break;
-                case 'v':
-                    tempBoard[column][i] = word[i - directionValue];
-                    break;
-            }
-        }
-        this.boardStore.dispatch(syncBoardSuccess({ newBoard: tempBoard }));
     }
 
     lettersInEasel(letters: string): boolean {
