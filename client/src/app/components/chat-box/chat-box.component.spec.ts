@@ -80,4 +80,11 @@ describe('ChatBoxComponent', () => {
         component.chatBoxBlur();
         expect(focusSpy).not.toHaveBeenCalled();
     });
+
+    it('ngOnInit should focus input if gameEnded changes', () => {
+        const focusSpy = spyOn(component.chatMessage.nativeElement, 'focus');
+        store.overrideSelector('gameStatus', { gameEnded: true });
+        component.ngOnInit();
+        expect(focusSpy).toHaveBeenCalled();
+    });
 });

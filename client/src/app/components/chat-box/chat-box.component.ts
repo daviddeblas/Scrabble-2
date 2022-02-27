@@ -19,11 +19,14 @@ export class ChatBoxComponent implements OnInit {
     constructor(private store: Store<{ chat: ChatMessage[]; gameStatus: GameStatus }>, private playerStore: Store<{ players: Players }>) {
         this.chat$ = store.select('chat');
         this.playerStore.subscribe((us) => (this.username = us.players.player.name));
-        this.store.select('gameStatus').subscribe((gameStatus) => (this.gameEnded = gameStatus.gameEnded));
     }
     ngOnInit(): void {
         this.store.dispatch(chatActions.initiateChatting());
         this.chatMessage.nativeElement.focus();
+        this.store.select('gameStatus').subscribe((gameStatus) => {
+            this.gameEnded = gameStatus.gameEnded;
+            if (gameStatus.gameEnded) this.chatMessage.nativeElement.focus();
+        });
     }
 
     submitMessage(): void {
