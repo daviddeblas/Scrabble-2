@@ -168,6 +168,9 @@ export class Room {
         return () => {
             self.processSkip([], game.activePlayer as number);
             self.postCommand();
+            if (this.game?.needsToEnd()) {
+                this.endGame();
+            }
         };
     }
 
