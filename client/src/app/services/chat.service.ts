@@ -17,8 +17,8 @@ export class ChatService {
         private socketService: SocketClientService,
         private gameStore: Store<{ gameStatus: GameStatus }>,
     ) {}
-    broadcastMsg(username: string, message: string) {
-        this.socketService.send('send message', { username, message });
+    broadcastMsg(username: string, message: string, messageType: string = '') {
+        this.socketService.send('send message', { username, message, messageType });
     }
 
     acceptNewAction(): void {
@@ -49,10 +49,10 @@ export class ChatService {
         });
     }
 
-    messageWritten(username: string, message: string): void {
+    messageWritten(username: string, message: string, messageType = ''): void {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message, messageType: '' }));
-            this.broadcastMsg(username, message);
+            this.store.dispatch(receivedMessage({ username, message, messageType }));
+            this.broadcastMsg(username, message, messageType);
         } else {
             let activePlayer;
             let gameEnded;

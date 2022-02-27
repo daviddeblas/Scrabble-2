@@ -23,7 +23,7 @@ export class ChatEffects {
             this.actions$.pipe(
                 ofType(messageWritten),
                 tap((action) => {
-                    this.chatService.messageWritten(action.username, action.message);
+                    this.chatService.messageWritten(action.username, action.message, action.messageType);
                 }),
             ),
         { dispatch: false },

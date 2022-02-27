@@ -42,7 +42,7 @@ describe('ChatService', () => {
 
     it('broadcastMsg should emit send message with the username and message', (done) => {
         const sendSpy = spyOn(service['socketService'], 'send');
-        const expectedMessage = { username: 'My Name', message: 'Coucou' };
+        const expectedMessage = { username: 'My Name', message: 'Coucou', messageType: '' };
         service.broadcastMsg(expectedMessage.username, expectedMessage.message);
         setTimeout(() => {
             expect(sendSpy).toHaveBeenCalledOnceWith('send message', expectedMessage);

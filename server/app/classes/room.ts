@@ -111,9 +111,9 @@ export class Room {
 
     initChatting(): void {
         this.sockets.forEach((s, index) => {
-            s.on('send message', ({ username, message }) => {
+            s.on('send message', ({ username, message, messageType }) => {
                 this.sockets.forEach((socket, i) => {
-                    if (i !== index) socket.emit('receive message', { username, message });
+                    if (i !== index) socket.emit('receive message', { username, message, messageType });
                 });
             });
         });
