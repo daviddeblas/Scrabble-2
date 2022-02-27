@@ -56,7 +56,7 @@ describe('[Board] Reducer', () => {
     });
 
     describe('[Players] Place Word Success', () => {
-        it('should add the word in the board horizontally and remove the multipliers', () => {
+        it('should add the word in the board horizontally', () => {
             const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.HORIZONTAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
@@ -64,11 +64,10 @@ describe('[Board] Reducer', () => {
 
             for (let x = newWord.position.x; x < newWord.length(); ++x) {
                 expect(result.board[x][0]).toEqual(newWord.letters[x]);
-                expect(result.multipliers[x][0]).toBeNull();
             }
         });
 
-        it('should add the word in the board vertically and remove the multipliers', () => {
+        it('should add the word in the board vertically', () => {
             const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.VERTICAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
@@ -76,7 +75,6 @@ describe('[Board] Reducer', () => {
 
             for (let y = newWord.position.y; y < newWord.length(); ++y) {
                 expect(result.board[0][y]).toEqual(newWord.letters[y]);
-                expect(result.multipliers[0][y]).toBeNull();
             }
         });
     });
