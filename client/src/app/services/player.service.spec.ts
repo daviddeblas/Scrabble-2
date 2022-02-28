@@ -79,7 +79,7 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h7h';
         service.placeWord(position, word);
-        const expectedWord = new Word(['W', 'O', 'R', 'D'], { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
+        const expectedWord = new Word('word', { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
@@ -90,7 +90,7 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'a2v';
         service.placeWord(position, word);
-        const expectedWord = new Word(['W', 'O', 'R', 'D'], { x: 1, y: 0 } as Vec2, Direction.VERTICAL);
+        const expectedWord = new Word('waord', { x: 1, y: 0 } as Vec2, Direction.VERTICAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
@@ -102,7 +102,7 @@ describe('PlayerService', () => {
         position = 'h8';
         word = 'w';
         service.placeWord(position, word);
-        const expectedWord = new Word(['W'], { x: 7, y: 7 } as Vec2, Direction.HORIZONTAL);
+        const expectedWord = new Word('w', { x: 7, y: 7 } as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
@@ -149,7 +149,7 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h7h';
         service.placeWord(position, word);
-        const expectedWord = new Word(['W', 'O', 'R', 'D'], { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
+        const expectedWord = new Word('word', { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).not.toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
