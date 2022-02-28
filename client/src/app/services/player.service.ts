@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Letter, stringToLetters } from '@app/classes/letter';
+import { Letter } from '@app/classes/letter';
 import { boardPositionToVec2 } from '@app/classes/vec2';
 import { Direction, Word } from '@app/classes/word';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
@@ -50,7 +50,7 @@ export class PlayerService {
                 if (letter) {
                     lettersToPlace += letter;
                 } else {
-                    lettersToPlace += letters[letterPlaced].toLowerCase();
+                    lettersToPlace += letters[letterPlaced];
                     letterPlaced++;
                 }
                 if (position.slice(POSITION_LAST_CHAR) === 'h') {
@@ -60,7 +60,7 @@ export class PlayerService {
                 }
             }
         } else {
-            lettersToPlace = letters.toLowerCase();
+            lettersToPlace = letters;
         }
         let boardPosition: string;
         let direction: string;
@@ -78,7 +78,7 @@ export class PlayerService {
             return;
         }
         const tempWordPlaced = new Word(
-            stringToLetters(letters),
+            lettersToPlace,
             boardPositionToVec2(boardPosition),
             direction === 'h' ? Direction.HORIZONTAL : Direction.VERTICAL,
         );
