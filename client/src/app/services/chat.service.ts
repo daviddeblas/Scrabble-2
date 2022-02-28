@@ -135,6 +135,6 @@ export class ChatService {
     }
 
     private validateExchangeCommand(command: string[]): boolean {
-        return /^[a-z]*$/.test(command[1]) && command.length === 2;
+        return /^[a-z/*]*$/.test(command[1]) && command.length === 2;
     }
 }
