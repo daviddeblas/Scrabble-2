@@ -32,17 +32,24 @@ export const reducer = createReducer(
 
     on(placeWordSuccess, (state, { word }) => {
         const boardCopy = JSON.parse(JSON.stringify(state.board));
+        const blankCopy: Vec2[] = JSON.parse(JSON.stringify(state.blanks));
         for (let i = 0; i < word.length(); ++i) {
             switch (word.direction) {
                 case Direction.HORIZONTAL:
                     boardCopy[word.position.x + i][word.position.y] = word.letters[i];
+                    if (word.letters[i] === '*') {
+                        blankCopy.push({ x: word.position.x + i, y: word.position.y });
+                    }
                     break;
                 case Direction.VERTICAL:
                     boardCopy[word.position.x][word.position.y + i] = word.letters[i];
+                    if (word.letters[i] === '*') {
+                        blankCopy.push({ x: word.position.x, y: word.position.y + i });
+                    }
                     break;
             }
         }
-        return { ...state, board: boardCopy };
+        return { ...state, board: boardCopy, blanks: blankCopy };
     }),
 
     on(resetAllState, () => initialState),
