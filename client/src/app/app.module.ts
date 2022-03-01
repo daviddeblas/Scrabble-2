@@ -24,6 +24,7 @@ import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,6 +43,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
         GamePreparationPageComponent,
         WaitingRoomComponent,
         GameJoinPageComponent,
+        SoloGameSettingsPageComponent,
     ],
     imports: [
         AppMaterialModule,
