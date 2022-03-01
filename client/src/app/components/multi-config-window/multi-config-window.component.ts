@@ -21,11 +21,9 @@ export const TIMER_INCREMENT = 30;
 export class MultiConfigWindowComponent implements OnInit {
     @Input() isSoloGame: boolean = false;
     @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
-    @Output() opponentLevel: EventEmitter<string> = new EventEmitter();
     settingsForm: FormGroup;
     dictionaries$: Observable<string[]>;
     timer: number;
-    selected: string = 'Débutant';
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
     readonly maxTime: number = MAX_TIME;
@@ -43,7 +41,7 @@ export class MultiConfigWindowComponent implements OnInit {
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(this.minNameLength), Validators.maxLength(this.maxNameLength)]],
-            botLevel: [''],
+            botLevel: ['Débutant'],
             selectedDictionary: ['', Validators.required],
         });
     }
@@ -58,7 +56,7 @@ export class MultiConfigWindowComponent implements OnInit {
 
     onSubmit(): void {
         const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
-        this.gameOptionsSubmitted.emit({ gameOptions });
-        if (this.isSoloGame) this.opponentLevel.emit(this.settingsForm.controls.botLevel.value);
+        if (this.isSoloGame) this.gameOptionsSubmitted.emit({ gameOptions, botLevel: this.settingsForm.controls.botLevel.value });
+        else this.gameOptionsSubmitted.emit({ gameOptions });
     }
 }

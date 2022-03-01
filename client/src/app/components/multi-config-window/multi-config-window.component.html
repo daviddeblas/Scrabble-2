@@ -27,7 +27,7 @@
 
             <mat-form-field *ngIf="isSoloGame" class="parameter-container" appearance="fill">
                 <mat-label>Niveau de l'adversaire</mat-label>
-                <mat-select [(value)]="selected" placeholder="Mode" formControlName="botLevel">
+                <mat-select formControlName="botLevel">
                     <mat-option value="Débutant">Débutant</mat-option>
                     <mat-option value="Expert" disabled>Expert</mat-option>
                 </mat-select>
