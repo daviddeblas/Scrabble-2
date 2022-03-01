@@ -94,7 +94,9 @@ describe('Rooms Manager Service', () => {
 
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
-        roomsManager.rooms[1].game = new Game(new GameConfig(), ['']);
+        const room = roomsManager.rooms[1];
+        // eslint-disable-next-line dot-notation
+        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout']);
         assert(spyOnSocket.calledWith('get list', expectedResult));
     });
 
