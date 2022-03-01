@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { keyDown } from '@app/actions/board.actions';
 import { Letter } from '@app/classes/letter';
 import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { BOARD_SIZE } from '@app/constants';
@@ -23,7 +24,7 @@ export class BoardComponent {
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 
-    constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }> /* private elementRef: ElementRef*/) {
+    constructor(private store: Store<{ board: BoardState; localSettings: LocalSettings }> /* private elementRef: ElementRef*/) {
         this.boardState$ = store.select('board');
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.multipliers$ = store.select('board', 'multipliers');
@@ -40,5 +41,9 @@ export class BoardComponent {
         return Array(n)
             .fill(0)
             .map((x, i) => String.fromCharCode(LETTER_A + i));
+    }
+
+    keyPressed(event: KeyboardEvent): void {
+        this.store.dispatch(keyDown({ key: event.key }));
     }
 }

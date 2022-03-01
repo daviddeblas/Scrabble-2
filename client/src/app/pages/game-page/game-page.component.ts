@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
+import { keyDown } from '@app/actions/board.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
@@ -11,5 +12,9 @@ import { Store } from '@ngrx/store';
 export class GamePageComponent {
     constructor(private store: Store<GameStatus>) {
         this.store.dispatch(getGameStatus());
+    }
+    @HostListener('window:keydown', ['$event'])
+    handleKeyDown(e: KeyboardEvent): void {
+        this.store.dispatch(keyDown({ key: e.key }));
     }
 }

@@ -4,5 +4,5 @@
         <text *ngIf="(selection$ | async)?.orientation === 'horizontal'" x="25" y="25" class="cell-text">→</text>
         <text *ngIf="(selection$ | async)?.orientation === 'vertical'" x="25" y="25" class="cell-text">↓</text>
     </g>
-    <rect width="50" height="50" (click)="click()" opacity="0" class="base"></rect>
+    <rect width="50" height="50" (mousedown)="click()" opacity="0" class="base"></rect>
 </svg:g>

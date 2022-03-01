@@ -9,3 +9,7 @@ export const syncBoardSuccess = createAction('[Board] Sync Board Success', props
 export const syncBoardFailure = createAction('[Board] Sync Board Failure', props<{ error: unknown }>());
 
 export const cellClick = createAction('[Board] Cell Clicked', props<{ pos: Vec2 }>());
+
+export const keyDown = createAction('[Board] Key Down', props<{ key: string }>());
+
+export const placeLetter = createAction('[Board] Letter Placed', props<{ letter: Letter }>());

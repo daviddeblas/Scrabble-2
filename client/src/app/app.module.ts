@@ -17,6 +17,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
+import { BoardEffects } from './effects/board.effects';
 import { DictionariesEffects } from './effects/dictionaries.effects';
 import { GameEffects } from './effects/game.effects';
 import { RoomEffects } from './effects/room.effects';
@@ -55,7 +56,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
             room: roomReducer.reducer,
             gameStatus: gameReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, BoardEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,
