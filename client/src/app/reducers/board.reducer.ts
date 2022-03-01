@@ -100,6 +100,9 @@ export const reducer = createReducer(
             selection: state.selection.copy(),
         };
 
+        // If letters has been placed
+        if (tempState.selection.modifiedCells.length > 0) return tempState;
+
         tempState.selection.cell = pos;
 
         if (state.selection.cell?.x === pos.x && state.selection.cell?.y === pos.y) {
@@ -116,6 +119,9 @@ export const reducer = createReducer(
         const board = cloneBoard(state.board);
         board[selectedPosition.x][selectedPosition.y] = letter;
 
+        const selection = state.selection.copy();
+        selection.modifiedCells.push(state.selection.cell as Vec2);
+
         switch (state.selection.orientation) {
             case Orientation.Horizontal:
                 selectedPosition.x++;
@@ -124,7 +130,7 @@ export const reducer = createReducer(
                 selectedPosition.y++;
                 break;
         }
-        const selection = state.selection.copy();
+
         selection.cell = selectedPosition;
         return {
             ...state,

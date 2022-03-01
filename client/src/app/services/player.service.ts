@@ -27,7 +27,10 @@ export class PlayerService {
         if (this.lettersInEasel(letters)) {
             const commandLine = 'échanger ' + letters;
             this.socketService.send('command', commandLine);
-        }
+        } else
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
     }
 
     placeWord(position: string, letters: string): void {
@@ -35,12 +38,19 @@ export class PlayerService {
         let lettersToPlace = '';
         let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], 10) - 1;
         let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-        if (!this.lettersInEasel(letters)) return;
+        if (!this.lettersInEasel(letters)) {
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
+            return;
+        }
         let letterPlaced = 0;
         if (letters.length > 1) {
             while (letterPlaced < letters.length) {
                 if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
-                    this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                    this.playerStore.dispatch(
+                        receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+                    );
                     return;
                 }
                 const letter = this.letterOnBoard(column, line);
@@ -69,7 +79,7 @@ export class PlayerService {
             direction = 'h';
         }
         if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
-            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - Mauvais placement', messageType: 'Error' }));
             return;
         }
         this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
@@ -112,7 +122,6 @@ export class PlayerService {
                 }
             }
             if (!letterExist) {
-                this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
                 return false;
             }
         }
