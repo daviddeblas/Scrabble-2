@@ -13,3 +13,9 @@ export const cellClick = createAction('[Board] Cell Clicked', props<{ pos: Vec2 
 export const keyDown = createAction('[Board] Key Down', props<{ key: string }>());
 
 export const placeLetter = createAction('[Board] Letter Placed', props<{ letter: Letter }>());
+
+export const removeLetters = createAction('[Board] Letters Removed', props<{ positions: Vec2[] }>());
+
+export const clearSelection = createAction('[Board] Selection Cleared');
+
+export const backspaceSelection = createAction('[Board] Selection Backspace');

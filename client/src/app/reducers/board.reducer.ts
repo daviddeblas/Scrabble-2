@@ -1,4 +1,4 @@
-import { cellClick, placeLetter, syncBoardSuccess } from '@app/actions/board.actions';
+import { backspaceSelection, cellClick, clearSelection, placeLetter, removeLetters, syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { BoardSelection, Orientation } from '@app/classes/board-selection';
@@ -136,6 +136,39 @@ export const reducer = createReducer(
             ...state,
             selection,
             board,
+        };
+    }),
+
+    on(removeLetters, (state, { positions }) => {
+        const board = cloneBoard(state.board);
+        positions.forEach((pos) => (board[pos.x][pos.y] = null));
+
+        return {
+            ...state,
+            board,
+        };
+    }),
+
+    on(clearSelection, (state): BoardState => {
+        return { ...state, selection: new BoardSelection() };
+    }),
+
+    on(backspaceSelection, (state): BoardState => {
+        const selection = state.selection.copy();
+        if (selection.cell === null) return { ...state };
+        if (selection.modifiedCells.length === 0) return { ...state, selection: new BoardSelection() };
+        switch (state.selection.orientation) {
+            case Orientation.Horizontal:
+                selection.cell.x--;
+                break;
+            case Orientation.Vertical:
+                selection.cell.y--;
+                break;
+        }
+
+        return {
+            ...state,
+            selection,
         };
     }),
 

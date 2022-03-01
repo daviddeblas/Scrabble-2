@@ -128,6 +128,12 @@ export class PlayerService {
         return true;
     }
 
+    getEasel(): Letter[] {
+        let playerEasel: Letter[] = [];
+        this.playerStore.select('players').subscribe((state) => (playerEasel = state.player.easel));
+        return playerEasel;
+    }
+
     letterOnBoard(column: number, line: number): string | undefined {
         let board: (Letter | null)[][] = [];
         this.boardStore.select('board').subscribe((us) => (board = us.board));

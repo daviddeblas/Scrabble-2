@@ -17,6 +17,8 @@ export const exchangeLettersFailure = createAction('[Players] Exchange Letters F
 
 export const removeLetterFromEasel = createAction('[Players] Remove Letters From Easel', props<{ letter: Letter }>());
 
+export const addLettersToEasel = createAction('[Players] Add Letters From Easel', props<{ letters: Letter[] }>());
+
 export const skipTurn = createAction('[Players] Skip Turn');
 
 export const surrender = createAction('[Players] Surrender');
