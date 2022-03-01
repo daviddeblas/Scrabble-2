@@ -5,5 +5,9 @@ import { Component } from '@angular/core';
     styleUrls: ['./solo-game-settings-page.component.scss'],
 })
 export class SoloGameSettingsPageComponent {
-    // constructor() {}
+    /* constructor(private store: Store) {}
+
+    onGameOptionsSubmitted(gameOptions: GameOptions) {
+        this.store.dispatch();
+    }*/
 }
