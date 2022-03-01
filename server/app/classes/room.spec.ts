@@ -2,6 +2,7 @@
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
@@ -117,26 +118,39 @@ describe('room', () => {
             expect(socketStub.calledWith('surrender game')).to.equal(true);
             expect(socketStub.calledWith('get game status')).to.equal(true);
         });
+
         it('quitRoomClient should not emit if game is not null', () => {
-            const emitStub = stub(socket, 'emit');
+            const room = new Room(socket, roomsManager, gameOptions);
+            room.game = {} as unknown as Game;
+            const emitStub = stub(socket, 'emit').callsFake(() => {
+                return true;
+            });
             room.quitRoomClient();
             expect(emitStub.called).to.equal(false);
         });
 
-        it('initiateRoomEvents should call setupSocket, initSurrenderGame and initChatting', (done) => {
+        it('initiateRoomEvents should call setupSocket', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stub(room as any, 'setupSocket').callsFake(() => {
-                return;
-            });
-            stub(room, 'initSurrenderGame').callsFake(() => {
-                return;
-            });
-            stub(room, 'initChatting').callsFake(() => {
-                done();
+            const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
             room.clients[0] = {} as io.Socket;
             room.initiateRoomEvents();
+            expect(setupSocketStub.called).to.equal(true);
+        });
+
+        it('actionAfterTimeout should call ', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const commandServiceStub = {
+                processSkip: stub(),
+                postCommand: stub(),
+            };
+            room['commandService'] = commandServiceStub as unknown as CommandService;
+            room['game'] = { activePlayer: 0 } as unknown as Game;
+            room['actionAfterTimeout']();
+            expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
+            expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
         });
     });
 
