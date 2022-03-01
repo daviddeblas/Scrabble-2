@@ -1,4 +1,5 @@
 import * as gameStatusActions from '@app/actions/game-status.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { GameStatus, initialState, reducer } from '@app/reducers/game-status.reducer';
 import { BoardState } from './board.reducer';
@@ -22,6 +23,7 @@ describe('[Game Status] Game Status Received', () => {
         multipliers: [],
         pointsPerLetter: new Map(),
         blanks: [],
+        selection: new BoardSelection(),
     };
 
     it('should set the game status', () => {

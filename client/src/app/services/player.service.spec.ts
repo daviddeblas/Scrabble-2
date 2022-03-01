@@ -3,6 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Letter } from '@app/classes/letter';
 import { BOARD_SIZE } from '@app/constants';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -35,7 +36,7 @@ describe('PlayerService', () => {
         board[14][14] = 'E';
 
         socketService = new SocketTestHelper();
-        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [] };
+        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [], selection: new BoardSelection() };
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({

@@ -1,6 +1,7 @@
 import * as boardActions from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Multiplier } from '@app/classes/multiplier';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
@@ -12,7 +13,13 @@ const createInitialBoard = () => {
     return initialBoard;
 };
 
-const createInitialState = () => ({ board: createInitialBoard(), pointsPerLetter: new Map(), multipliers: createInitialBoard(), blanks: [] });
+const createInitialState = () => ({
+    board: createInitialBoard(),
+    pointsPerLetter: new Map(),
+    multipliers: createInitialBoard(),
+    blanks: [],
+    selection: new BoardSelection(),
+});
 
 describe('[Board] Reducer', () => {
     let boardStub: BoardState;

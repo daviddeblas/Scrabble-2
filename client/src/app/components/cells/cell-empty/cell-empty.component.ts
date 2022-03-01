@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { cellClick } from '@app/actions/board.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Vec2 } from '@app/classes/vec2';
 import { BoardState } from '@app/reducers/board.reducer';
 import { LocalSettings } from '@app/reducers/local-settings.reducer';
@@ -16,12 +17,10 @@ import { Observable } from 'rxjs';
 export class CellEmptyComponent {
     @Input() pos: Vec2 = { x: 0, y: 0 };
 
-    selectedPos$: Observable<Vec2 | null>;
-    selectedOrientation$: Observable<string>;
+    selection$: Observable<BoardSelection>;
 
     constructor(public store: Store<{ board: BoardState; localSettings: LocalSettings }> /* private elementRef: ElementRef*/) {
-        this.selectedPos$ = store.select('board', 'selectedCell');
-        this.selectedOrientation$ = store.select('board', 'selectedOrientation');
+        this.selection$ = store.select('board', 'selection');
     }
 
     click(): void {

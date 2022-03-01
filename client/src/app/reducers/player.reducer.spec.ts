@@ -1,5 +1,6 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Letter } from '@app/classes/letter';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
@@ -39,6 +40,7 @@ describe('[Players] Reducer', () => {
             multipliers: [],
             pointsPerLetter: new Map(),
             blanks: [],
+            selection: new BoardSelection(),
         };
 
         it('should return the loaded players', () => {

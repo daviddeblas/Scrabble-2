@@ -1,6 +1,7 @@
 import { cellClick, syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
+import { BoardSelection, Orientation } from '@app/classes/board-selection';
 import { Letter } from '@app/classes/letter';
 import { Multiplier } from '@app/classes/multiplier';
 import { Vec2 } from '@app/classes/vec2';
@@ -16,8 +17,7 @@ export interface BoardState {
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
     blanks: Vec2[];
-    selectedCell: Vec2 | null;
-    selectedOrientation: string;
+    selection: BoardSelection;
 }
 
 export const initialState: BoardState = {
@@ -25,8 +25,7 @@ export const initialState: BoardState = {
     pointsPerLetter: new Map(),
     multipliers: [],
     blanks: [],
-    selectedCell: null,
-    selectedOrientation: 'h',
+    selection: new BoardSelection(null, 'horizontal' as Orientation),
 };
 
 export const reducer = createReducer(
@@ -34,7 +33,10 @@ export const reducer = createReducer(
     on(syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
 
     on(gameStatusReceived, (state, { board }) => ({
-        ...board,
+        ...state,
+        board: board.board,
+        multipliers: board.multipliers,
+        blanks: board.blanks,
         // transformer le array de tuple en map
         pointsPerLetter: new Map(board.pointsPerLetter as unknown as [Letter, number][]),
     })),
@@ -58,14 +60,17 @@ export const reducer = createReducer(
     on(cellClick, (state, { pos }) => {
         const tempState = {
             ...state,
-            selectedCell: pos,
+            selection: state.selection.copy(),
         };
 
-        if (state.selectedCell?.x === pos.x && state.selectedCell?.y === pos.y) {
-            tempState.selectedOrientation = tempState.selectedOrientation === 'h' ? 'v' : 'h';
+        tempState.selection.cell = pos;
+
+        if (state.selection.cell?.x === pos.x && state.selection.cell?.y === pos.y) {
+            tempState.selection.orientation =
+                tempState.selection.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
             return tempState;
         }
-        tempState.selectedOrientation = 'h';
+        tempState.selection.orientation = Orientation.Horizontal;
         return tempState;
     }),
 
