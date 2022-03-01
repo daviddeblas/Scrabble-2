@@ -17,13 +17,14 @@ export class KeyManagerService {
     onEnter(): void {
         let selection: BoardSelection = new BoardSelection();
         const placedLetters: Letter[] = [];
+        let letters: Letter[] = [];
         this.store.select('board').subscribe((state) => {
             selection = state.selection;
-            const letters = selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
-            letters.forEach((l) => placedLetters.push(l));
-            this.store.dispatch(addLettersToEasel({ letters }));
-            this.store.dispatch(removeLetters({ positions: selection.modifiedCells }));
+            letters = selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
         });
+        letters.forEach((l) => placedLetters.push(l));
+        this.store.dispatch(addLettersToEasel({ letters }));
+        this.store.dispatch(removeLetters({ positions: selection.modifiedCells }));
 
         const encodedPosition = `${String.fromCharCode(selection.modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${selection.modifiedCells[0].x + 1}${
             selection.orientation === Orientation.Horizontal ? 'h' : 'v'
@@ -34,11 +35,12 @@ export class KeyManagerService {
     }
 
     onEsc(): void {
+        let letters: Letter[] = [];
         this.store.select('board').subscribe((state) => {
             this.store.dispatch(removeLetters({ positions: state.selection.modifiedCells }));
-            const letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
-            this.store.dispatch(addLettersToEasel({ letters }));
+            letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
         });
+        this.store.dispatch(addLettersToEasel({ letters }));
         this.store.dispatch(clearSelection());
     }
 
