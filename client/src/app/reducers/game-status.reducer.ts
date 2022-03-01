@@ -29,5 +29,9 @@ export const reducer = createReducer(
         timer: status.timer,
     })),
     on(gameActions.endGame, (state, { winner }) => ({ ...state, gameEnded: true, winner })),
+    on(gameActions.refreshTimer, (state, { timer }) => ({
+        ...state,
+        timer,
+    })),
     on(resetAllState, () => initialState),
 );
