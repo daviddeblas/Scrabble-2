@@ -1,4 +1,4 @@
-import { syncBoardSuccess } from '@app/actions/board.actions';
+import { cellClick, syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Letter } from '@app/classes/letter';
@@ -16,9 +16,18 @@ export interface BoardState {
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
     blanks: Vec2[];
+    selectedCell: Vec2 | null;
+    selectedOrientation: string;
 }
 
-export const initialState: BoardState = { board: [], pointsPerLetter: new Map(), multipliers: [], blanks: [] };
+export const initialState: BoardState = {
+    board: [],
+    pointsPerLetter: new Map(),
+    multipliers: [],
+    blanks: [],
+    selectedCell: null,
+    selectedOrientation: 'h',
+};
 
 export const reducer = createReducer(
     initialState,
@@ -44,6 +53,20 @@ export const reducer = createReducer(
             }
         }
         return state;
+    }),
+
+    on(cellClick, (state, { pos }) => {
+        const tempState = {
+            ...state,
+            selectedCell: pos,
+        };
+
+        if (state.selectedCell?.x === pos.x && state.selectedCell?.y === pos.y) {
+            tempState.selectedOrientation = tempState.selectedOrientation === 'h' ? 'v' : 'h';
+            return tempState;
+        }
+        tempState.selectedOrientation = 'h';
+        return tempState;
     }),
 
     on(resetAllState, () => initialState),

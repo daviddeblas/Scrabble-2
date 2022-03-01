@@ -38,7 +38,6 @@
                 <g *ngIf="multiplier?.amount === 3 && multiplier?.type === multiplierType.Letter" app-cell-letter-x3 [pos]="{ x: i, y: j }"></g>
                 <g *ngIf="multiplier?.amount === 2 && multiplier?.type === multiplierType.Word" app-cell-word-x2 [pos]="{ x: i, y: j }"></g>
                 <g *ngIf="multiplier?.amount === 3 && multiplier?.type === multiplierType.Word" app-cell-word-x3 [pos]="{ x: i, y: j }"></g>
-                <g app-cell-empty [pos]="{ x: i, y: j }"></g>
             </ng-container>
         </ng-container>
     </g>
@@ -52,5 +51,13 @@
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
             [blank]="letter.blank"
         ></g>
+    </g>
+
+    <g transform="translate(50, 50)">
+        <ng-container *ngFor="let multipliersColumn of multipliers$ | async; let i = index">
+            <ng-container *ngFor="let multiplier of multipliersColumn; let j = index">
+                <g app-cell-empty [pos]="{ x: i, y: j }"></g>
+            </ng-container>
+        </ng-container>
     </g>
 </svg>
