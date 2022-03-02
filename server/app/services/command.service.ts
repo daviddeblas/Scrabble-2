@@ -128,7 +128,7 @@ export class CommandService {
         const blanks: number[] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (game.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
-            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
+            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i).toLowerCase()), iterationVector.copy()));
             if (/^[A-Z]*$/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);
         }
