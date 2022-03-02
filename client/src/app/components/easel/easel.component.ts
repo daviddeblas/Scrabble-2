@@ -1,12 +1,11 @@
 import { Component, HostListener } from '@angular/core';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
-import { MAX_EASEL_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Letter, stringToLetter } from 'common/classes/letter';
-import { POSITION_LAST_CHAR } from 'common/constants';
+import { EASEL_CAPACITY, POSITION_LAST_CHAR } from 'common/constants';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -29,7 +28,7 @@ export class EaselComponent {
         store.select('players').subscribe((players) => {
             this.easel = players.player.easel;
         });
-        this.letterColor = new Array(MAX_EASEL_SIZE).fill(this.mainColor);
+        this.letterColor = new Array(EASEL_CAPACITY).fill(this.mainColor);
     }
     @HostListener('window:mousewheel', ['$event'])
     mouseWheelEvent(event: WheelEvent): void {
