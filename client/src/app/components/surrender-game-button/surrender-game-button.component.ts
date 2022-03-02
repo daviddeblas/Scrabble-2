@@ -16,9 +16,11 @@ import { Observable } from 'rxjs';
 })
 export class SurrenderGameButtonComponent {
     gameEnded$: Observable<boolean>;
+    username: string;
 
     constructor(public dialog: MatDialog, private store: Store<{ gameStatus: GameStatus; players: Players }>, private router: Router) {
         this.gameEnded$ = this.store.select('gameStatus', 'gameEnded');
+        this.store.select('players').subscribe((players) => (this.username = players.player.name));
     }
 
     openConfirmSurrenderDialog(): void {
@@ -26,10 +28,8 @@ export class SurrenderGameButtonComponent {
     }
 
     quitGamePage(): void {
-        this.store.select('players').subscribe((players) => {
-            const quitMessage = { username: '', message: players.player.name + ' a quitté le jeu', messageType: 'System' };
-            this.store.dispatch(messageWritten(quitMessage));
-        });
+        const quitMessage = { username: '', message: this.username + ' a quitté le jeu', messageType: 'System' };
+        this.store.dispatch(messageWritten(quitMessage));
         this.router.navigateByUrl('/');
         this.store.dispatch(resetSocketConnection());
     }
