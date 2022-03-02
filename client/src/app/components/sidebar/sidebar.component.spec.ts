@@ -43,40 +43,34 @@ describe('SidebarComponent', () => {
         const expectedAction = cold('a', { a: zoomIn() });
         component.zoomIn();
         expect(store.scannedActions$).toBeObservable(expectedAction);
-        fixture.destroy();
     });
 
     it('should dispatch "[LocalSettings] Zoom Out"', () => {
         const expectedAction = cold('a', { a: zoomOut() });
         component.zoomOut();
         expect(store.scannedActions$).toBeObservable(expectedAction);
-        fixture.destroy();
     });
 
     it('should return false when undefined player', () => {
         component.activePlayer = 'John';
         expect(component.isActivePlayer(undefined)).toBeFalse();
-        fixture.destroy();
     });
 
     it('should return true when player is active ', () => {
         component.activePlayer = 'John';
         const player = new Player('John');
         expect(component.isActivePlayer(player)).toBeTrue();
-        fixture.destroy();
     });
 
     it('should return false when player is not active ', () => {
         component.activePlayer = 'Smith';
         const player = new Player('John');
         expect(component.isActivePlayer(player)).toBeFalse();
-        fixture.destroy();
     });
 
     it('should return time from countdown', () => {
         component.countdown = 83;
         expect(component.timerToString()).toBe('1:23');
-        fixture.destroy();
     });
 
     it('should decrement a second from countdown', () => {
@@ -84,20 +78,17 @@ describe('SidebarComponent', () => {
         component.countdown = 7;
         component.decrementCountdown()();
         expect(component.countdown).toBe(expected);
-        fixture.destroy();
     });
 
     it('should not be negative', () => {
         component.countdown = 0;
         component.decrementCountdown()();
         expect(component.countdown).toBe(0);
-        fixture.destroy();
     });
 
     it('storeTimerUnLoad should call localStorage.setItem ', () => {
         const spy = spyOn(window.localStorage, 'setItem');
         component.storeTimerUnLoad(eventStub);
         expect(spy).toHaveBeenCalled();
-        fixture.destroy();
     });
 });
