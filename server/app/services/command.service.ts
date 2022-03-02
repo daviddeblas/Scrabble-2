@@ -47,7 +47,7 @@ export class CommandService {
     }
 
     processDraw(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
-        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
+        if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
