@@ -1,6 +1,6 @@
 import dictionaryJson from '@app/../assets/dictionary.json';
 import { Dictionary } from '@app/classes/dictionary';
-import { BLANK_LETTER, Letter, lettersToString } from '@app/classes/letter';
+import { BLANK_LETTER, Letter, lettersToString } from 'common/classes/letter';
 import io from 'socket.io';
 import { Service } from 'typedi';
 // TODO pouvoir changer de dictionnaire

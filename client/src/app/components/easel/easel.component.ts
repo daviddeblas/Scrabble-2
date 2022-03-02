@@ -1,11 +1,12 @@
 import { Component, HostListener } from '@angular/core';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
-import { Letter, stringToLetter } from '@app/classes/letter';
-import { MAX_EASEL_SIZE, POSITION_LAST_CHAR } from '@app/constants';
+import { MAX_EASEL_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
+import { Letter, stringToLetter } from 'common/classes/letter';
+import { POSITION_LAST_CHAR } from 'common/constants';
 import { Observable } from 'rxjs';
 
 @Component({

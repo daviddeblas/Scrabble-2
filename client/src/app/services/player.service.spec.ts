@@ -3,13 +3,13 @@
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
-import { Vec2 } from '@app/classes/vec2';
 import { Direction, Word } from '@app/classes/word';
-import { BOARD_SIZE } from '@app/constants';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { BoardState } from '@app/reducers/board.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
+import { BOARD_SIZE } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { PlayerService } from './player.service';
@@ -79,7 +79,8 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h7h';
         service.placeWord(position, word);
-        const expectedWord = new Word('word', { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const expectedWord = new Word('word', new Vec2(6, 7) as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
@@ -90,7 +91,7 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'a2v';
         service.placeWord(position, word);
-        const expectedWord = new Word('waord', { x: 1, y: 0 } as Vec2, Direction.VERTICAL);
+        const expectedWord = new Word('waord', new Vec2(1, 0) as Vec2, Direction.VERTICAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
@@ -102,7 +103,8 @@ describe('PlayerService', () => {
         position = 'h8';
         word = 'w';
         service.placeWord(position, word);
-        const expectedWord = new Word('w', { x: 7, y: 7 } as Vec2, Direction.HORIZONTAL);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const expectedWord = new Word('w', new Vec2(7, 7) as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 

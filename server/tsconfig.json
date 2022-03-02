@@ -20,7 +20,8 @@
         "esModuleInterop": true,
 
         "paths": {
-            "@app/*": ["./app/*"]
+            "@app/*": ["./app/*"],
+            "common/*": ["../common/*"]
         }
     }
 }

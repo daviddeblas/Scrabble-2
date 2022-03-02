@@ -1,15 +1,13 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Letter, stringToLetter } from '@app/classes/letter';
-import { Multiplier } from '@app/classes/multiplier';
-import { Vec2 } from '@app/classes/vec2';
 import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
+import { Letter, stringToLetter } from 'common/classes/letter';
+import { Multiplier } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 
 export const boardFeatureKey = 'board';
-
-export const boardSize = 15;
 
 export interface BoardState {
     board: (Letter | null)[][];
@@ -40,14 +38,14 @@ export const reducer = createReducer(
                     boardCopy[word.position.x + i][word.position.y] = word.letters[i].toUpperCase();
                     multipliersCopy[word.position.x + i][word.position.y] = null;
                     if (stringToLetter(word.letters[i]) === '*') {
-                        blankCopy.push({ x: word.position.x + i, y: word.position.y });
+                        blankCopy.push(new Vec2(word.position.x + i, word.position.y));
                     }
                     break;
                 case Direction.VERTICAL:
                     boardCopy[word.position.x][word.position.y + i] = word.letters[i].toUpperCase();
                     multipliersCopy[word.position.x][word.position.y + i] = null;
                     if (stringToLetter(word.letters[i]) === '*') {
-                        blankCopy.push({ x: word.position.x, y: word.position.y + i });
+                        blankCopy.push(new Vec2(word.position.x, word.position.y + i));
                     }
                     break;
             }

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
-import { boardPositionToVec2 } from '@app/classes/vec2';
 import { Direction, Word } from '@app/classes/word';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
+import { boardPositionToVec2 } from 'common/classes/vec2';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({

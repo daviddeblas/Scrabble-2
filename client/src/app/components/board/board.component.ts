@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { Letter } from '@app/classes/letter';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
-import { BOARD_SIZE } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { LocalSettings } from '@app/reducers/local-settings.reducer';
 import { Store } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { BOARD_SIZE } from 'common/constants';
 import { Observable } from 'rxjs';
 
 const LETTER_A = 'A'.charCodeAt(0);

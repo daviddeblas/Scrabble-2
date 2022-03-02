@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
-import { GameOptions } from '@app/classes/game-options';
-import { RoomInfo } from '@app/classes/room-info';
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import * as sinon from 'sinon';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';

@@ -1,8 +1,8 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess, switchLettersEasel } from '@app/actions/player.actions';
-import { stringToLetters } from '@app/classes/letter';
 import { copyPlayer, Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
+import { stringToLetters } from 'common/classes/letter';
 
 export const playerFeatureKey = 'players';
 

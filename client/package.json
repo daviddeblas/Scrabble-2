@@ -12,6 +12,9 @@
         "lint": "ng lint --format stylish",
         "lint:fix": "npm run lint -- --fix"
     },
+    "_moduleAliases": {
+        "common": "../common/"
+    },
     "private": true,
     "dependencies": {
         "@angular/animations": "12.1.5",
@@ -33,7 +36,8 @@
         "rxjs": "~6.6.0",
         "socket.io-client": "^4.4.0",
         "tslib": "^2.2.0",
-        "zone.js": "~0.11.4"
+        "zone.js": "~0.11.4",
+        "common": "file:../common/"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~12.1.3",

@@ -1,11 +1,12 @@
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
-import { GameOptions } from '@app/classes/game-options';
+import { GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
-import { RoomInfo } from '@app/classes/room-info';
 import { PORT } from '@app/environnement.json';
 import { assert, expect } from 'chai';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import { createServer, Server } from 'http';
 import { restore, spy, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
@@ -59,7 +60,7 @@ describe('Rooms Manager Service', () => {
 
     it('joinRoom should throw Game not found error if the Room does not exist', () => {
         let errorMessage = 'Not the right message';
-        const expectedMessage = 'Game not found';
+        const expectedMessage = GameErrorType.GameNotExists;
         try {
             const playerName = 'Second player';
             roomsManager.joinRoom('1', socket, playerName);
@@ -93,7 +94,9 @@ describe('Rooms Manager Service', () => {
 
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         roomsManager.createRoom(socket, otherOption);
-        roomsManager.rooms[1].game = new Game(new GameConfig(), ['']);
+        const room = roomsManager.rooms[1];
+        // eslint-disable-next-line dot-notation
+        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout']);
         assert(spyOnSocket.calledWith('get list', expectedResult));
     });
 
