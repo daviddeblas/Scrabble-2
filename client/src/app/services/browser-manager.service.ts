@@ -6,6 +6,8 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 
+const waitingTime = 200;
+const thousandMilliseconds = 1000;
 @Injectable({
     providedIn: 'root',
 })
@@ -29,16 +31,14 @@ export class BrowserManagerService {
         this.store.dispatch(initiateChatting());
         this.store.dispatch(getGameStatus());
         this.retrieveSelectors();
-        setTimeout( () => 
-        {
+        setTimeout(() => {
             const date = new Date();
-            const oldTimer =localStorage.getItem('currentTimer');
+            const oldTimer = localStorage.getItem('currentTimer');
             if (!oldTimer) return;
             const parsedTimer = JSON.parse(oldTimer);
-            const diffDate = Math.round((date.getTime() - parsedTimer.date) / 1000);
-            this.store.dispatch(refreshTimer({ timer: parsedTimer.countdown - diffDate }))
-        }, 200);
-        
+            const diffDate = Math.round((date.getTime() - parsedTimer.date) / thousandMilliseconds);
+            this.store.dispatch(refreshTimer({ timer: parsedTimer.countdown - diffDate }));
+        }, waitingTime);
     }
 
     private storeSelectors(): void {

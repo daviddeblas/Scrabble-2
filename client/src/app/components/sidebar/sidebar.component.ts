@@ -21,13 +21,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     countdown: number = 0;
     interval: ReturnType<typeof setInterval>;
-    @HostListener('window:beforeunload', ['$event'])
-    storeTimerUnLoad($event: Event): void {
-        $event.preventDefault();
-        const date = new Date();
-        localStorage.setItem('currentTimer', JSON.stringify({countdown:this.countdown, date: date.getTime()}))
-    }
-
 
     constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
         this.players$ = store.select('players');
@@ -36,6 +29,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
             if (state) this.activePlayer = state.activePlayer;
             this.countdown = state.timer;
         });
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    storeTimerUnLoad($event: Event): void {
+        $event.preventDefault();
+        const date = new Date();
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: this.countdown, date: date.getTime() }));
     }
 
     ngOnInit(): void {
