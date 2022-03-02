@@ -91,7 +91,7 @@ export class Room {
             this.game.bag.letters.length,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
-
+        this.game.stopTimer();
         this.sockets.forEach((socket, index) => {
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
