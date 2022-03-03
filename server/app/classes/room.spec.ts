@@ -100,7 +100,13 @@ describe('room', () => {
                     hostReceived = true;
                 },
             } as unknown as io.Socket;
-            room.game = { players: ['player1', 'player2'], bag: { letters: [] } } as unknown as Game;
+            room.game = {
+                players: ['player1', 'player2'],
+                bag: { letters: [] },
+                stopTimer: () => {
+                    return;
+                },
+            } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
             room.surrenderGame('player2');
@@ -140,17 +146,37 @@ describe('room', () => {
             expect(setupSocketStub.called).to.equal(true);
         });
 
-        it('actionAfterTimeout should call ', () => {
+        it('actionAfterTimeout should call processSkip and postCommand', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const commandServiceStub = {
                 processSkip: stub(),
                 postCommand: stub(),
             };
             room['commandService'] = commandServiceStub as unknown as CommandService;
-            room['game'] = { activePlayer: 0 } as unknown as Game;
+            room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
             room['actionAfterTimeout']();
             expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
             expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
+        });
+
+        it('actionAfterTimeout should call end game if game is ended', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                needsToEnd: () => true,
+                skip: () => {
+                    return;
+                },
+            } as unknown as Game;
+            stub(room.commandService, 'processSkip').callsFake(() => {
+                return;
+            });
+            stub(room.commandService, 'postCommand').callsFake(() => {
+                return;
+            });
+            room.game = stubbedGame;
+            const endGame = stub(room.commandService, 'endGame');
+            room['actionAfterTimeout']();
+            expect(endGame.calledOnce).to.equal(true);
         });
     });
 
@@ -227,7 +253,7 @@ describe('room', () => {
             });
 
             it('client should receive message if host emits send message', (done) => {
-                const message = { username: 'Hostname', message: 'Host Message' };
+                const message = { username: 'Hostname', message: 'Host Message', messageType: '' };
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
                     hostSocket.emit('send message', message);
@@ -241,7 +267,7 @@ describe('room', () => {
             });
 
             it('host should receive message if client emits send message', (done) => {
-                const message = { username: 'ClientName', message: 'Client Message' };
+                const message = { username: 'ClientName', message: 'Client Message', messageType: '' };
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
                     clientSocket.emit('send message', message);

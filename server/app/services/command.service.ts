@@ -74,7 +74,7 @@ export class CommandService {
         });
     }
 
-    private endGame(game: Game, sockets: io.Socket[]): void {
+    endGame(game: Game, sockets: io.Socket[]): void {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             s.emit('end game', endGameStatus);

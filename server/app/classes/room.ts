@@ -120,9 +120,9 @@ export class Room {
         socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
         // Init Chat
-        socket.on('send message', ({ username, message }) => {
+        socket.on('send message', ({ username, message, messageType }) => {
             this.sockets.forEach((s, i) => {
-                if (i !== playerNumber) s.emit('receive message', { username, message });
+                if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
         });
 
@@ -136,5 +136,8 @@ export class Room {
         const game = this.game as Game;
         this.commandService.processSkip(game, this.sockets, [], game.activePlayer as number);
         this.commandService.postCommand(game, this.sockets);
+        if (game.needsToEnd()) {
+            this.commandService.endGame(game, this.sockets);
+        }
     }
 }
