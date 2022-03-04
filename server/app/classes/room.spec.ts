@@ -148,7 +148,7 @@ describe('room', () => {
             };
             room['commandService'] = commandServiceStub as unknown as CommandService;
             room['game'] = { activePlayer: 0 } as unknown as Game;
-            room['actionAfterTimeout']();
+            room['actionAfterTimeout'](room)();
             expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
             expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
         });

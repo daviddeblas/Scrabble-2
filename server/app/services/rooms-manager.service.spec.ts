@@ -96,7 +96,7 @@ describe('Rooms Manager Service', () => {
         roomsManager.createRoom(socket, otherOption);
         const room = roomsManager.rooms[1];
         // eslint-disable-next-line dot-notation
-        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout']);
+        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout'](room));
         assert(spyOnSocket.calledWith('get list', expectedResult));
     });
 
