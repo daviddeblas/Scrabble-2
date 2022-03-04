@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
@@ -73,7 +74,6 @@ describe('Individual functions', () => {
         const processStub = stub(commandService, 'processCommand').callsFake(() => {
             throw new Error('Error de test');
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorOnCommandStub = stub(commandService as any, 'errorOnCommand').callsFake(() => {
             return;
         });
@@ -103,7 +103,6 @@ describe('Individual functions', () => {
         const processStub = stub(commandService, 'processCommand').callsFake(() => {
             throw new Error('Error de test');
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorOnCommandStub = stub(commandService as any, 'errorOnCommand').callsFake(() => {
             return;
         });
@@ -157,21 +156,6 @@ describe('Individual functions', () => {
             expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(7, 6 + index)));
         });
     });
-
-    // it('post command emits turn ended', (done) => {
-    //     const clk = useFakeTimers();
-    //     const game = {
-    //         resetTimer: () => {
-    //             return;
-    //         },
-    //         gameOptions,
-    //     } as unknown as Game;
-    //     sockets.pop();
-    //     commandService.processSkip = () => done();
-    //     commandService.postCommand(game, sockets);
-    //     clk.tick(game.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
-    //     clk.restore();
-    // });
 
     it('errorCommand should start a timer and call postCommand', (done) => {
         const fakeSocket = {
@@ -322,7 +306,6 @@ describe('commands', () => {
             },
         } as io.Socket;
         room.sockets[0] = fakeSocket;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(room.game as any, 'skip').callsFake(() => {
             return;
         });
@@ -337,7 +320,6 @@ describe('commands', () => {
             },
         } as io.Socket;
         room.sockets[1] = fakeSocket;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(game as any, 'skip').callsFake(() => {
             return;
         });
@@ -352,15 +334,12 @@ describe('commands', () => {
             },
         } as io.Socket;
         room.sockets = [fakeSocket];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(commandService as any, 'parsePlaceCall').callsFake(() => {
             return ['a', 'b'];
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(room.game as any, 'place').callsFake(() => {
             return;
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(commandService as any, 'validatePlace').callsFake(() => {
             return true;
         });
@@ -375,15 +354,12 @@ describe('commands', () => {
             },
         } as io.Socket;
         room.sockets = [fakeSocket];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(commandService as any, 'parsePlaceCall').callsFake(() => {
             return ['a', 'b'];
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(room.game as any, 'place').callsFake(() => {
             return;
         });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(commandService as any, 'validatePlace').callsFake(() => {
             return true;
         });
