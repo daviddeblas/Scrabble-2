@@ -7,10 +7,17 @@
 }
 
 .room-name {
-    display: contents;
+    display: block;
+    padding-right: 20px;
+}
+
+.room-list {
+    margin-top: 2vh;
+    margin-bottom: 3vh;
 }
 
 .button {
+    float: right;
     width: 120px;
     height: 36px;
 }
