@@ -7,7 +7,7 @@ import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Letter } from 'common/classes/letter';
 import { boardPositionToVec2 } from 'common/classes/vec2';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -34,7 +34,7 @@ export class PlayerService {
     placeWord(position: string, letters: string): void {
         const command = 'placer';
         let lettersToPlace = '';
-        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], 10) - 1;
+        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE) - 1;
         let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
         if (!this.lettersInEasel(letters)) return;
         let letterPlaced = 0;
@@ -93,7 +93,9 @@ export class PlayerService {
         for (const letter of letters) {
             let letterExist = false;
             for (const element of easelLetters) {
-                if (element.toString().toLowerCase() === letter || (element.toString() === '*' && letter === letter.toUpperCase())) {
+                const equalLetter = element.toString().toLowerCase() === letter;
+                const isBlankLetter = element.toString() === '*' && letter === letter.toUpperCase();
+                if (equalLetter || isBlankLetter) {
                     easelLetters.splice(easelLetters.indexOf(element), 1);
                     letterExist = true;
                     break;
@@ -116,7 +118,7 @@ export class PlayerService {
     }
 
     wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
-        const column = parseInt(position.slice(1, position.length), 10) - 1;
+        const column = parseInt(position.slice(1, position.length), DECIMAL_BASE) - 1;
         const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
         let isPlacable = false;
         let board: (Letter | null)[][] = [];

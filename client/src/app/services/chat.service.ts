@@ -5,7 +5,7 @@ import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -119,7 +119,7 @@ export class ChatService {
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
-        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
