@@ -154,7 +154,7 @@ describe('room', () => {
             };
             room['commandService'] = commandServiceStub as unknown as CommandService;
             room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
-            room['actionAfterTimeout']();
+            room['actionAfterTimeout'](room)();
             expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
             expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
         });
@@ -175,7 +175,7 @@ describe('room', () => {
             });
             room.game = stubbedGame;
             const endGame = stub(room.commandService, 'endGame');
-            room['actionAfterTimeout']();
+            room['actionAfterTimeout'](room)();
             expect(endGame.calledOnce).to.equal(true);
         });
     });

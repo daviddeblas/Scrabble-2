@@ -74,7 +74,7 @@ export class Room {
             Container.get(GameConfigService).configs.configs[0],
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
-            this.actionAfterTimeout,
+            this.actionAfterTimeout(this),
         );
 
         this.manager.removeSocketFromJoiningList(this.sockets[1]);
@@ -132,12 +132,14 @@ export class Room {
         });
     }
 
-    private actionAfterTimeout(): void {
-        const game = this.game as Game;
-        this.commandService.processSkip(game, this.sockets, [], game.activePlayer as number);
-        this.commandService.postCommand(game, this.sockets);
-        if (game.needsToEnd()) {
-            this.commandService.endGame(game, this.sockets);
-        }
+    private actionAfterTimeout(room: Room): () => void {
+        return () => {
+            const game = room.game as Game;
+            room.commandService.processSkip(game, room.sockets, [], game.activePlayer as number);
+            room.commandService.postCommand(game, room.sockets);
+            if (game.needsToEnd()) {
+                room.commandService.endGame(game, room.sockets);
+            }
+        };
     }
 }
