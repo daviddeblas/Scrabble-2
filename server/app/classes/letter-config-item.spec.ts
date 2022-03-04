@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 import { LetterConfigItem } from './letter-config-item';
 
 describe('LetterConfigItem', () => {

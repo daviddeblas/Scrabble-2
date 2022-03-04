@@ -1,6 +1,7 @@
-import { GameOptions } from '@app/classes/game-options';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Room } from '@app/classes/room';
-import { RoomInfo } from '@app/classes/room-info';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
@@ -41,7 +42,7 @@ export class RoomsManager {
         const room = this.getRoom(roomId);
         if (room) {
             room.join(socket, name);
-        } else throw new Error('Game not found');
+        } else throw new GameError(GameErrorType.GameNotExists);
     }
 
     getRooms(): RoomInfo[] {

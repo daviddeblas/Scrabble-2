@@ -1,9 +1,10 @@
 import * as boardActions from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
-import { Multiplier } from '@app/classes/multiplier';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
+import { Multiplier } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 import { boardSize, BoardState, initialState, reducer } from './board.reducer';
 
 const createInitialBoard = () => {
@@ -57,7 +58,7 @@ describe('[Board] Reducer', () => {
 
     describe('[Players] Place Word Success', () => {
         it('should add the word in the board horizontally and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.HORIZONTAL);
+            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.HORIZONTAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);
@@ -69,7 +70,7 @@ describe('[Board] Reducer', () => {
         });
 
         it('should add the word in the board vertically and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.VERTICAL);
+            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.VERTICAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);

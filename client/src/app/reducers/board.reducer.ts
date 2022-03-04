@@ -1,11 +1,11 @@
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
-import { Multiplier } from '@app/classes/multiplier';
-import { Vec2 } from '@app/classes/vec2';
 import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
+import { Multiplier } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 
 export const boardFeatureKey = 'board';
 

@@ -1,6 +1,6 @@
-import { Letter } from '@app/classes/letter';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Letter } from 'common/classes/letter';
 import { describe } from 'mocha';
 import { Container } from 'typedi';
 
