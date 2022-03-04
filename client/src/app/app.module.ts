@@ -23,6 +23,7 @@ import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { MaterialPageComponent } from './pages/material-page/material-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -34,6 +35,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
     declarations: [
         AppComponent,
         MainPageComponent,
+        MaterialPageComponent,
         ConfirmSurrenderDialogComponent,
         GameSelectionPageComponent,
         MultiConfigWindowComponent,

@@ -6,9 +6,13 @@
     color: #fff;
 }
 
-.room-name {
+.room {
     display: block;
     padding-right: 20px;
+}
+
+.join-room {
+    float: right;
 }
 
 .room-list {
@@ -17,7 +21,6 @@
 }
 
 .button {
-    float: right;
     width: 120px;
     height: 36px;
 }

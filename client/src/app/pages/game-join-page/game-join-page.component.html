@@ -14,12 +14,12 @@
         <h2>Rooms:</h2>
         <mat-list>
             <mat-list-item *ngFor="let room of roomList$ | async" class="room-list">
-                <p class="room-name">
+                <p class="room">
                     <strong>Hôte</strong>: {{ room.gameOptions.hostname }} <br />
                     <strong>Temps</strong>: {{ room.gameOptions.timePerRound }} secondes<br />
                     <strong>Dictionnaire</strong>: {{ room.gameOptions.dictionaryType }}
                 </p>
-                <button mat-raised-button matStepperNext color="primary" class="button" (click)="selectRoom(room)">Rejoindre</button>
+                <button mat-raised-button matStepperNext color="primary" class="button join-room" (click)="selectRoom(room)">Rejoindre</button>
             </mat-list-item>
         </mat-list>
     </mat-step>
