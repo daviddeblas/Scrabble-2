@@ -24,7 +24,7 @@ export const forbiddenNameValidator = (name: string) => {
     styleUrls: ['./game-join-page.component.scss'],
 })
 export class GameJoinPageComponent implements OnDestroy {
-    @ViewChild(MatStepper) stepper: MatStepper;
+    @ViewChild(MatStepper) private stepper: MatStepper;
 
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;

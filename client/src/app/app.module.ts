@@ -7,7 +7,6 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as roomReducer from '@app/reducers/room.reducer';
@@ -35,7 +34,6 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
     declarations: [
         AppComponent,
         MainPageComponent,
-        MaterialPageComponent,
         ConfirmSurrenderDialogComponent,
         GameSelectionPageComponent,
         MultiConfigWindowComponent,

@@ -8,7 +8,7 @@ import { MultiConfigWindowComponent } from '@app/components/multi-config-window/
     styleUrls: ['./game-preparation-page.component.scss'],
 })
 export class GamePreparationPageComponent implements OnInit {
-    @ViewChild('MultiConfigWindowComponent') multiConfigWindowComponent: MultiConfigWindowComponent;
+    @ViewChild('MultiConfigWindowComponent') private multiConfigWindowComponent: MultiConfigWindowComponent;
     firstFormGroup: FormGroup;
     isEditable: boolean;
     constructor(private formBuilder: FormBuilder) {
