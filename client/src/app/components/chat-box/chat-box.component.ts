@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./chat-box.component.scss'],
 })
 export class ChatBoxComponent implements OnInit {
-    @ViewChild('chatMessage', { static: true }) private chatMessage: ElementRef<HTMLInputElement>;
+    @ViewChild('chatMessage', { static: true }) chatMessage: ElementRef<HTMLInputElement>;
     chat$: Observable<ChatMessage[]>;
     username: string;
     gameEnded: boolean;

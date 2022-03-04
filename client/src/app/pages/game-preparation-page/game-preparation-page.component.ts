@@ -10,10 +10,8 @@ import { MultiConfigWindowComponent } from '@app/components/multi-config-window/
 export class GamePreparationPageComponent implements OnInit {
     @ViewChild('MultiConfigWindowComponent') private multiConfigWindowComponent: MultiConfigWindowComponent;
     firstFormGroup: FormGroup;
-    isEditable: boolean;
-    constructor(private formBuilder: FormBuilder) {
-        this.isEditable = false;
-    }
+    isEditable = false;
+    constructor(private formBuilder: FormBuilder) {}
 
     ngOnInit(): void {
         this.firstFormGroup = this.formBuilder.group({

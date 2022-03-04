@@ -18,7 +18,7 @@ export class WaitingRoomComponent implements OnDestroy {
     @Input() stepper: MatStepper;
     roomInfo$: Observable<RoomInfo | undefined>;
     player2$: Observable<string | undefined>;
-    gameStarted: boolean;
+    gameStarted: boolean = false;
 
     constructor(
         private dialogRef: MatDialogRef<GamePreparationPageComponent>,
@@ -28,7 +28,6 @@ export class WaitingRoomComponent implements OnDestroy {
     ) {
         this.roomInfo$ = roomStore.select('room', 'roomInfo');
         this.player2$ = roomStore.select('room', 'pendingPlayer');
-        this.gameStarted = false;
     }
 
     acceptInvite(): void {
