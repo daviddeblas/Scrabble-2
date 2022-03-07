@@ -5,7 +5,7 @@ export interface iVec2 {
     y: number;
 }
 
-export class Vec2 {
+export class Vec2 implements iVec2 {
     constructor(public x: number, public y: number) {}
 
     equals(b: Vec2): boolean {

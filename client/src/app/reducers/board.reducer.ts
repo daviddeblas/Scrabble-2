@@ -6,7 +6,7 @@ import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
 import { Letter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
-import { iVec2 } from 'common/classes/vec2';
+import { iVec2, Vec2 } from 'common/classes/vec2';
 
 export const boardFeatureKey = 'board';
 
@@ -101,7 +101,7 @@ export const reducer = createReducer(
         // If letters has been placed
         if (tempState.selection.modifiedCells.length > 0) return tempState;
 
-        tempState.selection.cell = pos;
+        tempState.selection.cell = new Vec2(pos.x, pos.y);
 
         if (state.selection.cell?.x === pos.x && state.selection.cell?.y === pos.y) {
             tempState.selection.orientation =
@@ -118,7 +118,7 @@ export const reducer = createReducer(
         board[selectedPosition.x][selectedPosition.y] = letter;
 
         const selection = state.selection.copy();
-        selection.modifiedCells.push(state.selection.cell as iVec2);
+        selection.modifiedCells.push(state.selection.cell as Vec2);
 
         switch (state.selection.orientation) {
             case Orientation.Horizontal:
@@ -129,7 +129,7 @@ export const reducer = createReducer(
                 break;
         }
 
-        selection.cell = selectedPosition;
+        selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
         return {
             ...state,
             selection,

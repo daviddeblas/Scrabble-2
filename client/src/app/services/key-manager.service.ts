@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { backspaceSelection, clearSelection, placeLetter, removeLetters } from '@app/actions/board.actions';
 import { addLettersToEasel, placeWord, removeLetterFromEasel } from '@app/actions/player.actions';
 import { BoardSelection, Orientation } from '@app/classes/board-selection';
-import { Letter, lettersToString, stringToLetter } from '@app/classes/letter';
-import { ASCII_ALPHABET_POSITION } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Store } from '@ngrx/store';
+import { Letter, lettersToString, stringToLetter } from 'common/classes/letter';
+import { ASCII_ALPHABET_POSITION } from 'common/constants';
 import { PlayerService } from './player.service';
 
 @Injectable({

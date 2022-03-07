@@ -1,4 +1,4 @@
-import { Vec2 } from './vec2';
+import { Vec2 } from 'common/classes/vec2';
 
 export enum Orientation {
     Horizontal = 'horizontal',
@@ -9,7 +9,7 @@ export class BoardSelection {
     constructor(public cell: Vec2 | null = null, public orientation: Orientation | null = null, public modifiedCells: Vec2[] = []) {}
 
     copy(): BoardSelection {
-        const cell = this.cell ? { x: this.cell.x, y: this.cell.y } : null;
+        const cell = this.cell ? this.cell.copy() : null;
         return new BoardSelection(cell, this.orientation, [...this.modifiedCells]);
     }
 }
