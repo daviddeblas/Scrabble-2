@@ -15,7 +15,8 @@
         "check-coverage": true,
         "per-file": true,
         "include": [
-            "app/**/*.ts"
+            "app/**/*.ts",
+            "../common/**/*.ts"
         ],
         "extension": [
             ".ts"
@@ -41,7 +42,8 @@
         "instrument": true
     },
     "_moduleAliases": {
-        "@app": "out/app/"
+        "@app": "out/server/app/",
+        "common": "out/common/"
     },
     "dependencies": {
         "cookie-parser": "1.4.5",

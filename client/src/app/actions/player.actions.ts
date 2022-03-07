@@ -1,7 +1,7 @@
 import { WordValidationError } from '@app/classes/errors/word-validation-error';
-import { Letter } from '@app/classes/letter';
 import { Word } from '@app/classes/word';
 import { createAction, props } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 
 export const placeWord = createAction('[Players] Place Word', props<{ position: string; letters: string }>());
 
@@ -18,6 +18,8 @@ export const exchangeLettersFailure = createAction('[Players] Exchange Letters F
 export const removeLetterFromEasel = createAction('[Players] Remove Letters From Easel', props<{ letter: Letter }>());
 
 export const addLettersToEasel = createAction('[Players] Add Letters From Easel', props<{ letters: Letter[] }>());
+
+export const switchLettersEasel = createAction('[Players] Switch Letters Easel', props<{ positionIndex: number; destinationIndex: number }>());
 
 export const skipTurn = createAction('[Players] Skip Turn');
 

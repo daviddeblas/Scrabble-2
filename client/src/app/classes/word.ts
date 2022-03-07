@@ -1,5 +1,5 @@
-import { Letter } from './letter';
-import { Vec2 } from './vec2';
+import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 
 export enum Direction {
     HORIZONTAL = 'h',

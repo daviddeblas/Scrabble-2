@@ -5,10 +5,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { RoomEffects } from '@app/effects/room.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { RoomInfo } from 'common/classes/room-info';
 import { cold } from 'jasmine-marbles';
 import { forbiddenNameValidator, GameJoinPageComponent } from './game-join-page.component';
 const FIXTURE_COOLDOWN = 10;
@@ -167,14 +167,7 @@ describe('Join room in Join Page Component with undefined selector', () => {
             declarations: [GameJoinPageComponent],
             imports: [ReactiveFormsModule, FormsModule, AppMaterialModule, BrowserAnimationsModule],
             providers: [
-                provideMockStore({
-                    selectors: [
-                        {
-                            selector: 'room',
-                            value: { pending: {} },
-                        },
-                    ],
-                }),
+                provideMockStore(),
                 {
                     provide: RoomEffects,
                     useValue: jasmine.createSpyObj('roomEffects', [], ['dialogRef']),
@@ -192,7 +185,27 @@ describe('Join room in Join Page Component with undefined selector', () => {
         setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
     });
 
+    it('roomListLength should return the length of roomList', () => {
+        store.overrideSelector('room', [{} as RoomInfo]);
+        component.roomList$ = store.select('room');
+        const expectedLength = 1;
+        expect(component.roomListLength()).toEqual(expectedLength);
+    });
+
+    it('selectRandomRoom should call selectRoom with a number between 0 and the roomList size - 1', () => {
+        store.overrideSelector('room', [{}, {}, {}]);
+        component.roomList$ = store.select('room');
+        const selectRoomSpy = spyOn(component, 'selectRoom');
+        const roomLength = 3;
+        component.selectRandomRoom();
+        expect(selectRoomSpy).toHaveBeenCalled();
+        expect(selectRoomSpy.arguments).toBeLessThanOrEqual(roomLength - 1);
+        expect(selectRoomSpy.arguments).toBeGreaterThanOrEqual(0);
+    });
+
     it('joinRoom should not dispatch "[Room] Join Room" if the selected room is undefined', () => {
+        store.overrideSelector('room', {});
+        component.pendingRoom$ = store.select('room');
         const roomInfoStub = { roomId: 'id', gameOptions: { dictionaryType: 'dict', hostname: 'host', timePerRound: 60 } };
         component.selectRoom(roomInfoStub);
         const username = 'username';

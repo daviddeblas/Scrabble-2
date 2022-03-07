@@ -13,6 +13,7 @@ export enum GameErrorType {
     LetterIsNull = 'Lettre nulle',
     UndefinedPoints = "Cette lettre n'as pas de valeur associee",
     WrongPosition = 'Ce mot est dans la mauvaise position',
+    OutOfBoundPosition = "La position du mot est à l'extérieur du plateau",
     WrongPlaceArgument = 'Les arguments pour la commande placer sont mal formés',
     WrongDrawArgument = 'Les arguments pour la commande échanger sont mal formés',
     WrongSkipArgument = 'Les arguments pour la commande passer sont mal formés',

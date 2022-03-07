@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import { Letter } from '@app/classes/letter';
 import { Vec2 } from '@app/classes/vec2';
+=======
+>>>>>>> dev
 import { createAction, props } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 
 export const syncBoard = createAction('[Board] Sync Board');
 

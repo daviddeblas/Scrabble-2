@@ -2,17 +2,15 @@ import { backspaceSelection, cellClick, clearSelection, placeLetter, removeLette
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { BoardSelection, Orientation } from '@app/classes/board-selection';
-import { Letter } from '@app/classes/letter';
-import { Multiplier } from '@app/classes/multiplier';
-import { Vec2 } from '@app/classes/vec2';
 import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
+import { Multiplier } from 'common/classes/multiplier';
+import { iVec2 } from 'common/classes/vec2';
 
 export const boardFeatureKey = 'board';
 
-export const boardSize = 15;
-
-const createEmptyMatrix = (dimensions: Vec2) => {
+const createEmptyMatrix = (dimensions: iVec2) => {
     const matrix = new Array(dimensions.x);
     for (let i = 0; i < dimensions.x; i++) {
         matrix[i] = new Array(dimensions.y);
@@ -35,7 +33,7 @@ export interface BoardState {
     board: (Letter | null)[][];
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
-    blanks: Vec2[];
+    blanks: iVec2[];
     selection: BoardSelection;
 }
 
@@ -115,12 +113,12 @@ export const reducer = createReducer(
     }),
 
     on(placeLetter, (state, { letter }) => {
-        const selectedPosition = { x: (state.selection.cell as Vec2).x, y: (state.selection.cell as Vec2).y };
+        const selectedPosition = { x: (state.selection.cell as iVec2).x, y: (state.selection.cell as iVec2).y };
         const board = cloneBoard(state.board);
         board[selectedPosition.x][selectedPosition.y] = letter;
 
         const selection = state.selection.copy();
-        selection.modifiedCells.push(state.selection.cell as Vec2);
+        selection.modifiedCells.push(state.selection.cell as iVec2);
 
         switch (state.selection.orientation) {
             case Orientation.Horizontal:

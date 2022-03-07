@@ -1,15 +1,17 @@
-import * as boardActions from '@app/actions/board.actions';
+import { syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
-import { Multiplier } from '@app/classes/multiplier';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
-import { boardSize, BoardState, initialState, reducer } from './board.reducer';
+import { Multiplier } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
+import { BOARD_SIZE } from 'common/constants';
+import { BoardState, initialState, reducer } from './board.reducer';
 
 const createInitialBoard = () => {
-    const initialBoard = new Array(boardSize);
-    for (let i = 0; i < boardSize; ++i) initialBoard[i] = new Array(boardSize).fill(null);
+    const initialBoard = new Array(BOARD_SIZE);
+    for (let i = 0; i < BOARD_SIZE; ++i) initialBoard[i] = new Array(BOARD_SIZE).fill(null);
     return initialBoard;
 };
 
@@ -39,7 +41,7 @@ describe('[Board] Reducer', () => {
 
     describe('[Board] Sync Board', () => {
         it('should sync the state with the new board', () => {
-            const action = boardActions.syncBoardSuccess({ newBoard: boardStub.board });
+            const action = syncBoardSuccess({ newBoard: boardStub.board });
 
             stateStub.multipliers[0][0] = new Multiplier(multiplierValue);
             const result = reducer(stateStub, action);
@@ -64,7 +66,7 @@ describe('[Board] Reducer', () => {
 
     describe('[Players] Place Word Success', () => {
         it('should add the word in the board horizontally and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.HORIZONTAL);
+            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.HORIZONTAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);
@@ -76,7 +78,7 @@ describe('[Board] Reducer', () => {
         });
 
         it('should add the word in the board vertically and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.VERTICAL);
+            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.VERTICAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);

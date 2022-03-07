@@ -1,20 +1,25 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { BLANK_LETTER, Letter, stringToLetters } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
-import { spy } from 'sinon';
+import { GameOptions } from 'common/classes/game-options';
+import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
+import { spy, stub, useFakeTimers } from 'sinon';
 import Container from 'typedi';
-import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';
+import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
 
 describe('game', () => {
     let game: Game;
     let activePlayer: number;
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const timerCallbackMock = () => {
+        return;
+    };
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs.configs[0], ['player 1', 'player 2']);
+        game = new Game(Container.get(GameConfigService).configs.configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock);
         activePlayer = game.activePlayer;
     });
 
@@ -276,5 +281,34 @@ describe('game', () => {
 
     it('getActivePlayer', () => {
         expect(game['getActivePlayer']()).to.eq(game.players[game.activePlayer]);
+    });
+
+    it('getGameStatus  returns specific information given to the player', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const info = game.getGameStatus(0) as any;
+        expect(info.status.activePlayer).to.eq(game?.players[game?.activePlayer].name);
+        expect(info.board.board).to.eq(game?.board.board);
+        expect(info.board.multipliers).to.eq(game?.board.multipliers);
+        expect(info.status.letterPotLength).to.eq(game?.bag.letters.length);
+        expect(info.players.player).to.deep.eq(game?.players[0]);
+    });
+
+    it('init timer should wait the right amount of ', (done) => {
+        const clk = useFakeTimers();
+        game['actionAfterTimeout'] = () => done();
+        game.initTimer();
+        clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        clk.restore();
+    });
+
+    it('stop timer should not call anything after timeout', () => {
+        const clk = useFakeTimers();
+        const actionAfterTimeout = stub();
+        game['actionAfterTimeout'] = actionAfterTimeout;
+        game.initTimer();
+        game.stopTimer();
+        clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        expect(actionAfterTimeout.calledOnce).to.equal(false);
+        clk.restore();
     });
 });

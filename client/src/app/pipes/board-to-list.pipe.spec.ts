@@ -1,6 +1,7 @@
 import { BoardSelection } from '@app/classes/board-selection';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
+import { Vec2 } from 'common/classes/vec2';
 import { BoardToListPipe } from './board-to-list.pipe';
 
 describe('BoardToListPipe', () => {
@@ -26,8 +27,8 @@ describe('BoardToListPipe', () => {
         };
 
         const expected: PlacedLetter[] = [
-            { letter: 'A', position: { x: 0, y: 0 }, blank: false },
-            { letter: 'B', position: { x: 1, y: 1 }, blank: true },
+            { letter: 'A', position: new Vec2(0, 0), blank: false },
+            { letter: 'B', position: new Vec2(1, 1), blank: true },
         ];
         const result = pipe.transform(boardState);
         expect(result).toEqual(expected);

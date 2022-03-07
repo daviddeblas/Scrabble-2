@@ -1,5 +1,5 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
-import { addLettersToEasel, exchangeLettersSuccess, placeWordSuccess, removeLetterFromEasel } from '@app/actions/player.actions';
+import { addLettersToEasel, exchangeLettersSuccess, placeWordSuccess, removeLetterFromEasel, switchLettersEasel } from '@app/actions/player.actions';
 import { copyPlayer, Player } from '@app/classes/player';
 import { createReducer, on } from '@ngrx/store';
 
@@ -47,6 +47,16 @@ export const reducer = createReducer(
     on(addLettersToEasel, (state, { letters }) => {
         const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
         nextState.player.addLettersToEasel(letters);
+        return nextState;
+    }),
+
+    on(switchLettersEasel, (state, { positionIndex, destinationIndex }) => {
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextEasel = JSON.parse(JSON.stringify(state.player.easel));
+        const tempLetter = nextEasel[positionIndex];
+        nextEasel[positionIndex] = nextEasel[destinationIndex];
+        nextEasel[destinationIndex] = tempLetter;
+        nextState.player.easel = nextEasel;
         return nextState;
     }),
 
