@@ -15,8 +15,9 @@ export class Room {
     clientName: string | null;
     game: Game | null;
     commandService: CommandService;
-
     sockets: io.Socket[];
+    private playersLeft: number;
+
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
@@ -24,6 +25,7 @@ export class Room {
         this.game = null;
         this.clientName = null;
         this.commandService = Container.get(CommandService);
+        this.playersLeft = 2;
     }
 
     join(socket: io.Socket, name: string): void {
@@ -94,6 +96,9 @@ export class Room {
             socket.emit('receive message', { username: looserId, message: surrenderMessage, messageType: 'Systeme' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
+        if (--this.playersLeft <= 0) {
+            this.manager.removeRoom(this);
+        }
     }
 
     getRoomInfo(): RoomInfo {
@@ -123,6 +128,11 @@ export class Room {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
+            if (message.includes(' a quitté le jeu') && messageType === 'System') {
+                if (--this.playersLeft <= 0) {
+                    this.manager.removeRoom(this);
+                }
+            }
         });
 
         // Init surrender game
