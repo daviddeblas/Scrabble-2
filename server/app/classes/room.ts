@@ -88,11 +88,14 @@ export class Room {
     surrenderGame(looserId: string) {
         if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
 
-        const looserName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
-        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, looserName);
+        const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
         this.game.stopTimer();
+        this.game.endGame();
+        const looserName = looserId === this.host.id ? this.gameOptions.hostname : this.clientName;
         const surrenderMessage = looserName + ' à abandonné la partie';
+        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         this.sockets.forEach((socket, index) => {
+            socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
