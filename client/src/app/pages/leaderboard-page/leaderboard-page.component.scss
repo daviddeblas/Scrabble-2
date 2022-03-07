@@ -1,3 +1,7 @@
+p {
+    text-align: center;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -10,4 +14,28 @@
     flex-direction: row;
     justify-content: space-around;
     margin-top: 100px;
+}
+
+.leaderboard_classic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.leaderboard_log2990 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score {
+    margin-left: 50px;
+    margin-right: 50px;
 }
