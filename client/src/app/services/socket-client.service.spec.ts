@@ -25,10 +25,25 @@ describe('SocketClientService', () => {
         expect(spy).toHaveBeenCalled();
     });
 
+    it('should not connect if socket is alive', () => {
+        spyOn(service, 'isSocketAlive').and.callFake(() => true);
+        const oldSocket = service.socket;
+        service.connect();
+        expect(oldSocket).toBe(service.socket);
+    });
+
     it('should self disconnect when destroy', () => {
         const spy = spyOn(service, 'disconnect');
         service.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('resetConnection should call disconnect and connect', () => {
+        const disconnectSpy = spyOn(service, 'disconnect');
+        const connectSpy = spyOn(service, 'connect');
+        service.resetConnection();
+        expect(disconnectSpy).toHaveBeenCalled();
+        expect(connectSpy).toHaveBeenCalled();
     });
 
     it('should return if socket is alive', () => {

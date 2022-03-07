@@ -9,7 +9,7 @@ import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
 
-const MAX_TURNS_SKIPPED = 5;
+const MAX_TURNS_SKIPPED = 6;
 export const MAX_LETTERS_IN_EASEL = 7;
 export const BONUS_POINTS_FOR_FULL_EASEL = 50;
 export const MILLISECONDS_PER_SEC = 1000;

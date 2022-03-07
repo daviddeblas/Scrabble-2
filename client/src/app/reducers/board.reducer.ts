@@ -3,13 +3,11 @@ import { gameStatusReceived, resetAllState } from '@app/actions/game-status.acti
 import { placeWordSuccess } from '@app/actions/player.actions';
 import { Direction } from '@app/classes/word';
 import { createReducer, on } from '@ngrx/store';
-import { Letter } from 'common/classes/letter';
+import { Letter, stringToLetter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
 
 export const boardFeatureKey = 'board';
-
-export const boardSize = 15;
 
 export interface BoardState {
     board: (Letter | null)[][];
@@ -31,19 +29,28 @@ export const reducer = createReducer(
     })),
 
     on(placeWordSuccess, (state, { word }) => {
-        for (let i = word.direction === 'h' ? word.position.x : word.position.y; i < word.length(); ++i) {
+        const multipliersCopy = JSON.parse(JSON.stringify(state.multipliers));
+        const boardCopy = JSON.parse(JSON.stringify(state.board));
+        const blankCopy: Vec2[] = JSON.parse(JSON.stringify(state.blanks));
+        for (let i = 0; i < word.length(); ++i) {
             switch (word.direction) {
                 case Direction.HORIZONTAL:
-                    state.board[word.position.x + i][word.position.y] = word.letters[i];
-                    state.multipliers[word.position.x + i][word.position.y] = null;
+                    boardCopy[word.position.x + i][word.position.y] = word.letters[i].toUpperCase();
+                    multipliersCopy[word.position.x + i][word.position.y] = null;
+                    if (stringToLetter(word.letters[i]) === '*') {
+                        blankCopy.push(new Vec2(word.position.x + i, word.position.y));
+                    }
                     break;
                 case Direction.VERTICAL:
-                    state.board[word.position.x][word.position.y + i] = word.letters[i];
-                    state.multipliers[word.position.x][word.position.y + i] = null;
+                    boardCopy[word.position.x][word.position.y + i] = word.letters[i].toUpperCase();
+                    multipliersCopy[word.position.x][word.position.y + i] = null;
+                    if (stringToLetter(word.letters[i]) === '*') {
+                        blankCopy.push(new Vec2(word.position.x, word.position.y + i));
+                    }
                     break;
             }
         }
-        return state;
+        return { ...state, board: boardCopy, blanks: blankCopy, multipliers: multipliersCopy };
     }),
 
     on(resetAllState, () => initialState),

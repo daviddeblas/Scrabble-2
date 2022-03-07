@@ -48,7 +48,7 @@ export class CommandService {
     }
 
     processDraw(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
-        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
+        if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -75,7 +75,7 @@ export class CommandService {
         });
     }
 
-    private endGame(game: Game, sockets: io.Socket[]): void {
+    endGame(game: Game, sockets: io.Socket[]): void {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             s.emit('end game', endGameStatus);
@@ -126,7 +126,7 @@ export class CommandService {
         const blanks: number[] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (game.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
-            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
+            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i).toLowerCase()), iterationVector.copy()));
             if (/^[A-Z]*$/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);
         }
