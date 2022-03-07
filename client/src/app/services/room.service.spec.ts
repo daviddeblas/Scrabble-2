@@ -7,10 +7,10 @@ import {
     joinRoomDeclined,
     loadRoomsSuccess,
 } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
-import { RoomInfo } from '@app/classes/room-info';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { RoomService } from './room.service';

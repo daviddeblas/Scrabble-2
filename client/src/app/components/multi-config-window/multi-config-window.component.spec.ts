@@ -4,9 +4,9 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { GameOptions } from 'common/classes/game-options';
 import { cold } from 'jasmine-marbles';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 

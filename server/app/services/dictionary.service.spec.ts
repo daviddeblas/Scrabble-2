@@ -1,7 +1,7 @@
 import { DictionaryService } from '@app/services/dictionary.service';
 import { expect } from 'chai';
+import { stringToLetters } from 'common/classes/letter';
 import { Container } from 'typedi';
-import { stringToLetters } from '@app/classes/letter';
 
 describe('Dictionary Service', () => {
     let service: DictionaryService;

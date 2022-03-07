@@ -1,8 +1,8 @@
 import { LetterConfigItem } from '@app/classes/letter-config-item';
 import { DictionaryService } from '@app/services/dictionary.service';
+import { Vec2 } from 'common/classes/vec2';
 import Container from 'typedi';
 import { PositionedMultipliers } from './positioned-multipliers';
-import { Vec2 } from './vec2';
 
 export class GameConfig {
     constructor(

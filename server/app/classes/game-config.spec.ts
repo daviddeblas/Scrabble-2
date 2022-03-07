@@ -1,6 +1,6 @@
-import { GameConfig } from './game-config';
 import { expect } from 'chai';
-import { Vec2 } from './vec2';
+import { Vec2 } from 'common/classes/vec2';
+import { GameConfig } from './game-config';
 
 describe('GameConfig', () => {
     it('GameConfig default constructor', () => {

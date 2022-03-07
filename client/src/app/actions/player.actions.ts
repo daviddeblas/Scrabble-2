@@ -1,7 +1,7 @@
 import { WordValidationError } from '@app/classes/errors/word-validation-error';
-import { Letter } from '@app/classes/letter';
 import { Word } from '@app/classes/word';
 import { createAction, props } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 
 export const placeWord = createAction('[Players] Place Word', props<{ position: string; letters: string }>());
 
@@ -20,3 +20,5 @@ export const switchLettersEasel = createAction('[Players] Switch Letters Easel',
 export const skipTurn = createAction('[Players] Skip Turn');
 
 export const surrender = createAction('[Players] Surrender');
+
+export const resetSocketConnection = createAction('[Players] Reset Socket Connection');

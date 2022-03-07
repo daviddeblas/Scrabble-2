@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { surrender } from '@app/actions/player.actions';
+import { resetSocketConnection, surrender } from '@app/actions/player.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -55,10 +55,16 @@ describe('ConfirmSurrenderComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should dispatch [Players] Surrender when created', () => {
+    it('should dispatch [Players] resetSocketConnection when clicked', () => {
         component.surrenderGame();
-        const expectedAction = cold('a', { a: surrender() });
+        const expectedAction = cold('a', { a: resetSocketConnection() });
         expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch [Players] surrender when clicked', () => {
+        const dispatchSpy = spyOn(store, 'dispatch');
+        component.surrenderGame();
+        expect(dispatchSpy).toHaveBeenCalledWith(surrender());
     });
 
     it('should close the window when the accept button is clicked', () => {

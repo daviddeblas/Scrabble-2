@@ -19,7 +19,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     gameStatus$: Observable<GameStatus>;
     activePlayer: string;
 
-    countdown: number = 0;
+    countdown: number;
     interval: ReturnType<typeof setInterval>;
 
     constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
@@ -31,6 +31,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
                 this.countdown = state.timer;
             }
         });
+        this.countdown = 0;
     }
 
     @HostListener('window:beforeunload', ['$event'])

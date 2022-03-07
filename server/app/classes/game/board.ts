@@ -1,9 +1,9 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
-import { Letter } from '@app/classes/letter';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
+import { Letter } from 'common/classes/letter';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
 
 const ALLOWED_DIRECTIONS = [new Vec2(1, 0), new Vec2(0, 1)];
 
@@ -39,7 +39,7 @@ export class Board {
 
     place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number {
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
-            throw new Error('letter out of bound');
+            throw new GameError(GameErrorType.WrongPosition);
         const words = this.getAffectedWords(letters);
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
         if (!firstMove && allPlacedLetters.length === letters.length) throw new GameError(GameErrorType.WordNotConnected);

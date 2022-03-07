@@ -40,7 +40,7 @@ describe('ChatEffects', () => {
     it('should call the function messageWritten from chat service', (done) => {
         actions$ = of(chatActions.messageWritten({ username: 'Test1', message: 'Test2' }));
         effects.messageWrittenEffect$.subscribe();
-        expect(service.messageWritten).toHaveBeenCalledWith('Test1', 'Test2');
+        expect(service.messageWritten).toHaveBeenCalledWith('Test1', 'Test2', undefined);
         done();
     });
 });
