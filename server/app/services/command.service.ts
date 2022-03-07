@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { DECIMAL_BASE } from 'common/constants';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
@@ -102,7 +102,7 @@ export class CommandService {
         commandIsCorrect &&= /^[a-o]*$/.test(args[0][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(args[0]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(args[1]);
-        const columnNumber = parseInt((args[0].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((args[0].match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = gameConfig.boardSize.x;
         commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
@@ -114,7 +114,7 @@ export class CommandService {
 
     private parsePlaceCall(game: Game, args: string[]): [PlacedLetter[], number[]] {
         const positionNumber = (args[0].match(/\d+/) as RegExpMatchArray)[0];
-        const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const xPositionFromNumber = parseInt(positionNumber, DECIMAL_BASE) - 1;
         const yPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
 
         let iterationVector = new Vec2(xPositionFromNumber, yPositionFromLetter);
