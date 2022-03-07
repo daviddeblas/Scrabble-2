@@ -93,7 +93,7 @@ export class Room {
         this.game.stopTimer();
         const surrenderMessage = looserName + ' à abandonné la partie';
         this.sockets.forEach((socket, index) => {
-            socket.emit('receive message', { username: looserId, message: surrenderMessage, messageType: 'Systeme' });
+            socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
         if (--this.playersLeft <= 0) {
