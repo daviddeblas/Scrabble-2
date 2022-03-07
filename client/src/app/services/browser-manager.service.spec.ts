@@ -112,15 +112,6 @@ describe('BrowserManagerService', () => {
         expect(service.readCookieSocket).toEqual(undefined);
     });
 
-    // it('onBrowserLoad should not dispatch refreshTimer if no currentTimer key exist in LocalStorage', () => {
-    //     localStorage.removeItem('currentTimer');
-    //     service.onBrowserLoad();
-    //     const dispatchSpy = spyOn(store, 'dispatch').and.callFake(() => {
-    //         return;
-    //     });
-    //     expect(dispatchSpy).not.toHaveBeenCalled();
-    // });
-
     it('should should not dispatch refreshTimer if no currentTimer key exist in LocalStorage', (done) => {
         localStorage.removeItem('currentTimer');
         // eslint-disable-next-line dot-notation
