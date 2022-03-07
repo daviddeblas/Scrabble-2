@@ -5,6 +5,7 @@ import { BoardSelection, Orientation } from '@app/classes/board-selection';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Store } from '@ngrx/store';
 import { Letter, lettersToString, stringToLetter } from 'common/classes/letter';
+import { iVec2 } from 'common/classes/vec2';
 import { ASCII_ALPHABET_POSITION } from 'common/constants';
 import { PlayerService } from './player.service';
 
@@ -36,11 +37,13 @@ export class KeyManagerService {
 
     onEsc(): void {
         let letters: Letter[] = [];
+        let modifiedCells: iVec2[] = [];
         this.store.select('board').subscribe((state) => {
-            this.store.dispatch(removeLetters({ positions: state.selection.modifiedCells }));
+            modifiedCells = state.selection.modifiedCells;
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
         });
         this.store.dispatch(addLettersToEasel({ letters }));
+        this.store.dispatch(removeLetters({ positions: modifiedCells }));
         this.store.dispatch(clearSelection());
     }
 

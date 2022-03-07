@@ -129,14 +129,16 @@ export const reducer = createReducer(
         const selection = state.selection.copy();
         selection.modifiedCells.push(state.selection.cell as Vec2);
 
-        switch (state.selection.orientation) {
-            case Orientation.Horizontal:
-                selectedPosition.x++;
-                break;
-            case Orientation.Vertical:
-                selectedPosition.y++;
-                break;
-        }
+        do {
+            switch (state.selection.orientation) {
+                case Orientation.Horizontal:
+                    selectedPosition.x++;
+                    break;
+                case Orientation.Vertical:
+                    selectedPosition.y++;
+                    break;
+            }
+        } while (board[selectedPosition.x][selectedPosition.y] !== null);
 
         selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
         return {

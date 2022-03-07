@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { BoardState } from '@app/reducers/board.reducer';
 import { LocalSettings } from '@app/reducers/local-settings.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
 import { Letter } from 'common/classes/letter';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
@@ -23,11 +24,19 @@ export class BoardComponent {
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 
-    constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }> /* private elementRef: ElementRef*/) {
+    constructor(
+        store: Store<{ board: BoardState; localSettings: LocalSettings }>,
+        private keyManager: KeyManagerService /* private elementRef: ElementRef*/,
+    ) {
         this.boardState$ = store.select('board');
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.multipliers$ = store.select('board', 'multipliers');
         this.localSettings$ = store.select('localSettings');
+    }
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyDown(e: KeyboardEvent): void {
+        this.keyManager.onKey(e.key);
     }
 
     numberSequence(n: number): number[] {
