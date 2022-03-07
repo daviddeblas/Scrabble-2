@@ -4,6 +4,7 @@ import * as playersActions from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
+import { Letter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
@@ -65,28 +66,32 @@ describe('[Board] Reducer', () => {
     });
 
     describe('[Players] Place Word Success', () => {
-        it('should add the word in the board horizontally and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.HORIZONTAL);
+        it('should add the word in the board horizontally and remove multipliers', () => {
+            const newWord = new Word('alloA', new Vec2(0, 0), Direction.HORIZONTAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);
 
             for (let x = newWord.position.x; x < newWord.length(); ++x) {
-                expect(result.board[x][0]).toEqual(newWord.letters[x]);
-                expect(result.multipliers[x][0]).toBeNull();
+                expect(result.board[x][0]).toEqual(newWord.letters[x].toUpperCase() as Letter);
+                expect(result.multipliers[x][0]).toEqual(null);
             }
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result.blanks[0]).toEqual(new Vec2(4, 0));
         });
 
-        it('should add the word in the board vertically and remove the multipliers', () => {
-            const newWord = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.VERTICAL);
+        it('should add the word in the board vertically and remove multipliers', () => {
+            const newWord = new Word('alloA', new Vec2(0, 0), Direction.VERTICAL);
             const action = playersActions.placeWordSuccess({ word: newWord });
 
             const result = reducer(boardStub, action);
 
             for (let y = newWord.position.y; y < newWord.length(); ++y) {
-                expect(result.board[0][y]).toEqual(newWord.letters[y]);
-                expect(result.multipliers[0][y]).toBeNull();
+                expect(result.board[0][y]).toEqual(newWord.letters[y].toUpperCase() as Letter);
+                expect(result.multipliers[0][y]).toEqual(null);
             }
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result.blanks[0]).toEqual(new Vec2(0, 4));
         });
     });
 

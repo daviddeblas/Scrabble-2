@@ -1,4 +1,3 @@
-import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 
 export enum Direction {
@@ -7,7 +6,7 @@ export enum Direction {
 }
 
 export class Word {
-    constructor(public letters: Letter[], public position: Vec2, public direction?: Direction) {}
+    constructor(public letters: string, public position: Vec2, public direction?: Direction) {}
 
     length(): number {
         return this.letters.length;

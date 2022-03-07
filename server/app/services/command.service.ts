@@ -5,6 +5,7 @@ import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { DECIMAL_BASE } from 'common/constants';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
@@ -48,7 +49,7 @@ export class CommandService {
     }
 
     processDraw(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
-        if (!(/^[a-z]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
+        if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -75,7 +76,7 @@ export class CommandService {
         });
     }
 
-    private endGame(game: Game, sockets: io.Socket[]): void {
+    endGame(game: Game, sockets: io.Socket[]): void {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             s.emit('end game', endGameStatus);
@@ -102,7 +103,7 @@ export class CommandService {
         commandIsCorrect &&= /^[a-o]*$/.test(args[0][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(args[0]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(args[1]);
-        const columnNumber = parseInt((args[0].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((args[0].match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = gameConfig.boardSize.x;
         commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
@@ -114,7 +115,7 @@ export class CommandService {
 
     private parsePlaceCall(game: Game, args: string[]): [PlacedLetter[], number[]] {
         const positionNumber = (args[0].match(/\d+/) as RegExpMatchArray)[0];
-        const xPositionFromNumber = parseInt(positionNumber, 10) - 1;
+        const xPositionFromNumber = parseInt(positionNumber, DECIMAL_BASE) - 1;
         const yPositionFromLetter = args[0].charCodeAt(0) - 'a'.charCodeAt(0);
 
         let iterationVector = new Vec2(xPositionFromNumber, yPositionFromLetter);
@@ -126,7 +127,7 @@ export class CommandService {
         const blanks: number[] = [];
         for (let i = 0; i < args[1].length; i++) {
             while (game.board.letterAt(iterationVector)) iterationVector = iterationVector.add(direction);
-            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i)), iterationVector.copy()));
+            placableLetters.push(new PlacedLetter(stringToLetter(args[1].charAt(i).toLowerCase()), iterationVector.copy()));
             if (/^[A-Z]*$/.test(args[1].charAt(i))) blanks.push(i);
             iterationVector = iterationVector.add(direction);
         }

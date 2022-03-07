@@ -6,8 +6,18 @@
     color: #fff;
 }
 
-.room-name {
-    display: contents;
+.room {
+    display: block;
+    padding-right: 20px;
+}
+
+.join-room {
+    float: right;
+}
+
+.room-list {
+    margin-top: 2vh;
+    margin-bottom: 3vh;
 }
 
 .button {

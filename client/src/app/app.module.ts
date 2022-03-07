@@ -7,7 +7,6 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as roomReducer from '@app/reducers/room.reducer';
@@ -24,6 +23,7 @@ import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { MaterialPageComponent } from './pages/material-page/material-page.component';
 
 /**
  * Main module that is used in main.ts.

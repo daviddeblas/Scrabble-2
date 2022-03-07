@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { placeWordSuccess } from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
+import { Direction, Word } from '@app/classes/word';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { BoardState } from '@app/reducers/board.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
@@ -71,35 +73,40 @@ describe('PlayerService', () => {
         expect(sendSpy).toHaveBeenCalledWith('surrender game');
     });
 
-    it('placeWord should call setUpBoardWithWord if the placement is acceptable with direction', () => {
+    it('placeWord should dispatch placeWordSuccess if the placement is acceptable with direction', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        const sendSpy = spyOn(service, 'setUpBoardWithWord');
+        const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h7h';
         service.placeWord(position, word);
-        expect(sendSpy).toHaveBeenCalled();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const expectedWord = new Word('word', new Vec2(6, 7) as Vec2, Direction.HORIZONTAL);
+        expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
-    it('placeWord should call setUpBoardWithWord if the placement is acceptable with a letter already in place', () => {
+    it('placeWord should dispatch placeWordSuccess if the placement is acceptable with a letter already in place', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        const sendSpy = spyOn(service, 'setUpBoardWithWord');
+        const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'a2v';
         service.placeWord(position, word);
-        expect(sendSpy).toHaveBeenCalled();
+        const expectedWord = new Word('waord', new Vec2(1, 0) as Vec2, Direction.VERTICAL);
+        expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
-    it('placeWord should call setUpBoardWithWord if the placement is acceptable without direction', () => {
+    it('placeWord should dispatch placeWordSuccess if the placement is acceptable without direction', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        const sendSpy = spyOn(service, 'setUpBoardWithWord');
+        const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h8';
         word = 'w';
         service.placeWord(position, word);
-        expect(sendSpy).toHaveBeenCalled();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const expectedWord = new Word('w', new Vec2(7, 7) as Vec2, Direction.HORIZONTAL);
+        expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
     it('placeWord should dispatch receivedMessage if word is not placable', () => {
@@ -108,7 +115,9 @@ describe('PlayerService', () => {
         });
         position = 'c3';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -118,7 +127,9 @@ describe('PlayerService', () => {
         });
         position = 'o12h';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -128,19 +139,21 @@ describe('PlayerService', () => {
         });
         position = 'l15v';
         service.placeWord(position, word);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    it('placeWord should not call setUpBoardWithWord if letters are not in Easel', () => {
+    it('placeWord should not dispatch placeWordSuccess if letters are not in Easel', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return false;
         });
-        const sendSpy = spyOn(service, 'setUpBoardWithWord');
-        position = 'h8';
-        word = 'w';
+        const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
+        position = 'h7h';
         service.placeWord(position, word);
-        expect(sendSpy).not.toHaveBeenCalled();
+        const expectedWord = new Word('word', { x: 6, y: 7 } as Vec2, Direction.HORIZONTAL);
+        expect(dispatchSpy).not.toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
 
     it('exchangeLetters should call socketService send with namespace command if letters are in easel', () => {
@@ -256,28 +269,6 @@ describe('PlayerService', () => {
         const direction = 'v';
         word = 'ze';
         expect(service.wordPlacementCorrect(position, direction, word)).toBeFalse();
-    });
-
-    it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word vertically', () => {
-        position = 'h9';
-        const direction = 'v';
-        word = 'e';
-        board[CENTER_BOARD][CENTER_BOARD] = 'Z';
-        board[CENTER_BOARD + 1][CENTER_BOARD] = 'E';
-        service.setUpBoardWithWord(position, direction, word);
-        const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
-
-    it('setUpBoardWithWord should dispatch syncBoardSuccess with a new board which includes the added word horizontally', () => {
-        position = 'h9';
-        const direction = 'h';
-        word = 'e';
-        board[CENTER_BOARD][CENTER_BOARD] = 'Z';
-        board[CENTER_BOARD + 1][CENTER_BOARD] = 'E';
-        service.setUpBoardWithWord(position, direction, word);
-        const expectedAction = cold('a', { a: syncBoardSuccess({ newBoard: board }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('letterOnBoard should return a string if a letter exists on the board at the given position', () => {
