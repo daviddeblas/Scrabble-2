@@ -4,7 +4,7 @@ import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
-import { DECIMAL_BASE } from 'common/constants';
+import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
@@ -107,7 +107,7 @@ export class CommandService {
         const maxColumnNumber = gameConfig.boardSize.x;
         commandIsCorrect &&= columnNumber >= minColumnNumber && columnNumber <= maxColumnNumber;
         if (args[1].length > 1) {
-            commandIsCorrect &&= /^[vh]$/.test(args[0].slice(-1));
+            commandIsCorrect &&= /^[vh]$/.test(args[0].slice(POSITION_LAST_CHAR));
         }
         return commandIsCorrect;
     }
@@ -120,7 +120,7 @@ export class CommandService {
         let iterationVector = new Vec2(xPositionFromNumber, yPositionFromLetter);
 
         let direction = new Vec2(1, 0);
-        if (args[1].length > 1 && args[0].slice(-1) === 'v') direction = new Vec2(0, 1);
+        if (args[1].length > 1 && args[0].slice(POSITION_LAST_CHAR) === 'v') direction = new Vec2(0, 1);
 
         const placableLetters: PlacedLetter[] = [];
         const blanks: number[] = [];
