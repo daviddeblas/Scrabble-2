@@ -27,6 +27,11 @@
         <mat-card>
             <form [formGroup]="formGroup">
                 <ng-template matStepLabel>Entrez votre nom</ng-template>
+                <p class="room">
+                    <strong>Hôte</strong>: {{ selectedRoom?.gameOptions?.hostname }} <br />
+                    <strong>Temps</strong>: {{ selectedRoom?.gameOptions?.timePerRound }} secondes<br />
+                    <strong>Dictionnaire</strong>: {{ selectedRoom?.gameOptions?.dictionaryType }}
+                </p>
                 <mat-form-field centered class="parameter-container" appearance="fill">
                     <mat-label>Veuillez saisir votre nom</mat-label>
                     <input [attr.disabled]="true" matInput formControlName="name" placeholder="Nom" />
