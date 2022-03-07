@@ -29,7 +29,7 @@ export class RoomService {
 
     createSoloRoom(gameOptions: GameOptions, botLevel: string): void {
         this.socketService.send('create solo room', { gameOptions, botLevel });
-        this.socketService.on('create room success', (roomInfo: RoomInfo) => {
+        this.socketService.on('create solo room success', (roomInfo: RoomInfo) => {
             this.store.dispatch(createRoomSuccess({ roomInfo }));
         });
     }

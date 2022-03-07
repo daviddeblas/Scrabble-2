@@ -1,7 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
 import { Router } from '@angular/router';
-import { acceptInvite, cancelJoinRoom, closeRoom, createRoom, joinRoom, joinRoomAccepted, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import {
+    acceptInvite,
+    cancelJoinRoom,
+    closeRoom,
+    createRoom,
+    createSoloRoom,
+    joinRoom,
+    joinRoomAccepted,
+    loadRooms,
+    refuseInvite,
+} from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { RoomInfo } from '@app/classes/room-info';
 import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
@@ -27,6 +37,7 @@ describe('RoomEffects', () => {
         routerMock = jasmine.createSpyObj('router', ['navigateByUrl']);
         roomService = jasmine.createSpyObj('roomService', [
             'createRoom',
+            'createSoloRoom',
             'closeRoom',
             'joinRoom',
             'acceptInvite',
@@ -66,6 +77,13 @@ describe('RoomEffects', () => {
         actions$ = of(createRoom({ gameOptions: gameOptionsStub }));
         effects.createRoomEffect$.subscribe();
         expect(roomService.createRoom).toHaveBeenCalledWith(gameOptionsStub);
+    });
+
+    it('createSoloRoomEffect$ should call the createSoloRoom from room service', () => {
+        const botLevel = 'Debutant';
+        actions$ = of(createSoloRoom({ gameOptions: gameOptionsStub, botLevel }));
+        effects.createSoloRoomEffect$.subscribe();
+        expect(roomService.createSoloRoom).toHaveBeenCalledWith(gameOptionsStub, botLevel);
     });
 
     it('closeRoomEffect$ should call the closeRoom from room service', () => {

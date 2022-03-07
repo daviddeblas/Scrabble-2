@@ -2,14 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { createSoloRoom } from '@app/actions/room.actions';
+import { GameOptions } from '@app/classes/game-options';
 import { MultiConfigWindowComponent } from '@app/components/multi-config-window/multi-config-window.component';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { provideMockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
 import { SoloGameSettingsPageComponent } from './solo-game-settings-page.component';
 
 describe('SoloGameSettingsPageComponent', () => {
     let component: SoloGameSettingsPageComponent;
     let fixture: ComponentFixture<SoloGameSettingsPageComponent>;
+    let store: MockStore;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -24,6 +28,7 @@ describe('SoloGameSettingsPageComponent', () => {
                 provideMockStore(),
             ],
         }).compileComponents();
+        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
@@ -36,12 +41,20 @@ describe('SoloGameSettingsPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // Test a ajusté une fois l'action créer
-    /* it('should dispatch createRoom with the gameOptions when onGameOptionsSubmit called', () => {
+    it('should dispatch createSoloRoom with the gameOptions and botLevel when onGameOptionsSubmit called', () => {
         const expectedOptions = { name: 'My Name' } as unknown as GameOptions;
         const expectedLevel = 'Débutant';
         component.onGameOptionsSubmit(expectedOptions, expectedLevel);
-        const expectedAction = cold('a', { a: createRoom({ gameOptions: expectedOptions, botLevel: expectedLevel }) });
+        const expectedAction = cold('a', { a: createSoloRoom({ gameOptions: expectedOptions, botLevel: expectedLevel }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
-    });*/
+    });
+
+    it('should not dispatch createRoom when onGameOptionsSubmit called if bot level is undefined', () => {
+        const expectedOptions = { name: 'My Name' } as unknown as GameOptions;
+        const expectedLevel = undefined;
+        // eslint-disable-next-line dot-notation
+        const spy = spyOn(component['store'], 'dispatch');
+        component.onGameOptionsSubmit(expectedOptions, expectedLevel);
+        expect(spy).not.toHaveBeenCalled();
+    });
 });
