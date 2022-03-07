@@ -21,7 +21,6 @@ export class EaselComponent {
     easel: Letter[];
     pointsPerLetter$: Observable<Map<Letter, number>>;
     letterColor: string[];
-    playerIsActive: boolean = false;
 
     constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>) {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');

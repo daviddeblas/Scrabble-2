@@ -29,17 +29,6 @@ describe('SocketManager service tests', () => {
         sinon.restore();
     });
 
-    it('should handle create room event and create a new Room', (done) => {
-        const roomManagerSpy = sinon.spy(service.roomManager, 'createRoom');
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
-        clientSocket.emit('create room', defaultOptions);
-        setTimeout(() => {
-            assert(roomManagerSpy.calledOnce);
-            assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
-            roomManagerSpy.restore();
-            done();
-        }, RESPONSE_DELAY);
-    });
     it('should handle create room event and emit game settings event', (done) => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);

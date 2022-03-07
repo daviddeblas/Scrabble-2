@@ -1,4 +1,4 @@
-import { ASCII_ALPHABET_POSITION } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, DECIMAL_BASE } from 'common/constants';
 
 export interface iVec2 {
     x: number;
@@ -26,5 +26,5 @@ export class Vec2 {
 }
 
 export const boardPositionToVec2 = (position: string): Vec2 => {
-    return new Vec2(position.slice(0).charCodeAt(0) - ASCII_ALPHABET_POSITION, parseInt(position.substring(1), 10) - 1);
+    return new Vec2(parseInt(position.substring(1), DECIMAL_BASE) - 1, position.slice(0).charCodeAt(0) - ASCII_ALPHABET_POSITION);
 };

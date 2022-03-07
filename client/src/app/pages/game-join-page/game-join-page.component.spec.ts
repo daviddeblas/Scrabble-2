@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { CdkStep } from '@angular/cdk/stepper';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -47,7 +48,7 @@ describe('GameJoinPageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameJoinPageComponent);
         component = fixture.componentInstance;
-        component.stepper = stepperMock;
+        component['stepper'] = stepperMock;
         setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
     });
 
@@ -132,7 +133,7 @@ describe('GameJoinPageComponent', () => {
 
     it('onStepChange should closeRoom if stepper is selecting the first page', () => {
         let stepper = { selected: { editable: true } as CdkStep } as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         const spyOnCloseRoom = spyOn(component, 'cancelJoin');
 
@@ -140,7 +141,7 @@ describe('GameJoinPageComponent', () => {
         expect(spyOnCloseRoom).not.toHaveBeenCalled();
 
         stepper = { selected: { editable: false } as CdkStep } as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         component.onStepChange();
         expect(spyOnCloseRoom).toHaveBeenCalled();
@@ -148,7 +149,7 @@ describe('GameJoinPageComponent', () => {
 
     it('onStepChange should closeRoom if selected is undefined', () => {
         const stepper = {} as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         const spyOnCloseRoom = spyOn(component, 'cancelJoin');
 
@@ -181,7 +182,7 @@ describe('Join room in Join Page Component with undefined selector', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameJoinPageComponent);
         component = fixture.componentInstance;
-        component.stepper = stepperMock;
+        component['stepper'] = stepperMock;
         setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
     });
 

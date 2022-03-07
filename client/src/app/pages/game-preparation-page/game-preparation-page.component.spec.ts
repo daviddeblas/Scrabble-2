@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -43,13 +44,13 @@ describe('GamePreparationPageComponent', () => {
     });
 
     it('should return multiConfigWindowComponent.settingsForm if multiConfigWindowComponent is initialized ', () => {
-        component.multiConfigWindowComponent = jasmine.createSpyObj('MultiConfigWindowComponent', [], ['formSettings']);
-        expect(component.formSettings).toEqual(component.multiConfigWindowComponent.settingsForm);
+        component['multiConfigWindowComponent'] = jasmine.createSpyObj('MultiConfigWindowComponent', [], ['formSettings']);
+        expect(component.formSettings).toEqual(component['multiConfigWindowComponent'].settingsForm);
     });
 
     it('should not return multiConfigWindowComponent.settingsForm if multiConfigWindowComponent is initialized ', () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        component.multiConfigWindowComponent = undefined!;
+        component['multiConfigWindowComponent'] = undefined!;
         expect(component.formSettings).toEqual(component.firstFormGroup);
     });
 });

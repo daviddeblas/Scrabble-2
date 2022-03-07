@@ -20,3 +20,5 @@ export const switchLettersEasel = createAction('[Players] Switch Letters Easel',
 export const skipTurn = createAction('[Players] Skip Turn');
 
 export const surrender = createAction('[Players] Surrender');
+
+export const resetSocketConnection = createAction('[Players] Reset Socket Connection');
