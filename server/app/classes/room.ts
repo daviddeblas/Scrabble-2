@@ -4,7 +4,7 @@ import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 import io from 'socket.io';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
@@ -91,7 +91,7 @@ export class Room {
             this.game.bag.letters.length,
             looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
         );
-
+        this.game.stopTimer();
         this.sockets.forEach((socket, index) => {
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
@@ -102,7 +102,11 @@ export class Room {
     }
 
     removeUnneededListeners(socket: io.Socket): void {
-        socket.removeAllListeners('send message').removeAllListeners('surrender game').removeAllListeners('get game status');
+        socket
+            .removeAllListeners('send message')
+            .removeAllListeners('surrender game')
+            .removeAllListeners('get game status')
+            .removeAllListeners('command');
     }
 
     private setupSocket(socket: io.Socket, playerNumber: number): void {
@@ -116,9 +120,9 @@ export class Room {
         socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
         // Init Chat
-        socket.on('send message', ({ username, message }) => {
+        socket.on('send message', ({ username, message, messageType }) => {
             this.sockets.forEach((s, i) => {
-                if (i !== playerNumber) s.emit('receive message', { username, message });
+                if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
         });
 
@@ -130,9 +134,12 @@ export class Room {
 
     private actionAfterTimeout(room: Room): () => void {
         return () => {
-            const game = this.game as Game;
-            room.commandService.processSkip(game, this.sockets, [], game.activePlayer as number);
-            room.commandService.postCommand(game, this.sockets);
+            const game = room.game as Game;
+            room.commandService.processSkip(game, room.sockets, [], game.activePlayer as number);
+            room.commandService.postCommand(game, room.sockets);
+            if (game.needsToEnd()) {
+                room.commandService.endGame(game, room.sockets);
+            }
         };
     }
 }

@@ -20,7 +20,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     gameStatus$: Observable<GameStatus>;
     activePlayer: string;
 
-    countdown: number = 0;
+    countdown: number;
     interval: ReturnType<typeof setInterval>;
 
     constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
@@ -30,6 +30,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
             if (state) this.activePlayer = state.activePlayer;
             this.countdown = DEFAULT_TIMER;
         });
+        this.countdown = 0;
     }
 
     ngOnInit(): void {
