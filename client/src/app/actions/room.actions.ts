@@ -4,6 +4,7 @@ import { createAction, props } from '@ngrx/store';
 
 // Host
 export const createRoom = createAction('[Room] Create Room', props<{ gameOptions: GameOptions }>());
+export const createSoloRoom = createAction('[Room Create Solo Room', props<{ gameOptions: GameOptions; botLevel: string }>());
 export const createRoomSuccess = createAction('[Room] Create Room Success', props<{ roomInfo: RoomInfo }>());
 export const createRoomFailed = createAction('[Room] Create Room Failed', props<{ error: Error }>());
 export const closeRoom = createAction('[Room] Close Room');

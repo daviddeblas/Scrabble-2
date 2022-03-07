@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { createSoloRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { Store } from '@ngrx/store';
 
@@ -9,11 +10,7 @@ import { Store } from '@ngrx/store';
 export class SoloGameSettingsPageComponent {
     constructor(private store: Store) {}
 
-    onGameOptionsSubmit(gameOptions: GameOptions, botName?: string) {
-        if (botName) {
-            this.store;
-            gameOptions;
-        }
-        return;
+    onGameOptionsSubmit(gameOptions: GameOptions, botLevel?: string) {
+        if (botLevel !== undefined) this.store.dispatch(createSoloRoom({ gameOptions, botLevel }));
     }
 }
