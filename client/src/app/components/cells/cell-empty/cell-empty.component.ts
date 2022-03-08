@@ -5,6 +5,7 @@ import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 import { iVec2 } from 'common/classes/vec2';
 import { Observable } from 'rxjs';
 
@@ -31,6 +32,7 @@ export class CellEmptyComponent {
     }
 
     click(): void {
+        // First validation check for selecting a cell (Active player + Game Ended)
         let currentPlayer = '';
         let activePlayer = '';
         let gameEnded = false;
@@ -41,8 +43,14 @@ export class CellEmptyComponent {
             activePlayer = state.activePlayer;
             gameEnded = state.gameEnded;
         });
-
         if (gameEnded || currentPlayer !== activePlayer) return;
+
+        // Second validation for selecting a cell (Is cell empty)
+        let letter: Letter | null = null;
+        this.store.select('board').subscribe((state) => {
+            letter = state.board[this.pos.x][this.pos.y];
+        });
+        if (letter) return;
 
         this.store.dispatch(cellClick({ pos: this.pos }));
     }

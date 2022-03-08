@@ -15,6 +15,8 @@ import { PlayerService } from './player.service';
     providedIn: 'root',
 })
 export class KeyManagerService {
+    blankLettersBuffer: Letter[] = [];
+
     constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {}
 
     onEnter(): void {
@@ -33,8 +35,24 @@ export class KeyManagerService {
             selection.orientation === Orientation.Horizontal ? 'h' : 'v'
         }`;
 
-        this.store.dispatch(placeWord({ position: encodedPosition, letters: lettersToString(placedLetters).toLowerCase() }));
+        const blankPos: number[] = [];
+        while (this.blankLettersBuffer.length !== 0) {
+            blankPos.push(placedLetters.indexOf('*'));
+            placedLetters[blankPos[blankPos.length - 1]] = this.blankLettersBuffer[0];
+            this.blankLettersBuffer.splice(0, 1);
+        }
+        let encodedLetters = lettersToString(placedLetters).toLowerCase();
+        blankPos.forEach(
+            (index) =>
+                (encodedLetters =
+                    encodedLetters.slice(0, index) +
+                    encodedLetters.charAt(index).toUpperCase() +
+                    encodedLetters.slice(index + 1, encodedLetters.length - 1)),
+        );
+
+        this.store.dispatch(placeWord({ position: encodedPosition, letters: encodedLetters }));
         this.store.dispatch(clearSelection());
+        this.blankLettersBuffer = [];
     }
 
     onEsc(): void {
@@ -47,6 +65,7 @@ export class KeyManagerService {
         this.store.dispatch(addLettersToEasel({ letters }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
         this.store.dispatch(clearSelection());
+        this.blankLettersBuffer = [];
     }
 
     onBackspace(): void {
@@ -58,6 +77,7 @@ export class KeyManagerService {
             letter = state.board[lastCell.x][lastCell.y] as Letter;
         });
         if (!lastCell) return;
+        if (letter === '*') this.blankLettersBuffer.pop();
 
         this.store.dispatch(addLettersToEasel({ letters: [letter] }));
         this.store.dispatch(backspaceSelection());
@@ -65,6 +85,7 @@ export class KeyManagerService {
 
     onKey(key: string): void {
         if (document.activeElement !== null && document.activeElement.nodeName !== 'BODY') return;
+        if (key === 'Shift') return;
 
         let selectedCell: Vec2 | null = null;
         this.store.select('board').subscribe((state) => {
@@ -89,5 +110,6 @@ export class KeyManagerService {
         if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
         this.store.dispatch(placeLetter({ letter }));
         this.store.dispatch(removeLetterFromEasel({ letter }));
+        if (letter === '*') this.blankLettersBuffer.push(stringToLetter(key.toLowerCase()));
     }
 }
