@@ -3,6 +3,8 @@ import { backspaceSelection, clearSelection, placeLetter, removeLetters } from '
 import { addLettersToEasel, placeWord, removeLetterFromEasel } from '@app/actions/player.actions';
 import { BoardSelection, Orientation } from '@app/classes/board-selection';
 import { BoardState } from '@app/reducers/board.reducer';
+import { GameStatus } from '@app/reducers/game-status.reducer';
+import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Letter, lettersToString, stringToLetter } from 'common/classes/letter';
 import { iVec2, Vec2 } from 'common/classes/vec2';
@@ -13,7 +15,7 @@ import { PlayerService } from './player.service';
     providedIn: 'root',
 })
 export class KeyManagerService {
-    constructor(private store: Store<{ board: BoardState }>, private playerService: PlayerService) {}
+    constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {}
 
     onEnter(): void {
         let selection: BoardSelection = new BoardSelection();
@@ -63,6 +65,13 @@ export class KeyManagerService {
 
     onKey(key: string): void {
         if (document.activeElement !== null && document.activeElement.nodeName !== 'BODY') return;
+
+        let selectedCell: Vec2 | null = null;
+        this.store.select('board').subscribe((state) => {
+            selectedCell = state.selection.cell;
+        });
+        if (!selectedCell) return;
+
         switch (key) {
             case 'Enter':
                 this.onEnter();
@@ -75,13 +84,10 @@ export class KeyManagerService {
                 return;
             default:
         }
-        try {
-            const letter = stringToLetter(key);
-            if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
-            this.store.dispatch(placeLetter({ letter }));
-            this.store.dispatch(removeLetterFromEasel({ letter }));
-        } catch (_: unknown) {
-            // eslint-disable-next-line no-empty
-        }
+
+        const letter = stringToLetter(key);
+        if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
+        this.store.dispatch(placeLetter({ letter }));
+        this.store.dispatch(removeLetterFromEasel({ letter }));
     }
 }

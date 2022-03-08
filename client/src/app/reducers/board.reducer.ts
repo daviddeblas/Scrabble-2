@@ -74,6 +74,8 @@ export const reducer = createReducer(
         blanks: board.blanks,
         // transformer le array de tuple en map
         pointsPerLetter: new Map(board.pointsPerLetter as unknown as [Letter, number][]),
+        // Clear la selection au cas de fin de tour
+        selection: new BoardSelection(),
     })),
 
     on(placeWordSuccess, (state, { word }) => {
