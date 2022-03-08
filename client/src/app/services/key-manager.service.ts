@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { backspaceSelection, clearSelection, placeLetter, removeLetters } from '@app/actions/board.actions';
 import { addLettersToEasel, placeWord, removeLetterFromEasel } from '@app/actions/player.actions';
-import { BoardSelection, Orientation } from '@app/classes/board-selection';
+import { Orientation } from '@app/classes/board-selection';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
@@ -20,19 +20,23 @@ export class KeyManagerService {
     constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {}
 
     onEnter(): void {
-        let selection: BoardSelection = new BoardSelection();
+        let modifiedCells: Vec2[] = [];
+        let orientation: Orientation | null = null;
         const placedLetters: Letter[] = [];
         let letters: Letter[] = [];
         this.store.select('board').subscribe((state) => {
-            selection = state.selection;
-            letters = selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
+            modifiedCells = state.selection.modifiedCells;
+            letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
         });
         letters.forEach((l) => placedLetters.push(l));
         this.store.dispatch(addLettersToEasel({ letters }));
-        this.store.dispatch(removeLetters({ positions: selection.modifiedCells }));
+        this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
-        const encodedPosition = `${String.fromCharCode(selection.modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${selection.modifiedCells[0].x + 1}${
-            selection.orientation === Orientation.Horizontal ? 'h' : 'v'
+        if (orientation === null && modifiedCells.length > 1)
+            orientation = modifiedCells[0].x === modifiedCells[1].x ? Orientation.Horizontal : Orientation.Vertical;
+
+        const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${
+            orientation === Orientation.Horizontal ? 'h' : 'v'
         }`;
 
         const blankPos: number[] = [];

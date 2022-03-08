@@ -7,6 +7,7 @@ import { createReducer, on } from '@ngrx/store';
 import { Letter, stringToLetter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
 import { iVec2, Vec2 } from 'common/classes/vec2';
+import { BOARD_SIZE } from 'common/constants';
 
 export const boardFeatureKey = 'board';
 
@@ -27,6 +28,18 @@ const cloneBoard = (board: (Letter | null)[][]): (Letter | null)[][] => {
         }
     }
     return newBoard;
+};
+
+const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Orientation): boolean => {
+    switch (orientation) {
+        case Orientation.Horizontal:
+            for (let i = pos.x + 1; i < BOARD_SIZE; ++i) if (board[i][pos.y] === null) return false;
+            break;
+        case Orientation.Vertical:
+            for (let i = pos.y + 1; i < BOARD_SIZE; ++i) if (board[pos.x][i] === null) return false;
+            break;
+    }
+    return true;
 };
 
 export interface BoardState {
@@ -117,32 +130,43 @@ export const reducer = createReducer(
         if (state.selection.cell?.x === pos.x && state.selection.cell?.y === pos.y) {
             tempState.selection.orientation =
                 tempState.selection.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+            if (isCellAtBoardLimit(state.board, state.selection.cell, tempState.selection.orientation)) {
+                tempState.selection.orientation =
+                    tempState.selection.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+                if (isCellAtBoardLimit(state.board, state.selection.cell, tempState.selection.orientation)) tempState.selection.orientation = null;
+            }
+
             return tempState;
         }
+
         tempState.selection.orientation = Orientation.Horizontal;
         return tempState;
     }),
 
     on(placeLetter, (state, { letter }) => {
         const selectedPosition = { x: (state.selection.cell as iVec2).x, y: (state.selection.cell as iVec2).y };
+        if (state.board[selectedPosition.x][selectedPosition.y]) return state;
         const board = cloneBoard(state.board);
         board[selectedPosition.x][selectedPosition.y] = letter;
 
         const selection = state.selection.copy();
         selection.modifiedCells.push(state.selection.cell as Vec2);
 
-        do {
-            switch (state.selection.orientation) {
-                case Orientation.Horizontal:
-                    selectedPosition.x++;
-                    break;
-                case Orientation.Vertical:
-                    selectedPosition.y++;
-                    break;
-            }
-        } while (board[selectedPosition.x][selectedPosition.y] !== null);
+        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation)) selection.orientation = null;
+        else
+            do {
+                switch (state.selection.orientation) {
+                    case Orientation.Horizontal:
+                        selectedPosition.x++;
+                        break;
+                    case Orientation.Vertical:
+                        selectedPosition.y++;
+                        break;
+                }
+            } while (board[selectedPosition.x][selectedPosition.y] !== null);
 
         selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
+
         return {
             ...state,
             selection,
@@ -172,7 +196,9 @@ export const reducer = createReducer(
             // Clear selection
             return { ...state, selection: new BoardSelection() };
 
-        selection.cell = selection.modifiedCells.pop() as Vec2;
+        const lastCell = selection.modifiedCells.pop() as Vec2;
+        selection.orientation = selection.cell.x === lastCell.x ? Orientation.Horizontal : Orientation.Vertical;
+        selection.cell = lastCell;
 
         const board = cloneBoard(state.board);
         board[selection.cell.x][selection.cell.y] = null;
