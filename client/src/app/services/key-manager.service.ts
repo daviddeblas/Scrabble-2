@@ -85,7 +85,6 @@ export class KeyManagerService {
 
     onKey(key: string): void {
         if (document.activeElement !== null && document.activeElement.nodeName !== 'BODY') return;
-        if (key === 'Shift') return;
 
         let selectedCell: Vec2 | null = null;
         this.store.select('board').subscribe((state) => {
@@ -106,6 +105,9 @@ export class KeyManagerService {
             default:
         }
 
+        if (key.length !== 1) return;
+
+        key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const letter = stringToLetter(key);
         if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
         this.store.dispatch(placeLetter({ letter }));
