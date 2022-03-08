@@ -5,7 +5,7 @@ import { BoardSelection, Orientation } from '@app/classes/board-selection';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Store } from '@ngrx/store';
 import { Letter, lettersToString, stringToLetter } from 'common/classes/letter';
-import { iVec2 } from 'common/classes/vec2';
+import { iVec2, Vec2 } from 'common/classes/vec2';
 import { ASCII_ALPHABET_POSITION } from 'common/constants';
 import { PlayerService } from './player.service';
 
@@ -48,6 +48,16 @@ export class KeyManagerService {
     }
 
     onBackspace(): void {
+        let letter: Letter = '*';
+        let lastCell: Vec2 | null = null;
+        this.store.select('board').subscribe((state) => {
+            if (state.selection.modifiedCells.length === 0) return;
+            lastCell = state.selection.modifiedCells[state.selection.modifiedCells.length - 1] as Vec2;
+            letter = state.board[lastCell.x][lastCell.y] as Letter;
+        });
+        if (!lastCell) return;
+
+        this.store.dispatch(addLettersToEasel({ letters: [letter] }));
         this.store.dispatch(backspaceSelection());
     }
 

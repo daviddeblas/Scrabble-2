@@ -164,19 +164,20 @@ export const reducer = createReducer(
 
     on(backspaceSelection, (state): BoardState => {
         const selection = state.selection.copy();
+
         if (selection.cell === null) return { ...state };
-        if (selection.modifiedCells.length === 0) return { ...state, selection: new BoardSelection() };
-        switch (state.selection.orientation) {
-            case Orientation.Horizontal:
-                selection.cell.x--;
-                break;
-            case Orientation.Vertical:
-                selection.cell.y--;
-                break;
-        }
+        if (selection.modifiedCells.length === 0)
+            // Clear selection
+            return { ...state, selection: new BoardSelection() };
+
+        selection.cell = selection.modifiedCells.pop() as Vec2;
+
+        const board = cloneBoard(state.board);
+        board[selection.cell.x][selection.cell.y] = null;
 
         return {
             ...state,
+            board,
             selection,
         };
     }),
