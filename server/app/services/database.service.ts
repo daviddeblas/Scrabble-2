@@ -1,8 +1,8 @@
 import { Db, MongoClient, MongoClientOptions } from 'mongodb';
 
 const DATABASE_URL = 'mongodb+srv://log2990-101:<log2990-101>@cluster0.qzik0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-const DATABASE_NAME = 'highScores';
-const DATABASE_COLLECTIONS = 'highScores_coll';
+const DATABASE_NAME = 'Scores_DB';
+const DATABASE_COLLECTIONS = 'Scores';
 
 export class DatabaseService {
     private db: Db;
@@ -32,7 +32,7 @@ export class DatabaseService {
     }
 
     async populateDB(): Promise<void> {
-        const highScores_coll: highScores[] = [
+        const Scores: Scores[] = [
             {
                 id: 0,
                 name: 'DefaultUser0',
@@ -60,8 +60,8 @@ export class DatabaseService {
             },
         ];
 
-        for (const highScore of highScores_coll) {
-            await this.db.collection(DATABASE_COLLECTIONS).insertOne(highScore);
+        for (const Score of Scores) {
+            await this.db.collection(DATABASE_COLLECTIONS).insertOne(Score);
         }
     }
 
