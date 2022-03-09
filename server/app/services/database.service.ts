@@ -19,5 +19,14 @@ export class DatabaseService {
         } catch {
             throw Error('Database connection error');
         }
-}
 
+        if ((await this.db.collection(DATABASE_COLLECTIONS).countDocuments()) === 0) {
+            await this.populateDB();
+        }
+        return this.client;
+    }
+
+    async closeConnection(): Promise<void> {
+        return this.client.close();
+    }
+}
