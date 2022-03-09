@@ -59,4 +59,12 @@ export class DatabaseService {
             },
         ];
 
+        for (const highScore of highScores_coll) {
+            await this.db.collection(DATABASE_COLLECTIONS).insertOne(highScore);
+        }
+    }
+
+    get database(): Db {
+        return this.db;
+    }
 }
