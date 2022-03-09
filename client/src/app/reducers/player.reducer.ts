@@ -9,6 +9,7 @@ export const playerFeatureKey = 'players';
 export interface Players {
     player: Player;
     opponent: Player;
+    botLevel?: string;
 }
 
 export const initialState: Players = {
