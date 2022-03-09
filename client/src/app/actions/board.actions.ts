@@ -1,5 +1,5 @@
-import { Letter } from '@app/classes/letter';
 import { createAction, props } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
 
 export const syncBoard = createAction('[Board] Sync Board');
 

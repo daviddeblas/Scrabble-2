@@ -3,10 +3,10 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createSoloRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { MultiConfigWindowComponent } from '@app/components/multi-config-window/multi-config-window.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { GameOptions } from 'common/classes/game-options';
 import { cold } from 'jasmine-marbles';
 import { SoloGameSettingsPageComponent } from './solo-game-settings-page.component';
 

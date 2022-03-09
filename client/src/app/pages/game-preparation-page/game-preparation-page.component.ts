@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatStepper } from '@angular/material/stepper';
 import { createRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { MultiConfigWindowComponent } from '@app/components/multi-config-window/multi-config-window.component';
 import { Store } from '@ngrx/store';
+import { GameOptions } from 'common/classes/game-options';
 
 @Component({
     selector: 'app-game-preparation-page',

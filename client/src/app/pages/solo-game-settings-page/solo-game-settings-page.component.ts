@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { createSoloRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { Store } from '@ngrx/store';
+import { GameOptions } from 'common/classes/game-options';
 
 @Component({
     templateUrl: './solo-game-settings-page.component.html',
