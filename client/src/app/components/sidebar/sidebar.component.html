@@ -20,8 +20,11 @@
     </mat-card>
 
     <div class="info">
-        <mat-card *ngIf="(gameStatus$ | async)?.gameEnded === true">
+        <mat-card *ngIf="(gameStatus$ | async)?.gameEnded && (gameStatus$ | async)?.winner !== null">
             <h2>Félicitation {{ (gameStatus$ | async)?.winner }}!</h2>
+        </mat-card>
+        <mat-card *ngIf="(gameStatus$ | async)?.gameEnded && (gameStatus$ | async)?.winner === null">
+            <h2>Égalité {{ (gameStatus$ | async)?.winner }}!</h2>
         </mat-card>
         <mat-card>
             <p>Réserve: {{ (gameStatus$ | async)?.letterPotLength }}</p>
