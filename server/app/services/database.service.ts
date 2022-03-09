@@ -29,4 +29,34 @@ export class DatabaseService {
     async closeConnection(): Promise<void> {
         return this.client.close();
     }
+
+    async populateDB(): Promise<void> {
+        const highScores_coll: highScores[] = [
+            {
+                id: 0,
+                name: 'DefaultUser0',
+                score: 0,
+            },
+            {
+                id: 1,
+                name: 'DefaultUser1',
+                score: 0,
+            },
+            {
+                id: 2,
+                name: 'DefaultUser2',
+                score: 0,
+            },
+            {
+                id: 3,
+                name: 'DefaultUser3',
+                score: 0,
+            },
+            {
+                id: 4,
+                name: 'DefaultUser4',
+                score: 0,
+            },
+        ];
+
 }
