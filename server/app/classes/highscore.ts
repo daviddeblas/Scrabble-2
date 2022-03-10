@@ -21,7 +21,7 @@ export const DEFAULT_HIGHSCORE={
 };
 
 export const DATABASE= {
-    url:'mongodb+srv://log2990-101:<log2990-101>@cluster0.qzik0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    url:'mongodb+srv://log2990-101:log2990-101@cluster0.qzik0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
     highScore:{
         name: 'HighScore',
         collections: {
