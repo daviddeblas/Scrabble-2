@@ -1,20 +1,14 @@
-import { Collection } from 'mongodb';
-import { Player } from "../classes/game/player";
-import { HttpException } from '../classes/http.exception';
-import { DatabaseService } from './database.service';
-
-const DATABASE_COLLECTION= "highScores_coll";
+import { DATABASE, DEFAULT_HIGHSCORE } from '@app/classes/highscore';
+import { Db } from 'mongodb';
+import {} from ;
 
 export class LeaderboardService{
-    constructor(){
-        private databaseService: DatabaseService;
-    }
+    private highScoreDB: Db;
+    // get collection(): Collection<Player>{
+    //     return this.databaseService.database.collection(DATABASE_COLLECTION);
+    // }
 
-    get collection(): Collection<Player>{
-        return this.databaseService.database.collection(DATABASE_COLLECTION);
-    }
-
-    async getAllScores(): Promise<highScores[]>{
+    async getHighscores(): Promise<highScores[]>{
         return this.collection
             .find({})
             .toArray()
@@ -23,14 +17,10 @@ export class LeaderboardService{
             });
     }
 
-    async AddScore(score: Score): Promise<void>{
-        if(this.GameFinishStatus.toEndGameFinish()){
-                await this.collection.insertOne(score).catch((error:Error)=>{
-                    throw new HttpException(500, "failed to insert score");
-                });
-        }
-        else{
-            throw new Error("invalid score");
-        }
+    async addDefaultScores(): Promise<void>{
+        await Promise.all([
+            this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertMany(DEFAULT_HIGHSCORE.classical),
+            this.highScoreDB.collection(DATABASE.highScore.collections.log2290).insertMany(DEFAULT_HIGHSCORE.log2990),
+        ]);
     }
 }

@@ -6,7 +6,7 @@ import { Db, MongoClient } from 'mongodb';
 // const DATABASE_COLLECTIONS = 'Scores';
 
 export class DatabaseService {
-    private HighScore_DB: Db;
+    private highScore_DB: Db;
     private client: MongoClient;
     // private options: MongoClientOptions = {
     //     useNewUrlParser: true,
@@ -17,7 +17,7 @@ export class DatabaseService {
         try {
             const client = await MongoClient.connect(url);
             this.client = client;
-            this.HighScore_DB = client.db(DATABASE.highScore.name);
+            this.highScore_DB = client.db(DATABASE.highScore.name);
         } catch {
             throw Error('Database connection error');
         }
@@ -30,8 +30,8 @@ export class DatabaseService {
 
     async resetDB() {
         return Promise.all([
-            this.HighScore_DB.dropCollection(DATABASE.highScore.collections.classical),
-            this.HighScore_DB.dropCollection(DATABASE.highScore.collections.log2290),
+            this.highScore_DB.dropCollection(DATABASE.highScore.collections.classical),
+            this.highScore_DB.dropCollection(DATABASE.highScore.collections.log2290),
         ]);
     }
 }
