@@ -19,3 +19,14 @@ export const DEFAULT_HIGHSCORE={
         {name: 'name5', score:0}
     ] as HighScore[],
 };
+
+export const DATABASE= {
+    url:'mongodb+srv://log2990-101:<log2990-101>@cluster0.qzik0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    highScore:{
+        name: 'HighScore',
+        collections: {
+            classical: 'ScoreClassic',
+            log2290:'ScoreLog2990',
+        }
+    }
+}
