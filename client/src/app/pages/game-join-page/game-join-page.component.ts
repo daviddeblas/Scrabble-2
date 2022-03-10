@@ -94,11 +94,10 @@ export class GameJoinPageComponent implements OnDestroy {
         this.formGroup.controls.name.disable();
 
         this.pendingRoom$.subscribe((newPendingRoom) => {
-            if (!newPendingRoom) {
-                this.formGroup.controls.name.enable();
-                this.refused = true;
-                this.stepper.reset();
-            }
+            if (newPendingRoom) return;
+            this.formGroup.controls.name.enable();
+            this.refused = true;
+            this.stepper.reset();
         });
     }
 

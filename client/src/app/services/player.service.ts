@@ -25,10 +25,9 @@ export class PlayerService {
     }
 
     exchangeLetters(letters: string): void {
-        if (this.lettersInEasel(letters)) {
-            const commandLine = 'échanger ' + letters;
-            this.socketService.send('command', commandLine);
-        }
+        if (!this.lettersInEasel(letters)) return;
+        const commandLine = 'échanger ' + letters;
+        this.socketService.send('command', commandLine);
     }
 
     placeWord(position: string, letters: string): void {
@@ -130,12 +129,12 @@ export class PlayerService {
                 isPlacable ||= this.checkNearSpaces(column, line + i, board);
             }
             const letterBoard = direction === 'h' ? board[column + i][line] : board[column][line + i];
-            if (letterBoard !== null) {
-                if (letterBoard.toString() !== letters[i].toUpperCase()) {
-                    return false;
-                } else {
-                    isPlacable = true;
-                }
+            if (letterBoard === null) continue;
+
+            if (letterBoard.toString() !== letters[i].toUpperCase()) {
+                return false;
+            } else {
+                isPlacable = true;
             }
         }
         return isPlacable;

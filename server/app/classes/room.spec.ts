@@ -106,6 +106,9 @@ describe('room', () => {
                 stopTimer: () => {
                     return;
                 },
+                endGame: () => {
+                    return;
+                },
             } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
@@ -123,6 +126,9 @@ describe('room', () => {
                 players: ['player1', 'player2'],
                 bag: { letters: [] },
                 stopTimer: () => {
+                    return;
+                },
+                endGame: () => {
                     return;
                 },
             } as unknown as Game;

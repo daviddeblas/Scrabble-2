@@ -85,13 +85,12 @@ export class CommandService {
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {
         const delayForInvalidWord = 3000;
         sockets[playerNumber].emit('error', (error as Error).message);
-        if (error.message === GameErrorType.InvalidWord) {
-            game.stopTimer();
-            setTimeout(() => {
-                game.nextTurn();
-                this.postCommand(game, sockets);
-            }, delayForInvalidWord);
-        }
+        if (error.message !== GameErrorType.InvalidWord) return;
+        game.stopTimer();
+        setTimeout(() => {
+            game.nextTurn();
+            this.postCommand(game, sockets);
+        }, delayForInvalidWord);
     }
 
     private validatePlace(gameConfig: GameConfig, args: string[]): boolean {
