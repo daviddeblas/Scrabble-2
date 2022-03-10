@@ -12,6 +12,7 @@ import {
     joinRoomAccepted,
     loadRooms,
     refuseInvite,
+    switchToSoloRoom,
 } from '@app/actions/room.actions';
 import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { RoomService } from '@app/services/room.service';
@@ -36,6 +37,17 @@ export class RoomEffects {
                 ofType(createSoloRoom),
                 tap((action) => {
                     this.roomService.createSoloRoom(action.gameOptions, action.botLevel);
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    switchToSoloRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(switchToSoloRoom),
+                tap((action) => {
+                    this.roomService.switchToSoloRoom(action.botLevel);
                 }),
             ),
         { dispatch: false },

@@ -34,6 +34,13 @@ export class RoomService {
         });
     }
 
+    switchToSoloRoom(botLevel: string): void {
+        this.socketService.send('switch to solo room', { botLevel });
+        this.socketService.on('switched to solo', (roomInfo: RoomInfo) => {
+            this.store.dispatch(createRoomSuccess({ roomInfo }));
+        });
+    }
+
     waitForInvitations(): void {
         this.socketService.on('player joining', (playerName: string) => {
             this.store.dispatch(joinInviteReceived({ playerName }));
