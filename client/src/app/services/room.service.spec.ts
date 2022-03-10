@@ -17,6 +17,9 @@ import { RoomService } from './room.service';
 import { SocketClientService } from './socket-client.service';
 
 describe('RoomService', () => {
+    const timer = 60;
+    const botLevel = 'Debutant';
+    const gameOptions = new GameOptions('host', 'dict', timer);
     let service: RoomService;
     let socketService: SocketTestHelper;
     let store: MockStore;
@@ -39,8 +42,6 @@ describe('RoomService', () => {
         const sendSpy = spyOn(socketService, 'emit');
         const onSpy = spyOn(socketService, 'on');
 
-        const timer = 60;
-        const gameOptions = new GameOptions('host', 'dict', timer);
         service.createRoom(gameOptions);
 
         expect(sendSpy).toHaveBeenCalledWith('create room', gameOptions);
@@ -49,8 +50,7 @@ describe('RoomService', () => {
 
     it('should dispatch "[Room] Create Room Success" for the create room success and wait for invitations', () => {
         const waitForInvitationsSpy = spyOn(service, 'waitForInvitations');
-        const timer = 60;
-        const gameOptions = new GameOptions('host', 'dict', timer);
+
         service.createRoom(gameOptions);
 
         const roomInfo: RoomInfo = { roomId: 'room-id', gameOptions };
@@ -74,24 +74,37 @@ describe('RoomService', () => {
         const sendSpy = spyOn(socketService, 'emit');
         const onSpy = spyOn(socketService, 'on');
 
-        const timer = 60;
-        const botLevel = 'Debutant';
-
-        const gameOptions = new GameOptions('host', 'dict', timer);
         service.createSoloRoom(gameOptions, botLevel);
 
         expect(sendSpy).toHaveBeenCalledWith('create solo room', { gameOptions, botLevel });
         expect(onSpy).toHaveBeenCalled();
     });
 
-    it('should dispatch "[Room] Create Room Success" for the create room success and wait for invitations', () => {
-        const timer = 60;
-        const botLevel = 'Debutant';
-        const gameOptions = new GameOptions('host', 'dict', timer);
+    it('should dispatch "[Room] Create Room Success" for the create room success', () => {
         service.createSoloRoom(gameOptions, botLevel);
 
         const roomInfo: RoomInfo = { roomId: 'room-id', gameOptions };
         socketService.peerSideEmit('create solo room success', roomInfo);
+
+        const expectedAction = cold('a', { a: createRoomSuccess({ roomInfo }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should send a switch solo room request to socket and wait for the answer', () => {
+        const sendSpy = spyOn(socketService, 'emit');
+        const onSpy = spyOn(socketService, 'on');
+
+        service.switchToSoloRoom(botLevel);
+
+        expect(sendSpy).toHaveBeenCalledWith('switch to solo room', { botLevel });
+        expect(onSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch "[Room] Create Room Success" for the create room success', () => {
+        service.switchToSoloRoom(botLevel);
+
+        const roomInfo: RoomInfo = { roomId: 'room-id', gameOptions };
+        socketService.peerSideEmit('switched to solo', roomInfo);
 
         const expectedAction = cold('a', { a: createRoomSuccess({ roomInfo }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
@@ -151,8 +164,7 @@ describe('RoomService', () => {
     });
 
     describe('Room events', () => {
-        const timer = 60;
-        const roomList: RoomInfo[] = [new RoomInfo('room-id', new GameOptions('host', 'dict', timer))];
+        const roomList: RoomInfo[] = [new RoomInfo('room-id', gameOptions)];
         const playerName = 'player 2';
         it('should dispatch "[Room] Load Rooms Success" for the create room success and wait for invitations', () => {
             service.fetchRoomList();

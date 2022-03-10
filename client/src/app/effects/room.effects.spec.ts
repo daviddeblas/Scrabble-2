@@ -11,6 +11,7 @@ import {
     joinRoomAccepted,
     loadRooms,
     refuseInvite,
+    switchToSoloRoom,
 } from '@app/actions/room.actions';
 import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { RoomService } from '@app/services/room.service';
@@ -44,6 +45,7 @@ describe('RoomEffects', () => {
             'fetchRoomList',
             'refuseInvite',
             'acceptInvite',
+            'switchToSoloRoom',
             'cancelJoinRoom',
         ]);
         TestBed.configureTestingModule({
@@ -84,6 +86,13 @@ describe('RoomEffects', () => {
         actions$ = of(createSoloRoom({ gameOptions: gameOptionsStub, botLevel }));
         effects.createSoloRoomEffect$.subscribe();
         expect(roomService.createSoloRoom).toHaveBeenCalledWith(gameOptionsStub, botLevel);
+    });
+
+    it('switchToSoloRoomEffect$ should call the switchToSoloRoom from room service', () => {
+        const botLevel = 'Debutant';
+        actions$ = of(switchToSoloRoom({ botLevel }));
+        effects.switchToSoloRoomEffect$.subscribe();
+        expect(roomService.switchToSoloRoom).toHaveBeenCalledWith(botLevel);
     });
 
     it('closeRoomEffect$ should call the closeRoom from room service', () => {
