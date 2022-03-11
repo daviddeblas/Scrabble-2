@@ -1,3 +1,4 @@
+import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
@@ -15,15 +16,21 @@ export class Room {
     clientName: string | null;
     game: Game | null;
     commandService: CommandService;
+    botService: BotService;
 
     sockets: io.Socket[];
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => this.quitRoomHost());
+        this.host.once('switch to solo room', () => {
+            this.initSoloGame(BotDifficulty.Easy);
+            this.host.emit('switched to solo', this.getRoomInfo());
+        });
         this.game = null;
         this.clientName = null;
         this.commandService = Container.get(CommandService);
+        this.botService = Container.get(BotService);
     }
 
     join(socket: io.Socket, name: string): void {
@@ -75,6 +82,9 @@ export class Room {
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(this),
+            () => {
+                return;
+            },
         );
 
         this.manager.removeSocketFromJoiningList(this.sockets[1]);
@@ -109,6 +119,25 @@ export class Room {
             .removeAllListeners('command');
     }
 
+    initSoloGame(diff: BotDifficulty): void {
+        this.sockets = [this.host];
+
+        let botName: string;
+
+        while ((botName = this.botService.getName()) === this.gameOptions.hostname);
+
+        this.game = new Game(
+            Container.get(GameConfigService).configs.configs[0],
+            [this.gameOptions.hostname, botName],
+            this.gameOptions,
+            this.actionAfterTimeout(this),
+            this.actionAfterTurnWithBot(this, diff),
+        );
+
+        this.manager.notifyAvailableRoomsChange();
+        this.setupSocket(this.sockets[0], 0);
+    }
+
     private setupSocket(socket: io.Socket, playerNumber: number): void {
         const game = this.game as Game;
 
@@ -130,6 +159,13 @@ export class Room {
         socket.on('surrender game', () => {
             this.surrenderGame(socket.id);
         });
+    }
+
+    private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => void {
+        return () => {
+            if (room.game?.activePlayer === 1)
+                room.commandService.onCommand(room.game as Game, room.sockets, room.botService.move(room.game as Game, diff), 1);
+        };
     }
 
     private actionAfterTimeout(room: Room): () => void {

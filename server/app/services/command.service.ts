@@ -74,6 +74,7 @@ export class CommandService {
         sockets.forEach((s) => {
             s.emit('turn ended');
         });
+        game.actionAfterTurn();
     }
 
     endGame(game: Game, sockets: io.Socket[]): void {

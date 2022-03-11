@@ -24,7 +24,13 @@ export class Game {
     gameFinished: boolean;
     currentTimer: NodeJS.Timeout;
 
-    constructor(public config: GameConfig, playerNames: string[], public gameOptions: GameOptions, private actionAfterTimeout: () => void) {
+    constructor(
+        public config: GameConfig,
+        playerNames: string[],
+        public gameOptions: GameOptions,
+        private actionAfterTimeout: () => void,
+        public actionAfterTurn: () => void,
+    ) {
         this.bag = new Bag(config);
         this.board = new Board(config);
         this.activePlayer = Math.floor(Math.random() * playerNames.length);
