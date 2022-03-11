@@ -7,3 +7,5 @@ export const ASCII_ALPHABET_POSITION = 97;
 export const DEFAULT_TIMER = 60;
 
 export const DECIMAL_BASE = 10;
+
+export const BOT_NAMES = ['ROB', 'BOT', 'BOB'];
