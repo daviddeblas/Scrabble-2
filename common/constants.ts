@@ -9,3 +9,5 @@ export const DEFAULT_TIMER = 60;
 export const DECIMAL_BASE = 10;
 
 export const BOT_NAMES = ['ROB', 'BOT', 'BOB'];
+export const MIN_BOT_PLACEMENT_TIME = 3000;
+export const MAX_BOT_PLACEMENT_TIME = 20000;
