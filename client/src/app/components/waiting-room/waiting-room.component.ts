@@ -47,6 +47,7 @@ export class WaitingRoomComponent implements OnDestroy {
 
     convertToSolo(): void {
         this.store.dispatch(switchToSoloRoom({ botLevel: 'Débutant' }));
+        this.dialogRef.close();
     }
 
     ngOnDestroy(): void {
