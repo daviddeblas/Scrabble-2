@@ -57,25 +57,6 @@ export const initialState: BoardState = {
     blanks: [],
     selection: new BoardSelection(null, 'horizontal' as Orientation),
 };
-/*
-const copyBoard = (state: BoardState): BoardState => {
-    const blanks: Vec2[] = [];
-    state.blanks.forEach((pos: Vec2) => blanks.push({ x: pos.x, y: pos.y }));
-    const board = createEmptyMatrix({ x: state.board.length, y: state.board[0].length });
-    const multipliers = createEmptyMatrix({ x: state.board.length, y: state.board[0].length });
-    const selection = state.selection.copy();
-    const pointsPerLetter = state.pointsPerLetter;
-
-    for (let i = 0; i < state.board.length; i++) {
-        for (let j = 0; j < state.board[0].length; j++) {
-            board[i][j] = state.board[i][j];
-            multipliers[i][j] = state.multipliers[i][j];
-        }
-    }
-
-    return { blanks, board, multipliers, selection, pointsPerLetter };
-};
-*/
 export const reducer = createReducer(
     initialState,
     on(syncBoardSuccess, (state, { newBoard }) => ({ ...state, board: newBoard })),
@@ -93,19 +74,19 @@ export const reducer = createReducer(
 
     on(placeWordSuccess, (state, { word }) => {
         const multipliersCopy = JSON.parse(JSON.stringify(state.multipliers));
-        const boardCopy = JSON.parse(JSON.stringify(state.board));
+        const boardCopy = cloneBoard(state.board);
         const blankCopy: Vec2[] = JSON.parse(JSON.stringify(state.blanks));
         for (let i = 0; i < word.length(); ++i) {
             switch (word.direction) {
                 case Direction.HORIZONTAL:
-                    boardCopy[word.position.x + i][word.position.y] = word.letters[i].toUpperCase();
+                    boardCopy[word.position.x + i][word.position.y] = word.letters[i].toUpperCase() as Letter;
                     multipliersCopy[word.position.x + i][word.position.y] = null;
                     if (stringToLetter(word.letters[i]) === '*') {
                         blankCopy.push(new Vec2(word.position.x + i, word.position.y));
                     }
                     break;
                 case Direction.VERTICAL:
-                    boardCopy[word.position.x][word.position.y + i] = word.letters[i].toUpperCase();
+                    boardCopy[word.position.x][word.position.y + i] = word.letters[i].toUpperCase() as Letter;
                     multipliersCopy[word.position.x][word.position.y + i] = null;
                     if (stringToLetter(word.letters[i]) === '*') {
                         blankCopy.push(new Vec2(word.position.x, word.position.y + i));
