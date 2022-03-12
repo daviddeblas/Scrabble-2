@@ -167,7 +167,7 @@ export class Room {
             if (room.game?.activePlayer === 1) {
                 let date = new Date();
                 const startDate = date.getTime();
-                setTimeout(() => {
+                const maxTimePlacement = setTimeout(() => {
                     room.commandService.onCommand(room.game as Game, room.sockets, 'passer', 1);
                 }, MAX_BOT_PLACEMENT_TIME);
                 const botCommand = room.botService.move(room.game as Game, diff);
@@ -175,6 +175,7 @@ export class Room {
                 const timeTaken = date.getTime() - startDate;
                 if (timeTaken > MAX_BOT_PLACEMENT_TIME) return;
                 setTimeout(() => {
+                    clearTimeout(maxTimePlacement);
                     room.commandService.onCommand(room.game as Game, room.sockets, botCommand, 1);
                 }, Math.max(MIN_BOT_PLACEMENT_TIME - timeTaken, 0));
             }
