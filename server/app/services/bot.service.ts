@@ -1,6 +1,6 @@
 import { Game } from '@app/classes/game/game';
 import { Letter, lettersToString } from 'common/classes/letter';
-import { BOT_NAMES, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOT_NAMES } from 'common/constants';
 import { Service } from 'typedi';
 
 export enum BotDifficulty {
@@ -14,12 +14,7 @@ export class BotService {
     readonly exchangeCommandName = 'échanger';
     readonly placeCommandName = 'placer';
 
-    // eslint-disable-next-line no-unused-vars
     move(game: Game, difficulty: BotDifficulty): string {
-        setTimeout(() => {
-            return this.passCommandName;
-        }, MAX_BOT_PLACEMENT_TIME);
-
         let decidedMove = this.passCommandName;
         if (difficulty === BotDifficulty.Easy) {
             decidedMove = this.easyBotMove(game);
