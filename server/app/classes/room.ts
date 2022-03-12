@@ -4,6 +4,7 @@ import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
@@ -163,8 +164,16 @@ export class Room {
 
     private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => void {
         return () => {
-            if (room.game?.activePlayer === 1)
-                room.commandService.onCommand(room.game as Game, room.sockets, room.botService.move(room.game as Game, diff), 1);
+            if (room.game?.activePlayer === 1) {
+                let date = new Date();
+                const startDate = date.getTime();
+                const botCommand = room.botService.move(room.game as Game, diff);
+                date = new Date();
+                const timeTaken = date.getTime() - startDate;
+                setTimeout(() => {
+                    room.commandService.onCommand(room.game as Game, room.sockets, botCommand, 1);
+                }, Math.max(MIN_BOT_PLACEMENT_TIME - timeTaken, 0));
+            }
         };
     }
 
