@@ -24,14 +24,14 @@ export const forbiddenNameValidator = (name: string) => {
     styleUrls: ['./game-join-page.component.scss'],
 })
 export class GameJoinPageComponent implements OnDestroy {
-    @ViewChild(MatStepper) stepper: MatStepper;
+    @ViewChild(MatStepper) private stepper: MatStepper;
 
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
 
     formGroup: FormGroup;
     selectedRoom: RoomInfo | undefined;
-    isFormDisabled: boolean = false;
+    isFormDisabled: boolean;
 
     roomList$: Observable<RoomInfo[]>;
     pendingRoom$: Observable<RoomInfo | undefined>;
@@ -45,6 +45,7 @@ export class GameJoinPageComponent implements OnDestroy {
     ) {
         this.store.dispatch(resetAllState());
         this.formGroup = formBuilder.group({ name: new FormControl({ value: '', disabled: this.isFormDisabled }) });
+        this.isFormDisabled = false;
 
         this.roomList$ = roomStore.select('room', 'roomList');
         this.pendingRoom$ = roomStore.select('room', 'pendingRoom');

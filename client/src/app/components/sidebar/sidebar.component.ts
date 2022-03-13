@@ -1,14 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
+import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
+import { Vec2 } from 'common/classes/vec2';
 import { Observable } from 'rxjs';
 
 const INTERVAL_MILLISECONDS = 1000;
 const SECONDS_IN_MINUTE = 60;
-const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-sidebar',
@@ -18,18 +20,30 @@ const DEFAULT_TIMER = 60;
 export class SidebarComponent implements OnInit, OnDestroy {
     players$: Observable<Players>;
     gameStatus$: Observable<GameStatus>;
+    modifiedCells$: Observable<Vec2[]>;
     activePlayer: string;
 
-    countdown: number = 0;
+    countdown: number;
     interval: ReturnType<typeof setInterval>;
 
-    constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
+    constructor(private store: Store<{ players: Players; gameStatus: GameStatus; board: BoardState }>, private keyManager: KeyManagerService) {
         this.players$ = store.select('players');
         this.gameStatus$ = store.select('gameStatus');
         this.gameStatus$.subscribe((state) => {
-            if (state) this.activePlayer = state.activePlayer;
-            this.countdown = DEFAULT_TIMER;
+            if (state) {
+                this.activePlayer = state.activePlayer;
+                this.countdown = state.timer;
+            }
         });
+        this.modifiedCells$ = store.select('board', 'selection', 'modifiedCells');
+        this.countdown = 0;
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    storeTimerUnLoad($event: Event): void {
+        $event.preventDefault();
+        const date = new Date();
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: this.countdown, date: date.getTime() }));
     }
 
     ngOnInit(): void {
@@ -46,6 +60,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     zoomOut(): void {
         this.store.dispatch(zoomOut());
+    }
+
+    placeWord(): void {
+        this.keyManager.onEnter();
     }
 
     isActivePlayer(player: Player | undefined): boolean {

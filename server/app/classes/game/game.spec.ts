@@ -53,7 +53,8 @@ describe('game', () => {
 
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
+        const wordMultiplier = 2;
+        const expectedPoints = game.board['scorePositions'](positionsOfPlacement) * wordMultiplier;
         expect(thisPlayerScore).to.eq(expectedPoints);
 
         // this is no longer this players turn
@@ -82,7 +83,8 @@ describe('game', () => {
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
         const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
-        expect(thisPlayerScore).to.eq(expectedPoints);
+        const wordMultiplier = 2;
+        expect(thisPlayerScore).to.eq(expectedPoints * wordMultiplier);
 
         // this is no longer this players turn
         expect(game.activePlayer).to.not.eq(activePlayer);
@@ -110,6 +112,7 @@ describe('game', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
         const multiplierBonusOnBoard = 1;
+        const wordMultiplier = 2;
 
         game.place(
             oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
@@ -120,7 +123,7 @@ describe('game', () => {
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(3 + i, 7));
         const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
-        expect(thisPlayerScore).to.eq(expectedPoints + BONUS_POINTS_FOR_FULL_EASEL + multiplierBonusOnBoard);
+        expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
     });
 
     // eslint-disable-next-line max-len
@@ -142,8 +145,8 @@ describe('game', () => {
         const othersEasel = game.players[game.activePlayer].easel;
         const pointsArrayOfOtherEasel = othersEasel.map((l) => game.board.pointsPerLetter.get(l) as number);
         const bonusPointsFromOthersEasel = pointsArrayOfOtherEasel.reduce((sum, p) => sum + p);
-
-        const expectedPoints = normalScorePosition + bonusPointsFromOthersEasel;
+        const wordMultiplier = 2;
+        const expectedPoints = normalScorePosition * wordMultiplier + bonusPointsFromOthersEasel;
         expect(thisPlayerScore).to.eq(expectedPoints);
     });
 

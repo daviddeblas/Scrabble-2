@@ -1,5 +1,6 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { exchangeLettersSuccess, placeWordSuccess, switchLettersEasel } from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
 import { Letter } from 'common/classes/letter';
@@ -33,6 +34,7 @@ describe('[Players] Reducer', () => {
             winner: null,
             gameEnded: false,
             letterPotLength: 0,
+            timer: 0,
         };
 
         const boardState: BoardState = {
@@ -40,6 +42,7 @@ describe('[Players] Reducer', () => {
             multipliers: [],
             pointsPerLetter: new Map(),
             blanks: [],
+            selection: new BoardSelection(),
         };
 
         it('should return the loaded players', () => {
@@ -56,7 +59,7 @@ describe('[Players] Reducer', () => {
     });
 
     describe('[Players] Place Word Success', () => {
-        const word = new Word(['A', 'L', 'L', 'O'], new Vec2(0, 0), Direction.VERTICAL);
+        const word = new Word('allo', new Vec2(0, 0), Direction.VERTICAL);
 
         it('should remove used letters and add new letters to easel', () => {
             const initialPlayers: Players = createInitialPlayersState();
@@ -66,7 +69,7 @@ describe('[Players] Reducer', () => {
             const result = reducer(initialPlayers, action);
 
             const expectedResult = createInitialPlayersState();
-            expectedResult.player.removeLettersFromEasel(word.letters);
+            expectedResult.player.removeLettersFromEasel(['A', 'L', 'L', 'O']);
             expectedResult.player.addLettersToEasel(newLetters);
 
             expect(result).toEqual(expectedResult);
@@ -80,7 +83,7 @@ describe('[Players] Reducer', () => {
             const result = reducer(initialPlayers, action);
 
             const expectedResult = createInitialPlayersState();
-            expectedResult.player.removeLettersFromEasel(word.letters);
+            expectedResult.player.removeLettersFromEasel(['A', 'L', 'L', 'O']);
             expectedResult.player.score = newScore;
 
             expect(result).toEqual(expectedResult);

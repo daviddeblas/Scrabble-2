@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { syncBoardSuccess } from '@app/actions/board.actions';
 import { receivedMessage } from '@app/actions/chat.actions';
-import { exchangeLettersSuccess } from '@app/actions/player.actions';
+import { placeWordSuccess } from '@app/actions/player.actions';
+import { Direction, Word } from '@app/classes/word';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
-import { Letter, stringToLetters } from 'common/classes/letter';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from 'common/constants';
+import { Letter } from 'common/classes/letter';
+import { boardPositionToVec2 } from 'common/classes/vec2';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -27,27 +28,37 @@ export class PlayerService {
         if (this.lettersInEasel(letters)) {
             const commandLine = 'échanger ' + letters;
             this.socketService.send('command', commandLine);
-        }
+        } else
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
     }
 
     placeWord(position: string, letters: string): void {
         const command = 'placer';
         let lettersToPlace = '';
-        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], 10) - 1;
+        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE) - 1;
         let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-        if (!this.lettersInEasel(letters)) return;
+        if (!this.lettersInEasel(letters)) {
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
+            return;
+        }
         let letterPlaced = 0;
         if (letters.length > 1) {
             while (letterPlaced < letters.length) {
-                if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
-                    this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                if (column > BOARD_SIZE || line > BOARD_SIZE) {
+                    this.playerStore.dispatch(
+                        receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+                    );
                     return;
                 }
                 const letter = this.letterOnBoard(column, line);
                 if (letter) {
                     lettersToPlace += letter;
                 } else {
-                    lettersToPlace += letters[letterPlaced].toLowerCase();
+                    lettersToPlace += letters[letterPlaced];
                     letterPlaced++;
                 }
                 if (position.slice(POSITION_LAST_CHAR) === 'h') {
@@ -57,7 +68,7 @@ export class PlayerService {
                 }
             }
         } else {
-            lettersToPlace = letters.toLowerCase();
+            lettersToPlace = letters;
         }
         let boardPosition: string;
         let direction: string;
@@ -69,33 +80,16 @@ export class PlayerService {
             direction = 'h';
         }
         if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
-            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - Mauvais placement', messageType: 'Error' }));
             return;
         }
-        this.setUpBoardWithWord(boardPosition, direction, lettersToPlace);
-        this.playerStore.dispatch(exchangeLettersSuccess({ oldLetters: stringToLetters(letters), newLetters: [] }));
+        const tempWordPlaced = new Word(
+            lettersToPlace,
+            boardPositionToVec2(boardPosition),
+            direction === 'h' ? Direction.HORIZONTAL : Direction.VERTICAL,
+        );
+        this.boardStore.dispatch(placeWordSuccess({ word: tempWordPlaced }));
         this.socketService.send('command', command + ' ' + position + ' ' + letters);
-    }
-
-    setUpBoardWithWord(position: string, direction: string, letters: string): void {
-        let board: (Letter | null)[][] = [];
-        this.boardStore.select('board').subscribe((us) => (board = us.board));
-        const word = stringToLetters(letters);
-        const column = parseInt(position.slice(1, position.length), 10) - 1;
-        const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-        const tempBoard = JSON.parse(JSON.stringify(board));
-        const directionValue = direction === 'h' ? column : line;
-        for (let i = directionValue; i < word.length + directionValue; ++i) {
-            switch (direction) {
-                case 'h':
-                    tempBoard[i][line] = word[i - directionValue];
-                    break;
-                case 'v':
-                    tempBoard[column][i] = word[i - directionValue];
-                    break;
-            }
-        }
-        this.boardStore.dispatch(syncBoardSuccess({ newBoard: tempBoard }));
     }
 
     lettersInEasel(letters: string): boolean {
@@ -105,18 +99,25 @@ export class PlayerService {
         for (const letter of letters) {
             let letterExist = false;
             for (const element of easelLetters) {
-                if (element.toString().toLowerCase() === letter || (element.toString() === '*' && letter === letter.toUpperCase())) {
+                const equalLetter = element.toString().toLowerCase() === letter;
+                const isBlankLetter = element.toString() === '*' && letter === letter.toUpperCase();
+                if (equalLetter || isBlankLetter) {
                     easelLetters.splice(easelLetters.indexOf(element), 1);
                     letterExist = true;
                     break;
                 }
             }
             if (!letterExist) {
-                this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
                 return false;
             }
         }
         return true;
+    }
+
+    getEasel(): Letter[] {
+        let playerEasel: Letter[] = [];
+        this.playerStore.select('players').subscribe((state) => (playerEasel = state.player.easel));
+        return playerEasel;
     }
 
     letterOnBoard(column: number, line: number): string | undefined {
@@ -126,7 +127,7 @@ export class PlayerService {
     }
 
     wordPlacementCorrect(position: string, direction: string, letters: string): boolean {
-        const column = parseInt(position.slice(1, position.length), 10) - 1;
+        const column = parseInt(position.slice(1, position.length), DECIMAL_BASE) - 1;
         const line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
         let isPlacable = false;
         let board: (Letter | null)[][] = [];
@@ -138,7 +139,7 @@ export class PlayerService {
                 isPlacable ||= this.checkNearSpaces(column, line + i, board);
             }
             const letterBoard = direction === 'h' ? board[column + i][line] : board[column][line + i];
-            if (letterBoard !== null) {
+            if (letterBoard !== null && letterBoard !== undefined) {
                 if (letterBoard.toString() !== letters[i].toUpperCase()) {
                     return false;
                 } else {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
@@ -6,6 +7,7 @@ import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
+import { SECONDS_IN_MINUTE } from 'common/constants';
 import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
@@ -34,7 +36,7 @@ describe('room', () => {
                     return socket;
                 },
             } as unknown as io.Socket;
-            gameOptions = new GameOptions('a', 'b');
+            gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
         });
 
         it('constructor should create a Room', () => {
@@ -100,7 +102,13 @@ describe('room', () => {
                     hostReceived = true;
                 },
             } as unknown as io.Socket;
-            room.game = { players: ['player1', 'player2'], bag: { letters: [] } } as unknown as Game;
+            room.game = {
+                players: ['player1', 'player2'],
+                bag: { letters: [] },
+                stopTimer: () => {
+                    return;
+                },
+            } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
             room.surrenderGame('player2');
@@ -140,17 +148,37 @@ describe('room', () => {
             expect(setupSocketStub.called).to.equal(true);
         });
 
-        it('actionAfterTimeout should call ', () => {
+        it('actionAfterTimeout should call processSkip and postCommand', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const commandServiceStub = {
                 processSkip: stub(),
                 postCommand: stub(),
             };
             room['commandService'] = commandServiceStub as unknown as CommandService;
-            room['game'] = { activePlayer: 0 } as unknown as Game;
+            room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
             room['actionAfterTimeout'](room)();
             expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
             expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
+        });
+
+        it('actionAfterTimeout should call end game if game is ended', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                needsToEnd: () => true,
+                skip: () => {
+                    return;
+                },
+            } as unknown as Game;
+            stub(room.commandService, 'processSkip').callsFake(() => {
+                return;
+            });
+            stub(room.commandService, 'postCommand').callsFake(() => {
+                return;
+            });
+            room.game = stubbedGame;
+            const endGame = stub(room.commandService, 'endGame');
+            room['actionAfterTimeout'](room)();
+            expect(endGame.calledOnce).to.equal(true);
         });
     });
 
@@ -185,7 +213,7 @@ describe('room', () => {
             let room: Room;
 
             beforeEach(() => {
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('a', 'b', 60);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -227,7 +255,7 @@ describe('room', () => {
             });
 
             it('client should receive message if host emits send message', (done) => {
-                const message = { username: 'Hostname', message: 'Host Message' };
+                const message = { username: 'Hostname', message: 'Host Message', messageType: '' };
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
                     hostSocket.emit('send message', message);
@@ -241,7 +269,7 @@ describe('room', () => {
             });
 
             it('host should receive message if client emits send message', (done) => {
-                const message = { username: 'ClientName', message: 'Client Message' };
+                const message = { username: 'ClientName', message: 'Client Message', messageType: '' };
                 hostSocket.on('player joining', () => {
                     hostSocket.emit('accept');
                     clientSocket.emit('send message', message);
@@ -277,7 +305,7 @@ describe('room', () => {
         describe('getGameInfo', () => {
             it('client should receive game info when requested', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -303,7 +331,7 @@ describe('room', () => {
 
         describe('Receiving', () => {
             it('quit should call quitRoomHost() when emitted', (done) => {
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         const room = new Room(socket, roomsManager, gameOptions);
@@ -320,7 +348,7 @@ describe('room', () => {
 
             it('accept should call inviteAccepted()', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -338,7 +366,7 @@ describe('room', () => {
 
             it('client quit should call quitRoomClient', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 roomsManager.removeRoom.callsFake(() => {
                     return;
                 });

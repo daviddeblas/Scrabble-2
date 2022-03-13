@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { restoreMessages } from '@app/actions/chat.actions';
+import { refreshTimer } from '@app/actions/game-status.actions';
+import { DEFAULT_TIMER } from '@app/components/multi-config-window/multi-config-window.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { BrowserManagerService } from './browser-manager.service';
@@ -9,6 +11,8 @@ describe('BrowserManagerService', () => {
     let service: BrowserManagerService;
     let socketService: SocketClientService;
     let store: MockStore;
+    const waitingTime = 250;
+
     beforeEach(async () => {
         socketService = new SocketClientService();
         await TestBed.configureTestingModule({
@@ -106,5 +110,38 @@ describe('BrowserManagerService', () => {
 
     it('readCookieSocket should return undefined if no cookie with the key socket exist', () => {
         expect(service.readCookieSocket).toEqual(undefined);
+    });
+
+    it('should should not dispatch refreshTimer if no currentTimer key exist in LocalStorage', (done) => {
+        localStorage.removeItem('currentTimer');
+        // eslint-disable-next-line dot-notation
+        const spy = spyOn(service['store'], 'dispatch');
+        const fakeSend = () => {
+            return ' ';
+        };
+        spyOnProperty(service, 'readCookieSocket', 'get').and.callFake(fakeSend);
+        service.onBrowserLoad();
+        setTimeout(() => {
+            expect(spy).not.toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER }));
+            localStorage.clear();
+            done();
+        }, waitingTime);
+    });
+
+    it('should dispatch refreshTimer if there is the currentTimer key in LocalStorage', (done) => {
+        const date = new Date();
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER, date: date.getTime() }));
+        // eslint-disable-next-line dot-notation
+        const spy = spyOn(service['store'], 'dispatch');
+        const fakeSend = () => {
+            return ' ';
+        };
+        spyOnProperty(service, 'readCookieSocket', 'get').and.callFake(fakeSend);
+        service.onBrowserLoad();
+        setTimeout(() => {
+            expect(spy).toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER }));
+            localStorage.clear();
+            done();
+        }, waitingTime);
     });
 });

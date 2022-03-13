@@ -5,7 +5,7 @@ import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -17,8 +17,8 @@ export class ChatService {
         private socketService: SocketClientService,
         private gameStore: Store<{ gameStatus: GameStatus }>,
     ) {}
-    broadcastMsg(username: string, message: string) {
-        this.socketService.send('send message', { username, message });
+    broadcastMsg(username: string, message: string, messageType: string = '') {
+        this.socketService.send('send message', { username, message, messageType });
     }
 
     acceptNewAction(): void {
@@ -53,10 +53,10 @@ export class ChatService {
         });
     }
 
-    messageWritten(username: string, message: string): void {
+    messageWritten(username: string, message: string, messageType = ''): void {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message, messageType: '' }));
-            this.broadcastMsg(username, message);
+            this.store.dispatch(receivedMessage({ username, message, messageType }));
+            this.broadcastMsg(username, message, messageType);
         } else {
             let activePlayer;
             let gameEnded;
@@ -78,7 +78,9 @@ export class ChatService {
                     if (this.validatePlaceCommand(command)) {
                         this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;
@@ -86,7 +88,9 @@ export class ChatService {
                     if (this.validateExchangeCommand(command)) {
                         this.store.dispatch(exchangeLetters({ letters: command[1] }));
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;
@@ -94,7 +98,9 @@ export class ChatService {
                     if (command.length === 1) {
                         this.handleSkipCommand(command);
                     } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        this.store.dispatch(
+                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+                        );
                         return;
                     }
                     break;
@@ -130,12 +136,12 @@ export class ChatService {
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
-        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
         if (command[1].slice(POSITION_LAST_CHAR) === 'h') {
-            commandIsCorrect &&= columnNumber + command[2].length <= BOARD_SIZE;
+            commandIsCorrect &&= columnNumber - 1 + command[2].length <= BOARD_SIZE;
         } else if (command[1].slice(POSITION_LAST_CHAR) === 'v') {
             commandIsCorrect &&= command[1][0].charCodeAt(0) - ASCII_ALPHABET_POSITION + command[2].length <= BOARD_SIZE;
         }
@@ -146,6 +152,6 @@ export class ChatService {
     }
 
     private validateExchangeCommand(command: string[]): boolean {
-        return /^[a-z]*$/.test(command[1]) && command.length === 2;
+        return /^[a-z/*]*$/.test(command[1]) && command.length === 2;
     }
 }

@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card id="chat-box">
     <mat-card-title>Boite de Clavardage</mat-card-title>
     <mat-card id="chat-list">
         <mat-list role="list">
@@ -10,11 +10,11 @@
                     <section *ngIf="line.messageType === 'Error'; else systemMessage" id="error-message">
                         <strong>{{ line.messageType }}</strong> : {{ line.message }}
                     </section>
-                    <ng-template #systemMessage>
-                        <section *ngIf="line.messageType === 'System'; else opponentMessage" id="system-message">
-                            {{ line.message }}
-                        </section>
-                    </ng-template>
+                </ng-template>
+                <ng-template #systemMessage>
+                    <section *ngIf="line.messageType === 'System'; else opponentMessage" id="system-message">
+                        {{ line.message }}
+                    </section>
                 </ng-template>
                 <ng-template #opponentMessage>
                     <mat-card id="opponent-message">
@@ -27,7 +27,7 @@
     <form class="chat-box-form" onsubmit="return false;">
         <mat-form-field id="chat-input" appearance="fill">
             <mat-label>Message</mat-label>
-            <input matInput #chatMessage maxlength="512" placeholder="Discuter!" autocomplete="off" />
+            <input matInput #chatMessage maxlength="512" placeholder="Discuter!" autocomplete="off" (blur)="chatBoxBlur()" />
             <mat-hint align="start"><strong>Parlez avec l'adversaire</strong> </mat-hint>
             <mat-hint align="end">{{ chatMessage.value.length }} / 512</mat-hint>
         </mat-form-field>

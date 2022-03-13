@@ -7,6 +7,7 @@ import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
+import { SECONDS_IN_MINUTE } from 'common/constants';
 import { Observable } from 'rxjs';
 
 export const MAX_TIME = 300;
@@ -60,5 +61,13 @@ export class MultiConfigWindowComponent implements OnInit {
     onSubmit(): void {
         const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
         this.store.dispatch(createRoom({ gameOptions }));
+    }
+
+    timerToString(): string {
+        if (this.timer === MIN_TIME) {
+            return `${Math.floor(this.timer / SECONDS_IN_MINUTE)}:${(this.timer % SECONDS_IN_MINUTE).toString().padStart(2, '0')} sec`;
+        } else {
+            return `${Math.floor(this.timer / SECONDS_IN_MINUTE)}:${(this.timer % SECONDS_IN_MINUTE).toString().padStart(2, '0')} min`;
+        }
     }
 }
