@@ -42,6 +42,10 @@ const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: 
     return true;
 };
 
+const switchOrientation = (oldOrientation: Orientation | null): Orientation => {
+    return oldOrientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+};
+
 export interface BoardState {
     board: (Letter | null)[][];
     pointsPerLetter: Map<Letter, number>;
@@ -108,19 +112,14 @@ export const reducer = createReducer(
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);
 
-        if (state.selection.cell?.x === pos.x && state.selection.cell?.y === pos.y) {
-            tempState.selection.orientation =
-                tempState.selection.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-            if (isCellAtBoardLimit(state.board, state.selection.cell, tempState.selection.orientation)) {
-                tempState.selection.orientation =
-                    tempState.selection.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-                if (isCellAtBoardLimit(state.board, state.selection.cell, tempState.selection.orientation)) tempState.selection.orientation = null;
-            }
+        let orientation: Orientation | null = switchOrientation(tempState.selection.orientation);
 
-            return tempState;
+        if (isCellAtBoardLimit(state.board, tempState.selection.cell, orientation)) {
+            orientation = switchOrientation(orientation);
+            if (isCellAtBoardLimit(state.board, tempState.selection.cell, orientation)) orientation = null;
         }
 
-        tempState.selection.orientation = Orientation.Horizontal;
+        tempState.selection.orientation = orientation;
         return tempState;
     }),
 
