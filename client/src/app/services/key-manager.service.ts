@@ -52,7 +52,7 @@ export class KeyManagerService {
                 (encodedLetters =
                     encodedLetters.slice(0, index) +
                     encodedLetters.charAt(index).toUpperCase() +
-                    encodedLetters.slice(index + 1, encodedLetters.length - 1)),
+                    encodedLetters.slice(index + 1, encodedLetters.length)),
         );
 
         this.store.dispatch(placeWord({ position: encodedPosition, letters: encodedLetters }));
