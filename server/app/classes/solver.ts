@@ -30,4 +30,37 @@ export class Solver {
 
         return segments;
     }
+
+    generateRegex(line: (Letter | null)[], segments: Segment[]): RegExp {
+        const easelText = this.easel.includes('*') ? 'a-z' : this.easel.join('');
+
+        const regexParts = [];
+
+        for (let i = 0; i < segments.length; i++) {
+            let regexPart = `(?:(?!${segments[i].value}$)`;
+            if (segments[i].start !== 0) {
+                const left = i === 0 ? segments[i].start : segments[i].start - segments[i - 1].end - 1;
+                regexPart += `([${easelText}]{0,${left}}|^)`;
+            } else {
+                regexPart += '()';
+            }
+
+            regexPart += segments[i].value;
+
+            for (let j = i; j < segments.length; j++) {
+                if (j + 1 < segments.length) {
+                    const spacing = segments[j + 1].start - segments[j].end;
+                    regexPart += `(?:[${easelText}]{${spacing - 1}}$|[${easelText}]{${spacing}}${segments[j + 1].value}|$)`;
+                } else if (segments[j].end < line.length) {
+                    const spacing = line.length - segments[j].end;
+                    regexPart += `(?:[${easelText}]{1,${spacing}}|$)`;
+                }
+            }
+
+            regexPart += ')';
+            regexParts.push(regexPart);
+        }
+
+        return new RegExp(`^(?:${regexParts.join('|')})$`, 'i');
+    }
 }
