@@ -3,6 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Direction, Word } from '@app/classes/word';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -37,7 +38,7 @@ describe('PlayerService', () => {
         board[14][14] = 'E';
 
         socketService = new SocketTestHelper();
-        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [] };
+        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [], selection: new BoardSelection() };
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
@@ -115,7 +116,7 @@ describe('PlayerService', () => {
         position = 'c3';
         service.placeWord(position, word);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - Mauvais placement', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -124,10 +125,13 @@ describe('PlayerService', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        position = 'o12h';
+        spyOn(service, 'letterOnBoard').and.callFake(() => {
+            return 'A';
+        });
+        position = 'o13h';
         service.placeWord(position, word);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -136,10 +140,10 @@ describe('PlayerService', () => {
         spyOn(service, 'lettersInEasel').and.callFake(() => {
             return true;
         });
-        position = 'l15v';
+        position = 'm15v';
         service.placeWord(position, word);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });

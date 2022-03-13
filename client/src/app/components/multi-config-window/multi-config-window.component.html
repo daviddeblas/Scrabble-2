@@ -13,7 +13,7 @@
                 <p class="text-container">Temps par tour</p>
                 <div id="timer2-container">
                     <button class="timer-button" type="button" (click)="decrementTime()">-</button>
-                    <div #time id="time">{{ timer }}</div>
+                    <div #time id="time">{{ timerToString() }}</div>
                     <button class="timer-button" type="button" (click)="incrementTime()">+</button>
                 </div>
             </div>
