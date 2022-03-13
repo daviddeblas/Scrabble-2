@@ -1,5 +1,7 @@
 import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { Dictionary } from './dictionary';
+import { PlacedLetter } from './placed-letter';
 
 interface Segment {
     value: string;
@@ -15,6 +17,12 @@ interface Word {
 interface Line {
     letters: (Letter | null)[];
     blanks: number[];
+}
+
+interface Solution {
+    letters: PlacedLetter[];
+    blanks: Vec2[];
+    direction: Vec2;
 }
 
 export class Solver {
