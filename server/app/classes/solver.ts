@@ -28,6 +28,19 @@ interface Solution {
 export class Solver {
     constructor(private dictionary: Dictionary, private board: (Letter | null)[][], private easel: Letter[]) {}
 
+    findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
+        if (line.every((letter) => letter === null)) return []; // toutes les lettres sont null
+
+        const segments = this.generateSegments(line);
+        const regex = this.generateRegex(line, segments);
+        const searchResults = this.dictionarySearch(regex, segments);
+        const placedWords = this.filterDuplicateLetters(line, searchResults);
+
+        const result: Solution[] = [];
+
+        return result;
+    }
+
     generateSegments(line: (Letter | null)[]): Segment[] {
         const segments: Segment[] = [];
 
