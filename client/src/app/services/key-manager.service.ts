@@ -26,6 +26,7 @@ export class KeyManagerService {
         let letters: Letter[] = [];
         this.store.select('board').subscribe((state) => {
             modifiedCells = state.selection.modifiedCells;
+            orientation = state.selection.orientation;
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
         });
         letters.forEach((l) => placedLetters.push(l));
