@@ -4,6 +4,8 @@ import { BOARD_SIZE } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { PlacedLetter } from './placed-letter';
 
+const HINT_COUNT = 3;
+
 interface Segment {
     value: string;
     start: number;
