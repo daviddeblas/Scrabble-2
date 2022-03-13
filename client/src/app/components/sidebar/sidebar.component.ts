@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
 import { GameStatus } from '@app/reducers/game-status.reducer';
@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 
 const INTERVAL_MILLISECONDS = 1000;
 const SECONDS_IN_MINUTE = 60;
-const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-sidebar',
@@ -27,10 +26,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.players$ = store.select('players');
         this.gameStatus$ = store.select('gameStatus');
         this.gameStatus$.subscribe((state) => {
-            if (state) this.activePlayer = state.activePlayer;
-            this.countdown = DEFAULT_TIMER;
+            if (state) {
+                this.activePlayer = state.activePlayer;
+                this.countdown = state.timer;
+            }
         });
         this.countdown = 0;
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    storeTimerUnLoad($event: Event): void {
+        $event.preventDefault();
+        const date = new Date();
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: this.countdown, date: date.getTime() }));
     }
 
     ngOnInit(): void {

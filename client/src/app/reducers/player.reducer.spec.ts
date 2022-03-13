@@ -33,6 +33,7 @@ describe('[Players] Reducer', () => {
             winner: null,
             gameEnded: false,
             letterPotLength: 0,
+            timer: 0,
         };
 
         const boardState: BoardState = {

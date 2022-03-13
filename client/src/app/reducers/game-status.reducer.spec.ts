@@ -10,6 +10,7 @@ describe('[Game Status] Game Status Received', () => {
         winner: null,
         gameEnded: false,
         letterPotLength: 0,
+        timer: 0,
     };
 
     const playersStub: Players = {
@@ -53,5 +54,12 @@ describe('[Game Status] Game Status Received', () => {
         const result = reducer(gameStatusStub, action);
 
         expect(result).toEqual(initialState);
+    });
+
+    it('should refresh the current timer', () => {
+        const action = gameStatusActions.refreshTimer({ timer: 0 });
+        const result = reducer(initialState, action);
+
+        expect(result).toEqual({ ...initialState, timer: 0 });
     });
 });
