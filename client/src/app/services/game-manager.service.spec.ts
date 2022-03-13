@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { endGame, gameStatusReceived } from '@app/actions/game-status.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -23,7 +24,7 @@ describe('GameManagerService', () => {
         letterPotLength: 10,
         timer: 0,
     };
-    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map(), blanks: [] };
+    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map(), blanks: [], selection: new BoardSelection() };
     const status = { status: gameStatus, players, board: boardState };
 
     let service: GameManagerService;

@@ -1,6 +1,7 @@
-import * as boardActions from '@app/actions/board.actions';
+import { syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { Direction, Word } from '@app/classes/word';
 import { Letter } from 'common/classes/letter';
@@ -15,7 +16,13 @@ const createInitialBoard = () => {
     return initialBoard;
 };
 
-const createInitialState = () => ({ board: createInitialBoard(), pointsPerLetter: new Map(), multipliers: createInitialBoard(), blanks: [] });
+const createInitialState = () => ({
+    board: createInitialBoard(),
+    pointsPerLetter: new Map(),
+    multipliers: createInitialBoard(),
+    blanks: [],
+    selection: new BoardSelection(),
+});
 
 describe('[Board] Reducer', () => {
     let boardStub: BoardState;
@@ -35,7 +42,7 @@ describe('[Board] Reducer', () => {
 
     describe('[Board] Sync Board', () => {
         it('should sync the state with the new board', () => {
-            const action = boardActions.syncBoardSuccess({ newBoard: boardStub.board });
+            const action = syncBoardSuccess({ newBoard: boardStub.board });
 
             stateStub.multipliers[0][0] = new Multiplier(multiplierValue);
             const result = reducer(stateStub, action);

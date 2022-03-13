@@ -27,7 +27,8 @@
             <button mat-mini-fab color="primary" (click)="zoomOut()">
                 <mat-icon aria-hidden="false" aria-label="Diminuer la taille des lettres">zoom_out</mat-icon>
             </button>
-        </div>
+        </div><button mat-raised-button class="placeWord" color="primary" (click)="placeWord()"
+            [disabled]="(modifiedCells$ | async)?.length === 0" aria-label="Placer le mot">Jouer</button>
     </div>
 
     <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.player)">
