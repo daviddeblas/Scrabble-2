@@ -19,7 +19,13 @@ describe('game', () => {
     };
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs.configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock);
+        game = new Game(
+            Container.get(GameConfigService).configs.configs[0],
+            ['player 1', 'player 2'],
+            gameOptions,
+            timerCallbackMock,
+            timerCallbackMock,
+        );
         activePlayer = game.activePlayer;
     });
 
