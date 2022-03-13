@@ -29,6 +29,18 @@ interface Solution {
 export class Solver {
     constructor(private dictionary: Dictionary, private board: (Letter | null)[][], private easel: Letter[]) {}
 
+    findAllSolutions(): Solution[] {
+        const solutions: Solution[] = [];
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            solutions.push(...this.findLineSolutions(this.board[i], i, new Vec2(0, 1)));
+        }
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            const line = this.board.reduce((r, v) => [...r, v[i]], []);
+            solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));
+        }
+        return solutions;
+    }
+
     findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
         if (line.every((letter) => letter === null)) return []; // toutes les lettres sont null
 
