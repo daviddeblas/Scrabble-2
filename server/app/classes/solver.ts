@@ -1,5 +1,5 @@
 import { Letter } from 'common/classes/letter';
-import { Vec2 } from 'common/classes/vec2';
+import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { PlacedLetter } from './placed-letter';
@@ -55,6 +55,21 @@ export class Solver {
         }
 
         const hints: string[] = [];
+
+        for (const solution of solutions) {
+            let pos = vec2ToBoardPosition(solution.letters[0].position.flip()); // le board est inversé??
+            pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
+
+            let lettersString = '';
+            for (const letter of solution.letters) {
+                if (solution.blanks.find((v) => v.equals(letter.position))) {
+                    lettersString += letter.letter.toUpperCase();
+                } else {
+                    lettersString += letter.letter.toLowerCase();
+                }
+            }
+            hints.push(`!placer ${pos} ${lettersString}`);
+        }
 
         return hints;
     }
