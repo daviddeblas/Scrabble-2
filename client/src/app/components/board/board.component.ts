@@ -24,10 +24,7 @@ export class BoardComponent {
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 
-    constructor(
-        store: Store<{ board: BoardState; localSettings: LocalSettings }>,
-        private keyManager: KeyManagerService /* private elementRef: ElementRef*/,
-    ) {
+    constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }>, private keyManager: KeyManagerService) {
         this.boardState$ = store.select('board');
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.multipliers$ = store.select('board', 'multipliers');

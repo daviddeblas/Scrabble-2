@@ -107,7 +107,7 @@ export const reducer = createReducer(
             selection: state.selection.copy(),
         };
 
-        // If letters has been placed
+        // Si des lettres ont déjà été placées
         if (tempState.selection.modifiedCells.length > 0) return tempState;
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);

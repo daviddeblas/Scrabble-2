@@ -26,7 +26,7 @@ export class CellEmptyComponent {
             board: BoardState;
             players: Players;
             gameStatus: GameStatus;
-        }> /* private elementRef: ElementRef*/,
+        }>,
     ) {
         this.selection$ = store.select('board', 'selection');
     }
