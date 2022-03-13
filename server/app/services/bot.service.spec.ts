@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { restore, stub } from 'sinon';
 import { BotDifficulty, BotService } from './bot.service';
 
-describe('Browser service tests', () => {
+describe('Bot service tests', () => {
     let service: BotService;
     const fakeGame = {
         players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
