@@ -7,6 +7,11 @@ interface Segment {
     end: number;
 }
 
+interface Word {
+    word: string;
+    index: number;
+}
+
 export class Solver {
     constructor(private dictionary: Dictionary, private board: (Letter | null)[][], private easel: Letter[]) {}
 
@@ -62,5 +67,18 @@ export class Solver {
         }
 
         return new RegExp(`^(?:${regexParts.join('|')})$`, 'i');
+    }
+
+    dictionarySearch(regex: RegExp, segments: Segment[]): Word[] {
+        const matches: Word[] = [];
+        this.dictionary.words.forEach((w) => {
+            const match = regex.exec(w);
+            if (match) {
+                let i = 0;
+                while (match[i + 1] === undefined) i++;
+                matches.push({ word: w, index: segments[i].start - match[i + 1].length });
+            }
+        });
+        return matches;
     }
 }
