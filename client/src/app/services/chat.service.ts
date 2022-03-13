@@ -64,50 +64,72 @@ export class ChatService {
                 this.store.dispatch(receivedMessage({ username: '', message: 'La partie est finie', messageType: 'Error' }));
                 return;
             }
+            const command = message.split(' ');
+            if (this.handleNonTurnSpecificCommands(command)) return;
+
             if (username !== activePlayer) {
                 this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
                 return;
             }
-            const command = message.split(' ');
-            switch (command[0]) {
-                case '!placer':
-                    if (this.validatePlaceCommand(command)) {
-                        this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
-                    } else {
-                        this.store.dispatch(
-                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
-                        );
-                        return;
-                    }
-                    break;
-                case '!échanger':
-                    if (this.validateExchangeCommand(command)) {
-                        this.store.dispatch(exchangeLetters({ letters: command[1] }));
-                    } else {
-                        this.store.dispatch(
-                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
-                        );
-                        return;
-                    }
-                    break;
-                case '!passer':
-                    if (command.length === 1) {
-                        this.handleSkipCommand(command);
-                    } else {
-                        this.store.dispatch(
-                            receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
-                        );
-                        return;
-                    }
-                    break;
-                default:
-                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
-                    return;
-            }
+            this.handleTurnSpecificCommands(command);
         }
     }
 
-    handleSkipCommand(command: string[]): void {
+    handleNonTurnSpecificCommands(command: string[]): boolean {
+        switch (command[0]) {
+            case '!réserve':
+                if (command.length === 1) {
+                    this.handleSimpleCommand(command);
+                    return true;
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande réserve mal formée', messageType: 'Error' }),
+                    );
+                }
+                break;
+        }
+        return false;
+    }
+
+    handleTurnSpecificCommands(command: string[]) {
+        switch (command[0]) {
+            case '!placer':
+                if (this.validatePlaceCommand(command)) {
+                    this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+                    );
+                    return;
+                }
+                break;
+            case '!échanger':
+                if (this.validateExchangeCommand(command)) {
+                    this.store.dispatch(exchangeLetters({ letters: command[1] }));
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+                    );
+                    return;
+                }
+                break;
+            case '!passer':
+                if (command.length === 1) {
+                    this.handleSimpleCommand(command);
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+                    );
+                    return;
+                }
+                break;
+            default:
+                this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
+                return;
+        }
+    }
+
+    handleSimpleCommand(command: string[]): void {
         const commandLine = command[0].slice(1, command[0].length);
         this.socketService.send('command', commandLine);
     }
