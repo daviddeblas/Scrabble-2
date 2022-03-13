@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { CellEmptyComponent } from './cell-empty.component';
 
 describe('CellEmptyComponent', () => {
@@ -8,6 +9,7 @@ describe('CellEmptyComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [CellEmptyComponent],
+            providers: [provideMockStore()],
         }).compileComponents();
     });
 

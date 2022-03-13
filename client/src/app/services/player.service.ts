@@ -139,7 +139,7 @@ export class PlayerService {
                 isPlacable ||= this.checkNearSpaces(column, line + i, board);
             }
             const letterBoard = direction === 'h' ? board[column + i][line] : board[column][line + i];
-            if (letterBoard !== null) {
+            if (letterBoard !== null && letterBoard !== undefined) {
                 if (letterBoard.toString() !== letters[i].toUpperCase()) {
                     return false;
                 } else {
