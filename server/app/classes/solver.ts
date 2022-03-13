@@ -41,6 +41,24 @@ export class Solver {
         return solutions;
     }
 
+    getHints(): string[] {
+        const allSolutions: Solution[] = this.findAllSolutions(); // TODO ne pas chercher tout le board
+        if (allSolutions.length < 1) return [];
+        let solutions: Solution[] = [];
+        if (allSolutions.length > 3) {
+            for (let i = 0; i < HINT_COUNT; i++) {
+                Math.floor(((Math.random() + i) * solutions.length) / HINT_COUNT);
+                solutions.push(allSolutions[i]);
+            }
+        } else {
+            solutions = allSolutions;
+        }
+
+        const hints: string[] = [];
+
+        return hints;
+    }
+
     findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
         if (line.every((letter) => letter === null)) return []; // toutes les lettres sont null
 
