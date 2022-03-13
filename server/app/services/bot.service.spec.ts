@@ -3,6 +3,7 @@
 /* eslint-disable dot-notation */
 import { Game } from '@app/classes/game/game';
 import { expect } from 'chai';
+import { BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
 import { BotDifficulty, BotService } from './bot.service';
 
@@ -31,6 +32,11 @@ describe('Bot service tests', () => {
         expect(service.move(fakeGame, BotDifficulty.Hard)).to.equal('passer');
     });
 
+    it('getName should return one of the bot names', () => {
+        const nameChosen = service.getName();
+        expect(BOT_NAMES.includes(nameChosen)).to.equal(true);
+    });
+
     it('easyBotMove should return pass command if the random generated number is between 0 and 0.1', () => {
         const expectedNumber = 0.05;
         stub(Math, 'random').callsFake(() => expectedNumber);
@@ -46,15 +52,14 @@ describe('Bot service tests', () => {
         expect(exchangeCommandStub.called).to.equal(true);
     });
 
-    // Test for place when it will be possible
-    /* it('easyBotMove should call placeCommand if the random generated number is between 0.2 and 1', () => {
+    it('easyBotMove should call placeCommand if the random generated number is between 0.2 and 1', () => {
         const expectedNumber = 0.482;
         const expectedResult = 'placer h7h place';
         stub(Math, 'random').callsFake(() => expectedNumber);
         const placeCommandStub = stub(service as any, 'placeCommand').callsFake(() => expectedResult);
         expect(service['easyBotMove'](fakeGame)).to.equal(expectedResult);
         expect(placeCommandStub.called).to.equal(true);
-    });*/
+    });
 
     it('exchangeCommand should retrieve a random number of letters to exchange', () => {
         const minExchangeCommandLength = 9;

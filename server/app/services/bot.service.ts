@@ -43,7 +43,6 @@ export class BotService {
         } else if (percentChance < randomMoveChance && randomMoveChance < percentChance * 2) {
             return this.exchangeCommand(game);
         } else {
-            // return this.exchangeCommand(game);
             return this.placeCommand(game, BotDifficulty.Easy);
         }
     }

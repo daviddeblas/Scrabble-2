@@ -246,6 +246,24 @@ describe('Rooms Manager Service', () => {
             clientSocket.emit('create room');
         });
 
+        it('emitting create solo room should call the createRoom function and initSoloGame with the room given', (done) => {
+            stub(roomsManager, 'createRoom').callsFake(() => {
+                return {
+                    getRoomInfo: () => {
+                        return;
+                    },
+                    initSoloGame: () => {
+                        done();
+                        return;
+                    },
+                } as unknown as Room;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            clientSocket.emit('create solo room', {});
+        });
+
         it('emitting request list should call the getRooms function', (done) => {
             const rooms: RoomInfo[] = [new RoomInfo('RoomID', {} as GameOptions)];
             const getRoomsStub = stub(roomsManager, 'sendAvailableRooms').callsFake(() => {
