@@ -40,7 +40,7 @@ describe('game', () => {
         expect(game.turnsSkipped).to.eq(0);
     });
 
-    it('place should score according to scorePositions on correct placement', () => {
+    it('place should score according to scorePosition on correct placement', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
         // put letters in player easel so placement is possible
@@ -58,16 +58,16 @@ describe('game', () => {
         }).to.not.throw();
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
+        const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
         const wordMultiplier = 2;
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement) * wordMultiplier;
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement) * wordMultiplier;
         expect(thisPlayerScore).to.eq(expectedPoints);
 
         // this is no longer this players turn
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
-    it('place should score according to scorePositions on correct placement with a blank letter', () => {
+    it('place should score according to scorePosition on correct placement with a blank letter', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
         // put letters in player easel so placement is possible
@@ -87,8 +87,8 @@ describe('game', () => {
         }).to.not.throw();
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
+        const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
         const wordMultiplier = 2;
         expect(thisPlayerScore).to.eq(expectedPoints * wordMultiplier);
 
@@ -114,26 +114,21 @@ describe('game', () => {
         }).to.throw();
     });
     // eslint-disable-next-line max-len
-    it('place should score according to scorePositions added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
+    it('place should score according to scorePosition added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
         const multiplierBonusOnBoard = 1;
         const wordMultiplier = 2;
-
-        game.place(
-            oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
-            [],
-            game.activePlayer,
-        );
+        const positionsOfPlacement = oldEasel.map((l, i) => new PlacedLetter(l, new Vec2(3 + i, 7)));
+        game.place(positionsOfPlacement, [], game.activePlayer);
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(3 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
         expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
     });
 
     // eslint-disable-next-line max-len
-    it('place should score according to scorePositions added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
+    it('place should score according to scorePosition added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
         game.players[activePlayer].easel = stringToLetters('aa');
         const oldEasel = [...game.players[activePlayer].easel];
         game.bag.letters = [];
@@ -145,8 +140,8 @@ describe('game', () => {
 
         const thisPlayerScore = game.players[activePlayer].score;
 
-        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(6 + i, 7));
-        const normalScorePosition = game.board['scorePositions'](positionsOfPlacement);
+        const positionsOfPlacement = oldEasel.map((_l, i) => new PlacedLetter(oldEasel[i], new Vec2(6 + i, 7)));
+        const normalScorePosition = game.board['scorePosition'](positionsOfPlacement);
 
         const othersEasel = game.players[game.activePlayer].easel;
         const pointsArrayOfOtherEasel = othersEasel.map((l) => game.board.pointsPerLetter.get(l) as number);
