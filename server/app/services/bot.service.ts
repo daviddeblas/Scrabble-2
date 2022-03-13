@@ -2,7 +2,7 @@ import { Game } from '@app/classes/game/game';
 import { Solver } from '@app/classes/solver';
 import { Letter, lettersToString } from 'common/classes/letter';
 import { BOT_NAMES } from 'common/constants';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
 import { DictionaryService } from './dictionary.service';
 
 export enum BotDifficulty {
@@ -16,7 +16,7 @@ export enum CategoryOfPoints {
     MinMidCategory = 7,
     MaxMidCategory = 12,
     MinHighCategory = 13,
-    MaxHighCategory = Infinity,
+    MaxHighCategory = 18,
 }
 
 @Service()

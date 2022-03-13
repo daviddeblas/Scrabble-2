@@ -94,7 +94,7 @@ export class Solver {
                     stringSolution += letter.letter.toLowerCase();
                 }
             }
-            const score = board.scoreWordPosition(solution.letters);
+            const score = board.scorePosition(solution.letters);
             let pos = vec2ToBoardPosition(solution.letters[0].position.flip()); // le board est inversé??
             pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
             result.set([pos, stringSolution], score);
@@ -254,6 +254,6 @@ export class Solver {
     private isTimeTooLong(startTime: number): boolean {
         const date = new Date();
         const now = date.getTime();
-        return now - startTime < MAX_BOT_PLACEMENT_TIME;
+        return now - startTime > MAX_BOT_PLACEMENT_TIME;
     }
 }
