@@ -1,5 +1,6 @@
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { BOARD_SIZE } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { PlacedLetter } from './placed-letter';
 
@@ -37,7 +38,48 @@ export class Solver {
         const placedWords = this.filterDuplicateLetters(line, searchResults);
 
         const result: Solution[] = [];
+        const lineStart = direction.flip().mul(index);
 
+        for (const word of placedWords) {
+            const solution: Solution = { letters: [], blanks: [], direction };
+            let valid = true;
+            for (let i = 0; i < word.letters.length; i++) {
+                if (word.letters[i] === null) continue;
+                const letterPos = lineStart.add(direction.mul(i));
+
+                let perpendicularWord: string = word.letters[i] as Letter;
+
+                let k = letterPos.sub(direction.flip());
+                while (k.x >= 0 && k.y >= 0 && this.board[k.x][k.y] !== null) {
+                    perpendicularWord = this.board[k.x][k.y] + perpendicularWord;
+                    k = k.sub(direction.flip());
+                }
+
+                k = letterPos.add(direction.flip());
+                while (k.x < BOARD_SIZE && k.y < BOARD_SIZE && this.board[k.x][k.y] !== null) {
+                    perpendicularWord = perpendicularWord + this.board[k.x][k.y];
+                    k = k.add(direction.flip());
+                }
+
+                if (perpendicularWord.length > 1) {
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    if (this.dictionary.words.indexOf(perpendicularWord.toLowerCase()) === -1) {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                const placedLetter = new PlacedLetter(word.letters[i] as Letter, letterPos);
+                solution.letters.push(placedLetter);
+            }
+            if (!valid) continue;
+
+            for (const blank of word.blanks) {
+                solution.blanks.push(lineStart.add(direction.mul(blank)));
+            }
+
+            result.push(solution);
+        }
         return result;
     }
 
