@@ -12,6 +12,11 @@ interface Word {
     index: number;
 }
 
+interface Line {
+    letters: (Letter | null)[];
+    blanks: number[];
+}
+
 export class Solver {
     constructor(private dictionary: Dictionary, private board: (Letter | null)[][], private easel: Letter[]) {}
 
@@ -78,6 +83,34 @@ export class Solver {
                 while (match[i + 1] === undefined) i++;
                 matches.push({ word: w, index: segments[i].start - match[i + 1].length });
             }
+        });
+        return matches;
+    }
+
+    filterDuplicateLetters(line: (Letter | null)[], words: Word[]): Line[] {
+        const matches: Line[] = [];
+        words.forEach((w) => {
+            const insertedLine: Line = { letters: new Array(line.length).fill(null), blanks: [] };
+            insertedLine.letters.splice(w.index, w.word.length, ...(Array.from(w.word.toUpperCase()) as Letter[]));
+            const easelTmp = [...this.easel];
+
+            for (let i = w.index; i < w.index + w.word.length; i++) {
+                if (line[i] === null) {
+                    let index = easelTmp.indexOf(insertedLine.letters[i] as Letter);
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    if (index === -1) {
+                        index = easelTmp.indexOf('*');
+                        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                        if (index === -1) return;
+                        insertedLine.blanks.push(i);
+                    }
+
+                    easelTmp.splice(index, 1);
+                } else {
+                    insertedLine.letters[i] = null;
+                }
+            }
+            matches.push(insertedLine);
         });
         return matches;
     }
