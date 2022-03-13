@@ -37,6 +37,10 @@ export class ChatService {
             const chatMessage = { username, message: '!passer', messageType: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
+        this.socketService.on('hint success', (data: { hints: string[] }) => {
+            const chatMessage = { username: 'Server', message: data.hints.join('\n'), messageType: '' };
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
         this.socketService.on('turn ended', () => {
             this.store.dispatch(getGameStatus());
         });
@@ -94,6 +98,14 @@ export class ChatService {
                         return;
                     }
                     break;
+                case '!indice':
+                    if (command.length === 1) {
+                        this.handleHintCommand(command);
+                    } else {
+                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
+                        return;
+                    }
+                    break;
                 default:
                     this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
                     return;
@@ -102,6 +114,11 @@ export class ChatService {
     }
 
     handleSkipCommand(command: string[]): void {
+        const commandLine = command[0].slice(1, command[0].length);
+        this.socketService.send('command', commandLine);
+    }
+
+    handleHintCommand(command: string[]): void {
         const commandLine = command[0].slice(1, command[0].length);
         this.socketService.send('command', commandLine);
     }
