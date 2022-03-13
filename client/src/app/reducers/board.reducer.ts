@@ -30,7 +30,7 @@ const cloneBoard = (board: (Letter | null)[][]): (Letter | null)[][] => {
     return newBoard;
 };
 
-const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Orientation): boolean => {
+export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Orientation): boolean => {
     switch (orientation) {
         case Orientation.Horizontal:
             for (let i = pos.x + 1; i < BOARD_SIZE; ++i) if (board[i][pos.y] === null) return false;
@@ -181,9 +181,7 @@ export const reducer = createReducer(
         const lastCell = selection.modifiedCells.pop() as Vec2;
 
         selection.orientation = selection.cell.x === lastCell.x ? Orientation.Vertical : Orientation.Horizontal;
-        if (selection.cell.equals(lastCell) && selection.modifiedCells.length > 0)
-            selection.orientation =
-                selection.modifiedCells[selection.modifiedCells.length - 1].x === lastCell.x ? Orientation.Vertical : Orientation.Horizontal;
+        if (selection.cell.equals(lastCell)) selection.orientation = null;
 
         selection.cell = lastCell;
 

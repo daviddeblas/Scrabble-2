@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { backspaceSelection, clearSelection, placeLetter, removeLetters } from '@app/actions/board.actions';
 import { addLettersToEasel, placeWord, removeLetterFromEasel } from '@app/actions/player.actions';
 import { Orientation } from '@app/classes/board-selection';
-import { BoardState } from '@app/reducers/board.reducer';
+import { BoardState, isCellAtBoardLimit } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
@@ -110,6 +110,16 @@ export class KeyManagerService {
         }
 
         if (key.length !== 1) return;
+
+        // Verifie s'il possible de placer d'autre lettre sur le plateau
+        let board: (Letter | null)[][] = [];
+        let orientation: Orientation | null = null;
+        selectedCell = selectedCell as Vec2;
+        this.store.select('board').subscribe((state) => {
+            board = state.board;
+            orientation = state.selection.orientation;
+        });
+        if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Orientation) && board[selectedCell.x][selectedCell.y] !== null) return;
 
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const letter = stringToLetter(key);
