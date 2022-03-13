@@ -8,6 +8,15 @@ export enum BotDifficulty {
     Hard = 'Expert',
 }
 
+export enum CategoryOfPoints {
+    MinLowCategory = 0,
+    MaxLowCategory = 6,
+    MinMidCategory = 7,
+    MaxMidCategory = 12,
+    MinHighCategory = 13,
+    MaxHighCategory = Infinity,
+}
+
 @Service()
 export class BotService {
     readonly passCommandName = 'passer';
@@ -34,8 +43,8 @@ export class BotService {
         } else if (percentChance < randomMoveChance && randomMoveChance < percentChance * 2) {
             return this.exchangeCommand(game);
         } else {
-            return this.exchangeCommand(game);
-            // return this.placeCommand(game, BotDifficulty.Easy);
+            // return this.exchangeCommand(game);
+            return this.placeCommand(game, BotDifficulty.Easy);
         }
     }
 
@@ -52,5 +61,44 @@ export class BotService {
         }
         const exchangeCommandLetters = lettersToString(lettersToExchange).toLowerCase();
         return this.exchangeCommandName + ' ' + exchangeCommandLetters;
+    }
+
+    private placeCommand(game: Game, difficulty: BotDifficulty): string {
+        const foundPlacements = new Map<string[], number>();
+        if (foundPlacements.size === 0) return 'passer';
+        return this.placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
+    }
+
+    private determineWord(placements: Map<string[], number>, difficulty: BotDifficulty): string {
+        if (difficulty === BotDifficulty.Hard) return 'passer';
+        const fortyPercent = 0.4;
+        const thirtyPercent = 0.3;
+        let lowestPoints: number;
+        let maxPoints: number;
+        const wordPossibilities: string[][] = [];
+        let chooseRandomPoints: number;
+        let indexChosen: number;
+        while (wordPossibilities.length === 0) {
+            chooseRandomPoints = Math.random();
+            indexChosen = chooseRandomPoints < fortyPercent ? 0 : chooseRandomPoints < fortyPercent + thirtyPercent ? 1 : 2;
+            switch (indexChosen) {
+                case 0:
+                    lowestPoints = CategoryOfPoints.MinLowCategory;
+                    maxPoints = CategoryOfPoints.MaxLowCategory;
+                    break;
+                case 1:
+                    lowestPoints = CategoryOfPoints.MinMidCategory;
+                    maxPoints = CategoryOfPoints.MaxMidCategory;
+                    break;
+                case 2:
+                    lowestPoints = CategoryOfPoints.MinHighCategory;
+                    maxPoints = CategoryOfPoints.MaxHighCategory;
+                    break;
+            }
+            placements.forEach((value, key) => {
+                if (lowestPoints < value && value < maxPoints) wordPossibilities.push(key);
+            });
+        }
+        return wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)].join(' ');
     }
 }
