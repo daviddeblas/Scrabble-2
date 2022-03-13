@@ -17,6 +17,7 @@ export enum GameErrorType {
     WrongPlaceArgument = 'Les arguments pour la commande placer sont mal formés',
     WrongDrawArgument = 'Les arguments pour la commande échanger sont mal formés',
     WrongSkipArgument = 'Les arguments pour la commande passer sont mal formés',
+    WrongHintArgument = 'Les arguments pour la commande indice sont mal formés',
     GameIsFinished = 'La partie est finie',
     GameNotExists = "La partie n'existe pas",
     WordNotConnected = 'Le placement de mot ne connecte a aucun autre mot',
