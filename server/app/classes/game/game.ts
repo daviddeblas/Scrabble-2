@@ -101,7 +101,11 @@ export class Game {
         const opponent = { ...this.players[(playerNumber + 1) % 2] };
         opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
-            status: { activePlayer: this.players[this.activePlayer].name, letterPotLength: this.bag.letters.length },
+            status: {
+                activePlayer: this.players[this.activePlayer].name,
+                letterPotLength: this.bag.letters.length,
+                timer: this.gameOptions.timePerRound,
+            },
             players: { player: this.players[playerNumber], opponent },
             board: {
                 board: this.board.board,

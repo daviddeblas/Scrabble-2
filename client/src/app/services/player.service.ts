@@ -25,9 +25,13 @@ export class PlayerService {
     }
 
     exchangeLetters(letters: string): void {
-        if (!this.lettersInEasel(letters)) return;
-        const commandLine = 'échanger ' + letters;
-        this.socketService.send('command', commandLine);
+        if (this.lettersInEasel(letters)) {
+            const commandLine = 'échanger ' + letters;
+            this.socketService.send('command', commandLine);
+        } else
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
     }
 
     placeWord(position: string, letters: string): void {
@@ -35,13 +39,18 @@ export class PlayerService {
         let lettersToPlace = '';
         let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE) - 1;
         let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
-        if (!this.lettersInEasel(letters)) return;
+        if (!this.lettersInEasel(letters)) {
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
+            );
+            return;
+        }
         let letterPlaced = 0;
         if (letters.length > 1) {
             while (letterPlaced < letters.length) {
-                if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
+                if (column > BOARD_SIZE || line > BOARD_SIZE) {
                     this.playerStore.dispatch(
-                        receivedMessage({ username: '', message: 'Erreur de syntaxe: le mot ne rentre pas dans plateau', messageType: 'Error' }),
+                        receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
                     );
                     return;
                 }
@@ -71,9 +80,7 @@ export class PlayerService {
             direction = 'h';
         }
         if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
-            this.playerStore.dispatch(
-                receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
-            );
+            this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - Mauvais placement', messageType: 'Error' }));
             return;
         }
         const tempWordPlaced = new Word(
@@ -101,13 +108,16 @@ export class PlayerService {
                 }
             }
             if (!letterExist) {
-                this.playerStore.dispatch(
-                    receivedMessage({ username: '', message: 'Erreur de syntaxe: le chevalet ne contient pas ces lettres', messageType: 'Error' }),
-                );
                 return false;
             }
         }
         return true;
+    }
+
+    getEasel(): Letter[] {
+        let playerEasel: Letter[] = [];
+        this.playerStore.select('players').subscribe((state) => (playerEasel = state.player.easel));
+        return playerEasel;
     }
 
     letterOnBoard(column: number, line: number): string | undefined {
@@ -129,12 +139,12 @@ export class PlayerService {
                 isPlacable ||= this.checkNearSpaces(column, line + i, board);
             }
             const letterBoard = direction === 'h' ? board[column + i][line] : board[column][line + i];
-            if (letterBoard === null) continue;
-
-            if (letterBoard.toString() !== letters[i].toUpperCase()) {
-                return false;
-            } else {
-                isPlacable = true;
+            if (letterBoard !== null && letterBoard !== undefined) {
+                if (letterBoard.toString() !== letters[i].toUpperCase()) {
+                    return false;
+                } else {
+                    isPlacable = true;
+                }
             }
         }
         return isPlacable;

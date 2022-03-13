@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
@@ -6,6 +7,7 @@ import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
+import { SECONDS_IN_MINUTE } from 'common/constants';
 import { createServer, Server } from 'http';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import io from 'socket.io';
@@ -34,7 +36,7 @@ describe('room', () => {
                     return socket;
                 },
             } as unknown as io.Socket;
-            gameOptions = new GameOptions('a', 'b');
+            gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
         });
 
         it('constructor should create a Room', () => {
@@ -232,7 +234,7 @@ describe('room', () => {
             let room: Room;
 
             beforeEach(() => {
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('a', 'b', 60);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -352,7 +354,7 @@ describe('room', () => {
         describe('getGameInfo', () => {
             it('client should receive game info when requested', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('a', 'b');
+                const gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -378,7 +380,7 @@ describe('room', () => {
 
         describe('Receiving', () => {
             it('quit should call quitRoomHost() when emitted', (done) => {
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         const room = new Room(socket, roomsManager, gameOptions);
@@ -395,7 +397,7 @@ describe('room', () => {
 
             it('accept should call inviteAccepted()', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -413,7 +415,7 @@ describe('room', () => {
 
             it('client quit should call quitRoomClient', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b');
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
                 roomsManager.removeRoom.callsFake(() => {
                     return;
                 });

@@ -1,3 +1,4 @@
+import { BoardSelection } from '@app/classes/board-selection';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Vec2 } from 'common/classes/vec2';
@@ -21,7 +22,8 @@ describe('BoardToListPipe', () => {
             ],
             pointsPerLetter: new Map(),
             multipliers: [],
-            blanks: [new Vec2(1, 1)],
+            blanks: [{ x: 1, y: 1 }],
+            selection: new BoardSelection(),
         };
 
         const expected: PlacedLetter[] = [
