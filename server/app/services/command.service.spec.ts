@@ -17,6 +17,7 @@ import { stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import Container from 'typedi';
 import { CommandService } from './command.service';
+import { DictionaryService } from './dictionary.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Individual functions', () => {
@@ -41,7 +42,7 @@ describe('Individual functions', () => {
     };
 
     beforeEach(() => {
-        commandService = new CommandService();
+        commandService = new CommandService(Container.get(DictionaryService));
         sockets = [];
         sockets.push(createFakeSocket(0));
         sockets.push(createFakeSocket(1));
@@ -226,7 +227,7 @@ describe('commands', () => {
         sockets.push(createFakeSocket(1));
 
         gameOptions = new GameOptions('a', 'b');
-        commandService = new CommandService();
+        commandService = new CommandService(Container.get(DictionaryService));
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
         room.join(sockets[1], 'player 2');

@@ -3,14 +3,18 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE } from 'common/constants';
 import io from 'socket.io';
 import { Service } from 'typedi';
+import { DictionaryService } from './dictionary.service';
 
 @Service()
 export class CommandService {
+    constructor(public dictionaryService: DictionaryService) {}
+
     processCommand(game: Game, sockets: io.Socket[], fullCommand: string, playerNumber: number): void {
         if (game.gameFinished) throw new GameError(GameErrorType.GameIsFinished);
         const [command, ...args] = fullCommand.split(' ');
@@ -23,6 +27,9 @@ export class CommandService {
                 break;
             case 'passer':
                 this.processSkip(game, sockets, args, playerNumber);
+                break;
+            case 'indice':
+                this.processHint(game, sockets, args, playerNumber);
                 break;
         }
     }
@@ -67,6 +74,13 @@ export class CommandService {
         sockets.forEach((s) => {
             s.emit('skip success', game.players[playerNumber].name);
         });
+    }
+
+    processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+        if (args.length > 0) throw new GameError(GameErrorType.WrongHintArgument);
+        const solver = new Solver(this.dictionaryService.dictionary, game.board.board, game.players[playerNumber].easel);
+        const hints = solver.getHints();
+        sockets[playerNumber].emit('hint success', { hints });
     }
 
     postCommand(game: Game, sockets: io.Socket[]): void {
