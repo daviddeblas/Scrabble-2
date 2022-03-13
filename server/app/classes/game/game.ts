@@ -76,8 +76,14 @@ export class Game {
 
     needsToEnd(): boolean {
         if (this.gameFinished) return false;
-        if (this.turnsSkipped >= MAX_TURNS_SKIPPED) return true;
-        if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) return true;
+        if (this.turnsSkipped >= MAX_TURNS_SKIPPED) {
+            this.stopTimer();
+            return true;
+        }
+        if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) {
+            this.stopTimer();
+            return true;
+        }
         return false;
     }
 
