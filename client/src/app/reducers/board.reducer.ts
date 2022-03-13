@@ -112,7 +112,9 @@ export const reducer = createReducer(
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);
 
-        let orientation: Orientation | null = switchOrientation(tempState.selection.orientation);
+        let orientation: Orientation | null = state.selection.cell?.equals(tempState.selection.cell)
+            ? switchOrientation(tempState.selection.orientation)
+            : Orientation.Horizontal;
 
         if (isCellAtBoardLimit(state.board, tempState.selection.cell, orientation)) {
             orientation = switchOrientation(orientation);
@@ -132,8 +134,7 @@ export const reducer = createReducer(
         const selection = state.selection.copy();
         selection.modifiedCells.push(state.selection.cell as Vec2);
 
-        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation)) selection.orientation = null;
-        else
+        if (!isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation))
             do {
                 switch (state.selection.orientation) {
                     case Orientation.Horizontal:
@@ -146,6 +147,7 @@ export const reducer = createReducer(
             } while (board[selectedPosition.x][selectedPosition.y] !== null);
 
         selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
+        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation)) selection.orientation = null;
 
         return {
             ...state,
@@ -177,7 +179,12 @@ export const reducer = createReducer(
             return { ...state, selection: new BoardSelection() };
 
         const lastCell = selection.modifiedCells.pop() as Vec2;
-        selection.orientation = selection.cell.x === lastCell.x ? Orientation.Horizontal : Orientation.Vertical;
+
+        selection.orientation = selection.cell.x === lastCell.x ? Orientation.Vertical : Orientation.Horizontal;
+        if (selection.cell.equals(lastCell) && selection.modifiedCells.length > 0)
+            selection.orientation =
+                selection.modifiedCells[selection.modifiedCells.length - 1].x === lastCell.x ? Orientation.Vertical : Orientation.Horizontal;
+
         selection.cell = lastCell;
 
         const board = cloneBoard(state.board);
