@@ -1,6 +1,6 @@
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
-import { BOARD_SIZE } from 'common/constants';
+import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
@@ -34,12 +34,16 @@ export class Solver {
 
     findAllSolutions(): Solution[] {
         const solutions: Solution[] = [];
+        const date = new Date();
+        const startTime = date.getTime();
         for (let i = 0; i < BOARD_SIZE; i++) {
             solutions.push(...this.findLineSolutions(this.board[i], i, new Vec2(0, 1)));
         }
+        if (this.isTimeTooLong(startTime)) return [];
         for (let i = 0; i < BOARD_SIZE; i++) {
             const line = this.board.reduce((r, v) => [...r, v[i]], []);
             solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));
+            if (this.isTimeTooLong(startTime)) return [];
         }
         return solutions;
     }
@@ -245,5 +249,11 @@ export class Solver {
             matches.push(insertedLine);
         });
         return matches;
+    }
+
+    private isTimeTooLong(startTime: number): boolean {
+        const date = new Date();
+        const now = date.getTime();
+        return now - startTime < MAX_BOT_PLACEMENT_TIME;
     }
 }
