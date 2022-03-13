@@ -95,6 +95,36 @@ export class Board {
         return score;
     }
 
+    scoreWordPosition(word: PlacedLetter[]): number {
+        let score = 0;
+        let multiplier = 1;
+        word.forEach((placedLetter) => {
+            const letter = placedLetter.letter;
+            if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
+            // prends le nombre de points associe a cette lettre
+            const letterPoints = this.pointsPerLetter.get(letter) as number;
+            // annule s'il s'agit d'un blank
+            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) return;
+            // obtient le multiplieur a cette position
+            const multi = this.multipliers[placedLetter.position.x][placedLetter.position.y];
+            if (multi === null) {
+                score += letterPoints;
+                return;
+            }
+            switch (multi.type) {
+                case MultiplierType.Letter:
+                    score += letterPoints * multi.amount;
+                    break;
+                case MultiplierType.Word:
+                    score += letterPoints;
+                    multiplier = multiplier < multi.amount ? multi.amount : multiplier;
+                    break;
+            }
+        });
+        score *= multiplier;
+        return score;
+    }
+
     letterAt(vec: Vec2): Letter | null {
         return this.board[vec.x][vec.y];
     }

@@ -2,6 +2,7 @@ import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { Dictionary } from './dictionary';
+import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 
 const HINT_COUNT = 3;
@@ -74,6 +75,27 @@ export class Solver {
         }
 
         return hints;
+    }
+
+    getEasyBotSolutions(board: Board): Map<string[], number> {
+        const result = new Map<string[], number>();
+        const allSolutions: Solution[] = this.findAllSolutions();
+        if (allSolutions.length < 1) return result;
+        for (const solution of allSolutions) {
+            let stringSolution = '';
+            for (const letter of solution.letters) {
+                if (solution.blanks.find((v) => v.equals(letter.position))) {
+                    stringSolution += letter.letter.toUpperCase();
+                } else {
+                    stringSolution += letter.letter.toLowerCase();
+                }
+            }
+            const score = board.scoreWordPosition(solution.letters);
+            let pos = vec2ToBoardPosition(solution.letters[0].position.flip()); // le board est inversé??
+            pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
+            result.set([pos, stringSolution], score);
+        }
+        return result;
     }
 
     findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
