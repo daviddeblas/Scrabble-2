@@ -1,4 +1,5 @@
 import * as gameStatusActions from '@app/actions/game-status.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { GameStatus, initialState, reducer } from '@app/reducers/game-status.reducer';
 import { BoardState } from './board.reducer';
@@ -10,6 +11,7 @@ describe('[Game Status] Game Status Received', () => {
         winner: null,
         gameEnded: false,
         letterPotLength: 0,
+        timer: 0,
     };
 
     const playersStub: Players = {
@@ -22,6 +24,7 @@ describe('[Game Status] Game Status Received', () => {
         multipliers: [],
         pointsPerLetter: new Map(),
         blanks: [],
+        selection: new BoardSelection(),
     };
 
     it('should set the game status', () => {
@@ -53,5 +56,12 @@ describe('[Game Status] Game Status Received', () => {
         const result = reducer(gameStatusStub, action);
 
         expect(result).toEqual(initialState);
+    });
+
+    it('should refresh the current timer', () => {
+        const action = gameStatusActions.refreshTimer({ timer: 0 });
+        const result = reducer(initialState, action);
+
+        expect(result).toEqual({ ...initialState, timer: 0 });
     });
 });

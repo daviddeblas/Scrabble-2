@@ -1,4 +1,5 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
+import { clearSelection } from '@app/actions/board.actions';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
@@ -22,7 +23,7 @@ export class EaselComponent {
     pointsPerLetter$: Observable<Map<Letter, number>>;
     letterColor: string[];
 
-    constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>) {
+    constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>, private eRef: ElementRef) {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         store.select('players').subscribe((players) => {
             this.easel = players.player.easel;
@@ -47,6 +48,11 @@ export class EaselComponent {
         } else {
             this.selectLetterWithKey(event.key);
         }
+    }
+
+    @HostListener('document:click', ['$event'])
+    clickout(event: Event) {
+        if (this.eRef.nativeElement.contains(event.target)) this.store.dispatch(clearSelection());
     }
 
     handlePositionSwitch(moveRight: boolean) {
