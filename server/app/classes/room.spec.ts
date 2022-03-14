@@ -247,6 +247,20 @@ describe('room', () => {
             room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
+
+        it('actionAfterTurnWithBot should not call move from botService if the game has ended', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                activePlayer: 0,
+                gameFinished: true,
+            } as unknown as Game;
+            const moveStub = stub(room.botService, 'move').callsFake(() => {
+                return '';
+            });
+            room.game = stubbedGame;
+            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            expect(moveStub.called).to.equal(false);
+        });
     });
 
     describe('Room events', () => {
