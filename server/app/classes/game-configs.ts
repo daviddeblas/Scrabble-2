@@ -6,7 +6,10 @@ export enum GameMode {
     Log2990,
 }
 
+export type GameInfo = {
+    gameMode: number;
+};
+
 export class GameConfigs {
     configs: GameConfig[];
-    gameMode: number;
 }
