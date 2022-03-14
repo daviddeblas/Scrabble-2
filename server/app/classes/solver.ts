@@ -64,7 +64,7 @@ export class Solver {
         const hints: string[] = [];
 
         for (const solution of solutions) {
-            let pos = vec2ToBoardPosition(solution.letters[0].position.flip()); // le board est inversé??
+            let pos = vec2ToBoardPosition(solution.letters[0].position.flip());
             pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
 
             let lettersString = '';
@@ -233,11 +233,9 @@ export class Solver {
             for (let i = w.index; i < w.index + w.word.length; i++) {
                 if (line[i] === null) {
                     let index = easelTmp.indexOf(insertedLine.letters[i] as Letter);
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    if (index === -1) {
+                    if (index < 0) {
                         index = easelTmp.indexOf('*');
-                        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                        if (index === -1) return;
+                        if (index < 0) return;
                         insertedLine.blanks.push(i);
                     }
 
