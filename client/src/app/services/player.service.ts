@@ -36,49 +36,20 @@ export class PlayerService {
 
     placeWord(position: string, letters: string): void {
         const command = 'placer';
-        let lettersToPlace = '';
-        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE) - 1;
-        let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
+        const lettersToPlace = this.findLettersToPlace(position, letters);
+        if (lettersToPlace === '') {
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+            );
+            return;
+        }
         if (!this.lettersInEasel(letters)) {
             this.playerStore.dispatch(
                 receivedMessage({ username: '', message: 'Erreur de syntaxe - Lettres pas dans le chevalet', messageType: 'Error' }),
             );
             return;
         }
-        let letterPlaced = 0;
-        if (letters.length > 1) {
-            while (letterPlaced < letters.length) {
-                if (column > BOARD_SIZE || line > BOARD_SIZE) {
-                    this.playerStore.dispatch(
-                        receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
-                    );
-                    return;
-                }
-                const letter = this.letterOnBoard(column, line);
-                if (letter) {
-                    lettersToPlace += letter;
-                } else {
-                    lettersToPlace += letters[letterPlaced];
-                    letterPlaced++;
-                }
-                if (position.slice(POSITION_LAST_CHAR) === 'h') {
-                    column += 1;
-                } else {
-                    line += 1;
-                }
-            }
-        } else {
-            lettersToPlace = letters;
-        }
-        let boardPosition: string;
-        let direction: string;
-        if (/^[vh]$/.test(position.slice(POSITION_LAST_CHAR))) {
-            boardPosition = position.slice(0, position.length - 1);
-            direction = position.slice(POSITION_LAST_CHAR);
-        } else {
-            boardPosition = position;
-            direction = 'h';
-        }
+        const [boardPosition, direction] = this.separatePosition(position);
         if (!this.wordPlacementCorrect(boardPosition, direction, lettersToPlace)) {
             this.playerStore.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - Mauvais placement', messageType: 'Error' }));
             return;
@@ -161,5 +132,47 @@ export class PlayerService {
         if (column > 0) isPlacable ||= board[column - 1][line] != null;
         if (line > 0) isPlacable ||= board[column][line - 1] != null;
         return isPlacable;
+    }
+
+    private findLettersToPlace(position: string, letters: string): string {
+        let column = parseInt((position.match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE) - 1;
+        let line = position.charCodeAt(0) - ASCII_ALPHABET_POSITION;
+        let letterPlaced = 0;
+        let lettersToPlace = '';
+        if (letters.length > 1) {
+            while (letterPlaced < letters.length) {
+                if (column >= BOARD_SIZE || line >= BOARD_SIZE) {
+                    return '';
+                }
+                const letter = this.letterOnBoard(column, line);
+                if (letter) {
+                    lettersToPlace += letter;
+                } else {
+                    lettersToPlace += letters[letterPlaced];
+                    letterPlaced++;
+                }
+                if (position.slice(POSITION_LAST_CHAR) === 'h') {
+                    column += 1;
+                } else {
+                    line += 1;
+                }
+            }
+        } else {
+            lettersToPlace = letters;
+        }
+        return lettersToPlace;
+    }
+
+    private separatePosition(position: string): string[] {
+        let boardPosition;
+        let direction;
+        if (/^[vh]$/.test(position.slice(POSITION_LAST_CHAR))) {
+            boardPosition = position.slice(0, position.length - 1);
+            direction = position.slice(POSITION_LAST_CHAR);
+        } else {
+            boardPosition = position;
+            direction = 'h';
+        }
+        return [boardPosition, direction];
     }
 }
