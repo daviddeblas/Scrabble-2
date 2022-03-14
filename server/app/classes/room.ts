@@ -132,7 +132,7 @@ export class Room {
 
     initSoloGame(diff: BotDifficulty): void {
         this.sockets = [this.host];
-
+        this.playersLeft--;
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
