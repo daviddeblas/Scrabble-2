@@ -21,12 +21,38 @@
 }
 
 #solo-button {
+    justify-content: center;
+    display: flex;
     position: relative;
     min-width: auto;
-    float: right;
+    align-items: center;
 }
 
 #tabs-container {
     margin-bottom: 20%;
     font-size: 130%;
+}
+
+#waiting-section {
+    position: relative;
+}
+
+#parameter-solo-container {
+    justify-content: center;
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+#parameter-solo-button {
+    font-size: 10px;
+}
+
+#button-solo-label {
+    margin-top: 5%;
+    justify-content: center;
+    display: flex;
+    position: relative;
+    min-width: auto;
+    align-items: center;
 }
