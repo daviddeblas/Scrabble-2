@@ -3,20 +3,22 @@
 /* eslint-disable dot-notation */
 import { Game } from '@app/classes/game/game';
 import { expect } from 'chai';
-import { BOT_NAMES } from 'common/constants';
+import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
 import { BotDifficulty, BotService } from './bot.service';
 
 describe('Bot service tests', () => {
     let service: BotService;
-    const fakeGame = {
-        players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
-        bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
-        board: { board: [[], []] },
-    } as unknown as Game;
+    let fakeGame: Game;
 
     beforeEach(async () => {
         service = new BotService();
+        const fakeBoard = new Array(BOARD_SIZE).fill(new Array(BOARD_SIZE).fill(null));
+        fakeGame = {
+            players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
+            bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
+            board: { board: fakeBoard, scorePosition: () => 2 },
+        } as unknown as Game;
     });
 
     afterEach(() => {
@@ -60,6 +62,21 @@ describe('Bot service tests', () => {
         const placeCommandStub = stub(service as any, 'placeCommand').callsFake(() => expectedResult);
         expect(service['easyBotMove'](fakeGame)).to.equal(expectedResult);
         expect(placeCommandStub.called).to.equal(true);
+    });
+
+    it('placeCommand should call determineWord if there is at least a solution', () => {
+        fakeGame.board.board[7][7] = 'E';
+        const determineWordStub = stub(service as any, 'determineWord').callsFake(() => 'h7h plat');
+        const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
+        expect(placeResult).to.equal('placer h7h plat');
+        expect(determineWordStub.calledOnce).to.equal(true);
+    });
+
+    it('placeCommand should not call determineWord if there is no solution and return passer', () => {
+        const determineWordStub = stub(service as any, 'determineWord');
+        const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
+        expect(placeResult).to.equal('passer');
+        expect(determineWordStub.calledOnce).to.equal(false);
     });
 
     it('exchangeCommand should retrieve a random number of letters to exchange', () => {
