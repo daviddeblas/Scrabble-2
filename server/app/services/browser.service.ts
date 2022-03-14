@@ -23,10 +23,10 @@ export class BrowserService {
         });
 
         socket.on('browser reconnection', (oldClientId) => {
-            if (oldClientId === this.tempClientSocketId) {
-                clearTimeout(this.timeoutId);
-                this.roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
-            }
+            if (oldClientId !== this.tempClientSocketId) return;
+
+            clearTimeout(this.timeoutId);
+            this.roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
         });
     }
 }

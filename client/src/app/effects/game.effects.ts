@@ -1,4 +1,8 @@
 /* eslint-disable no-invalid-this */
+// Syntaxe utilisé sur le site de ngRx
+// Necessaire pour utiliser les actions dans les fichiers .effects, si on enleve la ligne esLint: unexpected this
+// Si on enleve le esLint : erreur de TypeScript
+
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { endGame, getGameStatus } from '@app/actions/game-status.actions';

@@ -1,5 +1,6 @@
 <mat-stepper linear #stepper (selectionChange)="onStepChange()">
     <mat-step [completed]="selectedRoom !== undefined" [editable]="true">
+        <p *ngIf="refused" class="error">Invitation refusée</p>
         <ng-template matStepLabel>Rejoindre une partie</ng-template>
         <button
             *ngIf="roomListLength() !== 0"
@@ -27,6 +28,11 @@
         <mat-card>
             <form [formGroup]="formGroup">
                 <ng-template matStepLabel>Entrez votre nom</ng-template>
+                <p class="room">
+                    <strong>Hôte</strong>: {{ selectedRoom?.gameOptions?.hostname }} <br />
+                    <strong>Temps</strong>: {{ selectedRoom?.gameOptions?.timePerRound }} secondes<br />
+                    <strong>Dictionnaire</strong>: {{ selectedRoom?.gameOptions?.dictionaryType }}
+                </p>
                 <mat-form-field centered class="parameter-container" appearance="fill">
                     <mat-label>Veuillez saisir votre nom</mat-label>
                     <input [attr.disabled]="true" matInput formControlName="name" placeholder="Nom" />
