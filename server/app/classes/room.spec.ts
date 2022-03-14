@@ -112,6 +112,9 @@ describe('room', () => {
                 stopTimer: () => {
                     return;
                 },
+                endGame: () => {
+                    return;
+                },
             } as unknown as Game;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
@@ -120,6 +123,24 @@ describe('room', () => {
                 expect(clientReceived && hostReceived).to.deep.equal(true);
                 done();
             }, RESPONSE_DELAY * 3);
+        });
+
+        it('surrenderGame should call RoomsManager.removeRoom if no players are left', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            room['playersLeft'] = 0;
+            room.game = {
+                players: ['player1', 'player2'],
+                bag: { letters: [] },
+                stopTimer: () => {
+                    return;
+                },
+                endGame: () => {
+                    return;
+                },
+            } as unknown as Game;
+            room.sockets = [];
+            room.surrenderGame('socket id');
+            expect(roomsManager.removeRoom.calledOnce).to.equal(true);
         });
 
         it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
@@ -325,6 +346,34 @@ describe('room', () => {
                     expect(data.message).to.equal(message.message);
                     done();
                 });
+                hostSocket.emit('create room');
+            });
+
+            it('should call removeRoom if no players are left when quit message sent', (done) => {
+                const message = { username: '', message: 'Player1 a quitté le jeu', messageType: 'System' };
+                hostSocket.on('player joining', () => {
+                    room['playersLeft'] = 1;
+                    hostSocket.emit('accept');
+                    clientSocket.emit('send message', message);
+                });
+                setTimeout(() => {
+                    expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+                    done();
+                }, RESPONSE_DELAY);
+                hostSocket.emit('create room');
+            });
+
+            it('should not call removeRoom if players are left when quit message sent', (done) => {
+                const message = { username: '', message: 'Player1 a quitté le jeu', messageType: 'System' };
+                hostSocket.on('player joining', () => {
+                    room['playersLeft'] = 2;
+                    hostSocket.emit('accept');
+                    clientSocket.emit('send message', message);
+                });
+                setTimeout(() => {
+                    expect(roomsManager.removeRoom.calledOnce).to.equal(false);
+                    done();
+                }, RESPONSE_DELAY);
                 hostSocket.emit('create room');
             });
 

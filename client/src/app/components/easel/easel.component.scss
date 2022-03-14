@@ -30,3 +30,14 @@
 #button-container button:disabled {
     background-color: #7f7f7f;
 }
+
+@media only screen and (max-width: 1400px) {
+    #button-container button {
+        display: block;
+        font-size: 8pt;
+        padding: 0.5vw, 0;
+        margin-top: 0.5vh;
+        max-width: 7vw;
+        max-height: 4vh;
+    }
+}
