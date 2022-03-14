@@ -25,8 +25,16 @@
                 </mat-select>
             </mat-form-field>
 
+            <mat-form-field *ngIf="isSoloGame" class="parameter-container" appearance="fill">
+                <mat-label>Niveau de l'adversaire</mat-label>
+                <mat-select formControlName="botLevel">
+                    <mat-option value="Débutant">Débutant</mat-option>
+                    <mat-option value="Expert" disabled>Expert</mat-option>
+                </mat-select>
+            </mat-form-field>
+
             <mat-card-actions>
-                <button mat-raised-button matStepperNext color="primary" type="submit" id="confirm-settings" [disabled]="!settingsForm.valid">
+                <button mat-raised-button color="primary" type="submit" id="confirm-settings" [disabled]="!settingsForm.valid">
                     Confirmer paramètres
                 </button>
             </mat-card-actions>

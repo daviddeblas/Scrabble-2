@@ -11,8 +11,14 @@ export class RoomsManager {
     joiningSockets: io.Socket[] = [];
 
     setupSocketConnection(socket: io.Socket) {
+        socket.on('create solo room', (options) => {
+            const room = this.createRoom(socket, options.gameOptions);
+            room.initSoloGame(options.botLevel);
+            socket.emit('create solo room success', room.getRoomInfo());
+        });
+
         socket.on('create room', (options) => {
-            socket.emit('create room success', this.createRoom(socket, options));
+            socket.emit('create room success', this.createRoom(socket, options).getRoomInfo());
         });
 
         socket.on('request list', () => {
@@ -26,11 +32,11 @@ export class RoomsManager {
         });
     }
 
-    createRoom(socket: io.Socket, options: GameOptions): RoomInfo {
+    createRoom(socket: io.Socket, options: GameOptions): Room {
         const newRoom = new Room(socket, this, options);
         this.rooms.push(newRoom);
         this.notifyAvailableRoomsChange();
-        return newRoom.getRoomInfo();
+        return newRoom;
     }
 
     removeRoom(room: Room): void {

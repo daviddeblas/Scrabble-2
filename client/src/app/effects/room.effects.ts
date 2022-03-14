@@ -6,7 +6,18 @@
 import { Injectable } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { acceptInvite, cancelJoinRoom, closeRoom, createRoom, joinRoom, joinRoomAccepted, loadRooms, refuseInvite } from '@app/actions/room.actions';
+import {
+    acceptInvite,
+    cancelJoinRoom,
+    closeRoom,
+    createRoom,
+    createSoloRoom,
+    joinRoom,
+    joinRoomAccepted,
+    loadRooms,
+    refuseInvite,
+    switchToSoloRoom,
+} from '@app/actions/room.actions';
 import { GameJoinPageComponent } from '@app/pages/game-join-page/game-join-page.component';
 import { RoomService } from '@app/services/room.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
@@ -19,6 +30,28 @@ export class RoomEffects {
                 ofType(createRoom),
                 tap((action) => {
                     this.roomService.createRoom(action.gameOptions);
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    createSoloRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(createSoloRoom),
+                tap((action) => {
+                    this.roomService.createSoloRoom(action.gameOptions, action.botLevel);
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    switchToSoloRoomEffect$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(switchToSoloRoom),
+                tap((action) => {
+                    this.roomService.switchToSoloRoom(action.botLevel);
                 }),
             ),
         { dispatch: false },

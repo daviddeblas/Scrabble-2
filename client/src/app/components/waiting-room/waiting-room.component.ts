@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { acceptInvite, closeRoom, refuseInvite } from '@app/actions/room.actions';
+import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { RoomState } from '@app/reducers/room.reducer';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -43,6 +43,11 @@ export class WaitingRoomComponent implements OnDestroy {
     quitWaitingRoom(): void {
         this.store.dispatch(closeRoom());
         this.stepper.reset();
+    }
+
+    convertToSolo(): void {
+        this.store.dispatch(switchToSoloRoom({ botLevel: 'Débutant' }));
+        this.dialogRef.close();
     }
 
     ngOnDestroy(): void {

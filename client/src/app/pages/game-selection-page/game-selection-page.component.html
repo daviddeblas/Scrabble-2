@@ -10,7 +10,7 @@
         <img src="https://bit.ly/3m206ss" routerLink="/main-page" width="400" height="80" alt="Logo Scrabble" />
 
         <div class="main-menu">
-            <button routerLink="/game" mat-raised-button disabled color="primary">
+            <button (click)="openSoloSettingsPage()" mat-raised-button color="primary">
                 <mat-icon>person</mat-icon>
                 Créer une partie solo
             </button>

@@ -24,7 +24,13 @@ export class Game {
     gameFinished: boolean;
     currentTimer: NodeJS.Timeout;
 
-    constructor(public config: GameConfig, playerNames: string[], public gameOptions: GameOptions, private actionAfterTimeout: () => void) {
+    constructor(
+        public config: GameConfig,
+        playerNames: string[],
+        public gameOptions: GameOptions,
+        private actionAfterTimeout: () => void,
+        public actionAfterTurn: () => void,
+    ) {
         this.bag = new Bag(config);
         this.board = new Board(config);
         this.activePlayer = Math.floor(Math.random() * playerNames.length);
@@ -35,6 +41,10 @@ export class Game {
         this.placeCounter = 0;
         this.gameFinished = false;
         this.initTimer();
+        const creationDelay = 200;
+        setTimeout(() => {
+            actionAfterTurn();
+        }, creationDelay);
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): void {
@@ -97,7 +107,7 @@ export class Game {
         this.activePlayer = this.nextPlayer();
     }
 
-    getGameStatus(playerNumber: number): unknown {
+    getGameStatus(playerNumber: number, botLevel?: string): unknown {
         const opponent = { ...this.players[(playerNumber + 1) % 2] };
         opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
@@ -106,7 +116,7 @@ export class Game {
                 letterPotLength: this.bag.letters.length,
                 timer: this.gameOptions.timePerRound,
             },
-            players: { player: this.players[playerNumber], opponent },
+            players: { player: this.players[playerNumber], opponent, botLevel },
             board: {
                 board: this.board.board,
                 pointsPerLetter: Array.from(this.board.pointsPerLetter),

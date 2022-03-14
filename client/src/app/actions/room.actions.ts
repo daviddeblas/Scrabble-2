@@ -4,6 +4,8 @@ import { RoomInfo } from 'common/classes/room-info';
 
 // Host
 export const createRoom = createAction('[Room] Create Room', props<{ gameOptions: GameOptions }>());
+export const createSoloRoom = createAction('[Room Create Solo Room', props<{ gameOptions: GameOptions; botLevel: string }>());
+export const switchToSoloRoom = createAction('[Room] Switch To Solo Room', props<{ botLevel: string }>());
 export const createRoomSuccess = createAction('[Room] Create Room Success', props<{ roomInfo: RoomInfo }>());
 export const createRoomFailed = createAction('[Room] Create Room Failed', props<{ error: Error }>());
 export const closeRoom = createAction('[Room] Close Room');

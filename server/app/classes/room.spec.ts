@@ -3,13 +3,14 @@
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { BotDifficulty } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
-import { SECONDS_IN_MINUTE } from 'common/constants';
+import { MIN_BOT_PLACEMENT_TIME, SECONDS_IN_MINUTE } from 'common/constants';
 import { createServer, Server } from 'http';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import { Game } from './game/game';
@@ -18,6 +19,9 @@ describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
     beforeEach(() => {
         roomsManager = createStubInstance(RoomsManager);
+    });
+    afterEach(() => {
+        restore();
     });
 
     describe('Individual functions', () => {
@@ -200,6 +204,48 @@ describe('room', () => {
             const endGame = stub(room.commandService, 'endGame');
             room['actionAfterTimeout'](room)();
             expect(endGame.calledOnce).to.equal(true);
+        });
+
+        it('initSoloGame should put the correct attributes and call notifyAvailableRoomsChanges and setupSocket', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const setUpSocketStub = stub(room as any, 'setupSocket');
+            room.initSoloGame(BotDifficulty.Easy);
+            expect(roomsManager.notifyAvailableRoomsChange.calledOnce).to.equal(true);
+            expect(setUpSocketStub.calledOnce).to.equal(true);
+            expect(room.sockets.length).to.equal(1);
+            expect(room.sockets.includes(socket)).to.equal(true);
+        });
+
+        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                activePlayer: 1,
+            } as unknown as Game;
+            const moveStub = stub(room.botService, 'move').callsFake(() => {
+                return '';
+            });
+            const onCommandStub = stub(room.commandService, 'onCommand');
+            room.game = stubbedGame;
+            const clk = useFakeTimers();
+            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            clk.tick(MIN_BOT_PLACEMENT_TIME);
+            clk.restore();
+            expect(onCommandStub.calledOnce).to.equal(true);
+            expect(moveStub.calledOnce).to.equal(true);
+        });
+
+        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                activePlayer: 0,
+            } as unknown as Game;
+            const moveStub = stub(room.botService, 'move').callsFake(() => {
+                return '';
+            });
+            room.game = stubbedGame;
+            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            expect(moveStub.called).to.equal(false);
         });
     });
 
@@ -390,6 +436,22 @@ describe('room', () => {
                             expect(quitRoomHostStub.calledOnce).to.deep.equal(true);
                             done();
                         }, RESPONSE_DELAY);
+                    });
+                });
+                hostSocket.emit('create room');
+            });
+
+            it('switch to solo room should call initSoloGame when emitted and emit switched to solo', (done) => {
+                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
+                server.on('connection', (socket) => {
+                    socket.on('create room', () => {
+                        const room = new Room(socket, roomsManager, gameOptions);
+                        const initSoloGameStub = stub(room, 'initSoloGame');
+                        hostSocket.on('switched to solo', () => {
+                            expect(initSoloGameStub.calledOnce).to.equal(true);
+                            done();
+                        });
+                        hostSocket.emit('switch to solo room');
                     });
                 });
                 hostSocket.emit('create room');

@@ -55,7 +55,7 @@ export class Board {
 
         let score = 0;
         words.forEach((w) => {
-            score += this.scorePositions(w.map((l) => l.position.copy()));
+            score += this.scorePosition(w);
         });
 
         letters.forEach((l) => {
@@ -65,18 +65,18 @@ export class Board {
         return score;
     }
 
-    scorePositions(pos: Vec2[]): number {
+    scorePosition(word: PlacedLetter[]): number {
         let score = 0;
         let multiplier = 1;
-        pos.forEach((vec) => {
-            const letter = this.board[vec.x][vec.y];
+        word.forEach((placedLetter) => {
+            const letter = placedLetter.letter;
             if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
             // prends le nombre de points associe a cette lettre
             const letterPoints = this.pointsPerLetter.get(letter) as number;
             // annule s'il s'agit d'un blank
-            if (this.blanks.findIndex((p) => p.equals(vec)) >= 0) return;
+            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) return;
             // obtient le multiplieur a cette position
-            const multi = this.multipliers[vec.x][vec.y];
+            const multi = this.multipliers[placedLetter.position.x][placedLetter.position.y];
             if (multi === null) {
                 score += letterPoints;
                 return;

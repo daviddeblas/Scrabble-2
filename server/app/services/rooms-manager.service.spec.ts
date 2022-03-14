@@ -96,7 +96,9 @@ describe('Rooms Manager Service', () => {
         roomsManager.createRoom(socket, otherOption);
         const room = roomsManager.rooms[1];
         // eslint-disable-next-line dot-notation
-        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout'](room));
+        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout'](room), () => {
+            return;
+        });
         assert(spyOnSocket.calledWith('get list', expectedResult));
     });
 
@@ -230,15 +232,36 @@ describe('Rooms Manager Service', () => {
         });
 
         it('emitting create room should call the createRoom function', (done) => {
-            const room: RoomInfo = new RoomInfo('RoomID', {} as GameOptions);
             stub(roomsManager, 'createRoom').callsFake(() => {
                 done();
-                return room;
+                return {
+                    getRoomInfo: () => {
+                        return;
+                    },
+                } as Room;
             });
             server.on('connection', (serverSocket) => {
                 roomsManager.setupSocketConnection(serverSocket);
             });
             clientSocket.emit('create room');
+        });
+
+        it('emitting create solo room should call the createRoom function and initSoloGame with the room given', (done) => {
+            stub(roomsManager, 'createRoom').callsFake(() => {
+                return {
+                    getRoomInfo: () => {
+                        return;
+                    },
+                    initSoloGame: () => {
+                        done();
+                        return;
+                    },
+                } as unknown as Room;
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            clientSocket.emit('create solo room', {});
         });
 
         it('emitting request list should call the getRooms function', (done) => {
