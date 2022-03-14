@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
-import { clearSelection } from '@app/actions/board.actions';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
 import { Letter, stringToLetter } from 'common/classes/letter';
 import { EASEL_CAPACITY, POSITION_LAST_CHAR } from 'common/constants';
@@ -23,7 +23,11 @@ export class EaselComponent {
     pointsPerLetter$: Observable<Map<Letter, number>>;
     letterColor: string[];
 
-    constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>, private eRef: ElementRef) {
+    constructor(
+        private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>,
+        private eRef: ElementRef,
+        private keyManager: KeyManagerService,
+    ) {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         store.select('players').subscribe((players) => {
             this.easel = players.player.easel;
@@ -52,7 +56,7 @@ export class EaselComponent {
 
     @HostListener('document:click', ['$event'])
     clickout(event: Event) {
-        if (this.eRef.nativeElement.contains(event.target)) this.store.dispatch(clearSelection());
+        if (this.eRef.nativeElement.contains(event.target)) this.keyManager.onEsc();
     }
 
     handlePositionSwitch(moveRight: boolean) {

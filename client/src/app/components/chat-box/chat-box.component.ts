@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { clearSelection } from '@app/actions/board.actions';
 import * as chatActions from '@app/actions/chat.actions';
 import { ChatMessage } from '@app/classes/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -21,6 +21,7 @@ export class ChatBoxComponent implements OnInit {
         private store: Store<{ chat: ChatMessage[]; gameStatus: GameStatus }>,
         private playerStore: Store<{ players: Players }>,
         private eRef: ElementRef,
+        private keyManager: KeyManagerService,
     ) {
         this.chat$ = store.select('chat');
         this.playerStore.subscribe((us) => (this.username = us.players.player.name));
@@ -28,7 +29,7 @@ export class ChatBoxComponent implements OnInit {
 
     @HostListener('document:click', ['$event'])
     clickout(event: Event) {
-        if (this.eRef.nativeElement.contains(event.target)) this.store.dispatch(clearSelection());
+        if (this.eRef.nativeElement.contains(event.target)) this.keyManager.onEsc();
     }
 
     ngOnInit(): void {
