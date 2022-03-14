@@ -18,6 +18,7 @@ export class Room {
     game: Game | null;
     commandService: CommandService;
     botService: BotService;
+    botLevel: string | undefined;
 
     sockets: io.Socket[];
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
@@ -32,6 +33,7 @@ export class Room {
         this.clientName = null;
         this.commandService = Container.get(CommandService);
         this.botService = Container.get(BotService);
+        this.botLevel = undefined;
     }
 
     join(socket: io.Socket, name: string): void {
@@ -137,13 +139,14 @@ export class Room {
 
         this.manager.notifyAvailableRoomsChange();
         this.setupSocket(this.sockets[0], 0);
+        this.botLevel = diff;
     }
 
     private setupSocket(socket: io.Socket, playerNumber: number): void {
         const game = this.game as Game;
 
         socket.on('get game status', () => {
-            socket.emit('game status', game.getGameStatus(playerNumber));
+            socket.emit('game status', game.getGameStatus(playerNumber, this.botLevel));
         });
 
         // Init command processing

@@ -101,7 +101,7 @@ export class Game {
         this.activePlayer = this.nextPlayer();
     }
 
-    getGameStatus(playerNumber: number): unknown {
+    getGameStatus(playerNumber: number, botLevel?: string): unknown {
         const opponent = { ...this.players[(playerNumber + 1) % 2] };
         opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
@@ -110,7 +110,7 @@ export class Game {
                 letterPotLength: this.bag.letters.length,
                 timer: this.gameOptions.timePerRound,
             },
-            players: { player: this.players[playerNumber], opponent },
+            players: { player: this.players[playerNumber], opponent, botLevel },
             board: {
                 board: this.board.board,
                 pointsPerLetter: Array.from(this.board.pointsPerLetter),
