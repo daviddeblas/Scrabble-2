@@ -12,6 +12,7 @@ describe('Bot service tests', () => {
     const fakeGame = {
         players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
         bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
+        board: { board: [[], []] },
     } as unknown as Game;
 
     beforeEach(async () => {
