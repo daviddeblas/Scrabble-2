@@ -95,7 +95,7 @@ export class Solver {
                 }
             }
             const score = board.scorePosition(solution.letters);
-            let pos = vec2ToBoardPosition(solution.letters[0].position.flip()); // le board est inversé??
+            let pos = vec2ToBoardPosition(solution.letters[0].position.flip());
             pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
             result.set([pos, stringSolution], score);
         }

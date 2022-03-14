@@ -79,11 +79,11 @@ export class BotService {
         let maxPoints: number;
         const wordPossibilities: string[][] = [];
         let chooseRandomPoints: number;
-        let indexChosen: number;
-        while (wordPossibilities.length === 0) {
+        const indexChosen: number[] = [];
+        while (wordPossibilities.length === 0 && !this.arrayIncludesAllThreeIndex(indexChosen)) {
             chooseRandomPoints = Math.random();
-            indexChosen = chooseRandomPoints < fortyPercent ? 0 : chooseRandomPoints < fortyPercent + thirtyPercent ? 1 : 2;
-            switch (indexChosen) {
+            indexChosen.push(chooseRandomPoints < fortyPercent ? 0 : chooseRandomPoints < fortyPercent + thirtyPercent ? 1 : 2);
+            switch (indexChosen[indexChosen.length - 1]) {
                 case 0:
                     lowestPoints = CategoryOfPoints.MinLowCategory;
                     maxPoints = CategoryOfPoints.MaxLowCategory;
@@ -102,5 +102,13 @@ export class BotService {
             });
         }
         return wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)].join(' ');
+    }
+
+    private arrayIncludesAllThreeIndex(array: number[]): boolean {
+        let result = true;
+        for (let index = 1; index <= 3; index++) {
+            result &&= array.includes(index);
+        }
+        return result;
     }
 }
