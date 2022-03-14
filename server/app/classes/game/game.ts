@@ -41,6 +41,10 @@ export class Game {
         this.placeCounter = 0;
         this.gameFinished = false;
         this.initTimer();
+        const creationDelay = 200;
+        setTimeout(() => {
+            actionAfterTurn();
+        }, creationDelay);
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): void {
