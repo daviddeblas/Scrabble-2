@@ -104,15 +104,14 @@ export class EaselComponent {
     }
 
     gameIsEnded(): boolean {
-        let gameEnded;
+        let gameEnded = false;
         this.store.select('gameStatus').subscribe((status) => {
             gameEnded = status.gameEnded;
         });
         if (gameEnded) {
             this.cancelSelection();
-            return true;
         }
-        return false;
+        return gameEnded;
     }
 
     selectLetterToSwitch(event: MouseEvent, letterIndex: number): void {

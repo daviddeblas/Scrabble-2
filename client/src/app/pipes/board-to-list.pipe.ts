@@ -13,14 +13,13 @@ export class BoardToListPipe implements PipeTransform {
         if (!value) return list;
         for (let i = 0; i < value.board.length; i++) {
             for (let j = 0; j < value.board[i].length; j++) {
-                if (value.board[i][j]) {
-                    const isBlank = !!value.blanks.find((v) => v.x === i && v.y === j);
-                    list.push({
-                        letter: value.board[i][j] as Letter,
-                        position: new Vec2(i, j),
-                        blank: isBlank,
-                    });
-                }
+                if (!value.board[i][j]) continue;
+                const isBlank = !!value.blanks.find((v) => v.x === i && v.y === j);
+                list.push({
+                    letter: value.board[i][j] as Letter,
+                    position: new Vec2(i, j),
+                    blank: isBlank,
+                });
             }
         }
         return list;

@@ -15,8 +15,9 @@ export class Room {
     clientName: string | null;
     game: Game | null;
     commandService: CommandService;
-
     sockets: io.Socket[];
+    private playersLeft: number;
+
     constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
@@ -24,6 +25,7 @@ export class Room {
         this.game = null;
         this.clientName = null;
         this.commandService = Container.get(CommandService);
+        this.playersLeft = 2;
     }
 
     join(socket: io.Socket, name: string): void {
@@ -86,15 +88,20 @@ export class Room {
     surrenderGame(looserId: string) {
         if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
 
-        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(
-            this.game.players,
-            this.game.bag.letters.length,
-            looserId === this.host.id ? this.clientName : this.gameOptions.hostname,
-        );
+        const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
         this.game.stopTimer();
+        this.game.endGame();
+        const looserName = looserId === this.host.id ? this.gameOptions.hostname : this.clientName;
+        const surrenderMessage = looserName + ' à abandonné la partie';
+        const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         this.sockets.forEach((socket, index) => {
+            socket.emit('turn ended');
+            socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
+        if (--this.playersLeft <= 0) {
+            this.manager.removeRoom(this);
+        }
     }
 
     getRoomInfo(): RoomInfo {
@@ -124,6 +131,11 @@ export class Room {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
+            if (message.includes(' a quitté le jeu') && messageType === 'System') {
+                if (--this.playersLeft <= 0) {
+                    this.manager.removeRoom(this);
+                }
+            }
         });
 
         // Init surrender game
