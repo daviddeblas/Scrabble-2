@@ -465,7 +465,7 @@ describe('room', () => {
                             expect(initSoloGameStub.calledOnce).to.equal(true);
                             done();
                         });
-                        hostSocket.emit('switch to solo room');
+                        hostSocket.emit('switch to solo room', { botLevel: 'Débutant' });
                     });
                 });
                 hostSocket.emit('create room');
