@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
+import { browserReload } from '@app/actions/browser.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
-import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -9,7 +9,13 @@ import { Store } from '@ngrx/store';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(private store: Store<GameStatus>) {
-        this.store.dispatch(getGameStatus());
+    constructor(private store: Store) {
+        store.dispatch(getGameStatus());
+        window.addEventListener('load', (event) => this.catchBrowserLoad(event));
+    }
+
+    catchBrowserLoad(event: Event) {
+        event.preventDefault();
+        this.store.dispatch(browserReload());
     }
 }
