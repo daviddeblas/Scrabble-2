@@ -27,8 +27,8 @@ export class Room {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => this.quitRoomHost());
-        this.host.once('switch to solo room', () => {
-            this.initSoloGame(BotDifficulty.Easy);
+        this.host.once('switch to solo room', (data) => {
+            this.initSoloGame(data.botLevel);
             this.host.emit('switched to solo', this.getRoomInfo());
         });
         this.game = null;
