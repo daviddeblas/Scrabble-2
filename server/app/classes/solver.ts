@@ -38,8 +38,8 @@ export class Solver {
         const startTime = date.getTime();
         for (let i = 0; i < BOARD_SIZE; i++) {
             solutions.push(...this.findLineSolutions(this.board[i], i, new Vec2(0, 1)));
+            if (this.isTimeTooLong(startTime)) return [];
         }
-        if (this.isTimeTooLong(startTime)) return [];
         for (let i = 0; i < BOARD_SIZE; i++) {
             const line = this.board.reduce((r, v) => [...r, v[i]], []);
             solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));

@@ -194,6 +194,24 @@ describe('Individual functions', () => {
         sockets[playerNumber] = fakeSocket;
         commandService['errorOnCommand'](game, sockets, new Error('error'), playerNumber);
     });
+
+    it('errorOnCommand should not emit error if the socket does not contain corresponding socket', (done) => {
+        let emitWasCalled = false;
+        const fakeSocket = {
+            emit: () => {
+                emitWasCalled = true;
+            },
+        } as unknown as io.Socket;
+        const game = {} as unknown as Game;
+        const playerNumber = 0;
+        sockets[playerNumber] = fakeSocket;
+        commandService['errorOnCommand'](game, sockets, new Error('error'), 3);
+        const responseTime = 200;
+        setTimeout(() => {
+            expect(emitWasCalled).to.equal(false);
+            done();
+        }, responseTime);
+    });
 });
 
 describe('commands', () => {

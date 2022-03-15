@@ -132,7 +132,7 @@ export class Room {
 
     initSoloGame(diff: BotDifficulty): void {
         this.sockets = [this.host];
-
+        this.playersLeft--;
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
@@ -181,7 +181,7 @@ export class Room {
     private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => void {
         return () => {
             const game = this.game as Game;
-            if (game.activePlayer === 1) {
+            if (game.activePlayer === 1 && !game.gameFinished) {
                 let date = new Date();
                 const startDate = date.getTime();
                 const botCommand = room.botService.move(game, diff);
