@@ -74,7 +74,8 @@ export class Room {
     }
 
     initiateRoomEvents() {
-        this.sockets = [this.host, this.clients[0] as io.Socket];
+        this.sockets = [this.host as io.Socket];
+        if (this.clients[0]) this.sockets.push(this.clients[0]);
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
@@ -152,7 +153,6 @@ export class Room {
 
     private setupSocket(socket: io.Socket, playerNumber: number): void {
         const game = this.game as Game;
-
         socket.on('get game status', () => {
             socket.emit('game status', game.getGameStatus(playerNumber, this.botLevel));
         });
