@@ -55,7 +55,7 @@ export class CommandService {
             (originalConfig.find((configItem) => configItem.letter === letter) as LetterConfigItem).amount++;
         });
 
-        const message = 'bag: \n'.concat(...originalConfig.map((configItem) => `${configItem.letter}: ${configItem.amount},\n`));
+        const message = 'Réserve: \n'.concat(...originalConfig.map((configItem) => `${configItem.letter}: ${configItem.amount},\n`));
 
         sockets[playerNumber].emit('receive message', { username: '', message, messageType: 'System' });
     }
