@@ -9,59 +9,39 @@
         <div class="leaderboard_classic">
             <h1>Mode Classique</h1>
             <div class="info">
-                <div class="rank">
-                    <p>Rang</p>
-                    <p>1</p>
-                    <p>2</p>
-                    <p>3</p>
-                    <p>4</p>
-                    <p>5</p>
-                </div>
-                <div class="score">
-                    <p>Score</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                </div>
-                <div class="username">
-                    <p>Nom d'utilisateur</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                </div>
+                <mat-table [dataSource]="highScoreClassic">
+                    <ng-container matColumnDef="rank">
+                        <mat-header-cell *matHeaderCellDef>Rank</mat-header-cell>
+                        <mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="name">
+                        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.name }}</mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="score">
+                        <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
+                        <mat-cell *matCellDef="let element">{{ element.score }}</mat-cell>
+                    </ng-container>
+                </mat-table>
             </div>
         </div>
         <div class="leaderboard_log2990">
             <h1>Mode LOG2990</h1>
             <div class="info">
-                <div class="rank">
-                    <p>Rang</p>
-                    <p>1</p>
-                    <p>2</p>
-                    <p>3</p>
-                    <p>4</p>
-                    <p>5</p>
-                </div>
-                <div class="score">
-                    <p>Score</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                    <p>0</p>
-                </div>
-                <div class="username">
-                    <p>Nom d'utilisateur</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                    <p>name</p>
-                </div>
+                <table mat-table [dataSource]="highScoreLog2990">
+                    <ng-container matColumnDef="rank">
+                        <td mat-header-cell *matHeaderCellDef>Rank</td>
+                        <th mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</th>
+                    </ng-container>
+                    <ng-container matColumnDef="name">
+                        <td mat-header-cell *matHeaderCellDef>Name</td>
+                        <th mat-cell *matCellDef="let element">{{ element.name }}</th>
+                    </ng-container>
+                    <ng-container matColumnDef="score">
+                        <td mat-header-cell *matHeaderCellDef>Score</td>
+                        <th mat-cell *matCellDef="let element">{{ element.score }}</th>
+                    </ng-container>
+                </table>
             </div>
         </div>
     </div>
