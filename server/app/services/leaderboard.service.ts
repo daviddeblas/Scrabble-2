@@ -1,7 +1,9 @@
 import { GameMode } from '@app/classes/game-configs';
 import { DATABASE, DEFAULT_HIGHSCORE, HighScore } from '@app/classes/highscore';
 import { Db, Document, WithId } from 'mongodb';
+import { Service } from 'typedi';
 
+@Service()
 export class LeaderboardService {
     private highScoreDB: Db;
 

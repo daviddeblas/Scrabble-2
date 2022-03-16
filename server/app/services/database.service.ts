@@ -1,6 +1,8 @@
 import { DATABASE } from '@app/classes/highscore';
 import { Db, MongoClient } from 'mongodb';
+import { Service } from 'typedi';
 
+@Service()
 export class DatabaseService {
     private highScoreDB: Db;
     private client: MongoClient;
