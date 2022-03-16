@@ -1,6 +1,8 @@
 // Fichier issu de l'exemple du cours de socketIo
 
 /* eslint-disable */
+// Le fichier qui nous est fournit contient plusieurs erreur esLint, comme on peut l'utiliser comme tel
+// on a juste ignorer toutes les erreurs esLint relier a ce fichier
 type CallbackSignature = (params: unknown) => unknown;
 
 export class SocketTestHelper {

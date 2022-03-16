@@ -15,8 +15,9 @@ import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { CommandService } from './command.service';
+import { DictionaryService } from './dictionary.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Individual functions', () => {
@@ -41,7 +42,7 @@ describe('Individual functions', () => {
     };
 
     beforeEach(() => {
-        commandService = new CommandService();
+        commandService = new CommandService(Container.get(DictionaryService));
         sockets = [];
         sockets.push(createFakeSocket(0));
         sockets.push(createFakeSocket(1));
@@ -193,6 +194,24 @@ describe('Individual functions', () => {
         sockets[playerNumber] = fakeSocket;
         commandService['errorOnCommand'](game, sockets, new Error('error'), playerNumber);
     });
+
+    it('errorOnCommand should not emit error if the socket does not contain corresponding socket', (done) => {
+        let emitWasCalled = false;
+        const fakeSocket = {
+            emit: () => {
+                emitWasCalled = true;
+            },
+        } as unknown as io.Socket;
+        const game = {} as unknown as Game;
+        const playerNumber = 0;
+        sockets[playerNumber] = fakeSocket;
+        commandService['errorOnCommand'](game, sockets, new Error('error'), 3);
+        const responseTime = 200;
+        setTimeout(() => {
+            expect(emitWasCalled).to.equal(false);
+            done();
+        }, responseTime);
+    });
 });
 
 describe('commands', () => {
@@ -226,7 +245,7 @@ describe('commands', () => {
         sockets.push(createFakeSocket(1));
 
         gameOptions = new GameOptions('a', 'b');
-        commandService = new CommandService();
+        commandService = new CommandService(Container.get(DictionaryService));
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
         room.join(sockets[1], 'player 2');
@@ -274,11 +293,19 @@ describe('commands', () => {
             expect(() => commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer)).to.throw();
         });
 
-        it('string with skip calls processSkip', (done) => {
+        it('string with skip calls processBag', (done) => {
             commandService.processBag = () => {
                 done();
             };
             const fullCommand = 'réserve';
+            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+        });
+
+        it('string with hint calls processHint', (done) => {
+            commandService.processHint = () => {
+                done();
+            };
+            const fullCommand = 'indice';
             commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
         });
     });
@@ -306,6 +333,10 @@ describe('commands', () => {
         expect(() => commandService.processSkip(game, room.sockets, ['a', 'b'], 0)).to.throw();
     });
 
+    it('processHint with arguments should throw an error', () => {
+        expect(() => commandService.processHint(game, room.sockets, ['a', 'b'], 0)).to.throw();
+    });
+
     it('ProcessSkip should emit skip success when player number is 0', (done) => {
         const fakeSocket = {
             emit: (event: string) => {
@@ -318,6 +349,17 @@ describe('commands', () => {
             return;
         });
         commandService.processSkip(game, room.sockets, [], 0);
+    });
+
+    it('processHint should emit hint success', (done) => {
+        const fakeSocket = {
+            emit: (event: string) => {
+                if (event === 'hint success') done();
+                return;
+            },
+        } as io.Socket;
+        room.sockets[0] = fakeSocket;
+        commandService.processHint(game, room.sockets, [], 0);
     });
 
     it('ProcessSkip should emit skip success when player number is 1', (done) => {

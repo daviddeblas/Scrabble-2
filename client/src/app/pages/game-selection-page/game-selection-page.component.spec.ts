@@ -36,12 +36,17 @@ describe('GameSelectionPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should open the window when the begin button is clicked', () => {
+    it('should open the window when the solo button is clicked', () => {
+        component.openSoloSettingsPage();
+        expect(mockDialogSpy.open).toHaveBeenCalled();
+    });
+
+    it('should open the window when the multiplayer button is clicked', () => {
         component.openGamePreparationPage();
         expect(mockDialogSpy.open).toHaveBeenCalled();
     });
 
-    it('should open the window when the begin button is clicked', () => {
+    it('should open the window when the join button is clicked', () => {
         component.openGameJoinPage();
         expect(mockDialogSpy.open).toHaveBeenCalled();
     });

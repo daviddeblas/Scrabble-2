@@ -12,7 +12,10 @@ export class BrowserService {
     setupSocketConnection(socket: io.Socket) {
         socket.on('closed browser', (userId) => {
             const room = this.roomsManager.getRoom(socket.id);
-            if (room?.game === null) room.quitRoomHost();
+            if (room?.game === null) {
+                room.quitRoomHost();
+                return;
+            }
 
             this.tempClientSocketId = userId;
             this.tempServerSocket = socket;
@@ -23,10 +26,10 @@ export class BrowserService {
         });
 
         socket.on('browser reconnection', (oldClientId) => {
-            if (oldClientId === this.tempClientSocketId) {
-                clearTimeout(this.timeoutId);
-                this.roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
-            }
+            if (oldClientId !== this.tempClientSocketId) return;
+
+            clearTimeout(this.timeoutId);
+            this.roomsManager.switchPlayerSocket(this.tempServerSocket, socket);
         });
     }
 }
