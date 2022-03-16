@@ -14,6 +14,7 @@ function createInitialPlayersState() {
     const players: Players = {
         player: new Player('Player 1'),
         opponent: new Player('Player 2'),
+        botLevel: 'Débutant',
     };
 
     players.player.easel = ['A', 'S', 'S', 'L', 'L', 'P', 'O'];
@@ -27,6 +28,7 @@ describe('[Players] Reducer', () => {
         const playersStub: Players = {
             player: new Player('Player 1'),
             opponent: new Player('Player 2'),
+            botLevel: 'Débutant',
         };
 
         const gameStatusStub: GameStatus = {

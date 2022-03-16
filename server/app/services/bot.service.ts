@@ -73,8 +73,8 @@ export class BotService {
 
     private determineWord(placements: Map<string[], number>, difficulty: BotDifficulty): string {
         if (difficulty === BotDifficulty.Hard) return 'passer';
-        const fortyPercent = 0.4;
-        const thirtyPercent = 0.3;
+        const firstPointCategory = 0.4;
+        const secondPointCategory = 0.7;
         let lowestPoints: number;
         let maxPoints: number;
         const wordPossibilities: string[][] = [];
@@ -82,7 +82,7 @@ export class BotService {
         const indexChosen: number[] = [];
         while (wordPossibilities.length === 0 && !this.arrayIncludesAllThreeIndex(indexChosen)) {
             chooseRandomPoints = Math.random();
-            indexChosen.push(chooseRandomPoints < fortyPercent ? 0 : chooseRandomPoints < fortyPercent + thirtyPercent ? 1 : 2);
+            indexChosen.push(chooseRandomPoints < firstPointCategory ? 0 : chooseRandomPoints < secondPointCategory ? 1 : 2);
             switch (indexChosen[indexChosen.length - 1]) {
                 case 0:
                     lowestPoints = CategoryOfPoints.MinLowCategory;
@@ -106,7 +106,7 @@ export class BotService {
 
     private arrayIncludesAllThreeIndex(array: number[]): boolean {
         let result = true;
-        for (let index = 1; index <= 3; index++) {
+        for (let index = 0; index < 3; index++) {
             result &&= array.includes(index);
         }
         return result;

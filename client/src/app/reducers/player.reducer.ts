@@ -23,7 +23,7 @@ export const reducer = createReducer(
     on(gameStatusReceived, (state, { players }) => players),
 
     on(placeWordSuccess, (state, { word, newLetters, newScore }) => {
-        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent), botLevel: state.botLevel };
         nextState.player.removeLettersFromEasel(stringToLetters(word.letters));
 
         if (newLetters) nextState.player.addLettersToEasel(newLetters);
@@ -33,7 +33,7 @@ export const reducer = createReducer(
     }),
 
     on(exchangeLettersSuccess, (state, { oldLetters, newLetters }) => {
-        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent), botLevel: state.botLevel };
         nextState.player.removeLettersFromEasel(oldLetters);
         nextState.player.addLettersToEasel(newLetters);
 
@@ -41,19 +41,19 @@ export const reducer = createReducer(
     }),
 
     on(removeLetterFromEasel, (state, { letter }) => {
-        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent), botLevel: state.botLevel };
         nextState.player.removeLettersFromEasel([letter]);
         return nextState;
     }),
 
     on(addLettersToEasel, (state, { letters }) => {
-        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent), botLevel: state.botLevel };
         nextState.player.addLettersToEasel(letters);
         return nextState;
     }),
 
     on(switchLettersEasel, (state, { positionIndex, destinationIndex }) => {
-        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent) };
+        const nextState = { player: copyPlayer(state.player), opponent: copyPlayer(state.opponent), botLevel: state.botLevel };
         const nextEasel = JSON.parse(JSON.stringify(state.player.easel));
         const tempLetter = nextEasel[positionIndex];
         nextEasel[positionIndex] = nextEasel[destinationIndex];
