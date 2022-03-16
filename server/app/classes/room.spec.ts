@@ -173,6 +173,16 @@ describe('room', () => {
             expect(setupSocketStub.called).to.equal(true);
         });
 
+        it('initiateRoomEvents should call setupSocket once if no client is present', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
+                return;
+            });
+            room.initiateRoomEvents();
+            expect(setupSocketStub.calledOnce).to.equal(true);
+        });
+
         it('actionAfterTimeout should call processSkip and postCommand', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const commandServiceStub = {
@@ -465,7 +475,7 @@ describe('room', () => {
                             expect(initSoloGameStub.calledOnce).to.equal(true);
                             done();
                         });
-                        hostSocket.emit('switch to solo room');
+                        hostSocket.emit('switch to solo room', { botLevel: 'Débutant' });
                     });
                 });
                 hostSocket.emit('create room');
