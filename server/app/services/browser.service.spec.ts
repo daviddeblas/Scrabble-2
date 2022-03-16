@@ -91,7 +91,6 @@ describe('Browser service tests', () => {
         roomsManager.rooms.push(room);
         const userId = '123';
         stub(roomsManager, 'getRoom').callsFake(() => room);
-        // service.roomsManager.getRoom = roomMangerStub;
         clientSocket.emit('closed browser', userId);
         setTimeout(() => {
             expect(spyOnQuitRoomHost.calledOnce).to.equal(true);

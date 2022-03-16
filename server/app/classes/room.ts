@@ -157,10 +157,10 @@ export class Room {
             socket.emit('game status', game.getGameStatus(playerNumber, this.botLevel));
         });
 
-        // Init command processing
+        // Initialise le traitement des commandes
         socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
-        // Init Chat
+        // Initialise le chat
         socket.on('send message', ({ username, message, messageType }) => {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
@@ -172,7 +172,7 @@ export class Room {
             }
         });
 
-        // Init surrender game
+        // Initialise l'abbandon de la partie
         socket.on('surrender game', () => {
             this.surrenderGame(socket.id);
         });

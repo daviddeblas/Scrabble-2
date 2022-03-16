@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { restoreMessages } from '@app/actions/chat.actions';
 import { refreshTimer } from '@app/actions/game-status.actions';
@@ -24,7 +25,7 @@ describe('BrowserManagerService', () => {
         socketService.connect();
     });
     afterEach(() => {
-        document.cookie = 'socket= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; // Permet de supprimer les cookies créée pour le test
+        document.cookie = 'socket= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; // Permet de supprimer les cookies crée pour le test
         socketService.disconnect();
     });
 
@@ -78,7 +79,6 @@ describe('BrowserManagerService', () => {
 
     it('storeSelectors should store the data selector in localStorage', () => {
         const providedMessage = { username: 'Player', message: 'Message' };
-        // eslint-disable-next-line dot-notation
         service['storeSelectors']();
         expect(localStorage.getItem('chatMessages')).toEqual(JSON.stringify([providedMessage]));
     });
@@ -86,7 +86,6 @@ describe('BrowserManagerService', () => {
     it('retrieveSelectors should get the local storage stored under the chatMessages key and dispatch restoreMessages', () => {
         const expectedMessage = JSON.stringify([{ username: 'Player1', message: 'HelloWorld' }]);
         localStorage.setItem('chatMessages', expectedMessage);
-        // eslint-disable-next-line dot-notation
         service['retrieveSelectors']();
         const expectedAction = cold('a', { a: restoreMessages({ oldMessages: JSON.parse(expectedMessage) }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
@@ -94,7 +93,6 @@ describe('BrowserManagerService', () => {
 
     it('retrieveSelectors should not dispatch restoreMessages if no chatMessages key exist in LocalStorage', () => {
         localStorage.removeItem('chatMessages');
-        // eslint-disable-next-line dot-notation
         service['retrieveSelectors']();
         const dispatchSpy = spyOn(store, 'dispatch').and.callFake(() => {
             return;
@@ -114,7 +112,6 @@ describe('BrowserManagerService', () => {
 
     it('should should not dispatch refreshTimer if no currentTimer key exist in LocalStorage', (done) => {
         localStorage.removeItem('currentTimer');
-        // eslint-disable-next-line dot-notation
         const spy = spyOn(service['store'], 'dispatch');
         const fakeSend = () => {
             return ' ';
@@ -131,7 +128,6 @@ describe('BrowserManagerService', () => {
     it('should dispatch refreshTimer if there is the currentTimer key in LocalStorage', (done) => {
         const date = new Date();
         localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER, date: date.getTime() }));
-        // eslint-disable-next-line dot-notation
         const spy = spyOn(service['store'], 'dispatch');
         const fakeSend = () => {
             return ' ';
