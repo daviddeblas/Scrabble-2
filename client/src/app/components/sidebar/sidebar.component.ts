@@ -1,4 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { messageWritten } from '@app/actions/chat.actions';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -64,6 +65,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     placeWord(): void {
         this.keyManager.onEnter();
+    }
+
+    getHint(): void {
+        this.store.dispatch(messageWritten({ username: this.activePlayer, message: '!indice' }));
     }
 
     isActivePlayer(player: Player | undefined): boolean {
