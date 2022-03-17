@@ -179,7 +179,7 @@ describe('ChatService', () => {
         const exampleMessage = ['!passer', 'z4,e'];
         service['handleTurnSpecificCommands'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande passer mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -198,7 +198,7 @@ describe('ChatService', () => {
         spyOn(service as any, 'validatePlaceCommand').and.callFake(() => false);
         service['handlePlaceCommand'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande placer mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -207,7 +207,7 @@ describe('ChatService', () => {
         const exampleMessage = ['!échanger', 'n_fpe38'];
         service['handleExchangeCommand'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande échanger mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -216,7 +216,7 @@ describe('ChatService', () => {
         const exampleMessage = ['!passer', 'n_fpe38'];
         service['handleSimpleCommand'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });

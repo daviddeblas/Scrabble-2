@@ -87,7 +87,7 @@ export class ChatService {
                     return true;
                 } else {
                     this.store.dispatch(
-                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande réserve mal formée', messageType: 'Error' }),
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
                     );
                 }
                 break;
@@ -108,7 +108,7 @@ export class ChatService {
                     this.handleSimpleCommand(command);
                 } else {
                     this.store.dispatch(
-                        receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande passer mal formée', messageType: 'Error' }),
                     );
                     return;
                 }
@@ -127,7 +127,7 @@ export class ChatService {
             const commandLine = command[0].slice(1, command[0].length);
             this.socketService.send('command', commandLine);
         } else {
-            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe: commande mal formée', messageType: 'Error' }));
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande mal formée', messageType: 'Error' }));
             return;
         }
     }
@@ -136,7 +136,7 @@ export class ChatService {
         if (this.validateExchangeCommand(command)) {
             this.store.dispatch(exchangeLetters({ letters: command[1] }));
         } else {
-            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }));
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande échanger mal formée', messageType: 'Error' }));
             return;
         }
     }
@@ -145,7 +145,7 @@ export class ChatService {
         if (this.validatePlaceCommand(command)) {
             this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
         } else {
-            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }));
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande placer mal formée', messageType: 'Error' }));
             return;
         }
     }
