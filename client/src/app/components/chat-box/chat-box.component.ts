@@ -42,6 +42,7 @@ export class ChatBoxComponent implements OnInit {
     }
 
     submitMessage(): void {
+        if (!this.chatMessage.nativeElement.value) return;
         this.store.dispatch(chatActions.messageWritten({ username: this.username, message: this.chatMessage.nativeElement.value }));
         this.chatMessage.nativeElement.value = '';
     }
