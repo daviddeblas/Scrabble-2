@@ -1,8 +1,10 @@
+/* eslint-disable dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
 import { LetterComponent } from '@app/components/letter/letter.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameStatus } from '@app/reducers/game-status.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { EaselComponent } from './easel.component';
@@ -13,12 +15,14 @@ describe('EaselComponent', () => {
     let fixture: ComponentFixture<EaselComponent>;
     let mouseClickStub: MouseEvent;
     let store: MockStore;
+    let keyManagerMock: jasmine.SpyObj<KeyManagerService>;
 
     beforeEach(async () => {
+        keyManagerMock = jasmine.createSpyObj('keyManager', ['onEsc']);
         await TestBed.configureTestingModule({
             declarations: [EaselComponent, LetterComponent],
             imports: [AppMaterialModule],
-            providers: [provideMockStore()],
+            providers: [provideMockStore(), { provide: KeyManagerService, useValue: keyManagerMock }],
         }).compileComponents();
         mouseClickStub = {
             preventDefault: () => {
@@ -308,5 +312,17 @@ describe('EaselComponent', () => {
         const cancelSelectionSpy = spyOn(component, 'cancelSelection');
         component.selectLetterForManipulation(0);
         expect(cancelSelectionSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should call onEsc if the click target is inside the chatBox', () => {
+        const e: Event = { target: component['eRef'].nativeElement } as Event;
+        component.clickout(e);
+        expect(keyManagerMock.onEsc).toHaveBeenCalled();
+    });
+
+    it('should not call onEsc if the click target is outside the chatBox', () => {
+        const e: Event = { target: document.parentElement } as Event;
+        component.clickout(e);
+        expect(keyManagerMock.onEsc).not.toHaveBeenCalled();
     });
 });
