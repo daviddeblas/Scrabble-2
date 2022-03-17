@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { PlacedLetter } from '@app/classes/placed-letter';
+import { PlacedLetter } from '@app/interfaces/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
