@@ -94,6 +94,30 @@ describe('ChatBoxComponent', () => {
         expect(focusSpy).not.toHaveBeenCalled();
     });
 
+    it('should send the dispatch message written with place command found by hint', () => {
+        const expectedMessage = '!placer h7h mordre';
+        component.gameEnded = false;
+        component.sendHintMessage(expectedMessage);
+        const expectedAction = cold('a', { a: messageWritten({ username: component.username, message: expectedMessage }) });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should not dispatch message written if the message does not start by !placer', () => {
+        const dispatchSpy = spyOn(component['store'], 'dispatch');
+        const expectedMessage = '!passer';
+        component.gameEnded = false;
+        component.sendHintMessage(expectedMessage);
+        expect(dispatchSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not dispatch message written if game has ended', () => {
+        const dispatchSpy = spyOn(component['store'], 'dispatch');
+        const expectedMessage = '!placer h7h mordre';
+        component.gameEnded = true;
+        component.sendHintMessage(expectedMessage);
+        expect(dispatchSpy).not.toHaveBeenCalled();
+    });
+
     it('ngOnInit should focus input if gameEnded changes', () => {
         const focusSpy = spyOn(component['chatMessage'].nativeElement, 'focus');
         store.overrideSelector('gameStatus', { gameEnded: true });
