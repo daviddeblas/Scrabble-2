@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
-import { GameMode } from '@app/classes/game-info';
 import { HighScore } from '@app/classes/highscore';
 
 @Component({
@@ -13,7 +12,5 @@ export class LeaderboardPageComponent implements AfterViewInit {
     highScoreLog2990: HighScore[];
     displayedColumns: string[] = ['position', 'name', 'score'];
 
-    ngAfterViewInit(): void {
-        this.httpService.getHighScores(GameMode.Classical);
-    }
+    ngAfterViewInit(): void {}
 }
