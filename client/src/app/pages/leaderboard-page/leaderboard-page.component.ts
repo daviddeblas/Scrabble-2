@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { HighScore } from '@app/classes/highscore';
 
 @Component({
@@ -6,11 +6,9 @@ import { HighScore } from '@app/classes/highscore';
     templateUrl: './leaderboard-page.component.html',
     styleUrls: ['./leaderboard-page.component.scss'],
 })
-export class LeaderboardPageComponent implements AfterViewInit {
+export class LeaderboardPageComponent {
     @Output() readonly buttonClick = new EventEmitter<string>();
     highScoreClassic: HighScore[];
     highScoreLog2990: HighScore[];
-    displayedColumns: string[] = ['position', 'name', 'score'];
-
-    ngAfterViewInit(): void {}
+    displayedColumns: string[] = ['rank', 'name', 'score'];
 }
