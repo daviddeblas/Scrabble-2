@@ -1,4 +1,4 @@
-import { DATABASE } from '@app/classes/highscore';
+import { DATABASE, HighScore } from '@app/classes/highscore';
 import { Db, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
@@ -15,11 +15,27 @@ export class DatabaseService {
         } catch {
             throw Error('Database connection error');
         }
+        if ((await this.highScoreDB.collection(DATABASE.highScore.collections).countDocuments()) === 0) {
+            await this.populateDB();
+        }
+
         return this.client;
     }
 
     async closeConnection(): Promise<void> {
         return this.client.close();
+    }
+
+    async populateDB(): Promise<void> {
+        let scores: HighScore[];
+
+        for (const score of scores) {
+            await this.highScoreDB.collection(DATABASE.highScore.collections).insertOne(score);
+        }
+    }
+
+    get database(): Db {
+        return this.highScoreDB;
     }
 
     async resetDB() {
