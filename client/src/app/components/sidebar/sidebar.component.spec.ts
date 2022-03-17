@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { messageWritten } from '@app/actions/chat.actions';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -42,6 +43,12 @@ describe('SidebarComponent', () => {
     it('should dispatch "[LocalSettings] Zoom In"', () => {
         const expectedAction = cold('a', { a: zoomIn() });
         component.zoomIn();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch "[Chat] Message Written"', () => {
+        const expectedAction = cold('a', { a: messageWritten({ username: component.activePlayer, message: '!indice' }) });
+        component.getHint();
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
