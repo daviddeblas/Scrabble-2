@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
+import { loadLeaderboard } from '@app/actions/leaderboard.actions';
 import { createRoom } from '@app/actions/room.actions';
 import { GameOptions } from '@app/classes/game-options';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
@@ -40,6 +41,7 @@ export class MultiConfigWindowComponent implements OnInit {
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');
         store.dispatch(loadDictionaries());
+        store.dispatch(loadLeaderboard());
     }
 
     ngOnInit(): void {
