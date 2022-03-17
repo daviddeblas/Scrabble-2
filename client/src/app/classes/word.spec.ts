@@ -1,5 +1,6 @@
+import { Direction } from '@app/enums/direction';
 import { Vec2 } from 'common/classes/vec2';
-import { Direction, Word } from './word';
+import { Word } from './word';
 
 describe('Word', () => {
     it('should create an instance', () => {
