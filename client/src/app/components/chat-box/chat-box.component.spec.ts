@@ -61,6 +61,18 @@ describe('ChatBoxComponent', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
+    it('should not dispatch "[Chat] Message written" when submitted with no message', () => {
+        const dispatchSpy = spyOn(store, 'dispatch');
+        const expectedUsername = 'My username';
+        const expectedMessage = '';
+        component['chatMessage'].nativeElement.value = expectedMessage;
+        component.username = expectedUsername;
+        fixture.detectChanges();
+
+        component.submitMessage();
+        expect(dispatchSpy).not.toHaveBeenCalled();
+    });
+
     it('should reset the chatMessage value when submitted', () => {
         component['chatMessage'].nativeElement.value = 'My message';
         fixture.detectChanges();
