@@ -1,6 +1,7 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
+import { copyLetterConfigItem, LetterConfigItem } from '@app/classes/letter-config-item';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
@@ -27,6 +28,9 @@ export class CommandService {
             case 'passer':
                 this.processSkip(game, sockets, args, playerNumber);
                 break;
+            case 'réserve':
+                this.processBag(game, sockets, args, playerNumber);
+                break;
             case 'indice':
                 this.processHint(game, sockets, args, playerNumber);
                 break;
@@ -43,6 +47,23 @@ export class CommandService {
         if (game.needsToEnd()) {
             this.endGame(game, sockets);
         }
+    }
+
+    processBag(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+        const lettersToSend = [...game.bag.letters];
+        lettersToSend.push(...game.players[(playerNumber + 1) % game.players.length].easel);
+        const originalConfig = game.config.letters.map((item) => copyLetterConfigItem(item));
+
+        originalConfig.forEach((configItem) => {
+            configItem.amount = 0;
+        });
+        lettersToSend.forEach((letter) => {
+            (originalConfig.find((configItem) => configItem.letter === letter) as LetterConfigItem).amount++;
+        });
+
+        const message = 'Réserve: \n'.concat(...originalConfig.map((configItem) => `${configItem.letter}: ${configItem.amount},\n`));
+
+        sockets[playerNumber].emit('receive message', { username: '', message, messageType: 'System' });
     }
 
     processPlace(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {

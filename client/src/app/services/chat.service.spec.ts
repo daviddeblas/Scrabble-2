@@ -192,7 +192,7 @@ describe('ChatService', () => {
     });
 
     it('should dispatch handleSkipCommand with the command to skip if the command is valid', () => {
-        const exchangeCommandSpy = spyOn(service, 'handleSkipCommand');
+        const exchangeCommandSpy = spyOn(service, 'handleSimpleCommand');
         const exampleMessage = '!passer';
         service.messageWritten(username, exampleMessage);
         expect(exchangeCommandSpy).toHaveBeenCalledWith(['!passer']);
@@ -208,7 +208,7 @@ describe('ChatService', () => {
     it('handleSkipCommand should call socketService send with namespace command', () => {
         const exampleCommand = ['!passer'];
         const sendSpy = spyOn(service['socketService'], 'send');
-        service.handleSkipCommand(exampleCommand);
+        service.handleSimpleCommand(exampleCommand);
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'passer');
     });
 
@@ -318,5 +318,13 @@ describe('ChatService', () => {
         service.messageWritten(otherPlayer, exampleMessage);
         const expectedAction = cold('a', { a: receivedMessage({ username: '', message: 'La partie est finie', messageType: 'Error' }) });
         expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('handleNonTurnSpecificCommand should return true on correct call', () => {
+        expect(service.handleNonTurnSpecificCommands(['!réserve'])).toBeTruthy();
+    });
+
+    it('handleNonTurnSpecificCommand should return false on correct call', () => {
+        expect(service.handleNonTurnSpecificCommands(['!réserve', 'a'])).toBeFalsy();
     });
 });
