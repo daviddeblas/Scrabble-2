@@ -85,7 +85,7 @@ export class Room {
         this.sockets = [this.host, this.clients[0] as io.Socket];
 
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(this),
@@ -137,9 +137,9 @@ export class Room {
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
-
+        console.log(Container.get(GameConfigService).configs[0]);
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
             this.gameOptions,
             this.actionAfterTimeout(this),
