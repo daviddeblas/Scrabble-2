@@ -1,6 +1,6 @@
 import * as chatActions from '@app/actions/chat.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { createReducer, on } from '@ngrx/store';
 
 export const chatFeatureKey = 'chat';

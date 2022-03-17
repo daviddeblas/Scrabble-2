@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { backspaceSelection, clearSelection, placeLetter, removeLetters } from '@app/actions/board.actions';
 import { addLettersToEasel, placeWord, removeLetterFromEasel } from '@app/actions/player.actions';
-import { Orientation } from '@app/classes/board-selection';
+import { Direction } from '@app/enums/direction';
 import { BoardState, isCellAtBoardLimit } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
@@ -21,7 +21,7 @@ export class KeyManagerService {
 
     onEnter(): void {
         let modifiedCells: Vec2[] = [];
-        let orientation: Orientation | null = null;
+        let orientation: Direction | null = null;
         const placedLetters: Letter[] = [];
         let letters: Letter[] = [];
         this.store.select('board').subscribe((state) => {
@@ -34,11 +34,9 @@ export class KeyManagerService {
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
         if (orientation === null && modifiedCells.length > 1)
-            orientation = modifiedCells[0].x === modifiedCells[1].x ? Orientation.Horizontal : Orientation.Vertical;
+            orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.HORIZONTAL : Direction.VERTICAL;
 
-        const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${
-            orientation === Orientation.Horizontal ? 'h' : 'v'
-        }`;
+        const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${orientation}`;
 
         const blankPos: number[] = [];
         while (this.blankLettersBuffer.length !== 0) {
@@ -114,13 +112,13 @@ export class KeyManagerService {
 
         // Verifie s'il possible de placer d'autre lettre sur le plateau
         let board: (Letter | null)[][] = [];
-        let orientation: Orientation | null = null;
+        let orientation: Direction | null = null;
         selectedCell = selectedCell as Vec2;
         this.store.select('board').subscribe((state) => {
             board = state.board;
             orientation = state.selection.orientation;
         });
-        if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Orientation) && board[selectedCell.x][selectedCell.y] !== null) return;
+        if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction) && board[selectedCell.x][selectedCell.y] !== null) return;
 
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const letter = stringToLetter(key);

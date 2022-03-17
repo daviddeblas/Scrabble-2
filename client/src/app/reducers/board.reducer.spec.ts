@@ -3,7 +3,8 @@ import { gameStatusReceived, resetAllState } from '@app/actions/game-status.acti
 import * as playersActions from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
-import { Direction, Word } from '@app/classes/word';
+import { Word } from '@app/classes/word';
+import { Direction } from '@app/enums/direction';
 import { Letter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';

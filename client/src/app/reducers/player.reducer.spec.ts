@@ -2,7 +2,8 @@ import { gameStatusReceived, resetAllState } from '@app/actions/game-status.acti
 import { exchangeLettersSuccess, placeWordSuccess, switchLettersEasel } from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
-import { Direction, Word } from '@app/classes/word';
+import { Word } from '@app/classes/word';
+import { Direction } from '@app/enums/direction';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BoardState } from './board.reducer';

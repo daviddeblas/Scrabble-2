@@ -1,6 +1,6 @@
 import * as chatAction from '@app/actions/chat.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { initialState, reducer } from '@app/reducers/chat.reducer';
 describe('[Chat] Received message', () => {
     const chatMessageStub: ChatMessage = {
