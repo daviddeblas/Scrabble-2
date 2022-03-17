@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { StoreModule } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
@@ -14,12 +15,14 @@ describe('SidebarComponent', () => {
     let fixture: ComponentFixture<SidebarComponent>;
     let store: MockStore;
     let eventStub: Event;
+    let keyManagerMock: jasmine.SpyObj<KeyManagerService>;
 
     beforeEach(async () => {
+        keyManagerMock = jasmine.createSpyObj('keyManager', ['onEnter']);
         await TestBed.configureTestingModule({
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, StoreModule.forRoot({})],
             declarations: [SidebarComponent],
-            providers: [provideMockStore()],
+            providers: [provideMockStore(), { provide: KeyManagerService, useValue: keyManagerMock }],
         }).compileComponents();
         eventStub = {
             preventDefault: () => {
@@ -90,5 +93,10 @@ describe('SidebarComponent', () => {
         const spy = spyOn(window.localStorage, 'setItem');
         component.storeTimerUnLoad(eventStub);
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call keyManager.onEnter', () => {
+        component.placeWord();
+        expect(keyManagerMock.onEnter).toHaveBeenCalled();
     });
 });
