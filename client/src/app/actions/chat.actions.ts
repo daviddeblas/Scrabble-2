@@ -1,4 +1,4 @@
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { createAction, props } from '@ngrx/store';
 
 export const initiateChatting = createAction('[Chat] Initiate chatting');

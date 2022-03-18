@@ -1,8 +1,8 @@
 import { backspaceSelection, cellClick, clearSelection, placeLetter, removeLetters, syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { BoardSelection, Orientation } from '@app/classes/board-selection';
-import { Direction } from '@app/classes/word';
+import { BoardSelection } from '@app/classes/board-selection';
+import { Direction } from '@app/enums/direction';
 import { createReducer, on } from '@ngrx/store';
 import { Letter, stringToLetter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
@@ -30,20 +30,20 @@ const cloneBoard = (board: (Letter | null)[][]): (Letter | null)[][] => {
     return newBoard;
 };
 
-export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Orientation): boolean => {
+export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Direction): boolean => {
     switch (orientation) {
-        case Orientation.Horizontal:
+        case Direction.HORIZONTAL:
             for (let i = pos.x + 1; i < BOARD_SIZE; ++i) if (board[i][pos.y] === null) return false;
             break;
-        case Orientation.Vertical:
+        case Direction.VERTICAL:
             for (let i = pos.y + 1; i < BOARD_SIZE; ++i) if (board[pos.x][i] === null) return false;
             break;
     }
     return true;
 };
 
-const switchOrientation = (oldOrientation: Orientation | null): Orientation => {
-    return oldOrientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+const switchOrientation = (oldOrientation: Direction | null): Direction => {
+    return oldOrientation === Direction.HORIZONTAL ? Direction.VERTICAL : Direction.HORIZONTAL;
 };
 
 export interface BoardState {
@@ -59,7 +59,7 @@ export const initialState: BoardState = {
     pointsPerLetter: new Map(),
     multipliers: [],
     blanks: [],
-    selection: new BoardSelection(null, 'horizontal' as Orientation),
+    selection: new BoardSelection(null, 'horizontal' as Direction),
 };
 export const reducer = createReducer(
     initialState,
@@ -112,9 +112,9 @@ export const reducer = createReducer(
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);
 
-        let orientation: Orientation | null = state.selection.cell?.equals(tempState.selection.cell)
+        let orientation: Direction | null = state.selection.cell?.equals(tempState.selection.cell)
             ? switchOrientation(tempState.selection.orientation)
-            : Orientation.Horizontal;
+            : Direction.HORIZONTAL;
 
         if (isCellAtBoardLimit(state.board, tempState.selection.cell, orientation)) {
             orientation = switchOrientation(orientation);
@@ -134,20 +134,20 @@ export const reducer = createReducer(
         const selection = state.selection.copy();
         selection.modifiedCells.push(state.selection.cell as Vec2);
 
-        if (!isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation))
+        if (!isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Direction))
             do {
                 switch (state.selection.orientation) {
-                    case Orientation.Horizontal:
+                    case Direction.HORIZONTAL:
                         selectedPosition.x++;
                         break;
-                    case Orientation.Vertical:
+                    case Direction.VERTICAL:
                         selectedPosition.y++;
                         break;
                 }
             } while (board[selectedPosition.x][selectedPosition.y] !== null);
 
         selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
-        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Orientation)) selection.orientation = null;
+        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Direction)) selection.orientation = null;
 
         return {
             ...state,
@@ -180,7 +180,7 @@ export const reducer = createReducer(
 
         const lastCell = selection.modifiedCells.pop() as Vec2;
 
-        selection.orientation = selection.cell.x === lastCell.x ? Orientation.Vertical : Orientation.Horizontal;
+        selection.orientation = selection.cell.x === lastCell.x ? Direction.VERTICAL : Direction.HORIZONTAL;
         if (selection.cell.equals(lastCell)) selection.orientation = null;
 
         selection.cell = lastCell;

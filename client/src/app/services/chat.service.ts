@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';

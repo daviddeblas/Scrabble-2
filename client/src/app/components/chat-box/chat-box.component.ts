@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import * as chatActions from '@app/actions/chat.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { KeyManagerService } from '@app/services/key-manager.service';
