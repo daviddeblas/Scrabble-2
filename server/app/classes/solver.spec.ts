@@ -71,4 +71,17 @@ describe('solver', () => {
         ]);
         expect(regex.source).to.equal('^(?:(?:(?!X$)([a-z]{0,2}|^)X(?:[a-z]{1,12}|$)))$');
     });
+
+    it('should search in dictionary with regex', () => {
+        const dictionarySample = { words: ['arbre', 'cactus', 'sapin'] } as Dictionary;
+        const solver: Solver = new Solver(dictionarySample, board, []);
+        const words = solver.dictionarySearch(/^(.*)b/i, [{ start: 4, end: 5, value: 'B' }]);
+
+        expect(words).to.deep.equal([
+            {
+                word: 'arbre',
+                index: 2,
+            },
+        ]);
+    });
 });
