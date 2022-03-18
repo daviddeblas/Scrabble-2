@@ -6,6 +6,7 @@ import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
 import { BrowserService } from './services/browser.service';
 import { DictionaryService } from './services/dictionary.service';
+import { LeaderboardService } from './services/leaderboard.service';
 import { RoomsManager } from './services/rooms-manager.service';
 import { SocketService } from './services/socket-manager.service';
 
@@ -36,6 +37,7 @@ export class Server {
             Container.get(RoomsManager),
             Container.get(DictionaryService),
             Container.get(BrowserService),
+            Container.get(LeaderboardService),
         );
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);

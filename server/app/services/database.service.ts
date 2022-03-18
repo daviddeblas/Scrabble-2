@@ -15,7 +15,10 @@ export class DatabaseService {
         } catch {
             throw Error('Database connection error');
         }
-        if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
+        if (
+            (await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0 &&
+            (await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).countDocuments()) === 0
+        ) {
             await this.populateDB();
         }
 
@@ -31,6 +34,7 @@ export class DatabaseService {
 
         for (const score of scores) {
             await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
+            await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).insertOne(score);
         }
     }
 
