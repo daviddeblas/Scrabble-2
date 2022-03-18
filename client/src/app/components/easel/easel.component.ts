@@ -172,7 +172,7 @@ export class EaselComponent {
     }
 
     selectLetterForManipulation(letterIndex: number): void {
-        if (this.gameIsEnded()) return;
+        if (this.gameIsEnded() || this.letterColor[letterIndex] === this.exchangeColor) return;
         this.cancelSelection();
         this.letterColor[letterIndex] = this.manipulationColor;
     }
