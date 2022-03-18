@@ -42,11 +42,18 @@ export class ChatBoxComponent implements OnInit {
     }
 
     submitMessage(): void {
+        if (!this.chatMessage.nativeElement.value) return;
         this.store.dispatch(chatActions.messageWritten({ username: this.username, message: this.chatMessage.nativeElement.value }));
         this.chatMessage.nativeElement.value = '';
     }
 
     chatBoxBlur(): void {
         if (this.gameEnded) this.chatMessage.nativeElement.focus();
+    }
+
+    sendHintMessage(message: string): void {
+        if (message.startsWith('!placer') && !this.gameEnded) {
+            this.store.dispatch(chatActions.messageWritten({ username: this.username, message }));
+        }
     }
 }

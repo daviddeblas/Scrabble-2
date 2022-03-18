@@ -39,13 +39,23 @@
         </div>
         <button
             mat-raised-button
-            class="placeWord"
+            class="commandButton"
             color="primary"
             (click)="placeWord()"
             [disabled]="(modifiedCells$ | async)?.length === 0"
             aria-label="Placer le mot"
         >
             Jouer
+        </button>
+        <button
+            mat-raised-button
+            class="commandButton"
+            color="primary"
+            (click)="getHint()"
+            [disabled]="!isActivePlayer((players$ | async)?.player)"
+            aria-label="Prendre un indice"
+        >
+            Indice
         </button>
     </div>
 

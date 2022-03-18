@@ -43,3 +43,9 @@
     font-size: 10pt;
     height: auto;
 }
+
+#system-message:hover {
+    cursor: pointer;
+    background-color: lightgray;
+    text-decoration: underline gray;
+}

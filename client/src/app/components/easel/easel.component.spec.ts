@@ -309,4 +309,12 @@ describe('EaselComponent', () => {
         component.selectLetterForManipulation(0);
         expect(cancelSelectionSpy).toHaveBeenCalledTimes(0);
     });
+
+    it('selectLetterForManipulation should not call cancelSelection if the letter is due for exchange', () => {
+        store.overrideSelector('gameStatus', { gameEnded: false });
+        component.letterColor[0] = component.exchangeColor;
+        const cancelSelectionSpy = spyOn(component, 'cancelSelection');
+        component.selectLetterForManipulation(0);
+        expect(cancelSelectionSpy).toHaveBeenCalledTimes(0);
+    });
 });
