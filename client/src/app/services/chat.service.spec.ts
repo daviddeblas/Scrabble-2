@@ -1,10 +1,12 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
-import { ChatMessage } from '@app/classes/chat-message';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
@@ -94,6 +96,18 @@ describe('ChatService', () => {
         }, RESPONSE_TIME);
     });
 
+    it('acceptNewAction should be able to receive hint success and dispatch "[Chat] Received message"', (done) => {
+        const message = ['!placer h8h ear', '!placer h3v pla'];
+        const expectedMessage: ChatMessage = { username: '', message: '!placer h8h ear\n!placer h3v pla', messageType: 'System' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('hint success', { hints: message });
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
     it('acceptNewAction should be able to receive turn ended and dispatch "[Game Status] Get Game"', (done) => {
         service.acceptNewAction();
         socketHelper.peerSideEmit('turn ended');
@@ -136,9 +150,25 @@ describe('ChatService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
-    it('should dispatch "[Chat] Received message" with an Error if the command does not exist', () => {
-        const exampleMessage = '!Bonjour';
+    it('should call handleTurnSpecificCommands if the command is not a non turn specific command', () => {
+        const handleSpecificCommandSpy = spyOn(service as any, 'handleTurnSpecificCommands');
+        const exampleMessage = '!passer';
         service.messageWritten(username, exampleMessage);
+        expect(handleSpecificCommandSpy).toHaveBeenCalled();
+    });
+
+    it('should not call handleTurnSpecificCommands if handleNonTurnSpecificCommands returns true', () => {
+        const handleNonSpecificCommandSpy = spyOn(service as any, 'handleNonTurnSpecificCommands').and.callFake(() => true);
+        const handleSpecificCommandSpy = spyOn(service as any, 'handleTurnSpecificCommands');
+        const exampleMessage = '!réserve';
+        service.messageWritten(username, exampleMessage);
+        expect(handleNonSpecificCommandSpy).toHaveBeenCalled();
+        expect(handleSpecificCommandSpy).not.toHaveBeenCalled();
+    });
+
+    it('should dispatch "[Chat] Received message" with an Error if the command does not exist', () => {
+        const exampleMessage = ['!Bonjour'];
+        service['handleTurnSpecificCommands'](exampleMessage);
         const expectedAction = cold('a', {
             a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }),
         });
@@ -146,10 +176,10 @@ describe('ChatService', () => {
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
-        const exampleMessage = '!passer ,z4,e';
-        service.messageWritten(username, exampleMessage);
+        const exampleMessage = ['!passer', 'z4,e'];
+        service['handleTurnSpecificCommands'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande passer mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande passer mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -163,52 +193,82 @@ describe('ChatService', () => {
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command placer is not valid', () => {
-        const exampleMessage = '!placer nfpe ,z4,e';
+        const exampleMessage = ['!placer', 'nfpe', 'z4,e'];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn(service as any, 'validatePlaceCommand').and.callFake(() => false);
-        service.messageWritten(username, exampleMessage);
+        service['handlePlaceCommand'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande placer mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande placer mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Chat] Received message" with a syntax Error if the command échanger is not valid', () => {
-        const exampleMessage = '!échanger n_fpe38';
-        service.messageWritten(username, exampleMessage);
+        const exampleMessage = ['!échanger', 'n_fpe38'];
+        service['handleExchangeCommand'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Erreur de syntaxe: commande échanger mal formée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande échanger mal formée', messageType: 'Error' }),
+        });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch "[Chat] Received message" with a syntax Error if the command passer is not valid', () => {
+        const exampleMessage = ['!passer', 'n_fpe38'];
+        service['handleSimpleCommand'](exampleMessage);
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Erreur de syntaxe - commande mal formée', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch "[Players] Place Word" when typing a valid place command', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleMessage = '!placer a1h abcpzoe';
+        const exampleMessage = ['!placer', 'a1h', 'abcpzoe'];
         const position = 'a1h';
         const letters = 'abcpzoe';
-        service.messageWritten(username, exampleMessage);
+        service['handlePlaceCommand'](exampleMessage);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWord({ position, letters }));
     });
 
-    it('should dispatch handleSkipCommand with the command to skip if the command is valid', () => {
-        const exchangeCommandSpy = spyOn(service, 'handleSimpleCommand');
-        const exampleMessage = '!passer';
-        service.messageWritten(username, exampleMessage);
-        expect(exchangeCommandSpy).toHaveBeenCalledWith(['!passer']);
+    it('should call handlePlaceCommand with the command !placer', () => {
+        const exchangeCommandSpy = spyOn(service as any, 'handlePlaceCommand');
+        const exampleMessage = ['!placer', 'h7h', 'aer'];
+        service['handleTurnSpecificCommands'](exampleMessage);
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(exampleMessage);
+    });
+
+    it('should call handleExchangeCommand with the command !échanger', () => {
+        const exchangeCommandSpy = spyOn(service as any, 'handleExchangeCommand');
+        const exampleMessage = ['!échanger', 'aer'];
+        service['handleTurnSpecificCommands'](exampleMessage);
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(exampleMessage);
+    });
+
+    it('should call handleSimpleCommand with the command !indice', () => {
+        const exchangeCommandSpy = spyOn(service as any, 'handleSimpleCommand');
+        const exampleMessage = ['!indice'];
+        service['handleTurnSpecificCommands'](exampleMessage);
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(exampleMessage);
+    });
+
+    it('should call handleSimpleCommand with the command to skip if the command is valid', () => {
+        const exchangeCommandSpy = spyOn(service as any, 'handleSimpleCommand');
+        const exampleMessage = ['!passer'];
+        service['handleTurnSpecificCommands'](exampleMessage);
+        expect(exchangeCommandSpy).toHaveBeenCalledWith(exampleMessage);
     });
 
     it('should call handleExchangeCommand with the command to exchange if the command is valid', () => {
         const dispatchSpy = spyOn(service['store'], 'dispatch');
-        const exampleMessage = '!échanger aerev';
-        service.messageWritten(username, exampleMessage);
+        const exampleMessage = ['!échanger', 'aerev'];
+        service['handleExchangeCommand'](exampleMessage);
         expect(dispatchSpy).toHaveBeenCalledWith(exchangeLetters({ letters: 'aerev' }));
     });
 
-    it('handleSkipCommand should call socketService send with namespace command', () => {
+    it('handleSimpleCommand should call socketService send with namespace command', () => {
         const exampleCommand = ['!passer'];
         const sendSpy = spyOn(service['socketService'], 'send');
-        service.handleSimpleCommand(exampleCommand);
+        service['handleSimpleCommand'](exampleCommand);
         expect(sendSpy).toHaveBeenCalledOnceWith('command', 'passer');
     });
 
@@ -321,10 +381,10 @@ describe('ChatService', () => {
     });
 
     it('handleNonTurnSpecificCommand should return true on correct call', () => {
-        expect(service.handleNonTurnSpecificCommands(['!réserve'])).toBeTruthy();
+        expect(service['handleNonTurnSpecificCommands'](['!réserve'])).toBeTruthy();
     });
 
     it('handleNonTurnSpecificCommand should return false on correct call', () => {
-        expect(service.handleNonTurnSpecificCommands(['!réserve', 'a'])).toBeFalsy();
+        expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeFalsy();
     });
 });

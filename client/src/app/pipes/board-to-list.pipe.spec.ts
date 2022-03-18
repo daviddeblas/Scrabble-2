@@ -1,5 +1,5 @@
 import { BoardSelection } from '@app/classes/board-selection';
-import { PlacedLetter } from '@app/classes/placed-letter';
+import { PlacedLetter } from '@app/interfaces/placed-letter';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Vec2 } from 'common/classes/vec2';
 import { BoardToListPipe } from './board-to-list.pipe';

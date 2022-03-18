@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { initiateChatting, restoreMessages } from '@app/actions/chat.actions';
 import { getGameStatus, refreshTimer } from '@app/actions/game-status.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
