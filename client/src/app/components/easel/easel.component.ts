@@ -1,11 +1,12 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
 import { exchangeLetters, switchLettersEasel } from '@app/actions/player.actions';
-import { Letter, stringToLetter } from '@app/classes/letter';
-import { MAX_EASEL_SIZE, POSITION_LAST_CHAR } from '@app/constants';
 import { BoardState } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
+import { Letter, stringToLetter } from 'common/classes/letter';
+import { EASEL_CAPACITY, POSITION_LAST_CHAR } from 'common/constants';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -21,14 +22,17 @@ export class EaselComponent {
     easel: Letter[];
     pointsPerLetter$: Observable<Map<Letter, number>>;
     letterColor: string[];
-    playerIsActive: boolean = false;
 
-    constructor(private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>) {
+    constructor(
+        private store: Store<{ board: BoardState; players: Players; gameStatus: GameStatus }>,
+        private eRef: ElementRef,
+        private keyManager: KeyManagerService,
+    ) {
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         store.select('players').subscribe((players) => {
             this.easel = players.player.easel;
         });
-        this.letterColor = new Array(MAX_EASEL_SIZE).fill(this.mainColor);
+        this.letterColor = new Array(EASEL_CAPACITY).fill(this.mainColor);
     }
     @HostListener('window:mousewheel', ['$event'])
     mouseWheelEvent(event: WheelEvent): void {
@@ -48,6 +52,11 @@ export class EaselComponent {
         } else {
             this.selectLetterWithKey(event.key);
         }
+    }
+
+    @HostListener('document:click', ['$event'])
+    clickout(event: Event) {
+        if (this.eRef.nativeElement.contains(event.target)) this.keyManager.onEsc();
     }
 
     handlePositionSwitch(moveRight: boolean) {
@@ -95,15 +104,14 @@ export class EaselComponent {
     }
 
     gameIsEnded(): boolean {
-        let gameEnded;
+        let gameEnded = false;
         this.store.select('gameStatus').subscribe((status) => {
             gameEnded = status.gameEnded;
         });
         if (gameEnded) {
             this.cancelSelection();
-            return true;
         }
-        return false;
+        return gameEnded;
     }
 
     selectLetterToSwitch(event: MouseEvent, letterIndex: number): void {
@@ -164,7 +172,7 @@ export class EaselComponent {
     }
 
     selectLetterForManipulation(letterIndex: number): void {
-        if (this.gameIsEnded()) return;
+        if (this.gameIsEnded() || this.letterColor[letterIndex] === this.exchangeColor) return;
         this.cancelSelection();
         this.letterColor[letterIndex] = this.manipulationColor;
     }

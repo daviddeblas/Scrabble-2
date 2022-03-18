@@ -9,6 +9,7 @@ export interface GameStatus {
     letterPotLength: number;
     gameEnded: boolean;
     winner: string | null;
+    timer: number;
 }
 
 export const initialState: GameStatus = {
@@ -16,6 +17,7 @@ export const initialState: GameStatus = {
     letterPotLength: 0,
     gameEnded: false,
     winner: null,
+    timer: 0,
 };
 
 export const reducer = createReducer(
@@ -24,7 +26,12 @@ export const reducer = createReducer(
         ...state,
         activePlayer: status.activePlayer,
         letterPotLength: status.letterPotLength,
+        timer: status.timer,
     })),
     on(gameActions.endGame, (state, { winner }) => ({ ...state, gameEnded: true, winner })),
+    on(gameActions.refreshTimer, (state, { timer }) => ({
+        ...state,
+        timer,
+    })),
     on(resetAllState, () => initialState),
 );

@@ -1,5 +1,5 @@
 import { GameConfig } from '@app/classes/game-config';
-import { Letter } from '@app/classes/letter';
+import { Letter } from 'common/classes/letter';
 
 export class Bag {
     letters: Letter[];

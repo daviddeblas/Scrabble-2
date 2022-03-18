@@ -7,9 +7,9 @@ import {
     joinRoomDeclined,
     loadRoomsSuccess,
 } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
-import { RoomInfo } from '@app/classes/room-info';
 import { Store } from '@ngrx/store';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -24,6 +24,20 @@ export class RoomService {
         this.socketService.on('create room success', (roomInfo: RoomInfo) => {
             this.store.dispatch(createRoomSuccess({ roomInfo }));
             this.waitForInvitations();
+        });
+    }
+
+    createSoloRoom(gameOptions: GameOptions, botLevel: string): void {
+        this.socketService.send('create solo room', { gameOptions, botLevel });
+        this.socketService.on('create solo room success', (roomInfo: RoomInfo) => {
+            this.store.dispatch(createRoomSuccess({ roomInfo }));
+        });
+    }
+
+    switchToSoloRoom(botLevel: string): void {
+        this.socketService.send('switch to solo room', { botLevel });
+        this.socketService.on('switched to solo', (roomInfo: RoomInfo) => {
+            this.store.dispatch(createRoomSuccess({ roomInfo }));
         });
     }
 

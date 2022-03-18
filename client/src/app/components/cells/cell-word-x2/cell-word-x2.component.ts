@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Vec2 } from '@app/classes/vec2';
+import { iVec2 } from 'common/classes/vec2';
 
 @Component({
     /* Nécessaire pour les composantes SVG */
@@ -9,5 +9,5 @@ import { Vec2 } from '@app/classes/vec2';
     styleUrls: ['./cell-word-x2.component.scss'],
 })
 export class CellWordX2Component {
-    @Input() pos: Vec2 = { x: 0, y: 0 };
+    @Input() pos: iVec2 = { x: 0, y: 0 };
 }

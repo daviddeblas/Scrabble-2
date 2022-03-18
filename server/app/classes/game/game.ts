@@ -1,16 +1,18 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
-import { Letter } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
+import { GameOptions } from 'common/classes/game-options';
+import { BLANK_LETTER, Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
 
-const MAX_TURNS_SKIPPED = 5;
+const MAX_TURNS_SKIPPED = 6;
 export const MAX_LETTERS_IN_EASEL = 7;
 export const BONUS_POINTS_FOR_FULL_EASEL = 50;
+export const MILLISECONDS_PER_SEC = 1000;
 
 export class Game {
     players: Player[];
@@ -20,8 +22,15 @@ export class Game {
     turnsSkipped: number;
     placeCounter: number;
     gameFinished: boolean;
+    currentTimer: NodeJS.Timeout;
 
-    constructor(public config: GameConfig, playerNames: string[]) {
+    constructor(
+        public config: GameConfig,
+        playerNames: string[],
+        public gameOptions: GameOptions,
+        private actionAfterTimeout: () => void,
+        public actionAfterTurn: () => void,
+    ) {
         this.bag = new Bag(config);
         this.board = new Board(config);
         this.activePlayer = Math.floor(Math.random() * playerNames.length);
@@ -31,6 +40,11 @@ export class Game {
         this.players.forEach((p) => p.addLetters(this.bag.getLetters(MAX_LETTERS_IN_EASEL)));
         this.placeCounter = 0;
         this.gameFinished = false;
+        this.initTimer();
+        const creationDelay = 200;
+        setTimeout(() => {
+            actionAfterTurn();
+        }, creationDelay);
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): void {
@@ -43,7 +57,7 @@ export class Game {
             const lettersInCenter = letters.filter((l) =>
                 l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
             );
-            if (lettersInCenter.length === 0) throw new Error('bad starting move');
+            if (lettersInCenter.length === 0) throw new GameError(GameErrorType.BadStartingMove);
         }
         this.getActivePlayer().score += this.board.place(letters, blanks, this.placeCounter === 0);
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
@@ -72,8 +86,14 @@ export class Game {
 
     needsToEnd(): boolean {
         if (this.gameFinished) return false;
-        if (this.turnsSkipped >= MAX_TURNS_SKIPPED) return true;
-        if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) return true;
+        if (this.turnsSkipped >= MAX_TURNS_SKIPPED) {
+            this.stopTimer();
+            return true;
+        }
+        if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) {
+            this.stopTimer();
+            return true;
+        }
         return false;
     }
 
@@ -85,6 +105,38 @@ export class Game {
 
     nextTurn(): void {
         this.activePlayer = this.nextPlayer();
+    }
+
+    getGameStatus(playerNumber: number, botLevel?: string): unknown {
+        const opponent = { ...this.players[(playerNumber + 1) % 2] };
+        opponent.easel = opponent.easel.map(() => BLANK_LETTER);
+        return {
+            status: {
+                activePlayer: this.players[this.activePlayer].name,
+                letterPotLength: this.bag.letters.length,
+                timer: this.gameOptions.timePerRound,
+            },
+            players: { player: this.players[playerNumber], opponent, botLevel },
+            board: {
+                board: this.board.board,
+                pointsPerLetter: Array.from(this.board.pointsPerLetter),
+                multipliers: this.board.multipliers,
+                blanks: this.board.blanks,
+            },
+        };
+    }
+
+    initTimer(): void {
+        this.currentTimer = setTimeout(this.actionAfterTimeout, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+    }
+
+    resetTimer(): void {
+        clearTimeout(this.currentTimer);
+        this.initTimer();
+    }
+
+    stopTimer(): void {
+        clearTimeout(this.currentTimer);
     }
 
     private getGameEndStatus(): GameFinishStatus {

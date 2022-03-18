@@ -1,4 +1,4 @@
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 import { Player } from './player';
 
 describe('Player', () => {

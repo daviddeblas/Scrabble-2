@@ -4,11 +4,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomEffects } from '@app/effects/room.effects';
 import { RoomState } from '@app/reducers/room.reducer';
 import { Store } from '@ngrx/store';
+import { RoomInfo } from 'common/classes/room-info';
 import { Observable } from 'rxjs';
 
 export const forbiddenNameValidator = (name: string) => {
@@ -24,14 +24,15 @@ export const forbiddenNameValidator = (name: string) => {
     styleUrls: ['./game-join-page.component.scss'],
 })
 export class GameJoinPageComponent implements OnDestroy {
-    @ViewChild(MatStepper) stepper: MatStepper;
+    @ViewChild(MatStepper) private stepper: MatStepper;
 
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
 
     formGroup: FormGroup;
     selectedRoom: RoomInfo | undefined;
-    isFormDisabled: boolean = false;
+    isFormDisabled: boolean;
+    refused: boolean;
 
     roomList$: Observable<RoomInfo[]>;
     pendingRoom$: Observable<RoomInfo | undefined>;
@@ -45,6 +46,8 @@ export class GameJoinPageComponent implements OnDestroy {
     ) {
         this.store.dispatch(resetAllState());
         this.formGroup = formBuilder.group({ name: new FormControl({ value: '', disabled: this.isFormDisabled }) });
+        this.isFormDisabled = false;
+        this.refused = false;
 
         this.roomList$ = roomStore.select('room', 'roomList');
         this.pendingRoom$ = roomStore.select('room', 'pendingRoom');
@@ -91,10 +94,10 @@ export class GameJoinPageComponent implements OnDestroy {
         this.formGroup.controls.name.disable();
 
         this.pendingRoom$.subscribe((newPendingRoom) => {
-            if (!newPendingRoom) {
-                this.formGroup.controls.name.enable();
-                this.stepper.reset();
-            }
+            if (newPendingRoom) return;
+            this.formGroup.controls.name.enable();
+            this.refused = true;
+            this.stepper.reset();
         });
     }
 

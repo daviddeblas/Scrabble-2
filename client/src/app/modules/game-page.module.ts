@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BoardComponent } from '@app/components/board/board.component';
+import { CellEmptyComponent } from '@app/components/cells/cell-empty/cell-empty.component';
 import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
 import { CellLetterX3Component } from '@app/components/cells/cell-letter-x3/cell-letter-x3.component';
 import { CellStarComponent } from '@app/components/cells/cell-star/cell-star.component';
@@ -36,6 +37,7 @@ import { StoreModule } from '@ngrx/store';
         CellLetterX2Component,
         CellLetterX3Component,
         CellStarComponent,
+        CellEmptyComponent,
         LetterComponent,
         ChatBoxComponent,
         EaselComponent,

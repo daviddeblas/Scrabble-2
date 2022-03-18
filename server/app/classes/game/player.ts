@@ -1,5 +1,5 @@
-import { Letter } from '@app/classes/letter';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Letter } from 'common/classes/letter';
 
 export class Player {
     easel: Letter[];

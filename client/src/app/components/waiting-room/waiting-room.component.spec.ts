@@ -5,7 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { acceptInvite, closeRoom, refuseInvite } from '@app/actions/room.actions';
+import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
@@ -82,5 +82,10 @@ describe('WaitingRoomComponent', () => {
         component.quitWaitingRoom();
         expect(store.dispatch).toHaveBeenCalledWith(closeRoom());
         expect(component.stepper.reset).toHaveBeenCalled();
+    });
+
+    it('should dispatch "[Room] Switch To Solo Room" when convertToSolo called', () => {
+        component.convertToSolo();
+        expect(store.dispatch).toHaveBeenCalledWith(switchToSoloRoom({ botLevel: 'Débutant' }));
     });
 });

@@ -35,6 +35,15 @@ describe('PlayerEffects', () => {
         done();
     });
 
+    it('resetSocketConnection$ should call the function resetConnection from socket service', (done) => {
+        // eslint-disable-next-line dot-notation
+        const resetSocketSpy = spyOn(effects['socketService'], 'resetConnection');
+        actions$ = of({ type: '[Players] Reset Socket Connection' });
+        effects.resetSocketConnection$.subscribe();
+        expect(resetSocketSpy).toHaveBeenCalledWith();
+        done();
+    });
+
     it('placeWordEffect$ should call the function placeWord from player service', (done) => {
         actions$ = of({ type: '[Players] Place Word' });
         effects.placeWordEffect$.subscribe();

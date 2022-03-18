@@ -3,19 +3,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { createRoom } from '@app/actions/room.actions';
-import { GameOptions } from '@app/classes/game-options';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { cold } from 'jasmine-marbles';
+import { provideMockStore } from '@ngrx/store/testing';
+import { GameOptions } from 'common/classes/game-options';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 
 describe('MultiConfigWindowComponent', () => {
     let component: MultiConfigWindowComponent;
     let fixture: ComponentFixture<MultiConfigWindowComponent>;
     const iterationAmount = 10;
-
-    let store: MockStore;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -31,8 +27,6 @@ describe('MultiConfigWindowComponent', () => {
                 provideMockStore(),
             ],
         }).compileComponents();
-
-        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
@@ -139,14 +133,37 @@ describe('MultiConfigWindowComponent', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should dispatch "[Room] Create Room" when submitted', () => {
+    it('should emit with gameOptions when submitted and is not a solo game', () => {
         component.settingsForm.controls.name.setValue('My Name');
         component.settingsForm.controls.selectedDictionary.setValue('My Dictionary');
         fixture.detectChanges();
-
+        const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
         component.onSubmit();
         const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
-        const expectedAction = cold('a', { a: createRoom({ gameOptions: expectedGameOptions }) });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
+        expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions });
+    });
+
+    it('should emit with gameOptions and playerLevel when submitted and it is a solo game', () => {
+        component.settingsForm.controls.name.setValue('My Name');
+        component.settingsForm.controls.selectedDictionary.setValue('My Dictionary');
+        component.isSoloGame = true;
+        fixture.detectChanges();
+        const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
+        component.onSubmit();
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedLevel = 'Débutant';
+        expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions, botLevel: expectedLevel });
+    });
+
+    it('should return time in seconds if it is equal to 30 seconds', () => {
+        component.timer = 30;
+        expect(component.timerToString()).toBe('0:30 sec');
+        fixture.destroy();
+    });
+
+    it('should return the time in minutes', () => {
+        component.timer = 90;
+        expect(component.timerToString()).toBe('1:30 min');
+        fixture.destroy();
     });
 });

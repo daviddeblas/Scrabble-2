@@ -1,11 +1,15 @@
+#chat-box {
+    height: 90%;
+}
+
 #chat-list {
     display: flex;
     flex-direction: column-reverse;
-    height: 50vh;
+    height: 80%;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-bottom: 5vh;
-    margin-top: 2vh;
+    margin-bottom: 5%;
+    margin-top: 4%;
     word-break: break-all;
 }
 
@@ -16,21 +20,32 @@
 
 #user-message {
     padding: 10px;
+    margin-bottom: 1vh;
+    margin-top: 1vh;
     background-color: greenyellow;
 }
 
 #error-message {
     padding: 10px;
+    margin-bottom: 1vh;
+    margin-top: 1vh;
     color: red;
 }
 
 #opponent-message {
     padding: 10px;
+    margin-bottom: 1vh;
+    margin-top: 1vh;
     background-color: lightblue;
 }
 
 #chat-log-list {
-    margin-bottom: 2vh;
     font-size: 10pt;
     height: auto;
+}
+
+#system-message:hover {
+    cursor: pointer;
+    background-color: lightgray;
+    text-decoration: underline gray;
 }

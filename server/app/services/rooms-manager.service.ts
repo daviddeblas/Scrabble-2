@@ -1,6 +1,7 @@
-import { GameOptions } from '@app/classes/game-options';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Room } from '@app/classes/room';
-import { RoomInfo } from '@app/classes/room-info';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
@@ -10,8 +11,14 @@ export class RoomsManager {
     joiningSockets: io.Socket[] = [];
 
     setupSocketConnection(socket: io.Socket) {
+        socket.on('create solo room', (options) => {
+            const room = this.createRoom(socket, options.gameOptions);
+            room.initSoloGame(options.botLevel);
+            socket.emit('create solo room success', room.getRoomInfo());
+        });
+
         socket.on('create room', (options) => {
-            socket.emit('create room success', this.createRoom(socket, options));
+            socket.emit('create room success', this.createRoom(socket, options).getRoomInfo());
         });
 
         socket.on('request list', () => {
@@ -25,11 +32,11 @@ export class RoomsManager {
         });
     }
 
-    createRoom(socket: io.Socket, options: GameOptions): RoomInfo {
+    createRoom(socket: io.Socket, options: GameOptions): Room {
         const newRoom = new Room(socket, this, options);
         this.rooms.push(newRoom);
         this.notifyAvailableRoomsChange();
-        return newRoom.getRoomInfo();
+        return newRoom;
     }
 
     removeRoom(room: Room): void {
@@ -41,7 +48,7 @@ export class RoomsManager {
         const room = this.getRoom(roomId);
         if (room) {
             room.join(socket, name);
-        } else throw new Error('Game not found');
+        } else throw new GameError(GameErrorType.GameNotExists);
     }
 
     getRooms(): RoomInfo[] {

@@ -1,6 +1,5 @@
-import { Letter } from './letter';
-
-export const EASEL_CAPACITY = 7;
+import { Letter } from 'common/classes/letter';
+import { EASEL_CAPACITY } from 'common/constants';
 
 export const copyPlayer = (player: Player) => {
     const playerCopy = new Player(player.name);
@@ -20,11 +19,14 @@ export class Player {
 
     removeLettersFromEasel(lettersToRemove: Letter[]): void {
         const letters = [...lettersToRemove];
-        this.easel = this.easel.filter((x) => {
-            const i = letters.indexOf(x);
-            if (i > 0) letters.splice(i, 1);
-            return i < 0;
+        const easelCopy = [...this.easel];
+        letters.forEach((l) => {
+            const i = easelCopy.findIndex((letter) => l === letter);
+            if (i < 0) return;
+            easelCopy.splice(i, 1);
         });
+
+        this.easel = easelCopy;
     }
 
     addLettersToEasel(lettersToAdd: Letter[]): void {

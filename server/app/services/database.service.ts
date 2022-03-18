@@ -1,4 +1,4 @@
-import { DATABASE, HighScore } from '@app/classes/highscore';
+import { DATABASE, DEFAULT_HIGHSCORE, HighScore } from '@app/classes/highscore';
 import { Db, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
@@ -15,7 +15,7 @@ export class DatabaseService {
         } catch {
             throw Error('Database connection error');
         }
-        if ((await this.highScoreDB.collection(DATABASE.highScore.collections).countDocuments()) === 0) {
+        if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
             await this.populateDB();
         }
 
@@ -27,10 +27,10 @@ export class DatabaseService {
     }
 
     async populateDB(): Promise<void> {
-        let scores: HighScore[];
+        const scores: HighScore[] = DEFAULT_HIGHSCORE.classical;
 
         for (const score of scores) {
-            await this.highScoreDB.collection(DATABASE.highScore.collections).insertOne(score);
+            await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
         }
     }
 

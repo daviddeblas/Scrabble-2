@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { initiateChatting, restoreMessages } from '@app/actions/chat.actions';
-import { getGameStatus } from '@app/actions/game-status.actions';
-import { ChatMessage } from '@app/classes/chat-message';
+import { getGameStatus, refreshTimer } from '@app/actions/game-status.actions';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
 
+const waitingTime = 200;
+const thousandMilliseconds = 1000;
 @Injectable({
     providedIn: 'root',
 })
@@ -29,6 +31,14 @@ export class BrowserManagerService {
         this.store.dispatch(initiateChatting());
         this.store.dispatch(getGameStatus());
         this.retrieveSelectors();
+        setTimeout(() => {
+            const date = new Date();
+            const oldTimer = localStorage.getItem('currentTimer');
+            if (!oldTimer) return;
+            const parsedTimer = JSON.parse(oldTimer);
+            const diffDate = Math.round((date.getTime() - parsedTimer.date) / thousandMilliseconds);
+            this.store.dispatch(refreshTimer({ timer: parsedTimer.countdown - diffDate }));
+        }, waitingTime);
     }
 
     private storeSelectors(): void {

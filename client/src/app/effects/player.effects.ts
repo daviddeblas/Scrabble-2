@@ -1,7 +1,12 @@
 /* eslint-disable no-invalid-this */
+// Syntaxe utilisé sur le site de ngRx
+// Necessaire pour utiliser les actions dans les fichiers .effects, si on enleve la ligne esLint: unexpected this
+// Si on enleve le esLint : erreur de TypeScript
+
 import { Injectable } from '@angular/core';
-import { exchangeLetters, placeWord, surrender } from '@app/actions/player.actions';
+import { exchangeLetters, placeWord, resetSocketConnection, surrender } from '@app/actions/player.actions';
 import { PlayerService } from '@app/services/player.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { tap } from 'rxjs/operators';
 
@@ -13,6 +18,17 @@ export class PlayerEffects {
                 ofType(surrender),
                 tap(() => {
                     this.playerService.surrenderGame();
+                }),
+            ),
+        { dispatch: false },
+    );
+
+    resetSocketConnection$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(resetSocketConnection),
+                tap(() => {
+                    this.socketService.resetConnection();
                 }),
             ),
         { dispatch: false },
@@ -40,5 +56,5 @@ export class PlayerEffects {
         { dispatch: false },
     );
 
-    constructor(private actions$: Actions, private playerService: PlayerService) {}
+    constructor(private actions$: Actions, private playerService: PlayerService, private socketService: SocketClientService) {}
 }

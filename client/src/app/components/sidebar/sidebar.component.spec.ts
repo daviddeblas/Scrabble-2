@@ -1,7 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { messageWritten } from '@app/actions/chat.actions';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { StoreModule } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { SidebarComponent } from './sidebar.component';
@@ -10,14 +14,19 @@ describe('SidebarComponent', () => {
     let component: SidebarComponent;
     let fixture: ComponentFixture<SidebarComponent>;
     let store: MockStore;
+    let eventStub: Event;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AppMaterialModule],
+            imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, StoreModule.forRoot({})],
             declarations: [SidebarComponent],
             providers: [provideMockStore()],
         }).compileComponents();
-
+        eventStub = {
+            preventDefault: () => {
+                return;
+            },
+        } as unknown as Event;
         store = TestBed.inject(MockStore);
     });
 
@@ -34,6 +43,12 @@ describe('SidebarComponent', () => {
     it('should dispatch "[LocalSettings] Zoom In"', () => {
         const expectedAction = cold('a', { a: zoomIn() });
         component.zoomIn();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch "[Chat] Message Written"', () => {
+        const expectedAction = cold('a', { a: messageWritten({ username: component.activePlayer, message: '!indice' }) });
+        component.getHint();
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -76,5 +91,11 @@ describe('SidebarComponent', () => {
         component.countdown = 0;
         component.decrementCountdown()();
         expect(component.countdown).toBe(0);
+    });
+
+    it('storeTimerUnLoad should call localStorage.setItem ', () => {
+        const spy = spyOn(window.localStorage, 'setItem');
+        component.storeTimerUnLoad(eventStub);
+        expect(spy).toHaveBeenCalled();
     });
 });

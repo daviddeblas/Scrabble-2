@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
-import { ChatMessage } from '@app/classes/chat-message';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, POSITION_LAST_CHAR } from '@app/constants';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -17,8 +17,8 @@ export class ChatService {
         private socketService: SocketClientService,
         private gameStore: Store<{ gameStatus: GameStatus }>,
     ) {}
-    broadcastMsg(username: string, message: string) {
-        this.socketService.send('send message', { username, message });
+    broadcastMsg(username: string, message: string, messageType: string = '') {
+        this.socketService.send('send message', { username, message, messageType });
     }
 
     acceptNewAction(): void {
@@ -37,6 +37,10 @@ export class ChatService {
             const chatMessage = { username, message: '!passer', messageType: '' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
+        this.socketService.on('hint success', (data: { hints: string[] }) => {
+            const chatMessage = { username: '', message: data.hints.join('\n'), messageType: 'System' };
+            this.store.dispatch(receivedMessage(chatMessage));
+        });
         this.socketService.on('turn ended', () => {
             this.store.dispatch(getGameStatus());
         });
@@ -49,10 +53,10 @@ export class ChatService {
         });
     }
 
-    messageWritten(username: string, message: string): void {
+    messageWritten(username: string, message: string, messageType = ''): void {
         if (message[0] !== '!') {
-            this.store.dispatch(receivedMessage({ username, message, messageType: '' }));
-            this.broadcastMsg(username, message);
+            this.store.dispatch(receivedMessage({ username, message, messageType }));
+            this.broadcastMsg(username, message, messageType);
         } else {
             let activePlayer;
             let gameEnded;
@@ -64,46 +68,86 @@ export class ChatService {
                 this.store.dispatch(receivedMessage({ username: '', message: 'La partie est finie', messageType: 'Error' }));
                 return;
             }
+            const command = message.split(' ');
+            if (this.handleNonTurnSpecificCommands(command)) return;
+
             if (username !== activePlayer) {
                 this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
                 return;
             }
-            const command = message.split(' ');
-            switch (command[0]) {
-                case '!placer':
-                    if (this.validatePlaceCommand(command)) {
-                        this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
-                    } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
-                        return;
-                    }
-                    break;
-                case '!échanger':
-                    if (this.validateExchangeCommand(command)) {
-                        this.store.dispatch(exchangeLetters({ letters: command[1] }));
-                    } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
-                        return;
-                    }
-                    break;
-                case '!passer':
-                    if (command.length === 1) {
-                        this.handleSkipCommand(command);
-                    } else {
-                        this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe', messageType: 'Error' }));
-                        return;
-                    }
-                    break;
-                default:
-                    this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
-                    return;
-            }
+            this.handleTurnSpecificCommands(command);
         }
     }
 
-    handleSkipCommand(command: string[]): void {
-        const commandLine = command[0].slice(1, command[0].length);
-        this.socketService.send('command', commandLine);
+    private handleNonTurnSpecificCommands(command: string[]): boolean {
+        switch (command[0]) {
+            case '!réserve':
+                if (command.length === 1) {
+                    this.handleSimpleCommand(command);
+                    return true;
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
+                    );
+                }
+                break;
+        }
+        return false;
+    }
+
+    private handleTurnSpecificCommands(command: string[]) {
+        switch (command[0]) {
+            case '!placer':
+                this.handlePlaceCommand(command);
+                break;
+            case '!échanger':
+                this.handleExchangeCommand(command);
+                break;
+            case '!passer':
+                if (command.length === 1) {
+                    this.handleSimpleCommand(command);
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande passer mal formée', messageType: 'Error' }),
+                    );
+                    return;
+                }
+                break;
+            case '!indice':
+                this.handleSimpleCommand(command);
+                break;
+            default:
+                this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
+                return;
+        }
+    }
+
+    private handleSimpleCommand(command: string[]): void {
+        if (command.length === 1) {
+            const commandLine = command[0].slice(1, command[0].length);
+            this.socketService.send('command', commandLine);
+        } else {
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande mal formée', messageType: 'Error' }));
+            return;
+        }
+    }
+
+    private handleExchangeCommand(command: string[]): void {
+        if (this.validateExchangeCommand(command)) {
+            this.store.dispatch(exchangeLetters({ letters: command[1] }));
+        } else {
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande échanger mal formée', messageType: 'Error' }));
+            return;
+        }
+    }
+
+    private handlePlaceCommand(command: string[]): void {
+        if (this.validatePlaceCommand(command)) {
+            this.store.dispatch(placeWord({ position: command[1], letters: command[2] }));
+        } else {
+            this.store.dispatch(receivedMessage({ username: '', message: 'Erreur de syntaxe - commande placer mal formée', messageType: 'Error' }));
+            return;
+        }
     }
 
     private validatePlaceCommand(command: string[]): boolean {
@@ -113,12 +157,12 @@ export class ChatService {
         commandIsCorrect &&= /^[a-o]*$/.test(command[1][0]);
         commandIsCorrect &&= /^[a-z0-9]*$/.test(command[1]);
         commandIsCorrect &&= /^[a-zA-Z]*$/.test(command[2]);
-        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], 10); // Prend les nombres d'un string
+        const columnNumber = parseInt((command[1].match(/\d+/) as RegExpMatchArray)[0], DECIMAL_BASE); // Prend les nombres d'un string
         const minColumnNumber = 1;
         const maxColumnNumber = BOARD_SIZE;
         commandIsCorrect &&= minColumnNumber <= columnNumber && columnNumber <= maxColumnNumber;
         if (command[1].slice(POSITION_LAST_CHAR) === 'h') {
-            commandIsCorrect &&= columnNumber + command[2].length <= BOARD_SIZE;
+            commandIsCorrect &&= columnNumber - 1 + command[2].length <= BOARD_SIZE;
         } else if (command[1].slice(POSITION_LAST_CHAR) === 'v') {
             commandIsCorrect &&= command[1][0].charCodeAt(0) - ASCII_ALPHABET_POSITION + command[2].length <= BOARD_SIZE;
         }
@@ -129,6 +173,6 @@ export class ChatService {
     }
 
     private validateExchangeCommand(command: string[]): boolean {
-        return /^[a-z]*$/.test(command[1]) && command.length === 2;
+        return /^[a-z/*]*$/.test(command[1]) && command.length === 2;
     }
 }

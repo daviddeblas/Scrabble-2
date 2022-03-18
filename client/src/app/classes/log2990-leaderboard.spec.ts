@@ -22,7 +22,7 @@ describe('Log2990 Leaderboard', () => {
         log2990Leaderboard.highScoreClassicDB = new BehaviorSubject<HighScore[]>(expectedHighScores);
         const completeSpy = spyOn(log2990Leaderboard.highScoreClassicDB, 'complete');
         log2990Leaderboard.disconnect();
-        expect(completeSpy);
+        expect(completeSpy).not.toEqual(log2990Leaderboard);
     });
 
     it('should change the data of highScoreClassicDB', () => {

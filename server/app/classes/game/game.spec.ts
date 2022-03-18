@@ -1,20 +1,31 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { BLANK_LETTER, Letter, stringToLetters } from '@app/classes/letter';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
-import { spy } from 'sinon';
+import { GameOptions } from 'common/classes/game-options';
+import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
+import { spy, stub, useFakeTimers } from 'sinon';
 import Container from 'typedi';
-import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from './game';
+import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
 
 describe('game', () => {
     let game: Game;
     let activePlayer: number;
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const timerCallbackMock = () => {
+        return;
+    };
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs.configs[0], ['player 1', 'player 2']);
+        game = new Game(
+            Container.get(GameConfigService).configs.configs[0],
+            ['player 1', 'player 2'],
+            gameOptions,
+            timerCallbackMock,
+            timerCallbackMock,
+        );
         activePlayer = game.activePlayer;
     });
 
@@ -29,7 +40,7 @@ describe('game', () => {
         expect(game.turnsSkipped).to.eq(0);
     });
 
-    it('place should score according to scorePositions on correct placement', () => {
+    it('place should score according to scorePosition on correct placement', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
         // put letters in player easel so placement is possible
@@ -47,15 +58,16 @@ describe('game', () => {
         }).to.not.throw();
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
+        const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
+        const wordMultiplier = 2;
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement) * wordMultiplier;
         expect(thisPlayerScore).to.eq(expectedPoints);
 
         // this is no longer this players turn
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
-    it('place should score according to scorePositions on correct placement with a blank letter', () => {
+    it('place should score according to scorePosition on correct placement with a blank letter', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
         // put letters in player easel so placement is possible
@@ -75,9 +87,10 @@ describe('game', () => {
         }).to.not.throw();
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = lettersToPlace.map((_l, i) => new Vec2(6 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
-        expect(thisPlayerScore).to.eq(expectedPoints);
+        const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
+        const wordMultiplier = 2;
+        expect(thisPlayerScore).to.eq(expectedPoints * wordMultiplier);
 
         // this is no longer this players turn
         expect(game.activePlayer).to.not.eq(activePlayer);
@@ -101,25 +114,21 @@ describe('game', () => {
         }).to.throw();
     });
     // eslint-disable-next-line max-len
-    it('place should score according to scorePositions added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
+    it('place should score according to scorePosition added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
         const multiplierBonusOnBoard = 1;
-
-        game.place(
-            oldEasel.map((l, index) => new PlacedLetter(l, new Vec2(index + 3, 7))),
-            [],
-            game.activePlayer,
-        );
+        const wordMultiplier = 2;
+        const positionsOfPlacement = oldEasel.map((l, i) => new PlacedLetter(l, new Vec2(3 + i, 7)));
+        game.place(positionsOfPlacement, [], game.activePlayer);
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(3 + i, 7));
-        const expectedPoints = game.board['scorePositions'](positionsOfPlacement);
-        expect(thisPlayerScore).to.eq(expectedPoints + BONUS_POINTS_FOR_FULL_EASEL + multiplierBonusOnBoard);
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
+        expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
     });
 
     // eslint-disable-next-line max-len
-    it('place should score according to scorePositions added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
+    it('place should score according to scorePosition added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
         game.players[activePlayer].easel = stringToLetters('aa');
         const oldEasel = [...game.players[activePlayer].easel];
         game.bag.letters = [];
@@ -131,14 +140,14 @@ describe('game', () => {
 
         const thisPlayerScore = game.players[activePlayer].score;
 
-        const positionsOfPlacement = oldEasel.map((_l, i) => new Vec2(6 + i, 7));
-        const normalScorePosition = game.board['scorePositions'](positionsOfPlacement);
+        const positionsOfPlacement = oldEasel.map((_l, i) => new PlacedLetter(oldEasel[i], new Vec2(6 + i, 7)));
+        const normalScorePosition = game.board['scorePosition'](positionsOfPlacement);
 
         const othersEasel = game.players[game.activePlayer].easel;
         const pointsArrayOfOtherEasel = othersEasel.map((l) => game.board.pointsPerLetter.get(l) as number);
         const bonusPointsFromOthersEasel = pointsArrayOfOtherEasel.reduce((sum, p) => sum + p);
-
-        const expectedPoints = normalScorePosition + bonusPointsFromOthersEasel;
+        const wordMultiplier = 2;
+        const expectedPoints = normalScorePosition * wordMultiplier + bonusPointsFromOthersEasel;
         expect(thisPlayerScore).to.eq(expectedPoints);
     });
 
@@ -276,5 +285,34 @@ describe('game', () => {
 
     it('getActivePlayer', () => {
         expect(game['getActivePlayer']()).to.eq(game.players[game.activePlayer]);
+    });
+
+    it('getGameStatus  returns specific information given to the player', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const info = game.getGameStatus(0) as any;
+        expect(info.status.activePlayer).to.eq(game?.players[game?.activePlayer].name);
+        expect(info.board.board).to.eq(game?.board.board);
+        expect(info.board.multipliers).to.eq(game?.board.multipliers);
+        expect(info.status.letterPotLength).to.eq(game?.bag.letters.length);
+        expect(info.players.player).to.deep.eq(game?.players[0]);
+    });
+
+    it('init timer should wait the right amount of ', (done) => {
+        const clk = useFakeTimers();
+        game['actionAfterTimeout'] = () => done();
+        game.initTimer();
+        clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        clk.restore();
+    });
+
+    it('stop timer should not call anything after timeout', () => {
+        const clk = useFakeTimers();
+        const actionAfterTimeout = stub();
+        game['actionAfterTimeout'] = actionAfterTimeout;
+        game.initTimer();
+        game.stopTimer();
+        clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        expect(actionAfterTimeout.calledOnce).to.equal(false);
+        clk.restore();
     });
 });

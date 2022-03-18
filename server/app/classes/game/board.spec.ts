@@ -1,12 +1,12 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Vec2 } from '@app/classes/vec2';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
-import Container from 'typedi';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { Vec2 } from 'common/classes/vec2';
+import { Container } from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
 describe('board', () => {
@@ -72,7 +72,7 @@ describe('board', () => {
         board.place(correctLettersToPlace, [], true);
 
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
-        expect(board.scorePositions(correctLettersToPlace.map((l) => l.position))).to.eq(expectedPoints);
+        expect(board.scorePosition(correctLettersToPlace)).to.eq(expectedPoints);
     });
 
     it('scorePositions should score accordingly on correct placement with a single letter multiplier', () => {
@@ -117,7 +117,7 @@ describe('board', () => {
     });
 
     it('scoreWord throws on invalid position', () => {
-        expect(() => board.scorePositions([new Vec2(0, 0)])).to.throw();
+        expect(() => board.scorePosition([{ letter: null, position: new Vec2(0, 0) } as unknown as PlacedLetter])).to.throw();
     });
 
     it('scorePositions should score accordingly on correct placement with multiple word multiplier', () => {

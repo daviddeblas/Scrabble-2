@@ -1,7 +1,7 @@
 import { resetAllState } from '@app/actions/game-status.actions';
 import * as roomActions from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { createReducer, on } from '@ngrx/store';
+import { RoomInfo } from 'common/classes/room-info';
 
 export const roomsFeatureKey = 'room';
 

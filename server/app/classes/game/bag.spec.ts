@@ -1,7 +1,7 @@
 import { GameConfig } from '@app/classes/game-config';
-import { Letter } from '@app/classes/letter';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Letter } from 'common/classes/letter';
 import Container from 'typedi';
 import { Bag } from './bag';
 
