@@ -4,11 +4,12 @@ import { Dictionary } from './dictionary';
 import { PositionedMultipliers } from './positioned-multipliers';
 
 export class GameConfig {
+    dictionary: Dictionary;
     constructor(
         public name: string = 'default',
         public letters: LetterConfigItem[] = [],
         public boardSize: Vec2 = new Vec2(0, 0),
         public multipliers: PositionedMultipliers[] = [],
-        public dictionary: Dictionary,
+        public dictionaryName: string = 'Mon Dictionnaire',
     ) {}
 }

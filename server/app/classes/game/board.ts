@@ -44,7 +44,6 @@ export class Board {
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
         if (!firstMove && allPlacedLetters.length === letters.length) throw new GameError(GameErrorType.WordNotConnected);
         words.forEach((w) => {
-            console.log(this.config);
             if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
         });
 

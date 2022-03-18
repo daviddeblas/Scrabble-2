@@ -1,5 +1,5 @@
 import { Dictionary } from '@app/classes/dictionary';
-import { readdir, readFile } from 'fs/promises';
+import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import io from 'socket.io';
 import { Service } from 'typedi';
@@ -11,13 +11,13 @@ const dictionariesPath = 'assets/dictionaries';
 export class DictionaryService {
     dictionaries: Dictionary[] = [];
 
-    constructor() {
-        readdir(dictionariesPath).then((paths) => {
-            return paths.forEach(async (fileName) => {
-                return readFile(path.join(dictionariesPath, fileName), { encoding: 'utf8' }).then((json) => {
-                    this.dictionaries.push(JSON.parse(json));
-                });
-            });
+    async init() {
+        this.dictionaries = [];
+        const paths = await readdirSync(dictionariesPath);
+        await paths.forEach(async (fileName) => {
+            const json = await readFileSync(path.join(dictionariesPath, fileName), { encoding: 'utf8' });
+            const obj = JSON.parse(json);
+            this.dictionaries.push(new Dictionary(obj.title, obj.description, obj.words));
         });
     }
 

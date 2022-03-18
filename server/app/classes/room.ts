@@ -137,7 +137,6 @@ export class Room {
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
-        console.log(Container.get(GameConfigService).configs[0]);
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
