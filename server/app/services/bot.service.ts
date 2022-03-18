@@ -65,7 +65,7 @@ export class BotService {
     }
 
     private placeCommand(game: Game, difficulty: BotDifficulty): string {
-        const solver = new Solver(Container.get(DictionaryService).dictionary, game.board.board, game.players[1].easel);
+        const solver = new Solver(Container.get(DictionaryService).dictionary, game.board, game.players[1].easel);
         const foundPlacements: Map<string[], number> = solver.getEasyBotSolutions(game.board);
         if (foundPlacements.size === 0) return 'passer';
         return this.placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);

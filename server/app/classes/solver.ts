@@ -30,18 +30,18 @@ interface Solution {
 }
 
 export class Solver {
-    constructor(private dictionary: Dictionary, private board: (Letter | null)[][], private easel: Letter[]) {}
+    constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}
 
     findAllSolutions(): Solution[] {
         const solutions: Solution[] = [];
         const date = new Date();
         const startTime = date.getTime();
         for (let i = 0; i < BOARD_SIZE; i++) {
-            solutions.push(...this.findLineSolutions(this.board[i], i, new Vec2(0, 1)));
+            solutions.push(...this.findLineSolutions(this.board.board[i], i, new Vec2(0, 1)));
             if (this.isTimeTooLong(startTime)) return [];
         }
         for (let i = 0; i < BOARD_SIZE; i++) {
-            const line = this.board.reduce((r, v) => [...r, v[i]], []);
+            const line = this.board.board.reduce((r, v) => [...r, v[i]], []);
             solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));
             if (this.isTimeTooLong(startTime)) return [];
         }
@@ -123,14 +123,14 @@ export class Solver {
                 let perpendicularWord: string = word.letters[i] as Letter;
 
                 let k = letterPos.sub(direction.flip());
-                while (k.x >= 0 && k.y >= 0 && this.board[k.x][k.y] !== null) {
-                    perpendicularWord = this.board[k.x][k.y] + perpendicularWord;
+                while (k.x >= 0 && k.y >= 0 && this.board.board[k.x][k.y] !== null) {
+                    perpendicularWord = this.board.board[k.x][k.y] + perpendicularWord;
                     k = k.sub(direction.flip());
                 }
 
                 k = letterPos.add(direction.flip());
-                while (k.x < BOARD_SIZE && k.y < BOARD_SIZE && this.board[k.x][k.y] !== null) {
-                    perpendicularWord = perpendicularWord + this.board[k.x][k.y];
+                while (k.x < BOARD_SIZE && k.y < BOARD_SIZE && this.board.board[k.x][k.y] !== null) {
+                    perpendicularWord = perpendicularWord + this.board.board[k.x][k.y];
                     k = k.add(direction.flip());
                 }
 
