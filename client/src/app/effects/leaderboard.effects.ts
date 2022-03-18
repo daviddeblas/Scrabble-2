@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this */
 import { Injectable } from '@angular/core';
 import { loadLeaderboard } from '@app/actions/leaderboard.actions';
 import { LeaderboardService } from '@app/services/leaderboard.service';
@@ -15,8 +16,7 @@ export class LeaderboardEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
-    constructor(private actions$: Actions, private LeaderboardService: LeaderboardService) {}
+    constructor(private actions$: Actions, private leaderboardService: LeaderboardService) {}
 }
