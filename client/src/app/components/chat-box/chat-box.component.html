@@ -12,7 +12,7 @@
                     </section>
                 </ng-template>
                 <ng-template #systemMessage>
-                    <section *ngIf="line.messageType === 'System'; else opponentMessage" id="system-message">
+                    <section *ngIf="line.messageType === 'System'; else opponentMessage" id="system-message" (click)="sendHintMessage(line.message)">
                         {{ line.message }}
                     </section>
                 </ng-template>
