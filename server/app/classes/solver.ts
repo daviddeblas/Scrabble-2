@@ -135,8 +135,7 @@ export class Solver {
                 }
 
                 if (perpendicularWord.length > 1) {
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    if (this.dictionary.words.indexOf(perpendicularWord.toLowerCase()) === -1) {
+                    if (this.dictionary.words.indexOf(perpendicularWord.toLowerCase()) < 0) {
                         valid = false;
                         break;
                     }
