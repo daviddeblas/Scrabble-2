@@ -293,6 +293,14 @@ describe('commands', () => {
             expect(() => commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer)).to.throw();
         });
 
+        it('string with skip calls processBag', (done) => {
+            commandService.processBag = () => {
+                done();
+            };
+            const fullCommand = 'réserve';
+            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+        });
+
         it('string with hint calls processHint', (done) => {
             commandService.processHint = () => {
                 done();
@@ -436,5 +444,13 @@ describe('commands', () => {
             done();
         };
         commandService.processSkip(game, room.sockets, [], game.activePlayer);
+    });
+
+    it('process bag calls game emits on correctly formed arguments', (done) => {
+        room.sockets[0].emit = (): boolean => {
+            done();
+            return true;
+        };
+        commandService.processBag(game, room.sockets, [], 0);
     });
 });

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
 import { placeWordSuccess } from '@app/actions/player.actions';
-import { Direction, Word } from '@app/classes/word';
+import { Word } from '@app/classes/word';
+import { Direction } from '@app/enums/direction';
 import { BoardState } from '@app/reducers/board.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
