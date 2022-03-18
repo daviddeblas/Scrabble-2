@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 
-// Host
+// Hôte
 export const createRoom = createAction('[Room] Create Room', props<{ gameOptions: GameOptions }>());
 export const createSoloRoom = createAction('[Room Create Solo Room', props<{ gameOptions: GameOptions; botLevel: string }>());
 export const switchToSoloRoom = createAction('[Room] Switch To Solo Room', props<{ botLevel: string }>());
@@ -15,7 +15,7 @@ export const acceptInvite = createAction('[Room] Accept Invite');
 export const refuseInvite = createAction('[Room] Refuse Invite');
 export const joinInviteCanceled = createAction('[Room] Join Invite Canceled');
 
-// Joiner
+// Joindre
 export const loadRooms = createAction('[Room] Load Rooms');
 export const loadRoomsSuccess = createAction('[Room] Load Rooms Success', props<{ rooms: RoomInfo[] }>());
 export const loadRoomsFailed = createAction('[Room] Load Rooms Failed', props<{ error: Error }>());

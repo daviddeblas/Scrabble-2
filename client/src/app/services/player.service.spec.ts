@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
@@ -81,7 +82,6 @@ describe('PlayerService', () => {
         const dispatchSpy = spyOn(service['boardStore'], 'dispatch');
         position = 'h7h';
         service.placeWord(position, word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const expectedWord = new Word('word', new Vec2(6, 7) as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });
@@ -105,7 +105,6 @@ describe('PlayerService', () => {
         position = 'h8';
         word = 'w';
         service.placeWord(position, word);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const expectedWord = new Word('w', new Vec2(7, 7) as Vec2, Direction.HORIZONTAL);
         expect(dispatchSpy).toHaveBeenCalledWith(placeWordSuccess({ word: expectedWord }));
     });

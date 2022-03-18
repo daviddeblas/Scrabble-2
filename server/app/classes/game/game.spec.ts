@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -43,7 +45,7 @@ describe('game', () => {
     it('place should score according to scorePosition on correct placement', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
-        // put letters in player easel so placement is possible
+        // mettre des lettres sur le chevalet du joueur pour que le placement soit possible
         lettersToPlace.forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
@@ -63,14 +65,13 @@ describe('game', () => {
         const expectedPoints = game.board['scorePosition'](positionsOfPlacement) * wordMultiplier;
         expect(thisPlayerScore).to.eq(expectedPoints);
 
-        // this is no longer this players turn
+        // ce n'est plus le tour du joueur actif
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
     it('place should score according to scorePosition on correct placement with a blank letter', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
 
-        // put letters in player easel so placement is possible
         lettersToPlace.slice(1, 3).forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
@@ -78,7 +79,6 @@ describe('game', () => {
         game['getActivePlayer']().easel.push(BLANK_LETTER);
 
         expect(() => {
-            // place 'con' across in the middle
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 [0],
@@ -92,20 +92,17 @@ describe('game', () => {
         const wordMultiplier = 2;
         expect(thisPlayerScore).to.eq(expectedPoints * wordMultiplier);
 
-        // this is no longer this players turn
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
     it('place should throw on correct placement as second placement if not connected to other words', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
         game.placeCounter = 1;
-        // put letters in player easel so placement is possible
         lettersToPlace.forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
 
         expect(() => {
-            // place 'con' across in the middle
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 [],
@@ -113,7 +110,7 @@ describe('game', () => {
             );
         }).to.throw();
     });
-    // eslint-disable-next-line max-len
+
     it('place should score according to scorePosition added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
@@ -127,7 +124,6 @@ describe('game', () => {
         expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
     });
 
-    // eslint-disable-next-line max-len
     it('place should score according to scorePosition added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {
         game.players[activePlayer].easel = stringToLetters('aa');
         const oldEasel = [...game.players[activePlayer].easel];
@@ -212,7 +208,6 @@ describe('game', () => {
     });
 
     it('endGame should only call endGameScoreAdjustment once', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyOnScoreAjustment = spy(game as any, 'endGameScoreAdjustment');
         game.endGame();
         game.endGame();
@@ -288,7 +283,6 @@ describe('game', () => {
     });
 
     it('getGameStatus  returns specific information given to the player', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const info = game.getGameStatus(0) as any;
         expect(info.status.activePlayer).to.eq(game?.players[game?.activePlayer].name);
         expect(info.board.board).to.eq(game?.board.board);

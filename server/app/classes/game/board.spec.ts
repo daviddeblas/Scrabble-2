@@ -45,21 +45,18 @@ describe('board', () => {
     });
 
     it('getAffectedWordFromSinglePlacement should be correct', () => {
-        // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.place(correctLettersToPlace, [], true);
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWordFromSinglePlacement should not throw on border placements', () => {
-        // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 0)), new PlacedLetter('O', new Vec2(7, 0)), new PlacedLetter('N', new Vec2(8, 0))];
         lettersToPlace.forEach((l) => (board.board[l.position.x][l.position.y] = l.letter));
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWordFromSinglePlacement should pass over ', () => {
-        // place word 'con' across the 3 middle boxes
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0)));
     });
 

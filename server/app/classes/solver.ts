@@ -1,6 +1,6 @@
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
-import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME, POSITION_LAST_CHAR } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
@@ -135,8 +135,7 @@ export class Solver {
                 }
 
                 if (perpendicularWord.length > 1) {
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    if (this.dictionary.words.indexOf(perpendicularWord.toLowerCase()) === -1) {
+                    if (this.dictionary.words.indexOf(perpendicularWord.toLowerCase()) === POSITION_LAST_CHAR) {
                         valid = false;
                         break;
                     }
