@@ -11,8 +11,6 @@ export class LeaderboardService {
     constructor(private socketService: SocketClientService, private store: Store) {}
 
     getLeaderboard(): void {
-        this.socketService.send('get highscores');
-
         this.socketService.on('receive classic highscores', (scores: HighScore[]) => {
             this.store.dispatch(loadClassicLeaderboardSuccess({ highScores: scores }));
         });
@@ -20,5 +18,7 @@ export class LeaderboardService {
         this.socketService.on('receive log2990 highscores', (scores: HighScore[]) => {
             this.store.dispatch(loadLog2990LeaderboardSuccess({ highScores: scores }));
         });
+
+        this.socketService.send('get highScores');
     }
 }

@@ -31,7 +31,7 @@ describe('LeaderBoardService', () => {
     it('getLeaderboard should send "get highscores" to socket', () => {
         const emitSpy = spyOn(socketService, 'emit');
         service.getLeaderboard();
-        expect(emitSpy).toHaveBeenCalledWith('get highscores');
+        expect(emitSpy).toHaveBeenCalledWith('get highScores');
     });
 
     it('getLeaderboard should dispatch loadClassicLeaderboardSuccess when receive classic highscores is called', (done) => {

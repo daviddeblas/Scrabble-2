@@ -1,7 +1,7 @@
 import { HighScore } from '@app/classes/highscore';
 import { createAction, props } from '@ngrx/store';
 
-export const loadLeaderboard = createAction('[HighScores] load higScores');
+export const loadLeaderboard = createAction('[HighScores] Load LeaderBoard');
 
 export const loadClassicLeaderboardSuccess = createAction('[HighScores] Load Classic HighScores Success', props<{ highScores: HighScore[] }>());
 

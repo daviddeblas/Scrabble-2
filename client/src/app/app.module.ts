@@ -18,6 +18,7 @@ import { MultiConfigWindowComponent } from './components/multi-config-window/mul
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
 import { GameEffects } from './effects/game.effects';
+import { LeaderboardEffects } from './effects/leaderboard.effects';
 import { RoomEffects } from './effects/room.effects';
 import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
@@ -59,7 +60,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
             room: roomReducer.reducer,
             gameStatus: gameReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,

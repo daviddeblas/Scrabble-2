@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { loadLeaderboard } from '@app/actions/leaderboard.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { LeaderBoardScores } from '@app/reducers/leaderboard.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
 import { LeaderboardPageComponent } from './leaderboard-page.component';
 
 describe('LeaderboardPageComponent', () => {
@@ -16,7 +18,7 @@ describe('LeaderboardPageComponent', () => {
             providers: [provideMockStore()],
         }).compileComponents();
         store = TestBed.inject(MockStore);
-        store.overrideSelector('highScores', [] as unknown as LeaderBoardScores);
+        store.overrideSelector('highScores', {} as unknown as LeaderBoardScores);
     });
 
     beforeEach(() => {
@@ -27,5 +29,10 @@ describe('LeaderboardPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should dispatch loadLeaderboard when created', () => {
+        const expectedAction = cold('a', { a: loadLeaderboard() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 });
