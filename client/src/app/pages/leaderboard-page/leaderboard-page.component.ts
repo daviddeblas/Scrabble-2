@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { loadLeaderboard } from '@app/actions/leaderboard.actions';
-import { ClassicLeaderboard } from '@app/classes/ClassicLeaderboard';
-import { Log2990Leaderboard } from '@app/classes/LOG2990Leaderboard';
+import { ClassicLeaderboard } from '@app/classes/classic-leaderboard';
+import { Log2990Leaderboard } from '@app/classes/log2990-leaderboard';
 import { LeaderBoardScores } from '@app/reducers/leaderboard.reducer';
 import { Store } from '@ngrx/store';
 

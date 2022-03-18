@@ -8,7 +8,7 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class LeaderboardService {
-    constructor(private socketService: SocketClientService, private store: Store<{ highScores: HighScore[] }>) {}
+    constructor(private socketService: SocketClientService, private store: Store) {}
 
     getLeaderboard(): void {
         this.socketService.send('get highscores');
