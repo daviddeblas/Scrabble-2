@@ -1,6 +1,7 @@
 import { GameMode } from '@app/classes/game-configs';
 import { DATABASE, DEFAULT_HIGHSCORE, HighScore } from '@app/classes/highscore';
 import { Db, Document, WithId } from 'mongodb';
+import io from 'socket.io';
 import { Service } from 'typedi';
 
 @Service()
@@ -32,5 +33,11 @@ export class LeaderboardService {
             this.highScoreDB.collection(collection).insertOne(highScore);
             this.highScoreDB.collection(collection).deleteOne({ id: (lowestScore[0] as Document).id });
         }
+    }
+
+    setupSocketConnection(socket: io.Socket) {
+        socket.on('get highScores', () => {
+            socket.emit('receive highScores', this.getHighscores(1));
+        });
     }
 }
