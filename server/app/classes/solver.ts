@@ -110,9 +110,14 @@ export class Solver {
         const searchResults = this.dictionarySearch(regex, segments);
         const placedWords = this.filterDuplicateLetters(line, searchResults);
 
-        const result: Solution[] = [];
         const lineStart = direction.flip().mul(index);
+        const result = this.filterInvalidAffectedWords(placedWords, direction, lineStart);
 
+        return result;
+    }
+
+    filterInvalidAffectedWords(placedWords: Line[], direction: Vec2, lineStart: Vec2): Solution[] {
+        const result: Solution[] = [];
         for (const word of placedWords) {
             const solution: Solution = { letters: [], blanks: [], direction };
             let valid = true;
