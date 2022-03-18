@@ -40,4 +40,35 @@ describe('solver', () => {
             },
         ]);
     });
+
+    it('should return correct regex from segments', () => {
+        const solver: Solver = new Solver(dictionary, board, ['A', 'C', 'D']);
+        const regex = solver.generateRegex([
+            {
+                start: 2,
+                end: 3,
+                value: 'H',
+            },
+            {
+                start: 5,
+                end: 6,
+                value: 'A',
+            },
+        ]);
+        expect(regex.source).to.equal(
+            '^(?:(?:(?!H$)([ACD]{0,2}|^)H(?:[ACD]{1}$|[ACD]{2}A|$)(?:[ACD]{1,9}|$))|(?:(?!A$)([ACD]{0,1}|^)A(?:[ACD]{1,9}|$)))$',
+        );
+    });
+
+    it('should return correct regex from segments when blanks', () => {
+        const solver: Solver = new Solver(dictionary, board, ['*', 'C', 'D']);
+        const regex = solver.generateRegex([
+            {
+                start: 2,
+                end: 3,
+                value: 'X',
+            },
+        ]);
+        expect(regex.source).to.equal('^(?:(?:(?!X$)([a-z]{0,2}|^)X(?:[a-z]{1,12}|$)))$');
+    });
 });
