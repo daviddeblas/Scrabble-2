@@ -106,7 +106,7 @@ export class Solver {
         if (line.every((letter) => letter === null)) return []; // toutes les lettres sont null
 
         const segments = this.generateSegments(line);
-        const regex = this.generateRegex(line, segments);
+        const regex = this.generateRegex(segments);
         const searchResults = this.dictionarySearch(regex, segments);
         const placedWords = this.filterDuplicateLetters(line, searchResults);
 
@@ -177,7 +177,7 @@ export class Solver {
         return segments;
     }
 
-    generateRegex(line: (Letter | null)[], segments: Segment[]): RegExp {
+    generateRegex(segments: Segment[]): RegExp {
         const easelText = this.easel.includes('*') ? 'a-z' : this.easel.join('');
 
         const regexParts = [];
@@ -197,8 +197,8 @@ export class Solver {
                 if (j + 1 < segments.length) {
                     const spacing = segments[j + 1].start - segments[j].end;
                     regexPart += `(?:[${easelText}]{${spacing - 1}}$|[${easelText}]{${spacing}}${segments[j + 1].value}|$)`;
-                } else if (segments[j].end < line.length) {
-                    const spacing = line.length - segments[j].end;
+                } else if (segments[j].end < BOARD_SIZE) {
+                    const spacing = BOARD_SIZE - segments[j].end;
                     regexPart += `(?:[${easelText}]{1,${spacing}}|$)`;
                 }
             }
