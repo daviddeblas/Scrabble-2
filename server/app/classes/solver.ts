@@ -49,18 +49,27 @@ export class Solver {
     }
 
     getHints(): string[] {
-        const allSolutions: Solution[] = this.findAllSolutions(); // TODO ne pas chercher tout le board
-        if (allSolutions.length < 1) return [];
-        let solutions: Solution[] = [];
-        if (allSolutions.length > 3) {
-            for (let i = 0; i < HINT_COUNT; i++) {
-                const random = Math.floor(((Math.random() + i) * solutions.length) / HINT_COUNT);
-                solutions.push(allSolutions[random]);
-            }
-        } else {
-            solutions = allSolutions;
+        const solutions: Solution[] = this.findAllSolutions();
+        if (solutions.length < 1) return [];
+
+        const randomSolutions = this.pickRandomSolutions(solutions);
+        return this.solutionsToHints(randomSolutions);
+    }
+
+    pickRandomSolutions(solutions: Solution[]): Solution[] {
+        if (solutions.length <= HINT_COUNT) {
+            return solutions;
+        }
+        const randomSolutions: Solution[] = [];
+        for (let i = 0; i < HINT_COUNT; i++) {
+            const random = Math.floor(((Math.random() + i) * solutions.length) / HINT_COUNT);
+            randomSolutions.push(solutions[random]);
         }
 
+        return randomSolutions;
+    }
+
+    solutionsToHints(solutions: Solution[]): string[] {
         const hints: string[] = [];
 
         for (const solution of solutions) {
