@@ -237,7 +237,7 @@ describe('room', () => {
             room.game = stubbedGame;
             const clk = useFakeTimers();
             room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
-            clk.tick(MIN_BOT_PLACEMENT_TIME);
+            clk.tick(MIN_BOT_PLACEMENT_TIME * 2);
             clk.restore();
             expect(onCommandStub.calledOnce).to.equal(true);
             expect(moveStub.calledOnce).to.equal(true);
