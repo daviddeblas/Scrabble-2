@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
@@ -14,13 +15,15 @@ import { Observable } from 'rxjs';
     templateUrl: './waiting-room.component.html',
     styleUrls: ['./waiting-room.component.scss'],
 })
-export class WaitingRoomComponent implements OnDestroy {
+export class WaitingRoomComponent implements OnDestroy, OnInit {
     @Input() stepper: MatStepper;
     roomInfo$: Observable<RoomInfo | undefined>;
     player2$: Observable<string | undefined>;
     gameStarted: boolean;
+    settingsForm: FormGroup;
 
     constructor(
+        private fb: FormBuilder,
         private dialogRef: MatDialogRef<GamePreparationPageComponent>,
         public socketService: SocketClientService,
         private store: Store,
@@ -29,6 +32,12 @@ export class WaitingRoomComponent implements OnDestroy {
         this.roomInfo$ = roomStore.select('room', 'roomInfo');
         this.player2$ = roomStore.select('room', 'pendingPlayer');
         this.gameStarted = false;
+    }
+
+    ngOnInit() {
+        this.settingsForm = this.fb.group({
+            botLevel: ['Débutant'],
+        });
     }
 
     acceptInvite(): void {
@@ -46,7 +55,7 @@ export class WaitingRoomComponent implements OnDestroy {
     }
 
     convertToSolo(): void {
-        this.store.dispatch(switchToSoloRoom({ botLevel: 'Débutant' }));
+        this.store.dispatch(switchToSoloRoom({ botLevel: this.settingsForm.controls.botLevel.value }));
         this.dialogRef.close();
     }
 

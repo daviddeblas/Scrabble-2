@@ -1,5 +1,6 @@
+import { Direction } from '@app/enums/direction';
 import { Vec2 } from 'common/classes/vec2';
-import { BoardSelection, Orientation } from './board-selection';
+import { BoardSelection } from './board-selection';
 
 describe('BoardSelection', () => {
     it('should create an instance', () => {
@@ -11,7 +12,7 @@ describe('BoardSelection', () => {
     });
 
     it('should create a clone of the selection', () => {
-        const boardSelection = new BoardSelection(new Vec2(1, 1), Orientation.Horizontal, [new Vec2(0, 1)]);
+        const boardSelection = new BoardSelection(new Vec2(1, 1), Direction.HORIZONTAL, [new Vec2(0, 1)]);
         let cloneSelection = boardSelection.copy();
 
         expect(cloneSelection.cell).not.toBe(boardSelection.cell);

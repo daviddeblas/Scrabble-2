@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
@@ -164,7 +165,6 @@ describe('room', () => {
 
         it('initiateRoomEvents should call setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
@@ -175,7 +175,6 @@ describe('room', () => {
 
         it('initiateRoomEvents should call setupSocket once if no client is present', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
@@ -218,7 +217,6 @@ describe('room', () => {
 
         it('initSoloGame should put the correct attributes and call notifyAvailableRoomsChanges and setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setUpSocketStub = stub(room as any, 'setupSocket');
             room.initSoloGame(BotDifficulty.Easy);
             expect(roomsManager.notifyAvailableRoomsChange.calledOnce).to.equal(true);

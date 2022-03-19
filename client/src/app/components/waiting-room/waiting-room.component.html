@@ -1,10 +1,4 @@
 <div class="general-container">
-    <div id="solo-button">
-        <button mat-raised-button color="basic" (click)="convertToSolo()" routerLink="/game">
-            Solo Débutant
-            <mat-icon>person_outline</mat-icon>
-        </button>
-    </div>
     <section id="waiting-section" *ngIf="(player2$ | async) === undefined">
         <div id="text-container">
             <h1>En attente d'un autre joueur...</h1>
@@ -50,4 +44,24 @@
             Annuler
         </button>
     </div>
+    <form [formGroup]="settingsForm" *ngIf="(player2$ | async) === undefined">
+        <div id="button-solo-label">
+            <h2>Convertir partie en partie solo</h2>
+        </div>
+        <div id="solo-button">
+            <button mat-raised-button color="basic" (click)="convertToSolo()" routerLink="/game">
+                Solo
+                <mat-icon>person_outline</mat-icon>
+            </button>
+        </div>
+        <div id="parameter-solo-container">
+            <mat-form-field id="parameter-solo-button" appearance="fill">
+                <mat-label>Niveau de l'adversaire</mat-label>
+                <mat-select formControlName="botLevel">
+                    <mat-option value="Débutant">Débutant</mat-option>
+                    <mat-option value="Expert" disabled>Expert</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
 </div>

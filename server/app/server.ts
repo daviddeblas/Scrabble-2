@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// permet l'utilisation des consoles logs
 import { Application } from '@app/app';
 import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
