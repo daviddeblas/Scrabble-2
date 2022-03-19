@@ -184,9 +184,7 @@ describe.only('solver', () => {
     });
 
     it('should search solution for each line', () => {
-        const dictionarySample = { words: ['abc', 'abcd', 'zabcdr', 'abcx', 'rabcx'] } as Dictionary;
-        const solver: Solver = new Solver(dictionarySample, board, []);
-
+        const solver: Solver = new Solver(dictionary, board, []);
         const expected: Solution[] = [];
 
         const findLineStub = stub(solver, 'findLineSolutions');
