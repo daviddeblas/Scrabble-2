@@ -5,19 +5,25 @@ import { Game } from '@app/classes/game/game';
 import { expect } from 'chai';
 import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
+import Container from 'typedi';
 import { BotDifficulty, BotService } from './bot.service';
+import { DictionaryService } from './dictionary.service';
+import { GameConfigService } from './game-config.service';
 
 describe('Bot service tests', () => {
     let service: BotService;
     let fakeGame: Game;
 
     beforeEach(async () => {
+        await Container.get(DictionaryService).init();
+        await Container.get(GameConfigService).init();
         service = new BotService();
         const fakeBoard = new Array(BOARD_SIZE).fill(new Array(BOARD_SIZE).fill(null));
         fakeGame = {
             players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
             bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
             board: { board: fakeBoard, scorePosition: () => 2 },
+            config: Container.get(GameConfigService).configs[0],
         } as unknown as Game;
     });
 
@@ -64,12 +70,10 @@ describe('Bot service tests', () => {
         expect(placeCommandStub.called).to.equal(true);
     });
 
-    it('placeCommand should call determineWord if there is at least a solution', () => {
+    it('placeCommand should call determineWord if there is at least a solution', (done) => {
         fakeGame.board.board[7][7] = 'E';
-        const determineWordStub = stub(service as any, 'determineWord').callsFake(() => 'h7h plat');
-        const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
-        expect(placeResult).to.equal('placer h7h plat');
-        expect(determineWordStub.calledOnce).to.equal(true);
+        stub(service as any, 'determineWord').callsFake(() => done());
+        service['placeCommand'](fakeGame, BotDifficulty.Easy);
     });
 
     it('placeCommand should not call determineWord if there is no solution and return passer', () => {

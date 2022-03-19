@@ -3,7 +3,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
-import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';

@@ -7,6 +7,7 @@ import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
 import { BrowserService } from './services/browser.service';
 import { DictionaryService } from './services/dictionary.service';
+import { GameConfigService } from './services/game-config.service';
 import { RoomsManager } from './services/rooms-manager.service';
 import { SocketService } from './services/socket-manager.service';
 
@@ -28,15 +29,18 @@ export class Server {
             return false;
         }
     }
-    init(): void {
+    init() {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
+        Container.get(DictionaryService).init();
+        Container.get(GameConfigService).init();
         this.socketService = new SocketService(
             this.server,
             Container.get(RoomsManager),
             Container.get(DictionaryService),
             Container.get(BrowserService),
+            Container.get(GameConfigService),
         );
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
