@@ -30,7 +30,7 @@ const cloneBoard = (board: (Letter | null)[][]): (Letter | null)[][] => {
     return newBoard;
 };
 
-export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Direction): boolean => {
+export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orientation: Direction | null): boolean => {
     switch (orientation) {
         case Direction.HORIZONTAL:
             for (let i = pos.x + 1; i < BOARD_SIZE; ++i) if (board[i][pos.y] === null) return false;
@@ -42,7 +42,7 @@ export const isCellAtBoardLimit = (board: (Letter | null)[][], pos: Vec2, orient
     return true;
 };
 
-const switchOrientation = (oldOrientation: Direction | null): Direction => {
+export const switchOrientation = (oldOrientation: Direction | null): Direction => {
     return oldOrientation === Direction.HORIZONTAL ? Direction.VERTICAL : Direction.HORIZONTAL;
 };
 
@@ -102,13 +102,13 @@ export const reducer = createReducer(
     }),
 
     on(cellClick, (state, { pos }) => {
+        // Si des lettres ont déjà été placées
+        if (state.selection.modifiedCells.length > 0) return state;
+
         const tempState = {
             ...state,
             selection: state.selection.copy(),
         };
-
-        // Si des lettres ont déjà été placées
-        if (tempState.selection.modifiedCells.length > 0) return tempState;
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);
 
@@ -126,44 +126,37 @@ export const reducer = createReducer(
     }),
 
     on(placeLetter, (state, { letter }) => {
-        const selectedPosition = { x: (state.selection.cell as iVec2).x, y: (state.selection.cell as iVec2).y };
-        if (state.board[selectedPosition.x][selectedPosition.y]) return state;
-        const board = cloneBoard(state.board);
-        board[selectedPosition.x][selectedPosition.y] = letter;
-
         const selection = state.selection.copy();
-        selection.modifiedCells.push(state.selection.cell as Vec2);
+        if (!selection.cell) return state;
 
-        if (!isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Direction))
+        if (state.board[selection.cell.x][selection.cell.y]) return state;
+        const board = cloneBoard(state.board);
+        board[selection.cell.x][selection.cell.y] = letter;
+
+        selection.modifiedCells.push(selection.cell.copy());
+
+        if (!isCellAtBoardLimit(state.board, selection.cell, selection.orientation))
             do {
                 switch (state.selection.orientation) {
                     case Direction.HORIZONTAL:
-                        selectedPosition.x++;
+                        selection.cell.x++;
                         break;
                     case Direction.VERTICAL:
-                        selectedPosition.y++;
+                        selection.cell.y++;
                         break;
                 }
-            } while (board[selectedPosition.x][selectedPosition.y] !== null);
+            } while (board[selection.cell.x][selection.cell.y] !== null);
 
-        selection.cell = new Vec2(selectedPosition.x, selectedPosition.y);
-        if (isCellAtBoardLimit(state.board, selection.cell as Vec2, selection.orientation as Direction)) selection.orientation = null;
+        if (isCellAtBoardLimit(state.board, selection.cell, selection.orientation)) selection.orientation = null;
 
-        return {
-            ...state,
-            selection,
-            board,
-        };
+        return { ...state, selection, board };
     }),
 
     on(removeLetters, (state, { positions }) => {
         const board = cloneBoard(state.board);
         positions.forEach((pos) => (board[pos.x][pos.y] = null));
 
-        return {
-            ...state,
-            board,
-        };
+        return { ...state, board };
     }),
 
     on(clearSelection, (state): BoardState => {
@@ -173,7 +166,7 @@ export const reducer = createReducer(
     on(backspaceSelection, (state): BoardState => {
         const selection = state.selection.copy();
 
-        if (selection.cell === null) return { ...state };
+        if (selection.cell === null) return state;
         if (selection.modifiedCells.length === 0)
             // Clear selection
             return { ...state, selection: new BoardSelection() };
@@ -188,11 +181,7 @@ export const reducer = createReducer(
         const board = cloneBoard(state.board);
         board[selection.cell.x][selection.cell.y] = null;
 
-        return {
-            ...state,
-            board,
-            selection,
-        };
+        return { ...state, board, selection };
     }),
 
     on(resetAllState, () => initialState),
