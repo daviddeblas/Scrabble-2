@@ -2,8 +2,8 @@
 import { TestBed } from '@angular/core/testing';
 import { restoreMessages } from '@app/actions/chat.actions';
 import { refreshTimer } from '@app/actions/game-status.actions';
-import { DEFAULT_TIMER } from '@app/components/multi-config-window/multi-config-window.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { DEFAULT_TIMER } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { BrowserManagerService } from './browser-manager.service';
 import { SocketClientService } from './socket-client.service';
