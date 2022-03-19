@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
@@ -20,14 +21,13 @@ describe('game', () => {
         return;
     };
 
+    before(() => {
+        Container.get(DictionaryService).init();
+        Container.get(GameConfigService).init();
+    });
+
     beforeEach(() => {
-        game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
-            ['player 1', 'player 2'],
-            gameOptions,
-            timerCallbackMock,
-            timerCallbackMock,
-        );
+        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, timerCallbackMock);
         activePlayer = game.activePlayer;
     });
 

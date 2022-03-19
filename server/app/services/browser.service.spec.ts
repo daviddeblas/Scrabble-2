@@ -1,5 +1,5 @@
 import { Room } from '@app/classes/room';
-import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { assert, expect } from 'chai';
 import { createServer, Server } from 'http';
 import * as sinon from 'sinon';

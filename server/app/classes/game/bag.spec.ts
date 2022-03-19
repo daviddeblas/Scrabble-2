@@ -9,9 +9,11 @@ const LETTERS_TO_GET = 7;
 
 describe('bag', () => {
     let bag: Bag;
-    const gameConfig: GameConfig = Container.get(GameConfigService).configs.configs[0];
+    let gameConfig: GameConfig;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        await Container.get(GameConfigService).init();
+        gameConfig = Container.get(GameConfigService).configs[0];
         bag = new Bag(gameConfig);
     });
 
