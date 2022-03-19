@@ -257,4 +257,20 @@ describe.only('solver', () => {
         const hints = solver.solutionsToHints(solutions);
         expect(hints).to.deep.equal(['!placer i8v ab', '!placer h5h cDe']);
     });
+
+    it('should return solution strings', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const findSolutionStub = stub(solver, 'findAllSolutions').returns([]);
+
+        const pickRandomSolutionsSpy = spy(solver, 'pickRandomSolutions');
+        const solutionsToHintsSpy = spy(solver, 'solutionsToHints');
+
+        const results = solver.getHints();
+        expect(results).to.deep.equals([]);
+
+        assert(findSolutionStub.calledOnce);
+        assert(pickRandomSolutionsSpy.notCalled);
+        assert(solutionsToHintsSpy.notCalled);
+    });
 });
