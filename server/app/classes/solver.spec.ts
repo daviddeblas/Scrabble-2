@@ -4,6 +4,8 @@ import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
+import { assert } from 'console';
+import { spy } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { Solution, Solver } from './solver';
@@ -117,5 +119,29 @@ describe.only('solver', () => {
         ];
 
         expect(solutions).to.deep.equal(expected);
+    });
+
+    it('should not search when line is null', () => {
+        const dictionarySample = { words: ['aaa'] } as Dictionary;
+        const solver: Solver = new Solver(dictionarySample, board, []);
+
+        const generateSegmentsSpy = spy(solver, 'generateSegments');
+        const generateRegexSpy = spy(solver, 'generateRegex');
+        const dictionarySearchSpy = spy(solver, 'dictionarySearch');
+        const filterDuplicateLettersSpy = spy(solver, 'filterDuplicateLetters');
+        const filterInvalidAffectedWordsSpy = spy(solver, 'filterInvalidAffectedWords');
+
+        const solutions = solver.findLineSolutions(
+            [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+            5,
+            new Vec2(1, 0),
+        );
+        expect(solutions).to.deep.equal([]);
+
+        assert(generateSegmentsSpy.notCalled);
+        assert(generateRegexSpy.notCalled);
+        assert(dictionarySearchSpy.notCalled);
+        assert(filterDuplicateLettersSpy.notCalled);
+        assert(filterInvalidAffectedWordsSpy.notCalled);
     });
 });
