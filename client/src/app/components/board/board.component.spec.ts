@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
 import { CellLetterX3Component } from '@app/components/cells/cell-letter-x3/cell-letter-x3.component';
@@ -6,14 +7,17 @@ import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-wor
 import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
 import { LetterComponent } from '@app/components/letter/letter.component';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { StoreModule } from '@ngrx/store';
 import { BoardComponent } from './board.component';
 
 describe('BoardComponent', () => {
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
+    let keyManagerMock: jasmine.SpyObj<KeyManagerService>;
 
     beforeEach(async () => {
+        keyManagerMock = jasmine.createSpyObj('keyManager', ['onKey']);
         await TestBed.configureTestingModule({
             declarations: [
                 BoardComponent,
@@ -26,6 +30,12 @@ describe('BoardComponent', () => {
                 CellWordX3Component,
             ],
             imports: [StoreModule.forRoot({})],
+            providers: [
+                {
+                    provide: KeyManagerService,
+                    useValue: keyManagerMock,
+                },
+            ],
         }).compileComponents();
     });
 
@@ -54,5 +64,11 @@ describe('BoardComponent', () => {
 
         const letterSequence: string[] = component.letterSequence(sequenceLength);
         expect(letterSequence).toEqual(expectedSequence);
+    });
+
+    it('handleKeyDown should call keyManager.onKey', () => {
+        const e: KeyboardEvent = { key: 'a' } as KeyboardEvent;
+        component.handleKeyDown(e);
+        expect(keyManagerMock.onKey).toHaveBeenCalled();
     });
 });
