@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
 import * as playersActions from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
-import { Direction, Word } from '@app/classes/word';
+import { Word } from '@app/classes/word';
+import { Direction } from '@app/enums/direction';
 import { Letter } from 'common/classes/letter';
 import { Multiplier } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
@@ -76,7 +78,6 @@ describe('[Board] Reducer', () => {
                 expect(result.board[x][0]).toEqual(newWord.letters[x].toUpperCase() as Letter);
                 expect(result.multipliers[x][0]).toEqual(null);
             }
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             expect(result.blanks[0]).toEqual(new Vec2(4, 0));
         });
 
@@ -90,7 +91,6 @@ describe('[Board] Reducer', () => {
                 expect(result.board[0][y]).toEqual(newWord.letters[y].toUpperCase() as Letter);
                 expect(result.multipliers[0][y]).toEqual(null);
             }
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             expect(result.blanks[0]).toEqual(new Vec2(0, 4));
         });
     });

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { browserReload, browserUnload } from '@app/actions/browser.actions';
+import { browserUnload } from '@app/actions/browser.actions';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -28,14 +28,6 @@ describe('AppComponent', () => {
         app.catchBrowserReload(new Event('beforeunload'));
 
         const expectedAction = cold('a', { a: browserUnload() });
-
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
-
-    it('should dispatch browserReload when window reload', () => {
-        app.catchBrowserLoad(new Event('load'));
-
-        const expectedAction = cold('a', { a: browserReload() });
 
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });

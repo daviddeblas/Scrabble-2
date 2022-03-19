@@ -32,7 +32,7 @@ export class CellEmptyComponent {
     }
 
     click(): void {
-        // First validation check for selecting a cell (Active player + Game Ended)
+        // Premier contrôle de validation pour la sélection d'une cellule (Active player + Game Ended)
         let currentPlayer = '';
         let activePlayer = '';
         let gameEnded = false;
@@ -45,7 +45,7 @@ export class CellEmptyComponent {
         });
         if (gameEnded || currentPlayer !== activePlayer) return;
 
-        // Second validation for selecting a cell (Is cell empty)
+        // Deuxième validation pour la sélection d'une cellule (Is cell empty)
         let letter: Letter | null = null;
         this.store.select('board').subscribe((state) => {
             letter = state.board[this.pos.x][this.pos.y];

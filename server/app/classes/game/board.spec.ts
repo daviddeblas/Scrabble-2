@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
@@ -9,9 +10,11 @@ import { Vec2 } from 'common/classes/vec2';
 import { Container } from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
-describe('board', () => {
+describe('board', async () => {
     let board: Board;
-    const gameConfig = Container.get(GameConfigService).configs.configs[0];
+    await Container.get(DictionaryService).init();
+    await Container.get(GameConfigService).init();
+    const gameConfig = Container.get(GameConfigService).configs[0];
     const correctLettersToPlace = [
         new PlacedLetter('C', new Vec2(6, 7)),
         new PlacedLetter('O', new Vec2(7, 7)),
@@ -45,21 +48,18 @@ describe('board', () => {
     });
 
     it('getAffectedWordFromSinglePlacement should be correct', () => {
-        // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
         board.place(correctLettersToPlace, [], true);
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWordFromSinglePlacement should not throw on border placements', () => {
-        // place word 'con' across the 3 middle boxes
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 0)), new PlacedLetter('O', new Vec2(7, 0)), new PlacedLetter('N', new Vec2(8, 0))];
         lettersToPlace.forEach((l) => (board.board[l.position.x][l.position.y] = l.letter));
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0))).to.deep.eq(lettersToPlace);
     });
 
     it('getAffectedWordFromSinglePlacement should pass over ', () => {
-        // place word 'con' across the 3 middle boxes
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0)));
     });
 

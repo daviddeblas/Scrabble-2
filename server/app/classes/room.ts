@@ -27,8 +27,8 @@ export class Room {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => this.quitRoomHost());
-        this.host.once('switch to solo room', () => {
-            this.initSoloGame(BotDifficulty.Easy);
+        this.host.once('switch to solo room', (data) => {
+            this.initSoloGame(data.botLevel);
             this.host.emit('switched to solo', this.getRoomInfo());
         });
         this.game = null;
@@ -74,7 +74,8 @@ export class Room {
     }
 
     initiateRoomEvents() {
-        this.sockets = [this.host, this.clients[0] as io.Socket];
+        this.sockets = [this.host as io.Socket];
+        if (this.clients[0]) this.sockets.push(this.clients[0]);
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
@@ -84,7 +85,7 @@ export class Room {
         this.sockets = [this.host, this.clients[0] as io.Socket];
 
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(this),
@@ -136,9 +137,8 @@ export class Room {
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
-
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
             this.gameOptions,
             this.actionAfterTimeout(this),
@@ -152,15 +152,14 @@ export class Room {
 
     private setupSocket(socket: io.Socket, playerNumber: number): void {
         const game = this.game as Game;
-
         socket.on('get game status', () => {
             socket.emit('game status', game.getGameStatus(playerNumber, this.botLevel));
         });
 
-        // Init command processing
+        // Initialise le traitement des commandes
         socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
-        // Init Chat
+        // Initialise le chat
         socket.on('send message', ({ username, message, messageType }) => {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
@@ -172,7 +171,7 @@ export class Room {
             }
         });
 
-        // Init surrender game
+        // Initialise l'abbandon de la partie
         socket.on('surrender game', () => {
             this.surrenderGame(socket.id);
         });

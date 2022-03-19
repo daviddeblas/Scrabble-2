@@ -11,8 +11,8 @@ describe('SocketTestHelper', () => {
         expect(socketTestHelper).toBeTruthy();
     });
 
-    // La fonction disconnect est présente pour immiter la classe SocketClientService mais dans ce cas,
-    // elle n'as pas besoin de faire quelque chose car il ni à pas de réel connexion avec le server
+    // La fonction disconnect est présente pour imiter la classe SocketClientService mais dans ce cas,
+    // elle n'a pas besoin de faire quelque chose car il n'y a pas de réel connexion avec le server
     it('disconnect should not do anything', () => {
         const spy = spyOn(socketTestHelper, 'disconnect').and.callThrough();
         socketTestHelper.disconnect();

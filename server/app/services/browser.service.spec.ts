@@ -1,5 +1,5 @@
 import { Room } from '@app/classes/room';
-import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { assert, expect } from 'chai';
 import { createServer, Server } from 'http';
 import * as sinon from 'sinon';
@@ -91,7 +91,6 @@ describe('Browser service tests', () => {
         roomsManager.rooms.push(room);
         const userId = '123';
         stub(roomsManager, 'getRoom').callsFake(() => room);
-        // service.roomsManager.getRoom = roomMangerStub;
         clientSocket.emit('closed browser', userId);
         setTimeout(() => {
             expect(spyOnQuitRoomHost.calledOnce).to.equal(true);

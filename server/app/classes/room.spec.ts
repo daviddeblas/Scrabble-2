@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
-import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
@@ -164,13 +165,21 @@ describe('room', () => {
 
         it('initiateRoomEvents should call setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
             room.clients[0] = {} as io.Socket;
             room.initiateRoomEvents();
             expect(setupSocketStub.called).to.equal(true);
+        });
+
+        it('initiateRoomEvents should call setupSocket once if no client is present', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
+                return;
+            });
+            room.initiateRoomEvents();
+            expect(setupSocketStub.calledOnce).to.equal(true);
         });
 
         it('actionAfterTimeout should call processSkip and postCommand', () => {
@@ -208,7 +217,6 @@ describe('room', () => {
 
         it('initSoloGame should put the correct attributes and call notifyAvailableRoomsChanges and setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setUpSocketStub = stub(room as any, 'setupSocket');
             room.initSoloGame(BotDifficulty.Easy);
             expect(roomsManager.notifyAvailableRoomsChange.calledOnce).to.equal(true);
@@ -465,7 +473,7 @@ describe('room', () => {
                             expect(initSoloGameStub.calledOnce).to.equal(true);
                             done();
                         });
-                        hostSocket.emit('switch to solo room');
+                        hostSocket.emit('switch to solo room', { botLevel: 'Débutant' });
                     });
                 });
                 hostSocket.emit('create room');

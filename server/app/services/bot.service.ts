@@ -2,8 +2,7 @@ import { Game } from '@app/classes/game/game';
 import { Solver } from '@app/classes/solver';
 import { Letter, lettersToString } from 'common/classes/letter';
 import { BOT_NAMES } from 'common/constants';
-import { Container, Service } from 'typedi';
-import { DictionaryService } from './dictionary.service';
+import { Service } from 'typedi';
 
 export enum BotDifficulty {
     Easy = 'Débutant',
@@ -65,7 +64,7 @@ export class BotService {
     }
 
     private placeCommand(game: Game, difficulty: BotDifficulty): string {
-        const solver = new Solver(Container.get(DictionaryService).dictionary, game.board, game.players[1].easel);
+        const solver = new Solver(game.config.dictionary, game.board, game.players[1].easel);
         const foundPlacements: Map<string[], number> = solver.getEasyBotSolutions(game.board);
         if (foundPlacements.size === 0) return 'passer';
         return this.placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
