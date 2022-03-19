@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
+import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { assert } from 'console';
-import { spy } from 'sinon';
+import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { Solution, Solver } from './solver';
@@ -180,5 +181,28 @@ describe.only('solver', () => {
         assert(dictionarySearchSpy.calledOnce);
         assert(filterDuplicateLettersSpy.calledOnce);
         assert(filterInvalidAffectedWordsSpy.calledOnce);
+    });
+
+    it('should search solution for each line', () => {
+        const dictionarySample = { words: ['abc', 'abcd', 'zabcdr', 'abcx', 'rabcx'] } as Dictionary;
+        const solver: Solver = new Solver(dictionarySample, board, []);
+
+        const expected: Solution[] = [];
+
+        const findLineStub = stub(solver, 'findLineSolutions');
+        findLineStub.callsFake((line: (Letter | null)[], index: number, direction: Vec2) => {
+            const sol: Solution = {
+                letters: [],
+                blanks: [],
+                direction,
+            };
+            expected.push(sol);
+            return [sol];
+        });
+
+        const solutions = solver.findAllSolutions();
+
+        expect(solutions).to.deep.equal(expected);
+        assert(findLineStub.callCount === BOARD_SIZE * 2);
     });
 });
