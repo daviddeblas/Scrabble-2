@@ -17,7 +17,11 @@ describe('BrowserManagerService', () => {
     beforeEach(async () => {
         socketService = new SocketClientService();
         await TestBed.configureTestingModule({
-            providers: [provideMockStore({ selectors: [{ selector: 'chat', value: [{ username: 'Player', message: 'Message' }] }] })],
+            providers: [
+                provideMockStore({
+                    selectors: [{ selector: 'chat', value: { chatMessage: [{ username: 'Player', message: 'Message' }], lastSendMessage: [] } }],
+                }),
+            ],
         }).compileComponents();
         service = TestBed.inject(BrowserManagerService);
         store = TestBed.inject(MockStore);

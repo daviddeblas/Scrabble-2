@@ -124,4 +124,52 @@ describe('ChatBoxComponent', () => {
         component.ngOnInit();
         expect(focusSpy).toHaveBeenCalled();
     });
+
+    it('ArrowUp pressed should add one to the numberOfLastMessages', () => {
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowUp',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('ArrowDown pressed should remove one to the numberOfLastMessages if it is higher than 1', () => {
+        component['numberOfLastMessages'] = 2;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowDown',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('ArrowDown pressed should not remove one to the numberOfLastMessages if it is 1 or lower', () => {
+        component['numberOfLastMessages'] = 1;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowDown',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('not change numberOfLastMessages if it is another key', () => {
+        component['numberOfLastMessages'] = 3;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowLeft',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(3);
+    });
+
+    it('put the last given word as nativeElement', () => {
+        const expectedMessage = 'Hello World';
+        store.overrideSelector('chat', { chatMessage: [], lastSendMessage: [expectedMessage] });
+        component.chat$ = store.select('chat');
+        component['numberOfLastMessages'] = 3;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowUp',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        fixture.detectChanges();
+        expect(component['chatMessage'].nativeElement.value).toEqual(expectedMessage);
+    });
 });

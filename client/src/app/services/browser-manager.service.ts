@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { initiateChatting, restoreMessages } from '@app/actions/chat.actions';
 import { getGameStatus, refreshTimer } from '@app/actions/game-status.actions';
-import { ChatMessage } from '@app/interfaces/chat-message';
+import { ChatBox } from '@app/reducers/chat.reducer';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
@@ -12,7 +12,7 @@ const thousandMilliseconds = 1000;
     providedIn: 'root',
 })
 export class BrowserManagerService {
-    constructor(public socketService: SocketClientService, private store: Store, private chatStore: Store<{ chat: ChatMessage[] }>) {}
+    constructor(public socketService: SocketClientService, private store: Store, private chatStore: Store<{ chat: ChatBox }>) {}
     onBrowserClosed(): void {
         this.socketService.send('closed browser', this.socketService.socket.id);
         const date = new Date();
@@ -45,7 +45,7 @@ export class BrowserManagerService {
         this.chatStore
             .select('chat')
             .pipe(take(1))
-            .subscribe((messages) => localStorage.setItem('chatMessages', JSON.stringify(messages)));
+            .subscribe((messages) => localStorage.setItem('chatMessages', JSON.stringify(messages.chatMessage)));
     }
 
     private retrieveSelectors(): void {
