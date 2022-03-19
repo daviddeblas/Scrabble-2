@@ -237,4 +237,24 @@ describe.only('solver', () => {
         const result = solver.pickRandomSolutions(solutions);
         expect(result).to.deep.equal(solutions);
     });
+
+    it('should return solution strings', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const solutions: Solution[] = [
+            {
+                letters: [new PlacedLetter('A', new Vec2(7, 8)), new PlacedLetter('B', new Vec2(7, 8))],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+            {
+                letters: [new PlacedLetter('C', new Vec2(4, 7)), new PlacedLetter('D', new Vec2(8, 7)), new PlacedLetter('E', new Vec2(9, 7))],
+                blanks: [new Vec2(8, 7)],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const hints = solver.solutionsToHints(solutions);
+        expect(hints).to.deep.equal(['!placer i8v ab', '!placer h5h cDe']);
+    });
 });
