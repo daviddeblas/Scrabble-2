@@ -8,7 +8,7 @@ import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-import { Solution, Solver } from './solver';
+import { HINT_COUNT, Solution, Solver } from './solver';
 
 describe.only('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
@@ -202,5 +202,39 @@ describe.only('solver', () => {
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
+    });
+
+    it('should return random solutions', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const mathRandomStub = stub(Math, 'random').returns(0.5);
+
+        const solutions: Solution[] = new Array(9).map((v, i) => {
+            return {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(0, i),
+            };
+        });
+
+        const result = solver.pickRandomSolutions(solutions);
+        expect(result).to.deep.equal([solutions[1], solutions[4], solutions[7]]);
+
+        mathRandomStub.restore();
+    });
+
+    it('should return all solutions when not enough choice', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const solutions: Solution[] = new Array(HINT_COUNT - 1).map((v, i) => {
+            return {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(0, i),
+            };
+        });
+
+        const result = solver.pickRandomSolutions(solutions);
+        expect(result).to.deep.equal(solutions);
     });
 });
