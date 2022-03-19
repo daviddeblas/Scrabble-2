@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import dictionaryJson from '@app/../assets/dictionary.json';
 import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
@@ -11,7 +10,7 @@ import { PlacedLetter } from './placed-letter';
 import { Solution, Solver } from './solver';
 
 describe.only('solver', () => {
-    const dictionary: Dictionary = Object.assign(new Dictionary(), dictionaryJson);
+    const dictionary: Dictionary = new Dictionary('', '', []);
     let board: Board;
     beforeEach(() => {
         board = {} as Board;
