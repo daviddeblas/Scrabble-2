@@ -4,4 +4,5 @@ export interface PlacedLetter {
     letter: Letter;
     position: Vec2;
     blank: boolean;
+    lastPlacedWord?: string;
 }

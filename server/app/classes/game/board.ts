@@ -21,6 +21,7 @@ export class Board {
     multipliers: (Multiplier | null)[][];
     pointsPerLetter: Map<Letter, number>;
     blanks: Vec2[];
+    lastPlacedWord: Vec2[];
 
     constructor(private config: GameConfig) {
         this.board = createEmptyMatrix(config.boardSize);
@@ -35,9 +36,11 @@ export class Board {
         );
 
         this.blanks = [];
+        this.lastPlacedWord = [];
     }
 
     place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number {
+        this.lastPlacedWord = [];
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
             throw new GameError(GameErrorType.WrongPosition);
         const words = this.getAffectedWords(letters);
@@ -49,6 +52,7 @@ export class Board {
 
         letters.forEach((l) => {
             this.board[l.position.x][l.position.y] = l.letter;
+            this.lastPlacedWord.push(l.position);
         });
 
         blanks.forEach((v) => this.blanks.push(letters[v].position.copy()));

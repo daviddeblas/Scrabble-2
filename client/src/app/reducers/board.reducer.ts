@@ -51,6 +51,7 @@ export interface BoardState {
     pointsPerLetter: Map<Letter, number>;
     multipliers: (Multiplier | null)[][];
     blanks: iVec2[];
+    lastPlacedWord: iVec2[];
     selection: BoardSelection;
 }
 
@@ -59,6 +60,7 @@ export const initialState: BoardState = {
     pointsPerLetter: new Map(),
     multipliers: [],
     blanks: [],
+    lastPlacedWord: [],
     selection: new BoardSelection(null, 'horizontal' as Direction),
 };
 export const reducer = createReducer(
@@ -70,6 +72,7 @@ export const reducer = createReducer(
         board: board.board,
         multipliers: board.multipliers,
         blanks: board.blanks,
+        lastPlacedWord: board.lastPlacedWord,
         // transformer le array de tuple en map
         pointsPerLetter: new Map(board.pointsPerLetter as unknown as [Letter, number][]),
         // Clear la selection au cas de fin de tour

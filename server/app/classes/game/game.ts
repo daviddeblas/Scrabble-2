@@ -122,6 +122,7 @@ export class Game {
                 pointsPerLetter: Array.from(this.board.pointsPerLetter),
                 multipliers: this.board.multipliers,
                 blanks: this.board.blanks,
+                lastPlacedWord: this.board.lastPlacedWord,
             },
         };
     }

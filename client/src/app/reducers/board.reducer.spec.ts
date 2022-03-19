@@ -23,6 +23,7 @@ const createInitialState = () => ({
     pointsPerLetter: new Map(),
     multipliers: createInitialBoard(),
     blanks: [],
+    lastPlacedWord: [],
     selection: new BoardSelection(),
 });
 
