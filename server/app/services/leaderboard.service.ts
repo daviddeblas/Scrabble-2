@@ -1,5 +1,5 @@
 import { GameMode } from '@app/classes/game-configs';
-import { DATABASE, DEFAULT_HIGHSCORE, HighScore } from '@app/classes/highscore';
+import { DATABASE, DEFAULT_HIGHSCORE, HighScore, NUMBER_OF_SCORES } from '@app/classes/highscore';
 import { Db, Document, WithId } from 'mongodb';
 import io from 'socket.io';
 import { Service } from 'typedi';
@@ -13,6 +13,7 @@ export class LeaderboardService {
             .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
             .find({})
             .sort({ score: -1 })
+            .limit(NUMBER_OF_SCORES)
             .toArray()
             .then((score: WithId<Document>[]) => {
                 return score.map((s) => s as unknown as HighScore);

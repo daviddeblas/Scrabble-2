@@ -1,5 +1,5 @@
 import { DATABASE, DEFAULT_HIGHSCORE, HighScore } from '@app/classes/highscore';
-import { Db, MongoClient } from 'mongodb';
+import { Db, MongoClient, MongoClientOptions } from 'mongodb';
 import { Service } from 'typedi';
 
 @Service()
@@ -7,18 +7,20 @@ export class DatabaseService {
     private highScoreDB: Db;
     private client: MongoClient;
 
+    private options: MongoClientOptions = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    };
+
     async start(url: string): Promise<MongoClient | null> {
         try {
-            const client = await MongoClient.connect(url);
+            const client = await MongoClient.connect(url, this.options);
             this.client = client;
             this.highScoreDB = client.db(DATABASE.highScore.name);
         } catch {
             throw Error('Database connection error');
         }
-        if (
-            (await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0 &&
-            (await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).countDocuments()) === 0
-        ) {
+        if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
             await this.populateDB();
         }
 
@@ -34,7 +36,6 @@ export class DatabaseService {
 
         for (const score of scores) {
             await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
-            await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).insertOne(score);
         }
     }
 

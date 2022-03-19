@@ -3,6 +3,8 @@ export interface HighScore {
     score: number;
 }
 
+export const NUMBER_OF_SCORES = 5;
+
 export const DEFAULT_HIGHSCORE = {
     classical: [
         { name: 'name1', score: 0 },
