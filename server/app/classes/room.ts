@@ -180,17 +180,20 @@ export class Room {
 
     private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => void {
         return () => {
-            const game = this.game as Game;
-            if (game.activePlayer === 1 && !game.gameFinished) {
-                let date = new Date();
-                const startDate = date.getTime();
-                const botCommand = room.botService.move(game, diff);
-                date = new Date();
-                const timeTaken = date.getTime() - startDate;
-                setTimeout(() => {
-                    room.commandService.onCommand(game, room.sockets, botCommand, 1);
-                }, Math.max(MIN_BOT_PLACEMENT_TIME - timeTaken, 0));
-            }
+            const timeForSocketsResponse = 200;
+            setTimeout(() => {
+                const game = this.game as Game;
+                if (game.activePlayer === 1 && !game.gameFinished) {
+                    let date = new Date();
+                    const startDate = date.getTime();
+                    const botCommand = room.botService.move(game, diff);
+                    date = new Date();
+                    const timeTaken = date.getTime() - startDate;
+                    setTimeout(() => {
+                        room.commandService.onCommand(game, room.sockets, botCommand, 1);
+                    }, Math.max(MIN_BOT_PLACEMENT_TIME - timeTaken, 0));
+                }
+            }, timeForSocketsResponse);
         };
     }
 
