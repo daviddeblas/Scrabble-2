@@ -258,7 +258,7 @@ describe.only('solver', () => {
         expect(hints).to.deep.equal(['!placer i8v ab', '!placer h5h cDe']);
     });
 
-    it('should return solution strings', () => {
+    it('should return no hints when no solutions', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const findSolutionStub = stub(solver, 'findAllSolutions').returns([]);
@@ -272,5 +272,28 @@ describe.only('solver', () => {
         assert(findSolutionStub.calledOnce);
         assert(pickRandomSolutionsSpy.notCalled);
         assert(solutionsToHintsSpy.notCalled);
+    });
+
+    it('should hints', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const solutions: Solution[] = new Array(2).map((v, i) => {
+            return {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(0, i),
+            };
+        });
+
+        const findSolutionStub = stub(solver, 'findAllSolutions').returns(solutions);
+        const pickRandomSolutionsSpy = spy(solver, 'pickRandomSolutions');
+        const solutionsToHintsStub = stub(solver, 'solutionsToHints').returns(['abcdef']);
+
+        const results = solver.getHints();
+        expect(results).to.deep.equals(['abcdef']);
+
+        assert(findSolutionStub.calledOnce);
+        assert(pickRandomSolutionsSpy.calledWith(solutions));
+        assert(solutionsToHintsStub.calledWith(solutions));
     });
 });
