@@ -5,7 +5,7 @@ import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 
-const HINT_COUNT = 3;
+export const HINT_COUNT = 3;
 
 interface Segment {
     value: string;
@@ -23,7 +23,7 @@ interface Line {
     blanks: number[];
 }
 
-interface Solution {
+export interface Solution {
     letters: PlacedLetter[];
     blanks: Vec2[];
     direction: Vec2;
@@ -54,8 +54,8 @@ export class Solver {
         let solutions: Solution[] = [];
         if (allSolutions.length > 3) {
             for (let i = 0; i < HINT_COUNT; i++) {
-                Math.floor(((Math.random() + i) * solutions.length) / HINT_COUNT);
-                solutions.push(allSolutions[i]);
+                const random = Math.floor(((Math.random() + i) * solutions.length) / HINT_COUNT);
+                solutions.push(allSolutions[random]);
             }
         } else {
             solutions = allSolutions;
