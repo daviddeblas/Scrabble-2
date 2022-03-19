@@ -32,6 +32,21 @@ export interface Solution {
 export class Solver {
     constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}
 
+    static solutionToCommandArguments(solution: Solution): string {
+        let pos = vec2ToBoardPosition(solution.letters[0].position.flip());
+        pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
+
+        let lettersString = '';
+        for (const letter of solution.letters) {
+            if (solution.blanks.find((v) => v.equals(letter.position))) {
+                lettersString += letter.letter.toUpperCase();
+            } else {
+                lettersString += letter.letter.toLowerCase();
+            }
+        }
+        return `${pos} ${lettersString}`;
+    }
+
     findAllSolutions(): Solution[] {
         const solutions: Solution[] = [];
         const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
@@ -70,42 +85,18 @@ export class Solver {
 
     solutionsToHints(solutions: Solution[]): string[] {
         const hints: string[] = [];
-
         for (const solution of solutions) {
-            let pos = vec2ToBoardPosition(solution.letters[0].position.flip());
-            pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
-
-            let lettersString = '';
-            for (const letter of solution.letters) {
-                if (solution.blanks.find((v) => v.equals(letter.position))) {
-                    lettersString += letter.letter.toUpperCase();
-                } else {
-                    lettersString += letter.letter.toLowerCase();
-                }
-            }
-            hints.push(`!placer ${pos} ${lettersString}`);
+            hints.push(`!placer ${Solver.solutionToCommandArguments(solution)}`);
         }
-
         return hints;
     }
-
-    getEasyBotSolutions(board: Board): Map<string[], number> {
-        const result = new Map<string[], number>();
+    getEasyBotSolutions(board: Board): [Solution, number][] {
+        const result: [Solution, number][] = [];
         const allSolutions: Solution[] = this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
-            let stringSolution = '';
-            for (const letter of solution.letters) {
-                if (solution.blanks.find((v) => v.equals(letter.position))) {
-                    stringSolution += letter.letter.toUpperCase();
-                } else {
-                    stringSolution += letter.letter.toLowerCase();
-                }
-            }
             const score = board.scorePosition(solution.letters);
-            let pos = vec2ToBoardPosition(solution.letters[0].position.flip());
-            pos += solution.direction.equals(new Vec2(1, 0)) ? 'h' : 'v';
-            result.set([pos, stringSolution], score);
+            result.push([solution, score]);
         }
         return result;
     }

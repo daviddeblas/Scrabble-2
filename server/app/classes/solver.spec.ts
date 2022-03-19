@@ -10,7 +10,7 @@ import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { HINT_COUNT, Solution, Solver } from './solver';
 
-describe.only('solver', () => {
+describe('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
     let board: Board;
     beforeEach(() => {
