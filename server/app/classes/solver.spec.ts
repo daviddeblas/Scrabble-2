@@ -77,6 +77,18 @@ describe.only('solver', () => {
         expect(regex.source).to.equal('^(?:(?:(?!X$)([a-z]{0,2}|^)X(?:[a-z]{1,12}|$)))$');
     });
 
+    it('should return correct regex from segments when starting line', () => {
+        const solver: Solver = new Solver(dictionary, board, ['C', 'D']);
+        const regex = solver.generateRegex([
+            {
+                start: 0,
+                end: 1,
+                value: 'X',
+            },
+        ]);
+        expect(regex.source).to.equal('^(?:(?:(?!X$)()X(?:[CD]{1,14}|$)))$');
+    });
+
     it('should search in dictionary with regex', () => {
         const dictionarySample = { words: ['arbre', 'cactus', 'sapin'] } as Dictionary;
         const solver: Solver = new Solver(dictionarySample, board, []);
