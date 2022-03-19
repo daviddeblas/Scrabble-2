@@ -144,4 +144,42 @@ describe.only('solver', () => {
         assert(filterDuplicateLettersSpy.notCalled);
         assert(filterInvalidAffectedWordsSpy.notCalled);
     });
+
+    it('should search solution for a line', () => {
+        const dictionarySample = { words: ['abc', 'abcd', 'zabcdr', 'abcx', 'rabcx'] } as Dictionary;
+        board.board[7] = [null, null, null, null, null, 'A', 'B', 'C', null, null, null, null, null, null, null];
+        const solver: Solver = new Solver(dictionarySample, board, ['D', 'Z', 'R', 'E', 'N', 'E', 'E']);
+
+        const generateSegmentsSpy = spy(solver, 'generateSegments');
+        const generateRegexSpy = spy(solver, 'generateRegex');
+        const dictionarySearchSpy = spy(solver, 'dictionarySearch');
+        const filterDuplicateLettersSpy = spy(solver, 'filterDuplicateLetters');
+        const filterInvalidAffectedWordsSpy = spy(solver, 'filterInvalidAffectedWords');
+
+        const solutions = solver.findLineSolutions(
+            [null, null, null, null, null, 'A', 'B', 'C', null, null, null, null, null, null, null],
+            7,
+            new Vec2(0, 1),
+        );
+        const expected: Solution[] = [
+            {
+                letters: [new PlacedLetter('D', new Vec2(7, 8))],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+            {
+                letters: [new PlacedLetter('Z', new Vec2(7, 4)), new PlacedLetter('D', new Vec2(7, 8)), new PlacedLetter('R', new Vec2(7, 9))],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+        ];
+
+        expect(solutions).to.deep.equal(expected);
+
+        assert(generateSegmentsSpy.calledOnce);
+        assert(generateRegexSpy.calledOnce);
+        assert(dictionarySearchSpy.calledOnce);
+        assert(filterDuplicateLettersSpy.calledOnce);
+        assert(filterInvalidAffectedWordsSpy.calledOnce);
+    });
 });
