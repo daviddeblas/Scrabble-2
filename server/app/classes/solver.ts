@@ -34,16 +34,15 @@ export class Solver {
 
     findAllSolutions(): Solution[] {
         const solutions: Solution[] = [];
-        const date = new Date();
-        const startTime = date.getTime();
+        const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
         for (let i = 0; i < BOARD_SIZE; i++) {
             solutions.push(...this.findLineSolutions(this.board.board[i], i, new Vec2(0, 1)));
-            if (this.isTimeTooLong(startTime)) return [];
+            if (Date.now() > expiration) return [];
         }
         for (let i = 0; i < BOARD_SIZE; i++) {
             const line = this.board.board.reduce((r, v) => [...r, v[i]], []);
             solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));
-            if (this.isTimeTooLong(startTime)) return [];
+            if (Date.now() > expiration) return [];
         }
         return solutions;
     }
@@ -260,11 +259,5 @@ export class Solver {
             matches.push(insertedLine);
         });
         return matches;
-    }
-
-    private isTimeTooLong(startTime: number): boolean {
-        const date = new Date();
-        const now = date.getTime();
-        return now - startTime > MAX_BOT_PLACEMENT_TIME;
     }
 }
