@@ -1,9 +1,8 @@
 import { Game } from '@app/classes/game/game';
-import { Solver } from '@app/classes/solver';
+import { Solution, Solver } from '@app/classes/solver';
 import { Letter, lettersToString } from 'common/classes/letter';
 import { BOT_NAMES } from 'common/constants';
-import { Container, Service } from 'typedi';
-import { DictionaryService } from './dictionary.service';
+import { Service } from 'typedi';
 
 export enum BotDifficulty {
     Easy = 'Débutant',
@@ -65,19 +64,19 @@ export class BotService {
     }
 
     private placeCommand(game: Game, difficulty: BotDifficulty): string {
-        const solver = new Solver(Container.get(DictionaryService).dictionary, game.board.board, game.players[1].easel);
-        const foundPlacements: Map<string[], number> = solver.getEasyBotSolutions(game.board);
-        if (foundPlacements.size === 0) return 'passer';
+        const solver = new Solver(game.config.dictionary, game.board, game.players[1].easel);
+        const foundPlacements: [Solution, number][] = solver.getEasyBotSolutions();
+        if (foundPlacements.length === 0) return 'passer';
         return this.placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
     }
 
-    private determineWord(placements: Map<string[], number>, difficulty: BotDifficulty): string {
+    private determineWord(placements: [Solution, number][], difficulty: BotDifficulty): string {
         if (difficulty === BotDifficulty.Hard) return 'passer';
         const firstPointCategory = 0.4;
         const secondPointCategory = 0.7;
         let lowestPoints: number;
         let maxPoints: number;
-        const wordPossibilities: string[][] = [];
+        const wordPossibilities: Solution[] = [];
         let chooseRandomPoints: number;
         const indexChosen: number[] = [];
         while (wordPossibilities.length === 0 && !this.arrayIncludesAllThreeIndex(indexChosen)) {
@@ -97,11 +96,11 @@ export class BotService {
                     maxPoints = CategoryOfPoints.MaxHighCategory;
                     break;
             }
-            placements.forEach((value, key) => {
-                if (lowestPoints < value && value < maxPoints) wordPossibilities.push(key);
+            placements.forEach((value) => {
+                if (lowestPoints < value[1] && value[1] < maxPoints) wordPossibilities.push(value[0]);
             });
         }
-        return wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)].join(' ');
+        return Solver.solutionToCommandArguments(wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)]);
     }
 
     private arrayIncludesAllThreeIndex(array: number[]): boolean {

@@ -86,7 +86,7 @@ export class Room {
         this.sockets = [this.host, this.clients[0] as io.Socket];
 
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(this),
@@ -112,7 +112,8 @@ export class Room {
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         const game = this.game as Game;
         this.sockets.forEach((socket, index) => {
-            if (looserName !== this.game?.players[index].name) {
+            console.log(looserName, game.players[index].name);
+            if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
                 Container.get(DatabaseService).updateHighScore(highscore, 'classical');
             }
@@ -143,9 +144,8 @@ export class Room {
         let botName: string;
 
         while ((botName = this.botService.getName()) === this.gameOptions.hostname);
-
         this.game = new Game(
-            Container.get(GameConfigService).configs.configs[0],
+            Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
             this.gameOptions,
             this.actionAfterTimeout(this),
@@ -163,10 +163,10 @@ export class Room {
             socket.emit('game status', game.getGameStatus(playerNumber, this.botLevel));
         });
 
-        // Init command processing
+        // Initialise le traitement des commandes
         socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
-        // Init Chat
+        // Initialise le chat
         socket.on('send message', ({ username, message, messageType }) => {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
@@ -178,7 +178,7 @@ export class Room {
             }
         });
 
-        // Init surrender game
+        // Initialise l'abbandon de la partie
         socket.on('surrender game', () => {
             this.surrenderGame(socket.id);
         });

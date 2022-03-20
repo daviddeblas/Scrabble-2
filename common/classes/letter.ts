@@ -25,7 +25,7 @@ export type Letter =
     | 'X'
     | 'Y'
     | 'Z'
-    // BLANK
+    // Case vide
     | '*';
 
 export const BLANK_LETTER = '*' as Letter;

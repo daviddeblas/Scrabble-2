@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// permet l'utilisation des consoles logs
 import { Application } from '@app/app';
 import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
@@ -7,6 +8,7 @@ import { Container, Service } from 'typedi';
 import { BrowserService } from './services/browser.service';
 import { DatabaseService } from './services/database.service';
 import { DictionaryService } from './services/dictionary.service';
+import { GameConfigService } from './services/game-config.service';
 import { RoomsManager } from './services/rooms-manager.service';
 import { SocketService } from './services/socket-manager.service';
 
@@ -28,15 +30,18 @@ export class Server {
             return false;
         }
     }
-    init(): void {
+    init() {
         this.application.app.set('port', Server.appPort);
         this.server = http.createServer(this.application.app);
+        Container.get(DictionaryService).init();
+        Container.get(GameConfigService).init();
         this.socketService = new SocketService(
             this.server,
             Container.get(RoomsManager),
             Container.get(DictionaryService),
             Container.get(BrowserService),
             Container.get(DatabaseService),
+            Container.get(GameConfigService),
         );
         Container.get(DatabaseService).start();
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');

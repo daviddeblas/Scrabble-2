@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
-import { PORT, RESPONSE_DELAY } from '@app/environnement.json';
+import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
+import { DatabaseService } from '@app/services/database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
@@ -13,6 +15,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
+import Container from 'typedi';
 import { Game } from './game/game';
 
 describe('room', () => {
@@ -40,7 +43,7 @@ describe('room', () => {
                     return socket;
                 },
             } as unknown as io.Socket;
-            gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
+            gameOptions = new GameOptions('player1', 'b', SECONDS_IN_MINUTE);
         });
 
         it('constructor should create a Room', () => {
@@ -93,6 +96,9 @@ describe('room', () => {
         });
 
         it('surrenderGame should emit endGame if the game is not null', (done) => {
+            const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+                return;
+            });
             const room = new Room(socket, roomsManager, gameOptions);
             let clientReceived = false;
             const clientSocket = {
@@ -107,7 +113,7 @@ describe('room', () => {
                 },
             } as unknown as io.Socket;
             room.game = {
-                players: ['player1', 'player2'],
+                players: [{ name: 'player1' }, { name: 'player2' }],
                 bag: { letters: [] },
                 stopTimer: () => {
                     return;
@@ -121,6 +127,7 @@ describe('room', () => {
             room.surrenderGame('player2');
             setTimeout(() => {
                 expect(clientReceived && hostReceived).to.deep.equal(true);
+                expect(dataStub.called).to.equal(true);
                 done();
             }, RESPONSE_DELAY * 3);
         });
@@ -164,7 +171,6 @@ describe('room', () => {
 
         it('initiateRoomEvents should call setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
@@ -175,7 +181,6 @@ describe('room', () => {
 
         it('initiateRoomEvents should call setupSocket once if no client is present', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
                 return;
             });
@@ -218,7 +223,6 @@ describe('room', () => {
 
         it('initSoloGame should put the correct attributes and call notifyAvailableRoomsChanges and setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const setUpSocketStub = stub(room as any, 'setupSocket');
             room.initSoloGame(BotDifficulty.Easy);
             expect(roomsManager.notifyAvailableRoomsChange.calledOnce).to.equal(true);
