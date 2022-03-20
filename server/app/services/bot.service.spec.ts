@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { Game } from '@app/classes/game/game';
+import { PlacedLetter } from '@app/classes/placed-letter';
+import { Solution } from '@app/classes/solver';
 import { expect } from 'chai';
+import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
 import Container from 'typedi';
@@ -13,6 +16,17 @@ import { GameConfigService } from './game-config.service';
 describe('Bot service tests', () => {
     let service: BotService;
     let fakeGame: Game;
+
+    const solutionA: Solution = {
+        letters: [new PlacedLetter('A', new Vec2(6, 7)), new PlacedLetter('B', new Vec2(7, 7))],
+        blanks: [],
+        direction: new Vec2(1, 0),
+    };
+    const solutionB: Solution = {
+        letters: [new PlacedLetter('A', new Vec2(7, 8))],
+        blanks: [],
+        direction: new Vec2(0, 1),
+    };
 
     beforeEach(async () => {
         await Container.get(DictionaryService).init();
@@ -78,6 +92,7 @@ describe('Bot service tests', () => {
     });
 
     it('placeCommand should not call determineWord if there is no solution and return passer', () => {
+        fakeGame.players[1].easel = ['X'];
         const determineWordStub = stub(service as any, 'determineWord');
         const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
         expect(placeResult).to.equal('passer');
@@ -99,35 +114,32 @@ describe('Bot service tests', () => {
     it('determineWord should send the exchange with least points if the random number is between 0 and 0.4 (40% chance) with botLevel easy', () => {
         const expectedNumber = 0.15;
         stub(Math, 'random').callsFake(() => expectedNumber);
-        const fakePlacements = new Map<string[], number>();
-        const leastPointsPlacement = ['h7h', 'ab'];
-        fakePlacements.set(leastPointsPlacement, 2);
-        fakePlacements.set(['another', 'placement'], 10);
+        const fakePlacements: [Solution, number][] = [];
+        fakePlacements.push([solutionA, 2]);
+        fakePlacements.push([solutionB, 10]);
         expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
     });
 
     it('determineWord should send the exchange with middle amount of points with random number between 0.4 and 0.7 with botLevel easy', () => {
         const expectedNumber = 0.69;
         stub(Math, 'random').callsFake(() => expectedNumber);
-        const fakePlacements = new Map<string[], number>();
-        const midPointsPlacement = ['h7h', 'ab'];
-        fakePlacements.set(midPointsPlacement, 10);
-        fakePlacements.set(['another', 'placement'], 15);
+        const fakePlacements: [Solution, number][] = [];
+        fakePlacements.push([solutionA, 10]);
+        fakePlacements.push([solutionB, 15]);
         expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
     });
 
     it('determineWord should send the exchange with highest amount of points with random number between 0.7 and 1 with botLevel easy', () => {
         const expectedNumber = 0.92;
         stub(Math, 'random').callsFake(() => expectedNumber);
-        const fakePlacements = new Map<string[], number>();
-        const highPointsPlacement = ['h7h', 'ab'];
-        fakePlacements.set(highPointsPlacement, 15);
-        fakePlacements.set(['another', 'placement'], 10);
+        const fakePlacements: [Solution, number][] = [];
+        fakePlacements.push([solutionA, 15]);
+        fakePlacements.push([solutionB, 10]);
         expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
     });
 
     it('determineWord should send passer if bot difficulty hard', () => {
-        const fakePlacements = new Map<string[], number>();
+        const fakePlacements: [Solution, number][] = [];
         expect(service['determineWord'](fakePlacements, BotDifficulty.Hard)).to.equal('passer');
     });
 });

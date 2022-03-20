@@ -103,7 +103,7 @@ export class CommandService {
 
     processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         if (args.length > 0) throw new GameError(GameErrorType.WrongHintArgument);
-        const solver = new Solver(game.config.dictionary, game.board.board, game.players[playerNumber].easel);
+        const solver = new Solver(game.config.dictionary, game.board, game.players[playerNumber].easel);
         const hints = solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
     }
