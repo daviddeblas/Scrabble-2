@@ -9,7 +9,7 @@ import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-import { HINT_COUNT, Solution, Solver } from './solver';
+import { HINT_COUNT, Line, Solution, Solver, Word } from './solver';
 
 describe.only('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
@@ -107,6 +107,29 @@ describe.only('solver', () => {
             },
         ]);
     });
+
+    it('should filter duplicate letters', () => {
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', '*']);
+        const fakeLine: (Letter | null)[] = [null, null, null, null, 'C', null, null, null, null, null, null, null, null, null, null];
+        const fakeWords: Word[] = [
+            {
+                word: 'abca',
+                index: 2,
+            },
+            {
+                word: 'aaca',
+                index: 2,
+            },
+        ];
+        const expectedLines: Line[] = [
+            {
+                letters: [null, null, 'A', 'B', null, 'A', null, null, null, null, null, null, null, null, null],
+                blanks: [5],
+            },
+        ];
+        expect(solver.filterDuplicateLetters(fakeLine, fakeWords)).to.deep.equals(expectedLines);
+    });
+
     it('should filter invalid affected words', () => {
         const dictionarySample = { words: ['aaa', 'bbb'] } as Dictionary;
         // prettier-ignore
