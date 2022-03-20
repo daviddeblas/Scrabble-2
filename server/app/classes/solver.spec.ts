@@ -405,4 +405,12 @@ describe.only('solver', () => {
         assert(scorePositionStub.calledTwice);
         assert(findAllSolutionsStub.calledOnce);
     });
+
+    it('should return no easy bot solution', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+        const findAllSolutionsStub = stub(solver, 'findAllSolutions').returns([]);
+        const results = solver.getEasyBotSolutions();
+        expect(results).to.deep.equals([]);
+        assert(findAllSolutionsStub.calledOnce);
+    });
 });
