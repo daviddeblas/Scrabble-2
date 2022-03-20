@@ -4,12 +4,12 @@ import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
-import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-import { HINT_COUNT, Line, Solution, Solver, Word } from './solver';
+import { Line, Solution, Solver, Word } from './solver';
 
 describe('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);

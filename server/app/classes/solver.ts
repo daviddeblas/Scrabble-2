@@ -1,11 +1,9 @@
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
-import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-
-export const HINT_COUNT = 3;
 
 interface Segment {
     value: string;
