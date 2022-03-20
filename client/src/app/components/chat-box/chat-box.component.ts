@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import * as chatActions from '@app/actions/chat.actions';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
     templateUrl: './chat-box.component.html',
     styleUrls: ['./chat-box.component.scss'],
 })
-export class ChatBoxComponent implements OnInit {
+export class ChatBoxComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatMessage', { static: true }) private chatMessage: ElementRef<HTMLInputElement>;
     chat$: Observable<ChatMessage[]>;
     username: string;
@@ -22,6 +22,7 @@ export class ChatBoxComponent implements OnInit {
         private playerStore: Store<{ players: Players }>,
         private eRef: ElementRef,
         private keyManager: KeyManagerService,
+        private changeDetector: ChangeDetectorRef,
     ) {
         this.chat$ = store.select('chat');
         this.playerStore.subscribe((us) => (this.username = us.players.player.name));
@@ -39,6 +40,10 @@ export class ChatBoxComponent implements OnInit {
             this.gameEnded = gameStatus.gameEnded;
             if (gameStatus.gameEnded) this.chatMessage.nativeElement.focus();
         });
+    }
+
+    ngAfterViewChecked() {
+        this.changeDetector.detectChanges();
     }
 
     submitMessage(): void {
