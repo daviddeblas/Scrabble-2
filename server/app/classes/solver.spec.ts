@@ -451,4 +451,10 @@ describe.only('solver', () => {
         const regex = solver.firstSolutionRegex();
         expect(regex.source).to.equal('^(?!(?:[^A]*A){2})(?!(?:[^B]*B){2})(?!(?:[^C]*C){2}).{1,3}$');
     });
+
+    it('should generate first solution regex with blank', () => {
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C', '*']);
+        const regex = solver.firstSolutionRegex();
+        expect(regex.source).to.equal('^(?!(?:[^A]*A){3})(?!(?:[^B]*B){3})(?!(?:[^C]*C){3})(?!(?:[ABC]*[^ABC]){2}).{1,4}$');
+    });
 });
