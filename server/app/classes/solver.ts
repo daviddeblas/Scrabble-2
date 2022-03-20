@@ -62,6 +62,15 @@ export class Solver {
         return solutions;
     }
 
+    // Calcul simplifié pour la première solution
+    // Comme il peut y avoir beaucoup de solution au premier tour,
+    // certaines vérifications n'ont pas besoin d'être faites.
+    findFirstSolutions(): Solution[] {
+        const regex = this.firstSolutionRegex();
+        const words = this.dictionary.words.filter((v) => regex.test(v));
+        return this.firstSolutionTransform(words);
+    }
+
     firstSolutionRegex(): RegExp {
         const easelMap: Map<Letter, number> = new Map();
         for (const letter of this.easel) {
