@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
 import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
@@ -10,11 +11,16 @@ import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { HINT_COUNT, Solution, Solver } from './solver';
 
-describe('solver', () => {
+describe.only('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
     let board: Board;
     beforeEach(() => {
-        board = {} as Board;
+        board = {
+            // eslint-disable-next-line no-unused-vars
+            scorePosition: (word: PlacedLetter[]) => {
+                return 0;
+            },
+        } as Board;
         board.board = [...new Array(BOARD_SIZE)].map(() => new Array(BOARD_SIZE).fill(null));
     });
 
@@ -101,7 +107,6 @@ describe('solver', () => {
             },
         ]);
     });
-
     it('should filter invalid affected words', () => {
         const dictionarySample = { words: ['aaa', 'bbb'] } as Dictionary;
         // prettier-ignore
@@ -199,8 +204,10 @@ describe('solver', () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const expected: Solution[] = [];
 
+        stub(solver, 'isBoardEmpty').returns(false);
+
         const findLineStub = stub(solver, 'findLineSolutions');
-        findLineStub.callsFake((line: (Letter | null)[], index: number, direction: Vec2) => {
+        findLineStub.callsFake((_line: (Letter | null)[], _index: number, direction: Vec2) => {
             const sol: Solution = {
                 letters: [],
                 blanks: [],
@@ -219,8 +226,10 @@ describe('solver', () => {
     it('should return nothing if time expire', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
+        stub(solver, 'isBoardEmpty').returns(false);
+
         const findLineStub = stub(solver, 'findLineSolutions');
-        findLineStub.callsFake((line: (Letter | null)[], index: number, direction: Vec2) => {
+        findLineStub.callsFake((_line: (Letter | null)[], _index: number, direction: Vec2) => {
             const sol: Solution = {
                 letters: [],
                 blanks: [],
@@ -254,7 +263,7 @@ describe('solver', () => {
 
         const mathRandomStub = stub(Math, 'random').returns(0.5);
 
-        const solutions: Solution[] = new Array(9).map((v, i) => {
+        const solutions: Solution[] = [...new Array(9)].map((_v, i) => {
             return {
                 letters: [],
                 blanks: [],
@@ -271,7 +280,7 @@ describe('solver', () => {
     it('should return all solutions when not enough choice', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        const solutions: Solution[] = new Array(HINT_COUNT - 1).map((v, i) => {
+        const solutions: Solution[] = [...new Array(HINT_COUNT - 1)].map((_v, i) => {
             return {
                 letters: [],
                 blanks: [],
@@ -333,7 +342,7 @@ describe('solver', () => {
     it('should hints', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        const solutions: Solution[] = new Array(2).map((v, i) => {
+        const solutions: Solution[] = [...new Array(2)].map((_v, i) => {
             return {
                 letters: [],
                 blanks: [],
