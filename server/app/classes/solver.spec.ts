@@ -445,4 +445,10 @@ describe.only('solver', () => {
         assert(firstSolutionTransformStub.called);
         assert(firstSolutionRegexSpy.called);
     });
+
+    it('should generate first solution regex', () => {
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver.firstSolutionRegex();
+        expect(regex.source).to.equal('^(?!(?:[^A]*A){2})(?!(?:[^B]*B){2})(?!(?:[^C]*C){2}).{1,3}$');
+    });
 });
