@@ -11,7 +11,7 @@ import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { HINT_COUNT, Line, Solution, Solver, Word } from './solver';
 
-describe.only('solver', () => {
+describe('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
     let board: Board;
     beforeEach(() => {
