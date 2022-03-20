@@ -1,5 +1,6 @@
 import { Game } from '@app/classes/game/game';
-import { Solution, Solver } from '@app/classes/solver';
+import { Solver } from '@app/classes/solver';
+import { Solution } from '@app/interfaces/solution';
 import { Letter, lettersToString } from 'common/classes/letter';
 import { BOT_NAMES } from 'common/constants';
 import { Service } from 'typedi';

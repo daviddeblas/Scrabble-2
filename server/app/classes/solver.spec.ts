@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { Dictionary } from '@app/classes/dictionary';
+import { Line } from '@app/interfaces/line';
+import { Solution } from '@app/interfaces/solution';
+import { Word } from '@app/interfaces/word';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
@@ -9,7 +12,7 @@ import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-import { HINT_COUNT, Line, Solution, Solver, Word } from './solver';
+import { HINT_COUNT, Solver } from './solver';
 
 describe('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
