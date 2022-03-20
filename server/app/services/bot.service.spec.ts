@@ -91,6 +91,7 @@ describe('Bot service tests', () => {
     });
 
     it('placeCommand should not call determineWord if there is no solution and return passer', () => {
+        fakeGame.players[1].easel = ['X'];
         const determineWordStub = stub(service as any, 'determineWord');
         const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
         expect(placeResult).to.equal('passer');
