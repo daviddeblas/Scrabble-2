@@ -413,4 +413,14 @@ describe.only('solver', () => {
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
     });
+
+    it('should return if board is empty', () => {
+        const dictionarySample = { words: ['c', 'abcfdd', 'zabcdr', 'adgbcx', 'rabcx'] } as Dictionary;
+        const solver: Solver = new Solver(dictionarySample, board, ['A', 'B', 'C', '*']);
+
+        expect(solver.isBoardEmpty()).to.equal(true);
+
+        board.board[7] = [null, null, null, null, null, null, null, 'A', null, null, null, null, null, null, null];
+        expect(solver.isBoardEmpty()).to.equal(false);
+    });
 });
