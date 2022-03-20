@@ -5,6 +5,7 @@ import http from 'http';
 import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
 import { BrowserService } from './services/browser.service';
+import { DatabaseService } from './services/database.service';
 import { DictionaryService } from './services/dictionary.service';
 import { LeaderboardService } from './services/leaderboard.service';
 import { RoomsManager } from './services/rooms-manager.service';
@@ -15,6 +16,7 @@ export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
     private server: http.Server;
     private socketService: SocketService;
+    private databaseService: DatabaseService;
 
     constructor(private readonly application: Application) {}
 
@@ -39,6 +41,7 @@ export class Server {
             Container.get(BrowserService),
             Container.get(LeaderboardService),
         );
+        this.server.on('database connected', async () => this.databaseService.start());
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
