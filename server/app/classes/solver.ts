@@ -4,12 +4,10 @@ import { Solution } from '@app/interfaces/solution';
 import { Word } from '@app/interfaces/word';
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
-import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-
-export const HINT_COUNT = 3;
 
 export class Solver {
     constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}
@@ -29,7 +27,26 @@ export class Solver {
         return `${pos} ${lettersString}`;
     }
 
-    findAllSolutions(): Solution[] {
+    getHints(): string[] {
+        const solutions: Solution[] = this.findAllSolutions();
+        if (solutions.length < 1) return [];
+
+        const randomSolutions = this.pickRandomSolutions(solutions);
+        return this.solutionsToHints(randomSolutions);
+    }
+
+    getEasyBotSolutions(): [Solution, number][] {
+        const result: [Solution, number][] = [];
+        const allSolutions: Solution[] = this.findAllSolutions();
+        if (allSolutions.length < 1) return result;
+        for (const solution of allSolutions) {
+            const score = this.board.scorePosition(solution.letters);
+            result.push([solution, score]);
+        }
+        return result;
+    }
+
+    private findAllSolutions(): Solution[] {
         if (this.isBoardEmpty()) return this.findFirstSolutions();
         const solutions: Solution[] = [];
         const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
@@ -45,20 +62,20 @@ export class Solver {
         return solutions;
     }
 
-    isBoardEmpty(): boolean {
+    private isBoardEmpty(): boolean {
         return this.board.board[(BOARD_SIZE - 1) / 2][(BOARD_SIZE - 1) / 2] === null;
     }
 
     // Calcul simplifié pour la première solution
     // Comme il peut y avoir beaucoup de solution au premier tour,
     // certaines vérifications n'ont pas besoin d'être faites.
-    findFirstSolutions(): Solution[] {
+    private findFirstSolutions(): Solution[] {
         const regex = this.firstSolutionRegex();
         const words = this.dictionary.words.filter((v) => regex.test(v));
         return this.firstSolutionTransform(words);
     }
 
-    firstSolutionRegex(): RegExp {
+    private firstSolutionRegex(): RegExp {
         const easelMap: Map<Letter, number> = new Map();
         for (const letter of this.easel) {
             easelMap.set(letter, (easelMap.get(letter) || 0) + 1);
@@ -78,7 +95,7 @@ export class Solver {
         return new RegExp(`^${regexParts.join('')}.{1,${this.easel.length}}$`, 'i');
     }
 
-    firstSolutionTransform(words: string[]): Solution[] {
+    private firstSolutionTransform(words: string[]): Solution[] {
         const direction = new Vec2(1, 0);
         const startingPosition = new Vec2((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2);
         const solutions: Solution[] = [];
@@ -105,16 +122,7 @@ export class Solver {
 
         return solutions;
     }
-
-    getHints(): string[] {
-        const solutions: Solution[] = this.findAllSolutions();
-        if (solutions.length < 1) return [];
-
-        const randomSolutions = this.pickRandomSolutions(solutions);
-        return this.solutionsToHints(randomSolutions);
-    }
-
-    pickRandomSolutions(solutions: Solution[]): Solution[] {
+    private pickRandomSolutions(solutions: Solution[]): Solution[] {
         if (solutions.length <= HINT_COUNT) {
             return solutions;
         }
@@ -127,7 +135,7 @@ export class Solver {
         return randomSolutions;
     }
 
-    solutionsToHints(solutions: Solution[]): string[] {
+    private solutionsToHints(solutions: Solution[]): string[] {
         const hints: string[] = [];
         for (const solution of solutions) {
             hints.push(`!placer ${Solver.solutionToCommandArguments(solution)}`);
@@ -135,18 +143,7 @@ export class Solver {
         return hints;
     }
 
-    getEasyBotSolutions(): [Solution, number][] {
-        const result: [Solution, number][] = [];
-        const allSolutions: Solution[] = this.findAllSolutions();
-        if (allSolutions.length < 1) return result;
-        for (const solution of allSolutions) {
-            const score = this.board.scorePosition(solution.letters);
-            result.push([solution, score]);
-        }
-        return result;
-    }
-
-    findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
+    private findLineSolutions(line: (Letter | null)[], index: number, direction: Vec2): Solution[] {
         if (line.every((letter) => letter === null)) return []; // toutes les lettres sont null
 
         const segments = this.generateSegments(line);
@@ -160,7 +157,7 @@ export class Solver {
         return result;
     }
 
-    filterInvalidAffectedWords(placedWords: Line[], direction: Vec2, lineStart: Vec2): Solution[] {
+    private filterInvalidAffectedWords(placedWords: Line[], direction: Vec2, lineStart: Vec2): Solution[] {
         const result: Solution[] = [];
         for (const word of placedWords) {
             const solution: Solution = { letters: [], blanks: [], direction };
@@ -204,7 +201,7 @@ export class Solver {
         return result;
     }
 
-    generateSegments(line: (Letter | null)[]): Segment[] {
+    private generateSegments(line: (Letter | null)[]): Segment[] {
         const segments: Segment[] = [];
 
         let pos = 0;
@@ -225,7 +222,7 @@ export class Solver {
         return segments;
     }
 
-    generateRegex(segments: Segment[]): RegExp {
+    private generateRegex(segments: Segment[]): RegExp {
         const easelText = this.easel.includes('*') ? 'a-z' : this.easel.join('');
 
         const regexParts = [];
@@ -258,7 +255,7 @@ export class Solver {
         return new RegExp(`^(?:${regexParts.join('|')})$`, 'i');
     }
 
-    dictionarySearch(regex: RegExp, segments: Segment[]): Word[] {
+    private dictionarySearch(regex: RegExp, segments: Segment[]): Word[] {
         const matches: Word[] = [];
         this.dictionary.words.forEach((w) => {
             const match = regex.exec(w);
@@ -271,7 +268,7 @@ export class Solver {
         return matches;
     }
 
-    filterDuplicateLetters(line: (Letter | null)[], words: Word[]): Line[] {
+    private filterDuplicateLetters(line: (Letter | null)[], words: Word[]): Line[] {
         const matches: Line[] = [];
         words.forEach((w) => {
             const insertedLine: Line = { letters: new Array(line.length).fill(null), blanks: [] };
