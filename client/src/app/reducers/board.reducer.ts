@@ -11,7 +11,7 @@ import { BOARD_SIZE } from 'common/constants';
 
 export const boardFeatureKey = 'board';
 
-const createEmptyMatrix = (dimensions: iVec2) => {
+export const createEmptyMatrix = (dimensions: iVec2) => {
     const matrix = new Array(dimensions.x);
     for (let i = 0; i < dimensions.x; i++) {
         matrix[i] = new Array(dimensions.y);
