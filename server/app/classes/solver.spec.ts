@@ -384,4 +384,25 @@ describe.only('solver', () => {
         assert(pickRandomSolutionsSpy.calledWith(solutions));
         assert(solutionsToHintsStub.calledWith(solutions));
     });
+
+    it('should return easy bot solution', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const solutions: Solution[] = [...new Array(2)].map((v, i) => {
+            return {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(0, i),
+            };
+        });
+
+        const scorePositionStub = stub(board, 'scorePosition').returns(5);
+        const findAllSolutionsStub = stub(solver, 'findAllSolutions').returns(solutions);
+
+        const results = solver.getEasyBotSolutions();
+        expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
+
+        assert(scorePositionStub.calledTwice);
+        assert(findAllSolutionsStub.calledOnce);
+    });
 });
