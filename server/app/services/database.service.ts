@@ -8,7 +8,6 @@ import { Service } from 'typedi';
 export class DatabaseService {
     private highScoreDB: Db;
     private client: MongoClient;
-
     async start() {
         try {
             const client = new MongoClient(DATABASE.uri);
@@ -67,9 +66,9 @@ export class DatabaseService {
         const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
         const equalScore = await this.highScoreDB.collection(collection).findOne({ score: highScore.score });
         if (equalScore) {
-            if (equalScore.value.name.includes(highScore.name)) return;
+            if (equalScore.name.includes(highScore.name)) return;
             await this.highScoreDB.collection(collection).deleteOne({ score: highScore.score });
-            highScore.name = equalScore.value?.name + ' - ' + highScore.name;
+            highScore.name = equalScore.name + ' - ' + highScore.name;
         }
 
         this.highScoreDB.collection(collection).insertOne(highScore);
