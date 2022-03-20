@@ -246,6 +246,17 @@ describe.only('solver', () => {
         assert(findLineStub.callCount === BOARD_SIZE * 2);
     });
 
+    it('should call findFistSolutions when board empty', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        stub(solver, 'isBoardEmpty').returns(true);
+        const findFirstSolutionsStub = stub(solver, 'findFirstSolutions').returns([]);
+
+        const solutions = solver.findAllSolutions();
+        expect(solutions).to.deep.equal([]);
+        assert(findFirstSolutionsStub.calledOnce);
+    });
+
     it('should return nothing if time expire', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
