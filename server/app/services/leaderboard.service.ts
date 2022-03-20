@@ -8,7 +8,7 @@ import { Service } from 'typedi';
 export class LeaderboardService {
     private highScoreDB: Db;
 
-    async getHighscores(gameMode: number): Promise<HighScore[]> {
+    async getHighscores(gameMode: string): Promise<HighScore[]> {
         return this.highScoreDB
             .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
             .find({})
@@ -27,7 +27,7 @@ export class LeaderboardService {
         ]);
     }
 
-    async updateHighScore(highScore: HighScore, gameMode: number): Promise<void> {
+    async updateHighScore(highScore: HighScore, gameMode: string): Promise<void> {
         const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
         const lowestScore = await this.highScoreDB.collection(collection).find({}).sort({ score: 1 }).limit(1).toArray();
         if (highScore.score > lowestScore[0].score) {
@@ -38,7 +38,7 @@ export class LeaderboardService {
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('get highScores', () => {
-            socket.emit('receive highScores', this.getHighscores(1));
+            socket.emit('receive highScores', this.getHighscores('classical'));
         });
     }
 }
