@@ -423,4 +423,26 @@ describe.only('solver', () => {
         board.board[7] = [null, null, null, null, null, null, null, 'A', null, null, null, null, null, null, null];
         expect(solver.isBoardEmpty()).to.equal(false);
     });
+
+    it('should generate first solution from words', () => {
+        const dictionarySample = { words: ['c', 'abcfdd', 'zabcdr', 'adgbcx', 'rabcx'] } as Dictionary;
+        const solver: Solver = new Solver(dictionarySample, board, ['A', 'B', 'C', '*']);
+
+        const fakeSolution = [
+            {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const firstSolutionTransformStub = stub(solver, 'firstSolutionTransform').returns(fakeSolution);
+        const firstSolutionRegexSpy = spy(solver, 'firstSolutionRegex');
+
+        const solution = solver.findFirstSolutions();
+        expect(solution).to.equal(fakeSolution);
+
+        assert(firstSolutionTransformStub.called);
+        assert(firstSolutionRegexSpy.called);
+    });
 });
