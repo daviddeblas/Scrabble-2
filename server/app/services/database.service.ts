@@ -26,11 +26,11 @@ export class DatabaseService {
         }
     }
 
-    async closeConnection(): Promise<void> {
+    async closeConnection() {
         return this.client.close();
     }
 
-    async populateDBClassical(): Promise<void> {
+    async populateDBClassical() {
         const scores: HighScore[] = DEFAULT_HIGHSCORE.classical;
 
         for (const score of scores) {
@@ -38,7 +38,7 @@ export class DatabaseService {
         }
     }
 
-    async populateDBlog2990(): Promise<void> {
+    async populateDBlog2990() {
         const scores: HighScore[] = DEFAULT_HIGHSCORE.log2990;
 
         for (const score of scores) {
