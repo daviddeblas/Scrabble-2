@@ -13,12 +13,12 @@ interface Segment {
     end: number;
 }
 
-interface Word {
+export interface Word {
     word: string;
     index: number;
 }
 
-interface Line {
+export interface Line {
     letters: (Letter | null)[];
     blanks: number[];
 }
@@ -91,12 +91,12 @@ export class Solver {
         return hints;
     }
 
-    getEasyBotSolutions(board: Board): [Solution, number][] {
+    getEasyBotSolutions(): [Solution, number][] {
         const result: [Solution, number][] = [];
         const allSolutions: Solution[] = this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
-            const score = board.scorePosition(solution.letters);
+            const score = this.board.scorePosition(solution.letters);
             result.push([solution, score]);
         }
         return result;
