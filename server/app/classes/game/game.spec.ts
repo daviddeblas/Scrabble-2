@@ -39,7 +39,7 @@ describe('game', () => {
         const totalLettersInEachPlayerEasel = MAX_LETTERS_IN_EASEL;
         const totalAmountOfPlayers = 2;
         expect(game.bag.letters.length).to.eq(totalLetters - totalLettersInEachPlayerEasel * totalAmountOfPlayers);
-        expect(game.turnsSkipped).to.eq(0);
+        expect(game['turnsSkipped']).to.eq(0);
     });
 
     it('place should score according to scorePosition on correct placement', () => {
@@ -97,7 +97,7 @@ describe('game', () => {
 
     it('place should throw on correct placement as second placement if not connected to other words', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
-        game.placeCounter = 1;
+        game['placeCounter'] = 1;
         lettersToPlace.forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
@@ -178,7 +178,7 @@ describe('game', () => {
         game.skip(game.activePlayer);
 
         expect(game.activePlayer).to.not.eq(oldActivePlayer);
-        expect(game.turnsSkipped).to.eq(1);
+        expect(game['turnsSkipped']).to.eq(1);
     });
 
     it('gameEnded should be true when one players easel is empty', () => {
@@ -193,7 +193,7 @@ describe('game', () => {
     it('needsToEnd should be true when exceeding MAX_TURNS_SKIPPED', () => {
         expect(game.needsToEnd()).to.eq(false);
 
-        game.turnsSkipped = 10;
+        game['turnsSkipped'] = 10;
 
         expect(game.needsToEnd()).to.eq(true);
     });

@@ -3,7 +3,7 @@
 /* eslint-disable dot-notation */
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { Solution } from '@app/classes/solver';
+import { Solution } from '@app/interfaces/solution';
 import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
