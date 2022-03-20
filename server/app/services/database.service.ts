@@ -12,17 +12,18 @@ export class DatabaseService {
             const client = new MongoClient(DATABASE.uri);
             this.client = client;
             this.highScoreDB = client.db(DATABASE.highScore.name);
+
+            await this.client.connect();
+
+            if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
+                await this.populateDBClassical();
+            }
+
+            if ((await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).countDocuments()) === 0) {
+                await this.populateDBlog2990();
+            }
         } catch {
             throw Error('Database connection error');
-        }
-        await this.client.connect();
-
-        if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
-            await this.populateDBClassical();
-        }
-
-        if ((await this.highScoreDB.collection(DATABASE.highScore.collections.log2290).countDocuments()) === 0) {
-            await this.populateDBlog2990();
         }
     }
 
@@ -51,9 +52,7 @@ export class DatabaseService {
     }
 
     async resetDB() {
-        return Promise.all([
-            this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical),
-            this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2290),
-        ]);
+        await this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical);
+        await this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2290);
     }
 }
