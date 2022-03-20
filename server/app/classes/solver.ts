@@ -62,6 +62,26 @@ export class Solver {
         return solutions;
     }
 
+    firstSolutionRegex(): RegExp {
+        const easelMap: Map<Letter, number> = new Map();
+        for (const letter of this.easel) {
+            easelMap.set(letter, (easelMap.get(letter) || 0) + 1);
+        }
+        const blanksCount: number = easelMap.get('*') || 0;
+        let lettersString = '';
+        const regexParts: string[] = [];
+        easelMap.forEach((v, k) => {
+            if (k !== '*') {
+                regexParts.push(`(?!(?:[^${k}]*${k}){${v + blanksCount + 1}})`);
+                lettersString += k;
+            }
+        });
+        if (blanksCount > 0) {
+            regexParts.push(`(?!(?:[${lettersString}]*[^${lettersString}]){${blanksCount + 1}})`);
+        }
+        return new RegExp(`^${regexParts.join('')}.{1,${this.easel.length}}$`, 'i');
+    }
+
     getHints(): string[] {
         const solutions: Solution[] = this.findAllSolutions();
         if (solutions.length < 1) return [];
