@@ -82,6 +82,34 @@ export class Solver {
         return new RegExp(`^${regexParts.join('')}.{1,${this.easel.length}}$`, 'i');
     }
 
+    firstSolutionTransform(words: string[]): Solution[] {
+        const direction = new Vec2(1, 0);
+        const startingPosition = new Vec2((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2);
+        const solutions: Solution[] = [];
+
+        words.forEach((word) => {
+            const easelTmp = [...this.easel];
+            const wordArray: Letter[] = Array.from(word.toUpperCase()) as Letter[];
+            const solution: Solution = { letters: [], blanks: [], direction };
+            let position: Vec2 = startingPosition.copy();
+
+            for (const letter of wordArray) {
+                let index = easelTmp.indexOf(letter);
+                if (index < 0) {
+                    index = easelTmp.indexOf('*');
+                    if (index < 0) return;
+                    solution.blanks.push(position);
+                }
+                solution.letters.push(new PlacedLetter(letter, position));
+                easelTmp.splice(index, 1);
+                position = position.add(direction);
+            }
+            solutions.push(solution);
+        });
+
+        return solutions;
+    }
+
     getHints(): string[] {
         const solutions: Solution[] = this.findAllSolutions();
         if (solutions.length < 1) return [];
