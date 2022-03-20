@@ -1,5 +1,6 @@
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
+import { DatabaseService } from '@app/services/database.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
@@ -109,7 +110,12 @@ export class Room {
         const looserName = looserId === this.host.id ? this.gameOptions.hostname : this.clientName;
         const surrenderMessage = looserName + ' à abandonné la partie';
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
+        const game = this.game as Game;
         this.sockets.forEach((socket, index) => {
+            if (looserName !== this.game?.players[index].name) {
+                const highscore = { name: game.players[index].name, score: game.players[index].score };
+                Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+            }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));

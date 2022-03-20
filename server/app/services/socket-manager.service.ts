@@ -2,8 +2,8 @@ import http from 'http';
 import io from 'socket.io';
 import { Service } from 'typedi';
 import { BrowserService } from './browser.service';
+import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
-import { LeaderboardService } from './leaderboard.service';
 import { RoomsManager } from './rooms-manager.service';
 
 @Service()
@@ -15,14 +15,14 @@ export class SocketService {
         public roomManager: RoomsManager,
         public dictionaryService: DictionaryService,
         public browserService: BrowserService,
-        public leaderboardService: LeaderboardService,
+        public databaseService: DatabaseService,
     ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.sio.on('connection', (socket) => {
             roomManager.setupSocketConnection(socket);
             dictionaryService.setupSocketConnection(socket);
             browserService.setupSocketConnection(socket);
-            leaderboardService.setupSocketConnection(socket);
+            databaseService.setupSocketConnection(socket);
         });
     }
 

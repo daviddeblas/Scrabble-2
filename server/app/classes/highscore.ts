@@ -28,7 +28,7 @@ export const DATABASE = {
         name: 'Scores_DB',
         collections: {
             classical: 'ScoresClassic',
-            log2290: 'ScoresLog2990',
+            log2990: 'ScoresLog2990',
         },
     },
 };
