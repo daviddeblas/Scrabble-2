@@ -1,8 +1,13 @@
 import { Game } from '@app/classes/game/game';
-import { Solution, Solver } from '@app/classes/solver';
+import { Solver } from '@app/classes/solver';
+import { Solution } from '@app/interfaces/solution';
 import { Letter, lettersToString } from 'common/classes/letter';
 import { BOT_NAMES } from 'common/constants';
 import { Service } from 'typedi';
+
+const passCommandName = 'passer';
+const exchangeCommandName = 'échanger';
+const placeCommandName = 'placer';
 
 export enum BotDifficulty {
     Easy = 'Débutant',
@@ -20,12 +25,8 @@ export enum CategoryOfPoints {
 
 @Service()
 export class BotService {
-    readonly passCommandName = 'passer';
-    readonly exchangeCommandName = 'échanger';
-    readonly placeCommandName = 'placer';
-
     move(game: Game, difficulty: BotDifficulty): string {
-        let decidedMove = this.passCommandName;
+        let decidedMove = passCommandName;
         if (difficulty === BotDifficulty.Easy) {
             decidedMove = this.easyBotMove(game);
         }
@@ -40,7 +41,7 @@ export class BotService {
         const percentChance = 0.1;
         const randomMoveChance = Math.random();
         if (0 < randomMoveChance && randomMoveChance < percentChance) {
-            return this.passCommandName;
+            return passCommandName;
         } else if (percentChance < randomMoveChance && randomMoveChance < percentChance * 2) {
             return this.exchangeCommand(game);
         } else {
@@ -51,7 +52,7 @@ export class BotService {
     private exchangeCommand(game: Game): string {
         const playerEasel = JSON.parse(JSON.stringify(game.players[1].easel));
         const amountLettersToExchange = Math.floor(Math.random() * playerEasel.length + 1);
-        if (amountLettersToExchange > game.bag.letters.length) return this.passCommandName;
+        if (amountLettersToExchange > game.bag.letters.length) return passCommandName;
         const lettersToExchange: Letter[] = [];
         let indexLetterToRemove: number;
         while (lettersToExchange.length < amountLettersToExchange) {
@@ -60,14 +61,14 @@ export class BotService {
             playerEasel.splice(indexLetterToRemove, 1);
         }
         const exchangeCommandLetters = lettersToString(lettersToExchange).toLowerCase();
-        return this.exchangeCommandName + ' ' + exchangeCommandLetters;
+        return exchangeCommandName + ' ' + exchangeCommandLetters;
     }
 
     private placeCommand(game: Game, difficulty: BotDifficulty): string {
         const solver = new Solver(game.config.dictionary, game.board, game.players[1].easel);
         const foundPlacements: [Solution, number][] = solver.getEasyBotSolutions();
         if (foundPlacements.length === 0) return 'passer';
-        return this.placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
+        return placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
     }
 
     private determineWord(placements: [Solution, number][], difficulty: BotDifficulty): string {

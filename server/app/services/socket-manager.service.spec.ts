@@ -23,7 +23,7 @@ describe('SocketManager service tests', () => {
     });
 
     afterEach(() => {
-        service.roomManager.rooms = [];
+        service.roomManager['rooms'] = [];
         clientSocket.close();
         service['sio'].close();
         sinon.restore();

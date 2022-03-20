@@ -1,3 +1,7 @@
+import { Line } from '@app/interfaces/line';
+import { Segment } from '@app/interfaces/segment';
+import { Solution } from '@app/interfaces/solution';
+import { Word } from '@app/interfaces/word';
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
 import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
@@ -6,28 +10,6 @@ import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 
 export const HINT_COUNT = 3;
-
-interface Segment {
-    value: string;
-    start: number;
-    end: number;
-}
-
-export interface Word {
-    word: string;
-    index: number;
-}
-
-export interface Line {
-    letters: (Letter | null)[];
-    blanks: number[];
-}
-
-export interface Solution {
-    letters: PlacedLetter[];
-    blanks: Vec2[];
-    direction: Vec2;
-}
 
 export class Solver {
     constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}

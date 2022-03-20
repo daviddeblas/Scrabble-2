@@ -1,10 +1,6 @@
 import { Player } from '@app/classes/game/player';
+import { EndGameStatus } from '@app/interfaces/end-game-status';
 
-export interface EndGameStatus {
-    players: { player: Player; opponent: Player };
-    remainingLetters: number;
-    winner: string | null;
-}
 export class GameFinishStatus {
     constructor(public players: Player[], public remainingLetters: number, public winner: string | null) {}
 
