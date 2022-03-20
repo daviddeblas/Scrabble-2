@@ -283,6 +283,17 @@ describe('solver', () => {
         expect(result).to.deep.equal(solutions);
     });
 
+    it('should return command arguments', () => {
+        const solution: Solution = {
+            letters: [new PlacedLetter('C', new Vec2(4, 7)), new PlacedLetter('D', new Vec2(8, 7)), new PlacedLetter('E', new Vec2(9, 7))],
+            blanks: [new Vec2(8, 7)],
+            direction: new Vec2(1, 0),
+        };
+
+        const commandArg = Solver.solutionToCommandArguments(solution);
+        expect(commandArg).to.equal('h5h cDe');
+    });
+
     it('should return solution strings', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 

@@ -90,6 +90,7 @@ export class Solver {
         }
         return hints;
     }
+
     getEasyBotSolutions(board: Board): [Solution, number][] {
         const result: [Solution, number][] = [];
         const allSolutions: Solution[] = this.findAllSolutions();
