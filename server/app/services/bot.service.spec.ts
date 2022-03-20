@@ -72,6 +72,7 @@ describe('Bot service tests', () => {
 
     it('placeCommand should call determineWord if there is at least a solution', (done) => {
         fakeGame.board.board[7][7] = 'E';
+        fakeGame.players[1].easel = ['L'];
         stub(service as any, 'determineWord').callsFake(() => done());
         service['placeCommand'](fakeGame, BotDifficulty.Easy);
     });
