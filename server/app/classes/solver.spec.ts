@@ -3,7 +3,7 @@ import { Dictionary } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
-import { BOARD_SIZE } from 'common/constants';
+import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
@@ -214,6 +214,39 @@ describe('solver', () => {
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
+    });
+
+    it('should return nothing if time expire', () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const findLineStub = stub(solver, 'findLineSolutions');
+        findLineStub.callsFake((line: (Letter | null)[], index: number, direction: Vec2) => {
+            const sol: Solution = {
+                letters: [],
+                blanks: [],
+                direction,
+            };
+            return [sol];
+        });
+
+        let fakeNow: number;
+        let fakeNowIncrement: number;
+        const dateNowStub = stub(Date, 'now').callsFake(() => {
+            fakeNow += fakeNowIncrement;
+            return fakeNow;
+        });
+
+        fakeNow = 0;
+        fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 2;
+        let result = solver.findAllSolutions();
+        expect(result).to.deep.equal([]);
+
+        fakeNow = 0;
+        fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 0.75;
+        result = solver.findAllSolutions();
+        expect(result).to.deep.equal([]);
+
+        dateNowStub.restore();
     });
 
     it('should return random solutions', () => {
