@@ -457,4 +457,34 @@ describe.only('solver', () => {
         const regex = solver.firstSolutionRegex();
         expect(regex.source).to.equal('^(?!(?:[^A]*A){3})(?!(?:[^B]*B){3})(?!(?:[^C]*C){3})(?!(?:[ABC]*[^ABC]){2}).{1,4}$');
     });
+
+    it('should generate first solution from words', () => {
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C', '*']);
+        const words: string[] = ['aabc', 'aaab', 'zab', 'c', 'zzab'];
+        const expected: Solution[] = [
+            {
+                letters: [
+                    new PlacedLetter('A', new Vec2(7, 7)),
+                    new PlacedLetter('A', new Vec2(8, 7)),
+                    new PlacedLetter('B', new Vec2(9, 7)),
+                    new PlacedLetter('C', new Vec2(10, 7)),
+                ],
+                blanks: [new Vec2(8, 7)],
+                direction: new Vec2(1, 0),
+            },
+            {
+                letters: [new PlacedLetter('Z', new Vec2(7, 7)), new PlacedLetter('A', new Vec2(8, 7)), new PlacedLetter('B', new Vec2(9, 7))],
+                blanks: [new Vec2(7, 7)],
+                direction: new Vec2(1, 0),
+            },
+            {
+                letters: [new PlacedLetter('C', new Vec2(7, 7))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const results = solver.firstSolutionTransform(words);
+        expect(results).to.deep.equal(expected);
+    });
 });
