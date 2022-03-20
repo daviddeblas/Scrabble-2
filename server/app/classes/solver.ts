@@ -48,6 +48,7 @@ export class Solver {
     }
 
     findAllSolutions(): Solution[] {
+        if (this.isBoardEmpty()) return this.findFirstSolutions();
         const solutions: Solution[] = [];
         const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
         for (let i = 0; i < BOARD_SIZE; i++) {
@@ -60,6 +61,10 @@ export class Solver {
             if (Date.now() > expiration) return [];
         }
         return solutions;
+    }
+
+    isBoardEmpty(): boolean {
+        return this.board.board[(BOARD_SIZE - 1) / 2][(BOARD_SIZE - 1) / 2] === null;
     }
 
     // Calcul simplifié pour la première solution
