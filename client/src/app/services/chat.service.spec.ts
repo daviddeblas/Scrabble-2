@@ -96,9 +96,21 @@ describe('ChatService', () => {
         }, RESPONSE_TIME);
     });
 
-    it('acceptNewAction should be able to receive hint success and dispatch "[Chat] Received message"', (done) => {
+    it('acceptNewAction should be able to receive hint when less than 3 results success and dispatch "[Chat] Received message"', (done) => {
         const message = ['!placer h8h ear', '!placer h3v pla'];
-        const expectedMessage: ChatMessage = { username: '', message: '!placer h8h ear\n!placer h3v pla', messageType: 'System' };
+        const expectedMessage: ChatMessage = { username: '', message: '2 indices trouvés\n!placer h8h ear\n!placer h3v pla', messageType: 'System' };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('hint success', { hints: message });
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: receivedMessage(expectedMessage) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive hint success and dispatch "[Chat] Received message"', (done) => {
+        const message = ['!placer h8h ear', '!placer h3v pla', '!placer h3h abc'];
+        const expectedMessage: ChatMessage = { username: '', message: '!placer h8h ear\n!placer h3v pla\n!placer h3h abc', messageType: 'System' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('hint success', { hints: message });
         setTimeout(() => {

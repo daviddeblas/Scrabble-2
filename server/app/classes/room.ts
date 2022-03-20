@@ -14,16 +14,16 @@ import { Game } from './game/game';
 export class Room {
     started: boolean;
     clients: (io.Socket | null)[];
-    clientName: string | null;
     game: Game | null;
-    commandService: CommandService;
-    botService: BotService;
-    botLevel: string | undefined;
-
     sockets: io.Socket[];
+    commandService: CommandService;
+
+    private clientName: string | null;
+    private botService: BotService;
+    private botLevel: string | undefined;
     private playersLeft: number;
 
-    constructor(public host: io.Socket, public manager: RoomsManager, public gameOptions: GameOptions) {
+    constructor(public host: io.Socket, private manager: RoomsManager, private gameOptions: GameOptions) {
         this.clients = new Array(1);
         this.started = false;
         this.host.once('quit', () => this.quitRoomHost());
@@ -49,21 +49,16 @@ export class Room {
         client.once('cancel join room', () => this.quitRoomClient());
     }
 
-    quitRoomHost(): void {
-        if (this.clients[0]) this.inviteRefused(this.clients[0]);
-        this.manager.removeRoom(this);
-        this.manager.notifyAvailableRoomsChange();
+    removeUnneededListeners(socket: io.Socket): void {
+        socket
+            .removeAllListeners('send message')
+            .removeAllListeners('surrender game')
+            .removeAllListeners('get game status')
+            .removeAllListeners('command');
     }
 
-    inviteAccepted(client: io.Socket): void {
-        client.emit('accepted');
-        this.initGame();
-    }
-
-    inviteRefused(client: io.Socket): void {
-        client.emit('refused');
-        this.clients[0] = null;
-        this.clientName = null;
+    getRoomInfo(): RoomInfo {
+        return new RoomInfo(this.host.id, this.gameOptions);
     }
 
     quitRoomClient(): void {
@@ -88,7 +83,7 @@ export class Room {
             Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
-            this.actionAfterTimeout(this),
+            this.actionAfterTimeout(),
             () => {
                 return;
             },
@@ -119,18 +114,6 @@ export class Room {
         }
     }
 
-    getRoomInfo(): RoomInfo {
-        return new RoomInfo(this.host.id, this.gameOptions);
-    }
-
-    removeUnneededListeners(socket: io.Socket): void {
-        socket
-            .removeAllListeners('send message')
-            .removeAllListeners('surrender game')
-            .removeAllListeners('get game status')
-            .removeAllListeners('command');
-    }
-
     initSoloGame(diff: BotDifficulty): void {
         this.sockets = [this.host];
         this.playersLeft--;
@@ -141,7 +124,7 @@ export class Room {
             Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
             this.gameOptions,
-            this.actionAfterTimeout(this),
+            this.actionAfterTimeout(),
             this.actionAfterTurnWithBot(this, diff),
         );
 
@@ -150,6 +133,22 @@ export class Room {
         this.botLevel = diff;
     }
 
+    quitRoomHost(): void {
+        if (this.clients[0]) this.inviteRefused(this.clients[0]);
+        this.manager.removeRoom(this);
+        this.manager.notifyAvailableRoomsChange();
+    }
+
+    private inviteAccepted(client: io.Socket): void {
+        client.emit('accepted');
+        this.initGame();
+    }
+
+    private inviteRefused(client: io.Socket): void {
+        client.emit('refused');
+        this.clients[0] = null;
+        this.clientName = null;
+    }
     private setupSocket(socket: io.Socket, playerNumber: number): void {
         const game = this.game as Game;
         socket.on('get game status', () => {
@@ -193,14 +192,7 @@ export class Room {
         };
     }
 
-    private actionAfterTimeout(room: Room): () => void {
-        return () => {
-            const game = room.game as Game;
-            room.commandService.processSkip(game, room.sockets, [], game.activePlayer as number);
-            room.commandService.postCommand(game, room.sockets);
-            if (game.needsToEnd()) {
-                room.commandService.endGame(game, room.sockets);
-            }
-        };
+    private actionAfterTimeout(): () => void {
+        return this.commandService.actionAfterTimeout(this);
     }
 }
