@@ -165,6 +165,7 @@ describe('Database service', () => {
 
         afterEach(() => {
             server.removeAllListeners();
+            hostSocket.removeAllListeners();
         });
 
         after(() => {
@@ -177,7 +178,7 @@ describe('Database service', () => {
             server.on('connection', (socket) => {
                 databaseService.setupSocketConnection(socket);
                 hostSocket.emit('get highScores');
-                hostSocket.on('receive classic highscores', () => {
+                hostSocket.once('receive classic highscores', () => {
                     expect(getHighScoresStub.called);
                     done();
                 });
@@ -189,7 +190,7 @@ describe('Database service', () => {
             server.on('connection', (socket) => {
                 databaseService.setupSocketConnection(socket);
                 hostSocket.emit('get highScores');
-                hostSocket.on('receive log2990 highscores', () => {
+                hostSocket.once('receive log2990 highscores', () => {
                     expect(getHighScoresStub.called);
                     done();
                 });
