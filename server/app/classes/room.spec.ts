@@ -180,25 +180,7 @@ describe('room', () => {
             room.initiateRoomEvents();
             expect(setupSocketStub.calledOnce).to.equal(true);
         });
-        /*
-        it('actionAfterTimeout should call processSkip and postCommand', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const commandServiceStub = {
-                processSkip: stub(),
-                postCommand: stub(),
-                actionAfterTimeout: () => {
-                    return () => {
-                        return;
-                    };
-                },
-            };
-            room['commandService'] = commandServiceStub as unknown as CommandService;
-            room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
-            room['actionAfterTimeout']()();
-            expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
-            expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
-        });
-*/
+
         it('actionAfterTimeout should call end game if game is ended', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
@@ -229,48 +211,48 @@ describe('room', () => {
             expect(room.sockets.includes(socket)).to.equal(true);
         });
 
-        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', () => {
+        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 1,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             const onCommandStub = stub(room.commandService, 'onCommand');
             room.game = stubbedGame;
             const clk = useFakeTimers();
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             clk.tick(MIN_BOT_PLACEMENT_TIME);
             clk.restore();
             expect(onCommandStub.calledOnce).to.equal(true);
             expect(moveStub.calledOnce).to.equal(true);
         });
 
-        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', () => {
+        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 0,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
 
-        it('actionAfterTurnWithBot should not call move from botService if the game has ended', () => {
+        it('actionAfterTurnWithBot should not call move from botService if the game has ended', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 0,
                 gameFinished: true,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
     });

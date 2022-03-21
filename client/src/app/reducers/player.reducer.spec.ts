@@ -1,5 +1,5 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
-import { exchangeLettersSuccess, placeWordSuccess, switchLettersEasel } from '@app/actions/player.actions';
+import { addLettersToEasel, exchangeLettersSuccess, placeWordSuccess, removeLetterFromEasel, switchLettersEasel } from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
 import { Word } from '@app/classes/word';
@@ -89,6 +89,39 @@ describe('[Players] Reducer', () => {
             const expectedResult = createInitialPlayersState();
             expectedResult.player.removeLettersFromEasel(['A', 'L', 'L', 'O']);
             expectedResult.player.score = newScore;
+
+            expect(result).toEqual(expectedResult);
+        });
+    });
+
+    describe('[Players] Remove Letter From Easel', () => {
+        it('should remove letter from easel', () => {
+            const letterToRemove: Letter = 'A';
+
+            const initialPlayers: Players = createInitialPlayersState();
+            const action = removeLetterFromEasel({ letter: letterToRemove });
+
+            const result = reducer(initialPlayers, action);
+
+            const expectedResult = createInitialPlayersState();
+            expectedResult.player.removeLettersFromEasel([letterToRemove]);
+
+            expect(result).toEqual(expectedResult);
+        });
+    });
+
+    describe('[Players] Add Letters To Easel', () => {
+        it('should add letters to easel', () => {
+            const lettersToAdd: Letter[] = ['A', 'H'];
+
+            const initialPlayers: Players = createInitialPlayersState();
+            initialPlayers.player.easel = [];
+            const action = addLettersToEasel({ letters: lettersToAdd });
+
+            const result = reducer(initialPlayers, action);
+
+            const expectedResult = initialPlayers;
+            expectedResult.player.addLettersToEasel(lettersToAdd);
 
             expect(result).toEqual(expectedResult);
         });

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { initiateChatting, messageWritten } from '@app/actions/chat.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
@@ -12,7 +13,10 @@ describe('ChatBoxComponent', () => {
     let component: ChatBoxComponent;
     let fixture: ComponentFixture<ChatBoxComponent>;
     let store: MockStore;
+    let keyManagerMock: jasmine.SpyObj<KeyManagerService>;
+
     beforeEach(async () => {
+        keyManagerMock = jasmine.createSpyObj('keyManager', ['onEsc']);
         await TestBed.configureTestingModule({
             declarations: [ChatBoxComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, EffectsRootModule],
@@ -24,6 +28,7 @@ describe('ChatBoxComponent', () => {
                         addEffects: jasmine.createSpy('addEffects'),
                     },
                 },
+                { provide: KeyManagerService, useValue: keyManagerMock },
             ],
         }).compileComponents();
         store = TestBed.inject(MockStore);
@@ -191,6 +196,18 @@ describe('ChatBoxComponent', () => {
         fixture.nativeElement.dispatchEvent(arrowPressed);
         fixture.detectChanges();
         expect(component['chatMessage'].nativeElement.value).toEqual(expectedMessage);
+    });
+
+    it('should call onEsc if the click target is inside the chatBox', () => {
+        const e: Event = { target: component['eRef'].nativeElement } as Event;
+        component.clickout(e);
+        expect(keyManagerMock.onEsc).toHaveBeenCalled();
+    });
+
+    it('should not call onEsc if the click target is outside the chatBox', () => {
+        const e: Event = { target: document.parentElement } as Event;
+        component.clickout(e);
+        expect(keyManagerMock.onEsc).not.toHaveBeenCalled();
     });
 
     it('should call detectChanges() when ngAfterViewChecked is called', () => {

@@ -48,7 +48,7 @@ describe('Individual functions', () => {
         sockets.push(createFakeSocket(1));
     });
 
-    it('onCommand should call processCommand and postCommand', () => {
+    it('onCommand should call processCommand and postCommand', async () => {
         const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
             return;
         });
@@ -67,7 +67,7 @@ describe('Individual functions', () => {
             },
         } as unknown as Game;
 
-        commandService.onCommand(game, sockets, 'passer', 0);
+        await commandService.onCommand(game, sockets, 'passer', 0);
         expect(processStub.calledOnce && postCommandStub.calledOnce).to.equal(true);
     });
 
@@ -89,6 +89,17 @@ describe('Individual functions', () => {
 
         commandService.onCommand(game, sockets, 'passer', 0);
         expect(processStub.calledOnce && gameEndedCalled && errorOnCommandStub.calledOnce).to.equal(true);
+    });
+
+    it('actionAfterTimeout should call processSkip and postCommand', async () => {
+        const skipStub = stub(commandService as any, 'processSkip');
+        const postCommandStub = stub(commandService as any, 'postCommand');
+        const fakeGame = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
+        const roomStub = { game: fakeGame, commandService } as unknown as Room;
+
+        commandService['actionAfterTimeout'](roomStub)();
+        expect(skipStub.calledOnce).to.equal(true);
+        expect(postCommandStub.calledOnce).to.equal(true);
     });
 
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
@@ -287,10 +298,10 @@ describe('commands', () => {
             commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
-        it('string with place calls processPlace', () => {
+        it('string with place calls processPlace', (done) => {
             const fullCommand = 'placer h3h h';
             game.gameFinished = true;
-            expect(() => commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer)).to.throw();
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer).catch(() => done());
         });
 
         it('string with skip calls processBag', (done) => {
@@ -302,7 +313,7 @@ describe('commands', () => {
         });
 
         it('string with hint calls processHint', (done) => {
-            commandService['processHint'] = () => {
+            commandService['processHint'] = async () => {
                 done();
             };
             const fullCommand = 'indice';
@@ -333,8 +344,8 @@ describe('commands', () => {
         expect(() => commandService['processSkip'](game, room.sockets, ['a', 'b'], 0)).to.throw();
     });
 
-    it('processHint with arguments should throw an error', () => {
-        expect(() => commandService['processHint'](game, room.sockets, ['a', 'b'], 0)).to.throw();
+    it('processHint with arguments should throw an error', (done) => {
+        commandService['processHint'](game, room.sockets, ['a', 'b'], 0).catch(() => done());
     });
 
     it('ProcessSkip should emit skip success when player number is 0', (done) => {

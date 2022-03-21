@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { BotDifficulty, BotService } from './bot.service';
 import { DictionaryService } from './dictionary.service';
 import { GameConfigService } from './game-config.service';
@@ -51,8 +51,8 @@ describe('Bot service tests', () => {
         expect(easyBotMoveStub.calledOnce).to.equal(true);
     });
 
-    it('move should return passer if there is no according difficulty', () => {
-        expect(service.move(fakeGame, BotDifficulty.Hard)).to.equal('passer');
+    it('move should return passer if there is no according difficulty', async () => {
+        expect(await service.move(fakeGame, BotDifficulty.Hard)).to.equal('passer');
     });
 
     it('getName should return one of the bot names', () => {
@@ -60,27 +60,27 @@ describe('Bot service tests', () => {
         expect(BOT_NAMES.includes(nameChosen)).to.equal(true);
     });
 
-    it('easyBotMove should return pass command if the random generated number is between 0 and 0.1', () => {
+    it('easyBotMove should return pass command if the random generated number is between 0 and 0.1', async () => {
         const expectedNumber = 0.05;
         stub(Math, 'random').callsFake(() => expectedNumber);
-        expect(service['easyBotMove'](fakeGame)).to.equal('passer');
+        expect(await service['easyBotMove'](fakeGame)).to.equal('passer');
     });
 
-    it('easyBotMove should call exchangeCommand if the random generated number is between 0.1 and 0.2', () => {
+    it('easyBotMove should call exchangeCommand if the random generated number is between 0.1 and 0.2', async () => {
         const expectedNumber = 0.18;
         const expectedResult = 'échanger a';
         stub(Math, 'random').callsFake(() => expectedNumber);
         const exchangeCommandStub = stub(service as any, 'exchangeCommand').callsFake(() => expectedResult);
-        expect(service['easyBotMove'](fakeGame)).to.equal(expectedResult);
+        expect(await service['easyBotMove'](fakeGame)).to.equal(expectedResult);
         expect(exchangeCommandStub.called).to.equal(true);
     });
 
-    it('easyBotMove should call placeCommand if the random generated number is between 0.2 and 1', () => {
+    it('easyBotMove should call placeCommand if the random generated number is between 0.2 and 1', async () => {
         const expectedNumber = 0.482;
         const expectedResult = 'placer h7h place';
         stub(Math, 'random').callsFake(() => expectedNumber);
         const placeCommandStub = stub(service as any, 'placeCommand').callsFake(() => expectedResult);
-        expect(service['easyBotMove'](fakeGame)).to.equal(expectedResult);
+        expect(await service['easyBotMove'](fakeGame)).to.equal(expectedResult);
         expect(placeCommandStub.called).to.equal(true);
     });
 
@@ -91,10 +91,10 @@ describe('Bot service tests', () => {
         service['placeCommand'](fakeGame, BotDifficulty.Easy);
     });
 
-    it('placeCommand should not call determineWord if there is no solution and return passer', () => {
+    it('placeCommand should not call determineWord if there is no solution and return passer', async () => {
         fakeGame.players[1].easel = ['X'];
         const determineWordStub = stub(service as any, 'determineWord');
-        const placeResult = service['placeCommand'](fakeGame, BotDifficulty.Easy);
+        const placeResult = await service['placeCommand'](fakeGame, BotDifficulty.Easy);
         expect(placeResult).to.equal('passer');
         expect(determineWordStub.calledOnce).to.equal(false);
     });

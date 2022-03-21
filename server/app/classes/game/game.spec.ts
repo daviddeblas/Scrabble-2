@@ -10,7 +10,7 @@ import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { spy, stub, useFakeTimers } from 'sinon';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
 
 describe('game', () => {
@@ -20,6 +20,9 @@ describe('game', () => {
     const timerCallbackMock = () => {
         return;
     };
+    const afterTurnCallbackMock: () => Promise<void> = async () => {
+        return;
+    };
 
     before(() => {
         Container.get(DictionaryService).init();
@@ -27,7 +30,7 @@ describe('game', () => {
     });
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, timerCallbackMock);
+        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, afterTurnCallbackMock);
         activePlayer = game.activePlayer;
     });
 

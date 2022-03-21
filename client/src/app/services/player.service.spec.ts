@@ -290,4 +290,10 @@ describe('PlayerService', () => {
         const noLetterPosition = 9;
         expect(service.letterOnBoard(noLetterPosition, noLetterPosition)).toBeUndefined();
     });
+
+    it('should return the player easel', () => {
+        const playerEasel = service.getEasel();
+
+        expect(playerEasel).toEqual(['A', 'B', 'C', '*']);
+    });
 });
