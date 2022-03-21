@@ -112,7 +112,6 @@ export class Room {
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         const game = this.game as Game;
         this.sockets.forEach((socket, index) => {
-            console.log(looserName, game.players[index].name);
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
                 Container.get(DatabaseService).updateHighScore(highscore, 'classical');

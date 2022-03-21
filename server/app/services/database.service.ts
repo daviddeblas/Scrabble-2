@@ -25,8 +25,7 @@ export class DatabaseService {
             }
         } catch {
             // recevoir message si le base de donnees n'est pas connectee
-            // eslint-disable-next-line no-console
-            console.log('Database connection error');
+            throw Error('erreur de connection');
         }
     }
 
@@ -66,9 +65,9 @@ export class DatabaseService {
         const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
         const equalScore = await this.highScoreDB.collection(collection).findOne({ score: highScore.score });
         if (equalScore) {
-            if (equalScore.name.includes(highScore.name)) return;
+            if (equalScore.value.name.includes(highScore.name)) return;
             await this.highScoreDB.collection(collection).deleteOne({ score: highScore.score });
-            highScore.name = equalScore.name + ' - ' + highScore.name;
+            highScore.name = equalScore.value?.name + ' - ' + highScore.name;
         }
 
         this.highScoreDB.collection(collection).insertOne(highScore);
