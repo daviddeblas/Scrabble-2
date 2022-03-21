@@ -5,6 +5,7 @@ import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
 import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
+import { DATABASE } from './classes/highscore';
 import { BrowserService } from './services/browser.service';
 import { DatabaseService } from './services/database.service';
 import { DictionaryService } from './services/dictionary.service';
@@ -43,7 +44,7 @@ export class Server {
             Container.get(DatabaseService),
             Container.get(GameConfigService),
         );
-        Container.get(DatabaseService).start();
+        Container.get(DatabaseService).start(DATABASE.uri);
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

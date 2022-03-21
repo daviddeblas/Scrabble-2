@@ -8,9 +8,9 @@ import { Service } from 'typedi';
 export class DatabaseService {
     private highScoreDB: Db;
     private client: MongoClient;
-    async start() {
+    async start(url: string) {
         try {
-            const client = new MongoClient(DATABASE.uri);
+            const client = new MongoClient(url);
             this.client = client;
             this.highScoreDB = client.db(DATABASE.highScore.name);
 
