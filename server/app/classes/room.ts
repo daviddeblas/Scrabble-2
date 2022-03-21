@@ -156,7 +156,7 @@ export class Room {
         });
 
         // Initialise le traitement des commandes
-        socket.on('command', (command) => this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
+        socket.on('command', async (command) => await this.commandService.onCommand(this.game as Game, this.sockets, command, playerNumber));
 
         // Initialise le chat
         socket.on('send message', ({ username, message, messageType }) => {
