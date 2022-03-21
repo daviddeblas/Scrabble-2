@@ -6,7 +6,7 @@ import { Direction } from '@app/enums/direction';
 import { createEmptyMatrix } from '@app/reducers/board.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { Letter } from 'common/classes/letter';
-import { Vec2 } from 'common/classes/vec2';
+import { iVec2, Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { KeyManagerService } from './key-manager.service';
@@ -143,17 +143,18 @@ describe('KeyManagerService', () => {
         });
     });
 
-    describe('KeyManager.onEnter', () => {
-        const actions: { type: string }[] = [];
+    describe('KeyManager.onEnter, onEsc and onBackspace', () => {
+        let actions: { type: string }[];
         let dispatchSpy: jasmine.Spy;
 
         beforeEach(() => {
+            actions = [];
             dispatchSpy = spyOn(store, 'dispatch').and.callFake((action) => {
                 actions.push(action);
             });
         });
 
-        it('should dispatch addLettersToEasel, removeLetters, placeWord and clearSelection', () => {
+        it('onEnter should dispatch addLettersToEasel, removeLetters, placeWord and clearSelection', () => {
             service.onEnter();
 
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -175,7 +176,7 @@ describe('KeyManagerService', () => {
             expect(actions[3].type).toEqual('[Board] Selection Cleared');
         });
 
-        it('should set the orientation depending on the modified cells position', () => {
+        it('onEnter should set the orientation depending on the modified cells position', () => {
             selectionStub.orientation = null;
             store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
@@ -183,6 +184,57 @@ describe('KeyManagerService', () => {
 
             const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
             expect(placeWordAction.position).toEqual('a1h');
+        });
+
+        it('onEnter should set blank letters in capital when place word action is called', () => {
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
+
+            service.onEnter();
+
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.letters).toEqual(['L', '*']);
+
+            const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            expect(placeWordAction.letters).toEqual('lE');
+        });
+
+        it('onEsc should dispatch addLettersToEasel, removeLetters and clearSelection', () => {
+            service.onEsc();
+
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(dispatchSpy).toHaveBeenCalledTimes(3);
+
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.type).toEqual('[Players] Add Letters To Easel');
+            expect(addLettersToEaselAction.letters).toEqual(['L', 'E']);
+
+            const removeLetterAction = actions[1] as unknown as { type: string; positions: iVec2[] };
+            expect(removeLetterAction.type).toEqual('[Board] Letters Removed');
+            expect(removeLetterAction.positions).toEqual([new Vec2(0, 0), new Vec2(1, 0)]);
+
+            expect(actions[2].type).toEqual('[Board] Selection Cleared');
+        });
+
+        it('onEsc should dispatch addLettersToEasel with a blank letter with a blank was placed', () => {
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
+
+            service.onEsc();
+
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.letters).toEqual(['L', '*']);
+        });
+
+        it('onBackspace should dispatch addLettersToEasel and backspaceSelection', () => {
+            service.onBackspace();
+
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(dispatchSpy).toHaveBeenCalledTimes(2);
+
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.type).toEqual('[Players] Add Letters To Easel');
+            expect(addLettersToEaselAction.letters).toEqual(['E']);
+
+            expect(actions[1].type).toEqual('[Board] Selection Backspace');
         });
     });
 });

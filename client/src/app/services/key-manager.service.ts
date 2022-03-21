@@ -36,10 +36,12 @@ export class KeyManagerService {
 
         if (blanks.length > 0)
             [...modifiedCells].reverse().forEach((cell, index) => {
-                if (cell.equals(blanks[blanks.length - 1])) letters[letters.length - 1 - index] = BLANK_LETTER;
+                if (cell.equals(blanks[blanks.length - 1])) {
+                    letters[letters.length - 1 - index] = BLANK_LETTER;
+                }
             });
 
-        this.store.dispatch(addLettersToEasel({ letters }));
+        this.store.dispatch(addLettersToEasel({ letters: [...letters] }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
         if (orientation === null && modifiedCells.length > 1)
@@ -73,7 +75,7 @@ export class KeyManagerService {
         });
         if (blanks.length > 0)
             modifiedCells.reverse().forEach((cell, index) => {
-                if (cell.equals(blanks[blanks.length - 1])) letters[index] = BLANK_LETTER;
+                if (cell.equals(blanks[blanks.length - 1])) letters[letters.length - 1 - index] = BLANK_LETTER;
             });
         this.store.dispatch(addLettersToEasel({ letters }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
