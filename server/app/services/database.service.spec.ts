@@ -5,11 +5,16 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-underscore-dangle */
 import { DATABASE } from '@app/classes/highscore';
+import { PORT } from '@app/environnement';
 import { DatabaseService } from '@app/services/database.service';
 import { fail } from 'assert';
 import { expect } from 'chai';
+import { createServer, Server } from 'http';
 import { describe } from 'mocha';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { stub } from 'sinon';
+import io from 'socket.io';
+import { io as Client, Socket } from 'socket.io-client';
 
 describe.only('Database service', () => {
     let databaseService: DatabaseService;
@@ -126,5 +131,55 @@ describe.only('Database service', () => {
         await databaseService.resetDB();
         const scoreClassic = await databaseService.getHighscores('classical');
         expect(scoreClassic).to.be.empty;
+    });
+
+    describe('socket connections', () => {
+        let hostSocket: Socket;
+        let server: io.Server;
+        let httpServer: Server;
+
+        before((done) => {
+            httpServer = createServer();
+            httpServer.listen(PORT);
+            server = new io.Server(httpServer);
+            httpServer.on('listening', () => done());
+        });
+
+        beforeEach(() => {
+            hostSocket = Client('http://localhost:3000');
+        });
+
+        afterEach(() => {
+            server.removeAllListeners();
+        });
+
+        after(() => {
+            server.close();
+            httpServer.close();
+        });
+
+        it('should emit receive classic highscores when receiving get highScores', (done) => {
+            const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
+            server.on('connection', (socket) => {
+                databaseService.setupSocketConnection(socket);
+                hostSocket.on('receive classic highscores', () => {
+                    expect(getHighScoresStub.called);
+                    done();
+                });
+            });
+            hostSocket.emit('get highScores');
+        });
+
+        it('should emit receive log2990 highscores when receiving get highScores', (done) => {
+            const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
+            server.on('connection', (socket) => {
+                databaseService.setupSocketConnection(socket);
+                hostSocket.on('receive log2990 highscores', () => {
+                    expect(getHighScoresStub.called);
+                    done();
+                });
+            });
+            hostSocket.emit('get highScores');
+        });
     });
 });
