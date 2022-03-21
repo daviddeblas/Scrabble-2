@@ -125,13 +125,16 @@ export const reducer = createReducer(
         return tempState;
     }),
 
-    on(placeLetter, (state, { letter }) => {
+    on(placeLetter, (state, { letter, isBlank }) => {
         const selection = state.selection.copy();
         if (!selection.cell) return state;
 
         if (state.board[selection.cell.x][selection.cell.y]) return state;
         const board = cloneBoard(state.board);
         board[selection.cell.x][selection.cell.y] = letter;
+
+        const blanks = [...state.blanks];
+        if (isBlank) blanks.push(selection.cell.copy());
 
         selection.modifiedCells.push(selection.cell.copy());
 
@@ -149,14 +152,19 @@ export const reducer = createReducer(
 
         if (isCellAtBoardLimit(state.board, selection.cell, selection.orientation)) selection.orientation = null;
 
-        return { ...state, selection, board };
+        return { ...state, selection, board, blanks };
     }),
 
     on(removeLetters, (state, { positions }) => {
+        if (positions.length === 0) return state;
         const board = cloneBoard(state.board);
-        positions.forEach((pos) => (board[pos.x][pos.y] = null));
+        const blanks = [...state.blanks];
+        [...positions].reverse().forEach((pos) => {
+            board[pos.x][pos.y] = null;
+            while (pos === blanks[blanks.length - 1]) blanks.pop();
+        });
 
-        return { ...state, board };
+        return { ...state, board, blanks };
     }),
 
     on(clearSelection, (state): BoardState => {
@@ -181,7 +189,10 @@ export const reducer = createReducer(
         const board = cloneBoard(state.board);
         board[selection.cell.x][selection.cell.y] = null;
 
-        return { ...state, board, selection };
+        const blanks = [...state.blanks];
+        if (blanks.length > 0 && lastCell.equals(blanks[blanks.length - 1] as Vec2)) blanks.pop();
+
+        return { ...state, board, selection, blanks };
     }),
 
     on(resetAllState, () => initialState),
