@@ -19,7 +19,6 @@ export class CommandService {
     async onCommand(game: Game, sockets: io.Socket[], command: string, playerNumber: number): Promise<void> {
         try {
             await this.processCommand(game, sockets, command, playerNumber);
-            this.postCommand(game, sockets);
         } catch (error) {
             this.errorOnCommand(game, sockets, error, playerNumber);
         }
@@ -45,12 +44,15 @@ export class CommandService {
         switch (command) {
             case 'placer':
                 this.processPlace(game, sockets, args, playerNumber);
+                this.postCommand(game, sockets);
                 break;
             case 'échanger':
                 this.processDraw(game, sockets, args, playerNumber);
+                this.postCommand(game, sockets);
                 break;
             case 'passer':
                 this.processSkip(game, sockets, args, playerNumber);
+                this.postCommand(game, sockets);
                 break;
             case 'réserve':
                 this.processBag(game, sockets, args, playerNumber);
