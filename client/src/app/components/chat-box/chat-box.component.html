@@ -3,7 +3,7 @@
     <div id="chat-list" #scrollMe [scrollTop]="scrollMe.scrollHeight">
         <mat-card>
             <mat-list role="list">
-                <mat-list-item role="listitem" id="chat-log-list" *ngFor="let line of chat$ | async">
+                <mat-list-item role="listitem" id="chat-log-list" *ngFor="let line of (chat$ | async)?.chatMessage">
                     <mat-card *ngIf="line.username === this.username; else errorMessage" id="user-message">
                         <strong>{{ line.username }}</strong> : {{ line.message }}
                     </mat-card>

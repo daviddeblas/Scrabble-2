@@ -2,8 +2,8 @@
 import { TestBed } from '@angular/core/testing';
 import { restoreMessages } from '@app/actions/chat.actions';
 import { refreshTimer } from '@app/actions/game-status.actions';
-import { DEFAULT_TIMER } from '@app/components/multi-config-window/multi-config-window.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { DEFAULT_TIMER } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { BrowserManagerService } from './browser-manager.service';
 import { SocketClientService } from './socket-client.service';
@@ -17,7 +17,14 @@ describe('BrowserManagerService', () => {
     beforeEach(async () => {
         socketService = new SocketClientService();
         await TestBed.configureTestingModule({
-            providers: [provideMockStore({ selectors: [{ selector: 'chat', value: [{ username: 'Player', message: 'Message' }] }] })],
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        { selector: 'chat', value: { chatMessage: [{ username: 'Player', message: 'Message' }], lastSendMessage: [] } },
+                        { selector: 'gameStatus', value: { timer: DEFAULT_TIMER } },
+                    ],
+                }),
+            ],
         }).compileComponents();
         service = TestBed.inject(BrowserManagerService);
         store = TestBed.inject(MockStore);
@@ -127,7 +134,7 @@ describe('BrowserManagerService', () => {
 
     it('should dispatch refreshTimer if there is the currentTimer key in LocalStorage', (done) => {
         const date = new Date();
-        localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER, date: date.getTime() }));
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER - 1, date: date.getTime() }));
         const spy = spyOn(service['store'], 'dispatch');
         const fakeSend = () => {
             return ' ';
@@ -135,7 +142,7 @@ describe('BrowserManagerService', () => {
         spyOnProperty(service, 'readCookieSocket', 'get').and.callFake(fakeSend);
         service.onBrowserLoad();
         setTimeout(() => {
-            expect(spy).toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER }));
+            expect(spy).toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER - 1 }));
             localStorage.clear();
             done();
         }, waitingTime);

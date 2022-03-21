@@ -364,10 +364,12 @@ describe('room', () => {
                     hostSocket.emit('accept');
                     clientSocket.emit('send message', message);
                 });
-                setTimeout(() => {
-                    expect(roomsManager.removeRoom.calledOnce).to.equal(true);
-                    done();
-                }, RESPONSE_DELAY);
+                hostSocket.on('receive message', () => {
+                    setTimeout(() => {
+                        expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+                        done();
+                    }, RESPONSE_DELAY);
+                });
                 hostSocket.emit('create room');
             });
 

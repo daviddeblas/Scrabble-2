@@ -123,11 +123,79 @@ describe('ChatBoxComponent', () => {
         expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
-    it('ngOnInit should focus input if gameEnded changes', () => {
+    it('ngOnInit should call focus input twice if gameEnded changes to true', () => {
         const focusSpy = spyOn(component['chatMessage'].nativeElement, 'focus');
         store.overrideSelector('gameStatus', { gameEnded: true });
         component.ngOnInit();
-        expect(focusSpy).toHaveBeenCalled();
+        expect(focusSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('ngOnInit should call focus input once if gameEnded changes to false', () => {
+        const focusSpy = spyOn(component['chatMessage'].nativeElement, 'focus');
+        store.overrideSelector('gameStatus', { gameEnded: false });
+        component.ngOnInit();
+        expect(focusSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('ArrowUp pressed should add one to the numberOfLastMessages', () => {
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowUp',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('ArrowDown pressed should remove one to the numberOfLastMessages if it is higher than 1', () => {
+        component['numberOfLastMessages'] = 2;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowDown',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('ArrowDown pressed should not remove one to the numberOfLastMessages if it is 1 or lower', () => {
+        component['numberOfLastMessages'] = 1;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowDown',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(1);
+    });
+
+    it('not change numberOfLastMessages if it is another key', () => {
+        component['numberOfLastMessages'] = 3;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowLeft',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        expect(component['numberOfLastMessages']).toEqual(3);
+    });
+
+    it('should put the last given word as nativeElement', () => {
+        const expectedMessage = 'Hello World';
+        store.overrideSelector('chat', { chatMessage: [], lastSendMessage: [expectedMessage] });
+        component.chat$ = store.select('chat');
+        component['numberOfLastMessages'] = 3;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowUp',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        fixture.detectChanges();
+        expect(component['chatMessage'].nativeElement.value).toEqual(expectedMessage);
+    });
+
+    it('should put the given word at numberOfLastMessage as nativeElement', () => {
+        const expectedMessage = 'Hello World';
+        store.overrideSelector('chat', { chatMessage: [], lastSendMessage: [expectedMessage] });
+        component.chat$ = store.select('chat');
+        component['numberOfLastMessages'] = 0;
+        const arrowPressed = new KeyboardEvent('keydown', {
+            key: 'ArrowUp',
+        });
+        fixture.nativeElement.dispatchEvent(arrowPressed);
+        fixture.detectChanges();
+        expect(component['chatMessage'].nativeElement.value).toEqual(expectedMessage);
     });
 
     it('should call onEsc if the click target is inside the chatBox', () => {

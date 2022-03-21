@@ -14,5 +14,5 @@ export class LetterComponent {
     @Input() letter: Letter = 'A';
     @Input() value: number | undefined;
     @Input() blank: boolean = false;
-    @Input() color: string = '#fffcec';
+    @Input() color?: string = '#fffcec';
 }
