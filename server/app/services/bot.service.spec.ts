@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
 import { restore, stub } from 'sinon';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { BotDifficulty, BotService } from './bot.service';
 import { DictionaryService } from './dictionary.service';
 import { GameConfigService } from './game-config.service';

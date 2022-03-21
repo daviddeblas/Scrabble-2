@@ -2,7 +2,7 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { Bag } from './bag';
 
 const LETTERS_TO_GET = 7;

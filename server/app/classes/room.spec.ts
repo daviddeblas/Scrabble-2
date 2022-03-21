@@ -180,25 +180,7 @@ describe('room', () => {
             room.initiateRoomEvents();
             expect(setupSocketStub.calledOnce).to.equal(true);
         });
-        /*
-        it('actionAfterTimeout should call processSkip and postCommand', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const commandServiceStub = {
-                processSkip: stub(),
-                postCommand: stub(),
-                actionAfterTimeout: () => {
-                    return () => {
-                        return;
-                    };
-                },
-            };
-            room['commandService'] = commandServiceStub as unknown as CommandService;
-            room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
-            room['actionAfterTimeout']()();
-            expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
-            expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
-        });
-*/
+
         it('actionAfterTimeout should call end game if game is ended', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
