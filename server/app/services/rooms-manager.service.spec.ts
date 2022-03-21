@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
 import { GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
-import { PORT } from '@app/environnement.json';
+import { PORT } from '@app/environnement';
 import { assert, expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
@@ -34,28 +36,28 @@ describe('Rooms Manager Service', () => {
     });
 
     afterEach(() => {
-        roomsManager.rooms = []; // Reinitialisation de la liste de salle
+        roomsManager['rooms'] = []; // Reinitialisation de la liste de salle
     });
 
     it('createRoom should add a new room to the list', () => {
-        roomsManager.createRoom(socket, options);
-        expect(roomsManager.rooms).to.be.length(1);
+        roomsManager['createRoom'](socket, options);
+        expect(roomsManager['rooms']).to.be.length(1);
     });
 
     it('removeRoom should remove the created room from the list', () => {
-        roomsManager.createRoom(socket, options);
-        expect(roomsManager.rooms).to.be.length(1);
-        roomsManager.removeRoom(roomsManager.rooms[0]);
-        expect(roomsManager.rooms).to.deep.equal([]);
+        roomsManager['createRoom'](socket, options);
+        expect(roomsManager['rooms']).to.be.length(1);
+        roomsManager.removeRoom(roomsManager['rooms'][0]);
+        expect(roomsManager['rooms']).to.deep.equal([]);
     });
 
     it('joinRoom should call join if the room exists', () => {
-        roomsManager.createRoom(socket, options);
-        expect(roomsManager.rooms).to.be.length(1);
+        roomsManager['createRoom'](socket, options);
+        expect(roomsManager['rooms']).to.be.length(1);
         const playerName = 'Second player';
-        expect(roomsManager.rooms[0].clients[0]).to.be.equal(undefined);
-        roomsManager.joinRoom('1', socket, playerName);
-        expect(roomsManager.rooms[0].clients[0]).to.deep.equal(socket);
+        expect(roomsManager['rooms'][0].clients[0]).to.be.equal(undefined);
+        roomsManager['joinRoom']('1', socket, playerName);
+        expect(roomsManager['rooms'][0].clients[0]).to.deep.equal(socket);
     });
 
     it('joinRoom should throw Game not found error if the Room does not exist', () => {
@@ -63,7 +65,7 @@ describe('Rooms Manager Service', () => {
         const expectedMessage = GameErrorType.GameNotExists;
         try {
             const playerName = 'Second player';
-            roomsManager.joinRoom('1', socket, playerName);
+            roomsManager['joinRoom']('1', socket, playerName);
         } catch (error) {
             errorMessage = error.message;
         }
@@ -71,11 +73,11 @@ describe('Rooms Manager Service', () => {
     });
 
     it('getRooms should return the hostname of all rooms', () => {
-        roomsManager.createRoom(socket, options);
+        roomsManager['createRoom'](socket, options);
         const expectedResult = [new RoomInfo(socket.id, options)];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
+        roomsManager['createRoom'](socket, otherOption);
         expectedResult.push(new RoomInfo(socket.id, otherOption));
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
     });
@@ -86,17 +88,17 @@ describe('Rooms Manager Service', () => {
     });
 
     it('sendAvailableRooms should send only not started games', () => {
-        roomsManager.createRoom(socket, options);
+        roomsManager['createRoom'](socket, options);
         const spyOnSocket = spy(socket, 'emit');
         const expectedResult = [new RoomInfo(socket.id, options)];
         roomsManager.sendAvailableRooms(socket);
         assert(spyOnSocket.calledWith('get list', expectedResult));
 
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.createRoom(socket, otherOption);
-        const room = roomsManager.rooms[1];
+        roomsManager['createRoom'](socket, otherOption);
+        const room = roomsManager['rooms'][1];
         // eslint-disable-next-line dot-notation
-        room.game = new Game(new GameConfig(), [''], room.gameOptions, room['actionAfterTimeout'](room), () => {
+        room.game = new Game(new GameConfig(), [''], room['gameOptions'], room['actionAfterTimeout'](), async () => {
             return;
         });
         assert(spyOnSocket.calledWith('get list', expectedResult));
@@ -186,7 +188,7 @@ describe('Rooms Manager Service', () => {
 
     it('getRoom should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
-        roomsManager.rooms.push(new Room(socket, roomsManager, otherOption));
+        roomsManager['rooms'].push(new Room(socket, roomsManager, otherOption));
         const undefinedID = '3';
         expect(roomsManager.getRoom(undefinedID)).to.deep.equal(undefined);
     });
@@ -194,7 +196,7 @@ describe('Rooms Manager Service', () => {
     it('getRoom should return the room if the host socket Id is passed as a parameter', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         const expectedRoom = new Room(socket, roomsManager, otherOption);
-        roomsManager.rooms.push(expectedRoom);
+        roomsManager['rooms'].push(expectedRoom);
         expect(roomsManager.getRoom(socket.id)).to.equal(expectedRoom);
     });
 
@@ -203,7 +205,7 @@ describe('Rooms Manager Service', () => {
         const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
         const expectedRoom = new Room(socket, roomsManager, otherOption);
         expectedRoom.clients[0] = opponentSocket;
-        roomsManager.rooms.push(expectedRoom);
+        roomsManager['rooms'].push(expectedRoom);
         expect(roomsManager.getRoom(opponentSocket.id)).to.equal(expectedRoom);
     });
     describe('Setup connection events', () => {
@@ -232,7 +234,7 @@ describe('Rooms Manager Service', () => {
         });
 
         it('emitting create room should call the createRoom function', (done) => {
-            stub(roomsManager, 'createRoom').callsFake(() => {
+            stub(roomsManager, 'createRoom' as any).callsFake(() => {
                 done();
                 return {
                     getRoomInfo: () => {
@@ -247,7 +249,7 @@ describe('Rooms Manager Service', () => {
         });
 
         it('emitting create solo room should call the createRoom function and initSoloGame with the room given', (done) => {
-            stub(roomsManager, 'createRoom').callsFake(() => {
+            stub(roomsManager, 'createRoom' as any).callsFake(() => {
                 return {
                     getRoomInfo: () => {
                         return;
@@ -282,7 +284,7 @@ describe('Rooms Manager Service', () => {
         });
 
         it('emitting join room should call the joinRoom function', (done) => {
-            const joinRoomStub = stub(roomsManager, 'joinRoom').callsFake(() => {
+            const joinRoomStub = stub(roomsManager, 'joinRoom' as any).callsFake(() => {
                 return;
             });
             server.on('connection', (serverSocket) => {
@@ -297,8 +299,8 @@ describe('Rooms Manager Service', () => {
     });
 
     it('removeSocketFromJoiningList should remove socket from joining list', () => {
-        roomsManager.joiningSockets = [socket];
+        roomsManager['joiningSockets'] = [socket];
         roomsManager.removeSocketFromJoiningList(socket);
-        expect(roomsManager.joiningSockets).to.deep.equal([]);
+        expect(roomsManager['joiningSockets']).to.deep.equal([]);
     });
 });

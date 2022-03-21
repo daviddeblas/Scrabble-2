@@ -18,18 +18,19 @@ export class Game {
     players: Player[];
     board: Board;
     activePlayer: number;
-    bag: Bag;
-    turnsSkipped: number;
-    placeCounter: number;
     gameFinished: boolean;
-    currentTimer: NodeJS.Timeout;
+    bag: Bag;
+
+    private turnsSkipped: number;
+    private placeCounter: number;
+    private currentTimer: NodeJS.Timeout;
 
     constructor(
         public config: GameConfig,
         playerNames: string[],
-        public gameOptions: GameOptions,
+        private gameOptions: GameOptions,
         private actionAfterTimeout: () => void,
-        public actionAfterTurn: () => void,
+        public actionAfterTurn: () => Promise<void>,
     ) {
         this.bag = new Bag(config);
         this.board = new Board(config);

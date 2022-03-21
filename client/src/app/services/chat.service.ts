@@ -5,7 +5,7 @@ import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -38,7 +38,11 @@ export class ChatService {
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('hint success', (data: { hints: string[] }) => {
-            const chatMessage = { username: '', message: data.hints.join('\n'), messageType: 'System' };
+            let message: string = data.hints.join('\n');
+            if (data.hints.length < HINT_COUNT) {
+                message = `${data.hints.length} indices trouvés\n` + message;
+            }
+            const chatMessage = { username: '', message, messageType: 'System' };
             this.store.dispatch(receivedMessage(chatMessage));
         });
         this.socketService.on('turn ended', () => {

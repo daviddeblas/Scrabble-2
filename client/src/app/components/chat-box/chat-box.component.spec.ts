@@ -141,4 +141,10 @@ describe('ChatBoxComponent', () => {
         component.clickout(e);
         expect(keyManagerMock.onEsc).not.toHaveBeenCalled();
     });
+
+    it('should call detectChanges() when ngAfterViewChecked is called', () => {
+        const spy = spyOn(component['changeDetector'], 'detectChanges');
+        component.ngAfterViewChecked();
+        expect(spy).toHaveBeenCalled();
+    });
 });

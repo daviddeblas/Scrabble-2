@@ -1,5 +1,6 @@
 export const BOARD_SIZE = 15;
 export const EASEL_CAPACITY = 7;
+export const HINT_COUNT = 3;
 
 export const POSITION_LAST_CHAR = -1;
 export const ASCII_ALPHABET_POSITION = 97;

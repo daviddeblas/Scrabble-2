@@ -4,10 +4,14 @@ import { RoomsManager } from './rooms-manager.service';
 
 @Service()
 export class BrowserService {
-    tempClientSocketId: string;
-    tempServerSocket: io.Socket;
-    timeoutId: ReturnType<typeof setTimeout>;
-    roomsManager = Container.get(RoomsManager);
+    private tempClientSocketId: string;
+    private tempServerSocket: io.Socket;
+    private timeoutId: ReturnType<typeof setTimeout>;
+    private roomsManager: RoomsManager;
+
+    constructor() {
+        this.roomsManager = Container.get(RoomsManager);
+    }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('closed browser', (userId) => {

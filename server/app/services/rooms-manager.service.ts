@@ -7,8 +7,13 @@ import { Service } from 'typedi';
 
 @Service()
 export class RoomsManager {
-    rooms: Room[] = [];
-    joiningSockets: io.Socket[] = [];
+    private rooms: Room[];
+    private joiningSockets: io.Socket[];
+
+    constructor() {
+        this.joiningSockets = [];
+        this.rooms = [];
+    }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('create solo room', (options) => {
@@ -32,23 +37,9 @@ export class RoomsManager {
         });
     }
 
-    createRoom(socket: io.Socket, options: GameOptions): Room {
-        const newRoom = new Room(socket, this, options);
-        this.rooms.push(newRoom);
-        this.notifyAvailableRoomsChange();
-        return newRoom;
-    }
-
     removeRoom(room: Room): void {
         this.rooms.splice(this.rooms.indexOf(room), 1);
         this.notifyAvailableRoomsChange();
-    }
-
-    joinRoom(roomId: string, socket: io.Socket, name: string): void {
-        const room = this.getRoom(roomId);
-        if (room) {
-            room.join(socket, name);
-        } else throw new GameError(GameErrorType.GameNotExists);
     }
 
     getRooms(): RoomInfo[] {
@@ -85,5 +76,19 @@ export class RoomsManager {
 
     removeSocketFromJoiningList(clientSocket: io.Socket) {
         this.joiningSockets.splice(this.joiningSockets.indexOf(clientSocket), 1);
+    }
+
+    private createRoom(socket: io.Socket, options: GameOptions): Room {
+        const newRoom = new Room(socket, this, options);
+        this.rooms.push(newRoom);
+        this.notifyAvailableRoomsChange();
+        return newRoom;
+    }
+
+    private joinRoom(roomId: string, socket: io.Socket, name: string): void {
+        const room = this.getRoom(roomId);
+        if (room) {
+            room.join(socket, name);
+        } else throw new GameError(GameErrorType.GameNotExists);
     }
 }
