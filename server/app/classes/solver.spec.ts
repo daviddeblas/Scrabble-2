@@ -240,7 +240,7 @@ describe('solver', () => {
         assert(filterInvalidAffectedWordsSpy.calledOnce);
     });
 
-    it('should search solution for each line', () => {
+    it('should search solution for each line', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const expected: Solution[] = [];
 
@@ -257,24 +257,24 @@ describe('solver', () => {
             return [sol];
         });
 
-        const solutions = solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions']();
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
     });
 
-    it('should call findFistSolutions when board empty', () => {
+    it('should call findFistSolutions when board empty', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         stub(solver as any, 'isBoardEmpty').returns(true);
         const findFirstSolutionsStub = stub(solver as any, 'findFirstSolutions').returns([]);
 
-        const solutions = solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions']();
         expect(solutions).to.deep.equal([]);
         assert(findFirstSolutionsStub.calledOnce);
     });
 
-    it('should return nothing if time expire', () => {
+    it('should return nothing if time expire', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         stub(solver as any, 'isBoardEmpty').returns(false);
@@ -298,12 +298,12 @@ describe('solver', () => {
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 2;
-        let result = solver['findAllSolutions']();
+        let result = await solver['findAllSolutions']();
         expect(result).to.deep.equal([]);
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 0.75;
-        result = solver['findAllSolutions']();
+        result = await solver['findAllSolutions']();
         expect(result).to.deep.equal([]);
 
         dateNowStub.restore();
@@ -374,7 +374,7 @@ describe('solver', () => {
         expect(hints).to.deep.equal(['!placer i8v ab', '!placer h5h cDe']);
     });
 
-    it('should return no hints when no solutions', () => {
+    it('should return no hints when no solutions', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const findSolutionStub = stub(solver as any, 'findAllSolutions').returns([]);
@@ -382,7 +382,7 @@ describe('solver', () => {
         const pickRandomSolutionsSpy = spy(solver as any, 'pickRandomSolutions');
         const solutionsToHintsSpy = spy(solver as any, 'solutionsToHints');
 
-        const results = solver.getHints();
+        const results = await solver.getHints();
         expect(results).to.deep.equals([]);
 
         assert(findSolutionStub.calledOnce);
@@ -390,7 +390,7 @@ describe('solver', () => {
         assert(solutionsToHintsSpy.notCalled);
     });
 
-    it('should hints', () => {
+    it('should hints', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const solutions: Solution[] = [...new Array(2)].map((_v, i) => {
@@ -405,7 +405,7 @@ describe('solver', () => {
         const pickRandomSolutionsSpy = spy(solver as any, 'pickRandomSolutions');
         const solutionsToHintsStub = stub(solver as any, 'solutionsToHints').returns(['abcdef']);
 
-        const results = solver.getHints();
+        const results = await solver.getHints();
         expect(results).to.deep.equals(['abcdef']);
 
         assert(findSolutionStub.calledOnce);
@@ -413,7 +413,7 @@ describe('solver', () => {
         assert(solutionsToHintsStub.calledWith(solutions));
     });
 
-    it('should return easy bot solution', () => {
+    it('should return easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const solutions: Solution[] = [...new Array(2)].map((v, i) => {
@@ -427,17 +427,17 @@ describe('solver', () => {
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);
 
-        const results = solver.getEasyBotSolutions();
+        const results = await solver.getEasyBotSolutions();
         expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
 
         assert(scorePositionStub.calledTwice);
         assert(findAllSolutionsStub.calledOnce);
     });
 
-    it('should return no easy bot solution', () => {
+    it('should return no easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([]);
-        const results = solver.getEasyBotSolutions();
+        const results = await solver.getEasyBotSolutions();
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
     });
