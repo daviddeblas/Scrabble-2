@@ -25,10 +25,10 @@ export enum CategoryOfPoints {
 
 @Service()
 export class BotService {
-    move(game: Game, difficulty: BotDifficulty): string {
+    async move(game: Game, difficulty: BotDifficulty): Promise<string> {
         let decidedMove = passCommandName;
         if (difficulty === BotDifficulty.Easy) {
-            decidedMove = this.easyBotMove(game);
+            decidedMove = await this.easyBotMove(game);
         }
         return decidedMove;
     }
@@ -37,7 +37,7 @@ export class BotService {
         return BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
     }
 
-    private easyBotMove(game: Game): string {
+    private async easyBotMove(game: Game): Promise<string> {
         const percentChance = 0.1;
         const randomMoveChance = Math.random();
         if (0 < randomMoveChance && randomMoveChance < percentChance) {
@@ -45,7 +45,7 @@ export class BotService {
         } else if (percentChance < randomMoveChance && randomMoveChance < percentChance * 2) {
             return this.exchangeCommand(game);
         } else {
-            return this.placeCommand(game, BotDifficulty.Easy);
+            return await this.placeCommand(game, BotDifficulty.Easy);
         }
     }
 
@@ -64,9 +64,9 @@ export class BotService {
         return exchangeCommandName + ' ' + exchangeCommandLetters;
     }
 
-    private placeCommand(game: Game, difficulty: BotDifficulty): string {
+    private async placeCommand(game: Game, difficulty: BotDifficulty): Promise<string> {
         const solver = new Solver(game.config.dictionary, game.board, game.players[1].easel);
-        const foundPlacements: [Solution, number][] = solver.getEasyBotSolutions();
+        const foundPlacements: [Solution, number][] = await solver.getEasyBotSolutions();
         if (foundPlacements.length === 0) return 'passer';
         return placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
     }

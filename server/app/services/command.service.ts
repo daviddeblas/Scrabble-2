@@ -15,9 +15,9 @@ import { DictionaryService } from './dictionary.service';
 @Service()
 export class CommandService {
     constructor(public dictionaryService: DictionaryService) {}
-    onCommand(game: Game, sockets: io.Socket[], command: string, playerNumber: number) {
+    async onCommand(game: Game, sockets: io.Socket[], command: string, playerNumber: number): Promise<void> {
         try {
-            this.processCommand(game, sockets, command, playerNumber);
+            await this.processCommand(game, sockets, command, playerNumber);
             this.postCommand(game, sockets);
         } catch (error) {
             this.errorOnCommand(game, sockets, error, playerNumber);
@@ -38,7 +38,7 @@ export class CommandService {
         };
     }
 
-    private processCommand(game: Game, sockets: io.Socket[], fullCommand: string, playerNumber: number): void {
+    private async processCommand(game: Game, sockets: io.Socket[], fullCommand: string, playerNumber: number): Promise<void> {
         if (game.gameFinished) throw new GameError(GameErrorType.GameIsFinished);
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
@@ -55,7 +55,7 @@ export class CommandService {
                 this.processBag(game, sockets, args, playerNumber);
                 break;
             case 'indice':
-                this.processHint(game, sockets, args, playerNumber);
+                await this.processHint(game, sockets, args, playerNumber);
                 break;
         }
     }
@@ -109,10 +109,10 @@ export class CommandService {
         });
     }
 
-    private processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private async processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): Promise<void> {
         if (args.length > 0) throw new GameError(GameErrorType.WrongHintArgument);
         const solver = new Solver(game.config.dictionary, game.board, game.players[playerNumber].easel);
-        const hints = solver.getHints();
+        const hints = await solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
     }
 

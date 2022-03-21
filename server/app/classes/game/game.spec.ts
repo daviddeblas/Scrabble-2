@@ -20,6 +20,9 @@ describe('game', () => {
     const timerCallbackMock = () => {
         return;
     };
+    const afterTurnCallbackMock: () => Promise<void> = async () => {
+        return;
+    };
 
     before(() => {
         Container.get(DictionaryService).init();
@@ -27,7 +30,7 @@ describe('game', () => {
     });
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, timerCallbackMock);
+        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, afterTurnCallbackMock);
         activePlayer = game.activePlayer;
     });
 

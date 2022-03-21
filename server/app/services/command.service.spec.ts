@@ -48,7 +48,7 @@ describe('Individual functions', () => {
         sockets.push(createFakeSocket(1));
     });
 
-    it('onCommand should call processCommand and postCommand', () => {
+    it('onCommand should call processCommand and postCommand', async () => {
         const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
             return;
         });
@@ -67,7 +67,7 @@ describe('Individual functions', () => {
             },
         } as unknown as Game;
 
-        commandService.onCommand(game, sockets, 'passer', 0);
+        await commandService.onCommand(game, sockets, 'passer', 0);
         expect(processStub.calledOnce && postCommandStub.calledOnce).to.equal(true);
     });
 
@@ -287,10 +287,10 @@ describe('commands', () => {
             commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
-        it('string with place calls processPlace', () => {
+        it('string with place calls processPlace', (done) => {
             const fullCommand = 'placer h3h h';
             game.gameFinished = true;
-            expect(() => commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer)).to.throw();
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer).catch(() => done());
         });
 
         it('string with skip calls processBag', (done) => {
@@ -302,7 +302,7 @@ describe('commands', () => {
         });
 
         it('string with hint calls processHint', (done) => {
-            commandService['processHint'] = () => {
+            commandService['processHint'] = async () => {
                 done();
             };
             const fullCommand = 'indice';
@@ -333,8 +333,8 @@ describe('commands', () => {
         expect(() => commandService['processSkip'](game, room.sockets, ['a', 'b'], 0)).to.throw();
     });
 
-    it('processHint with arguments should throw an error', () => {
-        expect(() => commandService['processHint'](game, room.sockets, ['a', 'b'], 0)).to.throw();
+    it('processHint with arguments should throw an error', (done) => {
+        commandService['processHint'](game, room.sockets, ['a', 'b'], 0).catch(() => done());
     });
 
     it('ProcessSkip should emit skip success when player number is 0', (done) => {
