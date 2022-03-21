@@ -50,6 +50,7 @@
             [letter]="letter.letter"
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
             [blank]="letter.blank"
+            [color]="letter.lastPlacedWord"
         ></g>
     </g>
 

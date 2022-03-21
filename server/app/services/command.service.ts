@@ -79,8 +79,11 @@ export class CommandService {
 
     private processPlace(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         if (!this.validatePlace(game.config, args)) throw new GameError(GameErrorType.WrongPlaceArgument);
+        const pointBeforePlacement = game.players[playerNumber].score;
         const argsForParsePlaceCall = this.parsePlaceCall(game, args);
         game.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
+        const pointsWon = game.players[playerNumber].score - pointBeforePlacement;
+        args.push('- ' + pointsWon + ' points');
         sockets.forEach((s) => {
             s.emit('place success', { args, username: game.players[playerNumber].name });
         });
