@@ -29,7 +29,7 @@ export class DatabaseService {
         }
     }
 
-    async closeConnection() {
+    async closeConnection(): Promise<void> {
         return this.client.close();
     }
 
