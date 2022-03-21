@@ -192,4 +192,10 @@ describe('ChatBoxComponent', () => {
         fixture.detectChanges();
         expect(component['chatMessage'].nativeElement.value).toEqual(expectedMessage);
     });
+
+    it('should call detectChanges() when ngAfterViewChecked is called', () => {
+        const spy = spyOn(component['changeDetector'], 'detectChanges');
+        component.ngAfterViewChecked();
+        expect(spy).toHaveBeenCalled();
+    });
 });
