@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { initiateChatting, restoreMessages } from '@app/actions/chat.actions';
 import { getGameStatus, refreshTimer } from '@app/actions/game-status.actions';
 import { ChatBox } from '@app/reducers/chat.reducer';
+import { GameStatus } from '@app/reducers/game-status.reducer';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs/operators';
@@ -12,7 +13,7 @@ const thousandMilliseconds = 1000;
     providedIn: 'root',
 })
 export class BrowserManagerService {
-    constructor(public socketService: SocketClientService, private store: Store, private chatStore: Store<{ chat: ChatBox }>) {}
+    constructor(public socketService: SocketClientService, private store: Store<{ gameStatus: GameStatus; chat: ChatBox }>) {}
     onBrowserClosed(): void {
         this.socketService.send('closed browser', this.socketService.socket.id);
         const date = new Date();
@@ -37,19 +38,20 @@ export class BrowserManagerService {
             if (!oldTimer) return;
             const parsedTimer = JSON.parse(oldTimer);
             const diffDate = Math.round((date.getTime() - parsedTimer.date) / thousandMilliseconds);
-            this.store.dispatch(refreshTimer({ timer: parsedTimer.countdown - diffDate }));
+            let timer = 0;
+            this.store.select('gameStatus').subscribe((gameStatus) => (timer = gameStatus.timer));
+            this.store.dispatch(refreshTimer({ timer: (parsedTimer.countdown - diffDate) % timer }));
         }, waitingTime);
     }
 
     private storeSelectors(): void {
-        this.chatStore
+        this.store
             .select('chat')
             .pipe(take(1))
             .subscribe((messages) => localStorage.setItem('chatMessages', JSON.stringify(messages.chatMessage)));
     }
 
     private retrieveSelectors(): void {
-        this.store.dispatch(getGameStatus());
         const oldMessages = localStorage.getItem('chatMessages');
         localStorage.removeItem('chatMessages');
         if (!oldMessages) return;

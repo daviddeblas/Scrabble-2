@@ -19,7 +19,10 @@ describe('BrowserManagerService', () => {
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
-                    selectors: [{ selector: 'chat', value: { chatMessage: [{ username: 'Player', message: 'Message' }], lastSendMessage: [] } }],
+                    selectors: [
+                        { selector: 'chat', value: { chatMessage: [{ username: 'Player', message: 'Message' }], lastSendMessage: [] } },
+                        { selector: 'gameStatus', value: { timer: DEFAULT_TIMER } },
+                    ],
                 }),
             ],
         }).compileComponents();
@@ -131,7 +134,7 @@ describe('BrowserManagerService', () => {
 
     it('should dispatch refreshTimer if there is the currentTimer key in LocalStorage', (done) => {
         const date = new Date();
-        localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER, date: date.getTime() }));
+        localStorage.setItem('currentTimer', JSON.stringify({ countdown: DEFAULT_TIMER - 1, date: date.getTime() }));
         const spy = spyOn(service['store'], 'dispatch');
         const fakeSend = () => {
             return ' ';
@@ -139,7 +142,7 @@ describe('BrowserManagerService', () => {
         spyOnProperty(service, 'readCookieSocket', 'get').and.callFake(fakeSend);
         service.onBrowserLoad();
         setTimeout(() => {
-            expect(spy).toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER }));
+            expect(spy).toHaveBeenCalledWith(refreshTimer({ timer: DEFAULT_TIMER - 1 }));
             localStorage.clear();
             done();
         }, waitingTime);
