@@ -111,7 +111,7 @@ describe('Database service', () => {
     it('should reset the database when calling resetDB', async () => {
         const mongoUri = await mongoServer.getUri();
         await databaseService.start(mongoUri);
-        databaseService.resetDB();
+        await databaseService.resetDB();
         const scoreClassic = await databaseService.getHighscores('classical');
         expect(scoreClassic).to.be.empty;
     });
