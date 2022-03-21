@@ -91,6 +91,17 @@ describe('Individual functions', () => {
         expect(processStub.calledOnce && gameEndedCalled && errorOnCommandStub.calledOnce).to.equal(true);
     });
 
+    it('actionAfterTimeout should call processSkip and postCommand', async () => {
+        const skipStub = stub(commandService as any, 'processSkip');
+        const postCommandStub = stub(commandService as any, 'postCommand');
+        const fakeGame = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
+        const roomStub = { game: fakeGame, commandService } as unknown as Room;
+
+        commandService['actionAfterTimeout'](roomStub)();
+        expect(skipStub.calledOnce).to.equal(true);
+        expect(postCommandStub.calledOnce).to.equal(true);
+    });
+
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
         sockets[0] = {
             emit: (event: string) => {
