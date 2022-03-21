@@ -1,4 +1,3 @@
-import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { removeLetterFromEasel } from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
@@ -15,12 +14,10 @@ import { PlayerService } from './player.service';
 describe('KeyManagerService', () => {
     let service: KeyManagerService;
     let store: MockStore;
-    let mockDocument: { activeElement: { nodeName: string } };
     let boardStub: Letter[][];
     let selectionStub: BoardSelection;
 
     beforeEach(() => {
-        mockDocument = { activeElement: { nodeName: 'NOTBODY' } };
         boardStub = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
         boardStub[0][0] = 'L';
         boardStub[1][0] = 'E';
@@ -39,7 +36,6 @@ describe('KeyManagerService', () => {
                         },
                     ],
                 }),
-                { provide: DOCUMENT, useValue: mockDocument },
                 {
                     provide: PlayerService,
                     useValue: {
@@ -177,13 +173,25 @@ describe('KeyManagerService', () => {
         });
 
         it('onEnter should set the orientation depending on the modified cells position', () => {
+            // Horizontal
             selectionStub.orientation = null;
             store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
             service.onEnter();
 
-            const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            let placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
             expect(placeWordAction.position).toEqual('a1h');
+
+            // Vertical
+            actions = [];
+            selectionStub.orientation = null;
+            selectionStub.modifiedCells = [new Vec2(0, 0), new Vec2(0, 1)];
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
+
+            service.onEnter();
+
+            placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            expect(placeWordAction.position).toEqual('a1v');
         });
 
         it('onEnter should set blank letters in capital when place word action is called', () => {
@@ -196,6 +204,15 @@ describe('KeyManagerService', () => {
 
             const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
             expect(placeWordAction.letters).toEqual('lE');
+        });
+
+        it('onEnter should set blank letters in capital when place word action is called', () => {
+            selectionStub.modifiedCells = [];
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
+
+            service.onEnter();
+
+            expect(dispatchSpy).not.toHaveBeenCalled();
         });
 
         it('onEsc should dispatch addLettersToEasel, removeLetters and clearSelection', () => {
@@ -235,6 +252,24 @@ describe('KeyManagerService', () => {
             expect(addLettersToEaselAction.letters).toEqual(['E']);
 
             expect(actions[1].type).toEqual('[Board] Selection Backspace');
+        });
+
+        it("onBackspace shouldn't dispatch anything if there are no modifiedCells", () => {
+            selectionStub.modifiedCells = [];
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
+
+            service.onBackspace();
+
+            expect(dispatchSpy).not.toHaveBeenCalled();
+        });
+
+        it('onBackspace should dispatch addLettersToEasel with a blank letter with a blank was placed', () => {
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
+
+            service.onBackspace();
+
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.letters).toEqual(['*']);
         });
     });
 });

@@ -86,14 +86,16 @@ export class KeyManagerService {
         let letter: Letter = '*';
         let lastCell: Vec2 | null = null;
         let blanks: iVec2[] = [];
+        let hasModifiedCells = true;
         this.store.select('board').subscribe((state) => {
-            if (state.selection.modifiedCells.length === 0) return;
+            hasModifiedCells = state.selection.modifiedCells.length > 0;
+            if (!hasModifiedCells) return;
             lastCell = state.selection.modifiedCells[state.selection.modifiedCells.length - 1] as Vec2;
             letter = state.board[lastCell.x][lastCell.y] as Letter;
             blanks = state.blanks;
         });
 
-        if (!lastCell) return;
+        if (lastCell === null || !hasModifiedCells) return;
         if (blanks.length > 0 && (lastCell as Vec2).equals(blanks[blanks.length - 1])) letter = BLANK_LETTER;
 
         this.store.dispatch(addLettersToEasel({ letters: [letter] }));
