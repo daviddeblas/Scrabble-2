@@ -12,7 +12,7 @@ export const cellClick = createAction('[Board] Cell Clicked', props<{ pos: iVec2
 
 export const keyDown = createAction('[Board] Key Down', props<{ key: string }>());
 
-export const placeLetter = createAction('[Board] Letter Placed', props<{ letter: Letter }>());
+export const placeLetter = createAction('[Board] Letter Placed', props<{ letter: Letter; isBlank: boolean }>());
 
 export const removeLetters = createAction('[Board] Letters Removed', props<{ positions: iVec2[] }>());
 

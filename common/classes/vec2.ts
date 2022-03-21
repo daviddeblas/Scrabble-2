@@ -8,15 +8,15 @@ export interface iVec2 {
 export class Vec2 implements iVec2 {
     constructor(public x: number, public y: number) {}
 
-    equals(b: Vec2): boolean {
+    equals(b: iVec2): boolean {
         return this.x === b.x && this.y === b.y;
     }
 
-    add(b: Vec2): Vec2 {
+    add(b: iVec2): Vec2 {
         return new Vec2(this.x + b.x, this.y + b.y);
     }
 
-    sub(b: Vec2): Vec2 {
+    sub(b: iVec2): Vec2 {
         return new Vec2(this.x - b.x, this.y - b.y);
     }
 
@@ -30,6 +30,10 @@ export class Vec2 implements iVec2 {
 
     copy(): Vec2 {
         return new Vec2(this.x, this.y);
+    }
+
+    toInterface(): iVec2 {
+        return { x: this.x, y: this.y };
     }
 }
 

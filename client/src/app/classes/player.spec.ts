@@ -40,5 +40,11 @@ describe('Player', () => {
             player.removeLettersFromEasel(letters);
             expect(player.easel).toEqual(['A', 'Y', 'W']);
         });
+
+        it("shouldn't do anything if the easel doesn't contain the letters to remove", () => {
+            player.easel = ['I', 'A', 'O', 'U', 'Y', 'W'];
+            player.removeLettersFromEasel(['E', 'H', 'L']);
+            expect(player.easel).toEqual(['I', 'A', 'O', 'U', 'Y', 'W']);
+        });
     });
 });
