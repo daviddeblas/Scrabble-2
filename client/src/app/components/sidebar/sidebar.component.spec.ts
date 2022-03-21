@@ -8,6 +8,7 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { KeyManagerService } from '@app/services/key-manager.service';
 import { StoreModule } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { DEFAULT_TIMER } from 'common/constants';
 import { cold } from 'jasmine-marbles';
 import { SidebarComponent } from './sidebar.component';
 
@@ -23,7 +24,17 @@ describe('SidebarComponent', () => {
         await TestBed.configureTestingModule({
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, StoreModule.forRoot({})],
             declarations: [SidebarComponent],
-            providers: [provideMockStore(), { provide: KeyManagerService, useValue: keyManagerMock }],
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameStatus',
+                            value: { activePlayer: 'moi', timer: DEFAULT_TIMER },
+                        },
+                    ],
+                }),
+                { provide: KeyManagerService, useValue: keyManagerMock },
+            ],
         }).compileComponents();
         eventStub = {
             preventDefault: () => {

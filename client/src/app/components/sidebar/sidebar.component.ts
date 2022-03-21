@@ -31,10 +31,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.players$ = store.select('players');
         this.gameStatus$ = store.select('gameStatus');
         this.gameStatus$.subscribe((state) => {
-            if (state) {
-                this.activePlayer = state.activePlayer;
-                this.countdown = state.timer;
-            }
+            this.activePlayer = state.activePlayer;
+            this.countdown = state.timer;
         });
         this.modifiedCells$ = store.select('board', 'selection', 'modifiedCells');
         this.countdown = 0;
