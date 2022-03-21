@@ -182,7 +182,7 @@ describe('[Board] Reducer', () => {
     });
 
     describe('[Board] Letter Placed', () => {
-        const action = placeLetter({ letter: 'A' });
+        const action = placeLetter({ letter: 'A', isBlank: false });
         let initialSelectionPosition: Vec2;
 
         beforeEach(() => {

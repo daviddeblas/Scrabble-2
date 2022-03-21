@@ -5,6 +5,7 @@ import { BoardSelection } from '@app/classes/board-selection';
 import { Direction } from '@app/enums/direction';
 import { createEmptyMatrix } from '@app/reducers/board.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { cold } from 'jasmine-marbles';
@@ -15,9 +16,15 @@ describe('KeyManagerService', () => {
     let service: KeyManagerService;
     let store: MockStore;
     let mockDocument: { activeElement: { nodeName: string } };
+    let boardStub: Letter[][];
+    let selectionStub: BoardSelection;
 
     beforeEach(() => {
         mockDocument = { activeElement: { nodeName: 'NOTBODY' } };
+        boardStub = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
+        boardStub[0][0] = 'L';
+        boardStub[1][0] = 'E';
+        selectionStub = new BoardSelection(new Vec2(2, 0), Direction.HORIZONTAL, [new Vec2(0, 0), new Vec2(1, 0)]);
         TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
@@ -25,8 +32,9 @@ describe('KeyManagerService', () => {
                         {
                             selector: 'board',
                             value: {
-                                board: createEmptyMatrix({ x: 15, y: 15 }),
-                                selection: new BoardSelection(new Vec2(0, 2), Direction.HORIZONTAL, [new Vec2(0, 0), new Vec2(0, 1)]),
+                                board: boardStub,
+                                selection: selectionStub,
+                                blanks: [],
                             },
                         },
                     ],
@@ -50,88 +58,131 @@ describe('KeyManagerService', () => {
         expect(service).toBeTruthy();
     });
 
-    it("onKey shouldn't do anything if the board selection cell is null", () => {
-        store.overrideSelector('board', { selection: new BoardSelection() });
-        const dispatchSpy = spyOn(store, 'dispatch');
+    describe('KeyManager.onKey', () => {
+        it("onKey shouldn't do anything if the board selection cell is null", () => {
+            store.overrideSelector('board', { selection: new BoardSelection() });
+            const dispatchSpy = spyOn(store, 'dispatch');
 
-        service.onKey('a');
-        expect(dispatchSpy).not.toHaveBeenCalled();
-    });
-
-    it('onKey should the right method if receiving Enter, Escape or Backspace', () => {
-        const enterSpy = spyOn(service, 'onEnter');
-        service.onKey('Enter');
-        expect(enterSpy).toHaveBeenCalled();
-
-        const escSpy = spyOn(service, 'onEsc');
-        service.onKey('Escape');
-        expect(escSpy).toHaveBeenCalled();
-
-        const backspaceSpy = spyOn(service, 'onBackspace');
-        service.onKey('Backspace');
-        expect(backspaceSpy).toHaveBeenCalled();
-    });
-
-    it("onKey shouldn't do anything if receiving a key longer than 1 char that isn't enter, escape of backspace", () => {
-        const dispatchSpy = spyOn(store, 'dispatch');
-
-        service.onKey('Shift');
-        expect(dispatchSpy).not.toHaveBeenCalled();
-    });
-
-    it("onKey shouldn't do anything if the selection is filed with a letter and is at board limit", () => {
-        const customBoard = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
-        customBoard[BOARD_SIZE - 1][0] = 'a';
-
-        store.overrideSelector('board', {
-            board: customBoard,
-            selection: new BoardSelection(new Vec2(BOARD_SIZE - 1, 0), Direction.HORIZONTAL, [new Vec2(BOARD_SIZE - 1, 0)]),
+            service.onKey('a');
+            expect(dispatchSpy).not.toHaveBeenCalled();
         });
 
-        const dispatchSpy = spyOn(store, 'dispatch');
+        it('onKey should the right method if receiving Enter, Escape or Backspace', () => {
+            const enterSpy = spyOn(service, 'onEnter');
+            service.onKey('Enter');
+            expect(enterSpy).toHaveBeenCalled();
 
-        service.onKey('a');
-        expect(dispatchSpy).not.toHaveBeenCalled();
+            const escSpy = spyOn(service, 'onEsc');
+            service.onKey('Escape');
+            expect(escSpy).toHaveBeenCalled();
+
+            const backspaceSpy = spyOn(service, 'onBackspace');
+            service.onKey('Backspace');
+            expect(backspaceSpy).toHaveBeenCalled();
+        });
+
+        it("onKey shouldn't do anything if receiving a key longer than 1 char that isn't enter, escape of backspace", () => {
+            const dispatchSpy = spyOn(store, 'dispatch');
+
+            service.onKey('Shift');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+        });
+
+        it("onKey shouldn't do anything if the selection is filed with a letter and is at board limit", () => {
+            const customBoard = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
+            customBoard[BOARD_SIZE - 1][0] = 'a';
+
+            store.overrideSelector('board', {
+                board: customBoard,
+                selection: new BoardSelection(new Vec2(BOARD_SIZE - 1, 0), Direction.HORIZONTAL, [new Vec2(BOARD_SIZE - 1, 0)]),
+            });
+
+            const dispatchSpy = spyOn(store, 'dispatch');
+
+            service.onKey('a');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+        });
+
+        it("onKey shouldn't do anything if the letter is not in the player easel", () => {
+            const dispatchSpy = spyOn(store, 'dispatch');
+
+            service.onKey('z');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+        });
+
+        it('onKey should dispatch placeLetter and removeLetterFromEasel', () => {
+            service.onKey('a');
+
+            const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('onKey should convert letters with accent to their counterpart without accents', () => {
+            service.onKey('à');
+
+            const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('onKey should convert letters with accent to their counterpart without accents', () => {
+            service.onKey('à');
+
+            const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('onKey should add the blank to the service blank list', () => {
+            service.onKey('G');
+
+            const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: '*' }) });
+
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
     });
 
-    it("onKey shouldn't do anything if the letter is not in the player easel", () => {
-        const dispatchSpy = spyOn(store, 'dispatch');
+    describe('KeyManager.onEnter', () => {
+        const actions: { type: string }[] = [];
+        let dispatchSpy: jasmine.Spy;
 
-        service.onKey('z');
-        expect(dispatchSpy).not.toHaveBeenCalled();
-    });
+        beforeEach(() => {
+            dispatchSpy = spyOn(store, 'dispatch').and.callFake((action) => {
+                actions.push(action);
+            });
+        });
 
-    it('onKey should dispatch placeLetter and removeLetterFromEasel', () => {
-        service.onKey('a');
+        it('should dispatch addLettersToEasel, removeLetters, placeWord and clearSelection', () => {
+            service.onEnter();
 
-        const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(dispatchSpy).toHaveBeenCalledTimes(4);
 
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
+            const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
+            expect(addLettersToEaselAction.type).toEqual('[Players] Add Letters To Easel');
+            expect(addLettersToEaselAction.letters).toEqual(['L', 'E']);
 
-    it('onKey should convert letters with accent to their counterpart without accents', () => {
-        service.onKey('à');
+            const removeLetterAction = actions[1] as unknown as { type: string; positions: Vec2[] };
+            expect(removeLetterAction.type).toEqual('[Board] Letters Removed');
+            expect(removeLetterAction.positions).toEqual([new Vec2(0, 0), new Vec2(1, 0)]);
 
-        const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+            const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            expect(placeWordAction.type).toEqual('[Players] Place Word');
+            expect(placeWordAction.position).toEqual('a1h');
+            expect(placeWordAction.letters).toEqual('le');
 
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
+            expect(actions[3].type).toEqual('[Board] Selection Cleared');
+        });
 
-    it('onKey should convert letters with accent to their counterpart without accents', () => {
-        service.onKey('à');
+        it('should set the orientation depending on the modified cells position', () => {
+            selectionStub.orientation = null;
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
-        const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: 'A' }) });
+            service.onEnter();
 
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-    });
-
-    it('onKey should add the blank to the service blank list', () => {
-        service.onKey('G');
-
-        const expectedAction = cold('a', { a: removeLetterFromEasel({ letter: '*' }) });
-
-        expect(store.scannedActions$).toBeObservable(expectedAction);
-        expect(service.blankLettersBuffer.length > 0).toBeTruthy();
-        expect(service.blankLettersBuffer[0]).toEqual('G');
+            const placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            expect(placeWordAction.position).toEqual('a1h');
+        });
     });
 });
