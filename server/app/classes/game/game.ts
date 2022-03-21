@@ -30,7 +30,7 @@ export class Game {
         playerNames: string[],
         private gameOptions: GameOptions,
         private actionAfterTimeout: () => void,
-        public actionAfterTurn: () => void,
+        public actionAfterTurn: () => Promise<void>,
     ) {
         this.bag = new Bag(config);
         this.board = new Board(config);

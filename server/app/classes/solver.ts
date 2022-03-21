@@ -5,9 +5,13 @@ import { Word } from '@app/interfaces/word';
 import { Letter } from 'common/classes/letter';
 import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { promisify } from 'util';
 import { Dictionary } from './dictionary';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
+
+// éviter de bloquer la event loop pendant trop longtemps dans les calculs
+const immediatePromise: () => Promise<void> = promisify(setImmediate);
 
 export class Solver {
     constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}
@@ -27,17 +31,17 @@ export class Solver {
         return `${pos} ${lettersString}`;
     }
 
-    getHints(): string[] {
-        const solutions: Solution[] = this.findAllSolutions();
+    async getHints(): Promise<string[]> {
+        const solutions: Solution[] = await this.findAllSolutions();
         if (solutions.length < 1) return [];
 
         const randomSolutions = this.pickRandomSolutions(solutions);
         return this.solutionsToHints(randomSolutions);
     }
 
-    getEasyBotSolutions(): [Solution, number][] {
+    async getEasyBotSolutions(): Promise<[Solution, number][]> {
         const result: [Solution, number][] = [];
-        const allSolutions: Solution[] = this.findAllSolutions();
+        const allSolutions: Solution[] = await this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
             const score = this.board.scorePosition(solution.letters);
@@ -46,18 +50,21 @@ export class Solver {
         return result;
     }
 
-    private findAllSolutions(): Solution[] {
+    private async findAllSolutions(): Promise<Solution[]> {
+        await immediatePromise();
         if (this.isBoardEmpty()) return this.findFirstSolutions();
         const solutions: Solution[] = [];
         const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
         for (let i = 0; i < BOARD_SIZE; i++) {
             solutions.push(...this.findLineSolutions(this.board.board[i], i, new Vec2(0, 1)));
             if (Date.now() > expiration) return [];
+            await immediatePromise();
         }
         for (let i = 0; i < BOARD_SIZE; i++) {
             const line = this.board.board.reduce((r, v) => [...r, v[i]], []);
             solutions.push(...this.findLineSolutions(line, i, new Vec2(1, 0)));
             if (Date.now() > expiration) return [];
+            await immediatePromise();
         }
         return solutions;
     }

@@ -84,7 +84,7 @@ export class Room {
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(),
-            () => {
+            async () => {
                 return;
             },
         );
@@ -176,13 +176,13 @@ export class Room {
         });
     }
 
-    private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => void {
-        return () => {
+    private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => Promise<void> {
+        return async () => {
             const game = this.game as Game;
             if (game.activePlayer === 1 && !game.gameFinished) {
                 let date = new Date();
                 const startDate = date.getTime();
-                const botCommand = room.botService.move(game, diff);
+                const botCommand = await room.botService.move(game, diff);
                 date = new Date();
                 const timeTaken = date.getTime() - startDate;
                 setTimeout(() => {
