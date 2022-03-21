@@ -8,7 +8,7 @@ import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import io from 'socket.io';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
 import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
 

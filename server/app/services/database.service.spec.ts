@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -31,6 +32,7 @@ describe('Database service', () => {
         const mongoUri = await mongoServer.getUri();
         await databaseService.start(mongoUri);
         expect(databaseService['client']).to.not.be.undefined;
+        expect(databaseService['db'].databaseName).to.equal('database');
     });
 
     it('should not connect to the database when databaseConnect is called with the wrong URL', async () => {
@@ -43,14 +45,21 @@ describe('Database service', () => {
     });
 
     it('should no longer be connected if close is called', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.closeConnection();
         expect(databaseService['client']).to.be.false;
     });
 
+    it('should populate the database when start is called', async () => {
+        const mongoUri = mongoServer.getUri();
+        await databaseService.start(mongoUri);
+        const scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        expect(scores.length).to.equal(5);
+    });
+
     it('should not populate the database with start function if it is already populated', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         let scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
         expect(scores.length).to.equal(5);
@@ -60,17 +69,8 @@ describe('Database service', () => {
         expect(scores.length).to.equal(5);
     });
 
-    it('should return the right highscore list when connecting to the database', async () => {
-        const mongoUri = await mongoServer.getUri();
-        await databaseService.start(mongoUri);
-        const scoreClassical = await databaseService.getHighscores('classical');
-        expect(scoreClassical[0].name).to.equal('name1');
-        expect(scoreClassical[1].name).to.equal('name2');
-        expect(scoreClassical[2].name).to.equal('name3');
-    });
-
     it('should insert default scores in the database', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         const scoreClassic = await databaseService.getHighscores('classical');
         const scoreLog2990 = await databaseService.getHighscores('log2990');
@@ -78,8 +78,19 @@ describe('Database service', () => {
         expect(scoreLog2990.length).to.equal(5);
     });
 
+    it('should return the right highscore list when connecting to the database', async () => {
+        const mongoUri = mongoServer.getUri();
+        await databaseService.start(mongoUri);
+        const scoreClassical = await databaseService.getHighscores('classical');
+        expect(scoreClassical[0].name).to.equal('name1');
+        expect(scoreClassical[1].name).to.equal('name2');
+        expect(scoreClassical[2].name).to.equal('name3');
+        expect(scoreClassical[3].name).to.equal('name4');
+        expect(scoreClassical[4].name).to.equal('name5');
+    });
+
     it('should updateHighScore when a higher score has been reached in Classical', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.updateHighScore(player1, 'classical');
         const scoreClassic = await databaseService.getHighscores('classical');
@@ -87,8 +98,8 @@ describe('Database service', () => {
         expect(scoreClassic[0].score).to.equal(10);
     });
 
-    it('should not updateHighScore when a new score is lower or equal than all of the current highscores in Classical', async () => {
-        const mongoUri = await mongoServer.getUri();
+    it('should not updateHighScore when a new score is lower than all of the current highscores in Classical', async () => {
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.updateHighScore(player2, 'classical');
         const scoreClassic = await databaseService.getHighscores('classical');
@@ -98,11 +109,9 @@ describe('Database service', () => {
     });
 
     it('should reset the database when calling resetDB', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        setTimeout(() => {
-            databaseService.resetDB();
-        }, 5000);
+        databaseService.resetDB();
         const scoreClassic = await databaseService.getHighscores('classical');
         expect(scoreClassic).to.be.empty;
     });
