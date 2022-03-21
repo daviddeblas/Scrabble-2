@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { backspaceSelection, cellClick, clearSelection, placeLetter, removeLetters, syncBoardSuccess } from '@app/actions/board.actions';
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
@@ -255,21 +256,36 @@ describe('[Board] Reducer', () => {
 
             expect(result.selection.orientation).toBeNull();
         });
+
+        it('should add blank position to the blank list', () => {
+            const result = reducer(boardStub, placeLetter({ letter: 'A', isBlank: true }));
+
+            expect(result.blanks.length).toEqual(1);
+            expect(result.blanks[0]).toEqual(new Vec2(6, 6));
+        });
     });
 
     describe('[Board] Letters Removed', () => {
-        const action = removeLetters({
-            positions: [
-                { x: 5, y: 5 },
-                { x: 5, y: 6 },
-            ],
-        });
-
         it('should set the given position cells to null in the board', () => {
+            const action = removeLetters({
+                positions: [
+                    { x: 5, y: 5 },
+                    { x: 5, y: 6 },
+                ],
+            });
             const result = reducer(boardStub, action);
 
             expect(result.board[action.positions[0].x][action.positions[0].y]).toBeNull();
             expect(result.board[action.positions[1].x][action.positions[1].y]).toBeNull();
+        });
+
+        it("shouldn't do anything if positions is empty", () => {
+            const action = removeLetters({
+                positions: [],
+            });
+            const result = reducer(boardStub, action);
+
+            expect(result).toBe(boardStub);
         });
     });
 
@@ -323,7 +339,7 @@ describe('[Board] Reducer', () => {
             expect(result.selection.orientation).toBeNull();
         });
 
-        it('should clear the selection if the no cell were modified', () => {
+        it('should clear the selection if the no cells were modified', () => {
             boardStub.selection.modifiedCells = [];
             const result = reducer(boardStub, action);
 
@@ -335,6 +351,13 @@ describe('[Board] Reducer', () => {
             const result = reducer(boardStub, action);
 
             expect(result).toBe(boardStub);
+        });
+
+        it('should remove the blank if the last modified cell was a blank', () => {
+            boardStub.blanks = [initialModifiedCell];
+            const result = reducer(boardStub, action);
+
+            expect(result.blanks.length).toEqual(0);
         });
     });
 });
