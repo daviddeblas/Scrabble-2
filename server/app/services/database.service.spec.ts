@@ -124,9 +124,9 @@ describe('Database service', () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.updateHighScore(player3, 'classical');
-        await databaseService.updateHighScore(player1, 'classical');
+        await databaseService.updateHighScore(player3, 'classical');
         const scoreClassic = await databaseService.getHighscores('classical');
-        expect(scoreClassic[0].name).to.equal('fakePlayer3 - fakePlayer1');
+        expect(scoreClassic[0].name).to.equal('fakePlayer3');
     });
 
     it('should not updateHighScore when a new score is lower than all of the current highscores in Classical', async () => {

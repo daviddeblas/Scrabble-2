@@ -33,22 +33,6 @@ export class DatabaseService {
         return this.client.close();
     }
 
-    async populateDBClassical() {
-        const scores: HighScore[] = DEFAULT_HIGHSCORE.classical;
-
-        for (const score of scores) {
-            await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
-        }
-    }
-
-    async populateDBlog2990() {
-        const scores: HighScore[] = DEFAULT_HIGHSCORE.log2990;
-
-        for (const score of scores) {
-            await this.highScoreDB.collection(DATABASE.highScore.collections.log2990).insertOne(score);
-        }
-    }
-
     async getHighscores(gameMode: string): Promise<HighScore[]> {
         return this.highScoreDB
             .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
@@ -91,5 +75,21 @@ export class DatabaseService {
                 socket.emit('receive log2990 highscores', value);
             });
         });
+    }
+
+    private async populateDBClassical() {
+        const scores: HighScore[] = DEFAULT_HIGHSCORE.classical;
+
+        for (const score of scores) {
+            await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
+        }
+    }
+
+    private async populateDBlog2990() {
+        const scores: HighScore[] = DEFAULT_HIGHSCORE.log2990;
+
+        for (const score of scores) {
+            await this.highScoreDB.collection(DATABASE.highScore.collections.log2990).insertOne(score);
+        }
     }
 }
