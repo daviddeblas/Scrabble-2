@@ -84,6 +84,17 @@ describe('KeyManagerService', () => {
             expect(dispatchSpy).not.toHaveBeenCalled();
         });
 
+        it("onKey shouldn't do anything the focus is on something else than the body", () => {
+            const testButton = document.createElement('button');
+            document.body.appendChild(testButton);
+            testButton.focus();
+            const dispatchSpy = spyOn(store, 'dispatch');
+            service.onKey('a');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+            document.body.removeChild(testButton);
+            document.body.focus();
+        });
+
         it("onKey shouldn't do anything if the selection is filed with a letter and is at board limit", () => {
             const customBoard = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
             customBoard[BOARD_SIZE - 1][0] = 'a';
