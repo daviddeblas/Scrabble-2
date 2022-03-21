@@ -48,11 +48,8 @@ describe('Individual functions', () => {
         sockets.push(createFakeSocket(1));
     });
 
-    it('onCommand should call processCommand and postCommand', async () => {
+    it('onCommand should call processCommand', async () => {
         const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
-            return;
-        });
-        const postCommandStub = stub(commandService, 'postCommand' as any).callsFake(() => {
             return;
         });
 
@@ -68,7 +65,7 @@ describe('Individual functions', () => {
         } as unknown as Game;
 
         await commandService.onCommand(game, sockets, 'passer', 0);
-        expect(processStub.calledOnce && postCommandStub.calledOnce).to.equal(true);
+        expect(processStub.calledOnce).to.equal(true);
     });
 
     it('onCommand should call errorOnCommand if an error was thrown and gameEnded if game exists', () => {
@@ -91,10 +88,13 @@ describe('Individual functions', () => {
         expect(processStub.calledOnce && gameEndedCalled && errorOnCommandStub.calledOnce).to.equal(true);
     });
 
-    it('actionAfterTimeout should call processSkip and postCommand', async () => {
+    it('actionAfterTimeout should call processSkip', async () => {
         const skipStub = stub(commandService as any, 'processSkip');
-        const postCommandStub = stub(commandService as any, 'postCommand');
-        const fakeGame = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
+        const postCommandStub = stub(commandService, 'postCommand' as any);
+        const fakeGame = {
+            activePlayer: 0,
+            needsToEnd: () => false,
+        } as unknown as Game;
         const roomStub = { game: fakeGame, commandService } as unknown as Room;
 
         commandService['actionAfterTimeout'](roomStub)();
@@ -274,50 +274,61 @@ describe('commands', () => {
     });
 
     describe('process command', () => {
-        it('string with place calls processPlace', (done) => {
-            commandService['processPlace'] = () => {
-                done();
-            };
+        it('string with place calls processPlace', async () => {
+            const processPlaceStub = stub(commandService, 'processPlace' as any);
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'placer h3h h';
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            expect(processPlaceStub.calledOnce);
+            expect(postCommandStub.calledOnce);
         });
 
-        it('string with draw calls processDraw', (done) => {
-            commandService['processDraw'] = () => {
-                done();
-            };
+        it('string with draw calls processDraw', async () => {
+            const processDrawStub = stub(commandService, 'processDraw' as any);
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'échanger abc';
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            expect(processDrawStub.calledOnce);
+            expect(postCommandStub.calledOnce);
         });
 
-        it('string with skip calls processSkip', (done) => {
-            commandService['processSkip'] = () => {
-                done();
-            };
+        it('string with skip calls processSkip', async () => {
+            const processSkipStub = stub(commandService, 'processSkip' as any);
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'passer';
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            expect(processSkipStub.calledOnce);
+            expect(postCommandStub.calledOnce);
         });
 
-        it('string with place calls processPlace', (done) => {
+        it('string with place calls processPlace', async () => {
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'placer h3h h';
             game.gameFinished = true;
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer).catch(() => done());
+            let error = false;
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer).catch(() => {
+                error = true;
+            });
+            expect(error).to.equal(true);
+            expect(postCommandStub.notCalled);
         });
 
-        it('string with skip calls processBag', (done) => {
-            commandService['processBag'] = () => {
-                done();
-            };
+        it('string with skip calls processBag', async () => {
+            const processBagStub = stub(commandService, 'processBag' as any);
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'réserve';
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            expect(processBagStub.calledOnce);
+            expect(postCommandStub.notCalled);
         });
 
-        it('string with hint calls processHint', (done) => {
-            commandService['processHint'] = async () => {
-                done();
-            };
+        it('string with hint calls processHint', async () => {
+            const processHintStub = stub(commandService, 'processHint' as any);
+            const postCommandStub = stub(commandService, 'postCommand' as any);
             const fullCommand = 'indice';
-            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
+            expect(processHintStub.calledOnce);
+            expect(postCommandStub.notCalled);
         });
     });
 
