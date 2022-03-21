@@ -8,7 +8,7 @@ import { Vec2 } from 'common/classes/vec2';
     name: 'boardToList',
 })
 export class BoardToListPipe implements PipeTransform {
-    colorForLastWord = 'greenyellow';
+    colorForLastWord = 'blue';
     transform(value: BoardState | null): PlacedLetter[] {
         const list: PlacedLetter[] = [];
         if (!value) return list;

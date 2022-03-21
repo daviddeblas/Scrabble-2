@@ -111,6 +111,7 @@ export const reducer = createReducer(
         const tempState = {
             ...state,
             selection: state.selection.copy(),
+            lastPlacedWord: [],
         };
 
         tempState.selection.cell = new Vec2(pos.x, pos.y);
@@ -138,6 +139,8 @@ export const reducer = createReducer(
 
         const blanks = [...state.blanks];
         if (isBlank) blanks.push(selection.cell.copy());
+        const lastPlacedWord = [...state.lastPlacedWord];
+        lastPlacedWord.push(selection.cell.copy());
 
         selection.modifiedCells.push(selection.cell.copy());
 
@@ -155,7 +158,7 @@ export const reducer = createReducer(
 
         if (isCellAtBoardLimit(state.board, selection.cell, selection.orientation)) selection.orientation = null;
 
-        return { ...state, selection, board, blanks };
+        return { ...state, selection, board, blanks, lastPlacedWord };
     }),
 
     on(removeLetters, (state, { positions }) => {
