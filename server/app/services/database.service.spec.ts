@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-underscore-dangle */
+import { DATABASE } from '@app/classes/highscore';
 import { DatabaseService } from '@app/services/database.service';
 import { fail } from 'assert';
 import { expect } from 'chai';
@@ -34,12 +35,29 @@ describe('Database service', () => {
 
     it('should not connect to the database when databaseConnect is called with the wrong URL', async () => {
         try {
-            const mongoUri = await mongoServer.getUri();
-            await databaseService.start(mongoUri);
+            await databaseService.start('WRONG_URL');
             fail();
         } catch {
             expect(databaseService['client']).to.be.undefined;
         }
+    });
+
+    it('should no longer be connected if close is called', async () => {
+        const mongoUri = await mongoServer.getUri();
+        await databaseService.start(mongoUri);
+        await databaseService.closeConnection();
+        expect(databaseService['client']).to.be.false;
+    });
+
+    it('should not populate the database with start function if it is already populated', async () => {
+        const mongoUri = await mongoServer.getUri();
+        await databaseService.start(mongoUri);
+        let scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        expect(scores.length).to.equal(5);
+        await databaseService.closeConnection();
+        await databaseService.start(mongoUri);
+        scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        expect(scores.length).to.equal(5);
     });
 
     it('should return the right highscore list when connecting to the database', async () => {
