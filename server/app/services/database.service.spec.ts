@@ -108,10 +108,7 @@ describe('Database service', () => {
         await databaseService.updateHighScore(player3, 'classical');
         await databaseService.updateHighScore(player1, 'classical');
         const scoreClassic = await databaseService.getHighscores('classical');
-        for (const score of scoreClassic) {
-            expect(score.name).to.not.equal('fakePlayer3');
-            expect(score.name).to.not.equal('fakePlayer1');
-        }
+        expect(scoreClassic[0].name).to.equal('fakePlayer3 - fakePlayer1');
     });
 
     it('should not updateHighScore when a new score is lower than all of the current highscores in Classical', async () => {
