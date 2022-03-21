@@ -3,7 +3,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable no-underscore-dangle */
 import { DATABASE } from '@app/classes/highscore';
 import { PORT } from '@app/environnement';
 import { DatabaseService } from '@app/services/database.service';
@@ -177,24 +176,24 @@ describe('Database service', () => {
             const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
             server.on('connection', (socket) => {
                 databaseService.setupSocketConnection(socket);
+                hostSocket.emit('get highScores');
                 hostSocket.on('receive classic highscores', () => {
                     expect(getHighScoresStub.called);
                     done();
                 });
             });
-            hostSocket.emit('get highScores');
         });
 
         it('should emit receive log2990 highscores when receiving get highScores', (done) => {
             const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
             server.on('connection', (socket) => {
                 databaseService.setupSocketConnection(socket);
+                hostSocket.emit('get highScores');
                 hostSocket.on('receive log2990 highscores', () => {
                     expect(getHighScoresStub.called);
                     done();
                 });
             });
-            hostSocket.emit('get highScores');
         });
     });
 });
