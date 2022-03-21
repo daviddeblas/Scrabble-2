@@ -11,11 +11,12 @@ import { expect } from 'chai';
 import { describe } from 'mocha';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-describe('Database service', () => {
+describe.only('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
     const player1 = { name: 'fakePlayer1', score: 10 };
     const player2 = { name: 'fakePlayer2', score: -1 };
+    const player3 = { name: 'fakePlayer3', score: 10 };
 
     beforeEach(async () => {
         databaseService = new DatabaseService();
@@ -32,7 +33,6 @@ describe('Database service', () => {
         const mongoUri = await mongoServer.getUri();
         await databaseService.start(mongoUri);
         expect(databaseService['client']).to.not.be.undefined;
-        // expect(databaseService['db'].databaseName).to.equal('database');
     });
 
     it('should not connect to the database when databaseConnect is called with the wrong URL', async () => {
@@ -96,6 +96,15 @@ describe('Database service', () => {
         const scoreClassic = await databaseService.getHighscores('classical');
         expect(scoreClassic[0].name).to.equal('fakePlayer1');
         expect(scoreClassic[0].score).to.equal(10);
+    });
+
+    it('should present both names when two players have the same score in Classical highscores', async () => {
+        const mongoUri = await mongoServer.getUri();
+        await databaseService.start(mongoUri);
+        await databaseService.updateHighScore(player3, 'classical');
+        await databaseService.updateHighScore(player1, 'classical');
+        const scoreClassic = await databaseService.getHighscores('classical');
+        expect(scoreClassic[0].name).to.equal('fakePlayer3 - fakePlayer1');
     });
 
     it('should not updateHighScore when a new score is lower than all of the current highscores in Classical', async () => {
