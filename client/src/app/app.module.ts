@@ -18,11 +18,13 @@ import { MultiConfigWindowComponent } from './components/multi-config-window/mul
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
 import { GameEffects } from './effects/game.effects';
+import { LeaderboardEffects } from './effects/leaderboard.effects';
 import { RoomEffects } from './effects/room.effects';
 import { GamePageModule } from './modules/game-page.module';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
+import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
 
@@ -43,6 +45,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
         GamePreparationPageComponent,
         WaitingRoomComponent,
         GameJoinPageComponent,
+        LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
     ],
     imports: [
@@ -57,7 +60,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
             room: roomReducer.reducer,
             gameStatus: gameReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,
