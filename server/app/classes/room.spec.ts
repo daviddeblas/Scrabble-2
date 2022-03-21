@@ -5,7 +5,6 @@
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty } from '@app/services/bot.service';
-import { CommandService } from '@app/services/command.service';
 import { DatabaseService } from '@app/services/database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
@@ -49,7 +48,7 @@ describe('room', () => {
         it('constructor should create a Room', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             expect(room.clients.length).to.eq(1);
-            expect(room.gameOptions).to.eq(gameOptions);
+            expect(room['gameOptions']).to.eq(gameOptions);
             expect(room.host).to.eq(socket);
             expect(room.started).to.eq(false);
             socket.emit('quit');
@@ -64,7 +63,7 @@ describe('room', () => {
         it('quitRoomHost should call RoomsManager.removeRoom', (done) => {
             const room = new Room(socket, roomsManager, gameOptions);
             room.clients[0] = { id: '1' } as unknown as io.Socket;
-            stub(room, 'inviteRefused').callsFake(() => {
+            stub(room, 'inviteRefused' as any).callsFake(() => {
                 return done();
             });
             room.quitRoomHost();
@@ -73,7 +72,7 @@ describe('room', () => {
         it('inviteRefused should set remove the client from the room', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             room.clients[0] = socket;
-            room.inviteRefused(socket);
+            room['inviteRefused'](socket);
             expect(room.clients[0]).to.deep.equal(null);
         });
 
@@ -188,19 +187,6 @@ describe('room', () => {
             expect(setupSocketStub.calledOnce).to.equal(true);
         });
 
-        it('actionAfterTimeout should call processSkip and postCommand', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const commandServiceStub = {
-                processSkip: stub(),
-                postCommand: stub(),
-            };
-            room['commandService'] = commandServiceStub as unknown as CommandService;
-            room['game'] = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
-            room['actionAfterTimeout'](room)();
-            expect(commandServiceStub.processSkip.calledOnce).to.equal(true);
-            expect(commandServiceStub.postCommand.calledOnce).to.equal(true);
-        });
-
         it('actionAfterTimeout should call end game if game is ended', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
@@ -209,15 +195,15 @@ describe('room', () => {
                     return;
                 },
             } as unknown as Game;
-            stub(room.commandService, 'processSkip').callsFake(() => {
+            stub(room.commandService, 'processSkip' as any).callsFake(() => {
                 return;
             });
-            stub(room.commandService, 'postCommand').callsFake(() => {
+            stub(room.commandService, 'postCommand' as any).callsFake(() => {
                 return;
             });
             room.game = stubbedGame;
-            const endGame = stub(room.commandService, 'endGame');
-            room['actionAfterTimeout'](room)();
+            const endGame = stub(room.commandService, 'endGame' as any);
+            room['actionAfterTimeout']()();
             expect(endGame.calledOnce).to.equal(true);
         });
 
@@ -231,48 +217,48 @@ describe('room', () => {
             expect(room.sockets.includes(socket)).to.equal(true);
         });
 
-        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', () => {
+        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 1,
             } as unknown as Game;
-            const moveStub = stub(room.botService, 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             const onCommandStub = stub(room.commandService, 'onCommand');
             room.game = stubbedGame;
             const clk = useFakeTimers();
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             clk.tick(MIN_BOT_PLACEMENT_TIME);
             clk.restore();
             expect(onCommandStub.calledOnce).to.equal(true);
             expect(moveStub.calledOnce).to.equal(true);
         });
 
-        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', () => {
+        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 0,
             } as unknown as Game;
-            const moveStub = stub(room.botService, 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
 
-        it('actionAfterTurnWithBot should not call move from botService if the game has ended', () => {
+        it('actionAfterTurnWithBot should not call move from botService if the game has ended', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const stubbedGame = {
                 activePlayer: 0,
                 gameFinished: true,
             } as unknown as Game;
-            const moveStub = stub(room.botService, 'move').callsFake(() => {
+            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
-            room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
     });
@@ -384,10 +370,12 @@ describe('room', () => {
                     hostSocket.emit('accept');
                     clientSocket.emit('send message', message);
                 });
-                setTimeout(() => {
-                    expect(roomsManager.removeRoom.calledOnce).to.equal(true);
-                    done();
-                }, RESPONSE_DELAY);
+                hostSocket.on('receive message', () => {
+                    setTimeout(() => {
+                        expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+                        done();
+                    }, RESPONSE_DELAY);
+                });
                 hostSocket.emit('create room');
             });
 
@@ -491,7 +479,7 @@ describe('room', () => {
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
-                        const inviteAcceptedStub = stub(room, 'inviteAccepted');
+                        const inviteAcceptedStub = stub(room, 'inviteAccepted' as any);
                         room.join(socket, 'player 2');
                         hostSocket.emit('accept');
                         setTimeout(() => {

@@ -6,7 +6,7 @@ import { BoardState, isCellAtBoardLimit } from '@app/reducers/board.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
-import { Letter, lettersToString, stringToLetter } from 'common/classes/letter';
+import { BLANK_LETTER, Letter, lettersToString, stringToLetter } from 'common/classes/letter';
 import { iVec2, Vec2 } from 'common/classes/vec2';
 import { ASCII_ALPHABET_POSITION } from 'common/constants';
 import { PlayerService } from './player.service';
@@ -15,72 +15,88 @@ import { PlayerService } from './player.service';
     providedIn: 'root',
 })
 export class KeyManagerService {
-    blankLettersBuffer: Letter[] = [];
-
     constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {}
 
     onEnter(): void {
         let modifiedCells: Vec2[] = [];
         let orientation: Direction | null = null;
         const placedLetters: Letter[] = [];
-        let letters: Letter[] = [];
+        let blanks: iVec2[] = [];
+        let board: (Letter | null)[][] = [];
         this.store.select('board').subscribe((state) => {
             modifiedCells = state.selection.modifiedCells;
             orientation = state.selection.orientation;
-            letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
+            blanks = state.blanks;
+            board = state.board;
         });
+        if (modifiedCells.length === 0) return;
+
+        const letters = modifiedCells.map((pos) => board[pos.x][pos.y] as Letter);
         letters.forEach((l) => placedLetters.push(l));
-        this.store.dispatch(addLettersToEasel({ letters }));
+
+        if (blanks.length > 0)
+            [...modifiedCells].reverse().forEach((cell, index) => {
+                if (cell.equals(blanks[blanks.length - 1])) {
+                    letters[letters.length - 1 - index] = BLANK_LETTER;
+                }
+            });
+
+        this.store.dispatch(addLettersToEasel({ letters: [...letters] }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
         if (orientation === null && modifiedCells.length > 1)
-            orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.HORIZONTAL : Direction.VERTICAL;
+            orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.VERTICAL : Direction.HORIZONTAL;
 
         const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${orientation}`;
 
-        const blankPos: number[] = [];
-        while (this.blankLettersBuffer.length !== 0) {
-            blankPos.push(placedLetters.indexOf('*'));
-            placedLetters[blankPos[blankPos.length - 1]] = this.blankLettersBuffer[0];
-            this.blankLettersBuffer.splice(0, 1);
-        }
         let encodedLetters = lettersToString(placedLetters).toLowerCase();
-        blankPos.forEach(
-            (index) =>
-                (encodedLetters =
+
+        letters.forEach((letter, index) => {
+            if (letter === BLANK_LETTER) {
+                encodedLetters =
                     encodedLetters.slice(0, index) +
                     encodedLetters.charAt(index).toUpperCase() +
-                    encodedLetters.slice(index + 1, encodedLetters.length)),
-        );
+                    encodedLetters.slice(index + 1, encodedLetters.length);
+            }
+        });
 
         this.store.dispatch(placeWord({ position: encodedPosition, letters: encodedLetters }));
         this.store.dispatch(clearSelection());
-        this.blankLettersBuffer = [];
     }
 
     onEsc(): void {
         let letters: Letter[] = [];
-        let modifiedCells: iVec2[] = [];
+        let modifiedCells: Vec2[] = [];
+        let blanks: iVec2[] = [];
         this.store.select('board').subscribe((state) => {
             modifiedCells = state.selection.modifiedCells;
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
+            blanks = state.blanks;
         });
+        if (blanks.length > 0)
+            modifiedCells.reverse().forEach((cell, index) => {
+                if (cell.equals(blanks[blanks.length - 1])) letters[letters.length - 1 - index] = BLANK_LETTER;
+            });
         this.store.dispatch(addLettersToEasel({ letters }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
         this.store.dispatch(clearSelection());
-        this.blankLettersBuffer = [];
     }
 
     onBackspace(): void {
         let letter: Letter = '*';
         let lastCell: Vec2 | null = null;
+        let blanks: iVec2[] = [];
+        let hasModifiedCells = true;
         this.store.select('board').subscribe((state) => {
-            if (state.selection.modifiedCells.length === 0) return;
+            hasModifiedCells = state.selection.modifiedCells.length > 0;
+            if (!hasModifiedCells) return;
             lastCell = state.selection.modifiedCells[state.selection.modifiedCells.length - 1] as Vec2;
             letter = state.board[lastCell.x][lastCell.y] as Letter;
+            blanks = state.blanks;
         });
-        if (!lastCell) return;
-        if (letter === '*') this.blankLettersBuffer.pop();
+
+        if (lastCell === null || !hasModifiedCells) return;
+        if (blanks.length > 0 && (lastCell as Vec2).equals(blanks[blanks.length - 1])) letter = BLANK_LETTER;
 
         this.store.dispatch(addLettersToEasel({ letters: [letter] }));
         this.store.dispatch(backspaceSelection());
@@ -123,8 +139,7 @@ export class KeyManagerService {
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const letter = stringToLetter(key);
         if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
-        this.store.dispatch(placeLetter({ letter }));
+        this.store.dispatch(placeLetter({ letter: stringToLetter(key.toLowerCase()), isBlank: letter === '*' }));
         this.store.dispatch(removeLetterFromEasel({ letter }));
-        if (letter === '*') this.blankLettersBuffer.push(stringToLetter(key.toLowerCase()));
     }
 }

@@ -10,7 +10,7 @@ import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { spy, stub, useFakeTimers } from 'sinon';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
 
 describe('game', () => {
@@ -20,6 +20,9 @@ describe('game', () => {
     const timerCallbackMock = () => {
         return;
     };
+    const afterTurnCallbackMock: () => Promise<void> = async () => {
+        return;
+    };
 
     before(() => {
         Container.get(DictionaryService).init();
@@ -27,7 +30,7 @@ describe('game', () => {
     });
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, timerCallbackMock);
+        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, afterTurnCallbackMock);
         activePlayer = game.activePlayer;
     });
 
@@ -39,7 +42,7 @@ describe('game', () => {
         const totalLettersInEachPlayerEasel = MAX_LETTERS_IN_EASEL;
         const totalAmountOfPlayers = 2;
         expect(game.bag.letters.length).to.eq(totalLetters - totalLettersInEachPlayerEasel * totalAmountOfPlayers);
-        expect(game.turnsSkipped).to.eq(0);
+        expect(game['turnsSkipped']).to.eq(0);
     });
 
     it('place should score according to scorePosition on correct placement', () => {
@@ -97,7 +100,7 @@ describe('game', () => {
 
     it('place should throw on correct placement as second placement if not connected to other words', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
-        game.placeCounter = 1;
+        game['placeCounter'] = 1;
         lettersToPlace.forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
@@ -178,7 +181,7 @@ describe('game', () => {
         game.skip(game.activePlayer);
 
         expect(game.activePlayer).to.not.eq(oldActivePlayer);
-        expect(game.turnsSkipped).to.eq(1);
+        expect(game['turnsSkipped']).to.eq(1);
     });
 
     it('gameEnded should be true when one players easel is empty', () => {
@@ -193,7 +196,7 @@ describe('game', () => {
     it('needsToEnd should be true when exceeding MAX_TURNS_SKIPPED', () => {
         expect(game.needsToEnd()).to.eq(false);
 
-        game.turnsSkipped = 10;
+        game['turnsSkipped'] = 10;
 
         expect(game.needsToEnd()).to.eq(true);
     });

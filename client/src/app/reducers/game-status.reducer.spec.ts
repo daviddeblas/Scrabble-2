@@ -24,6 +24,7 @@ describe('[Game Status] Game Status Received', () => {
         multipliers: [],
         pointsPerLetter: new Map(),
         blanks: [],
+        lastPlacedWord: [],
         selection: new BoardSelection(),
     };
 

@@ -10,9 +10,9 @@ export const exchangeLetters = createAction('[Players] Exchange Letters', props<
 
 export const exchangeLettersSuccess = createAction('[Players] Exchange Letters Success', props<{ oldLetters: Letter[]; newLetters: Letter[] }>());
 
-export const removeLetterFromEasel = createAction('[Players] Remove Letters From Easel', props<{ letter: Letter }>());
+export const removeLetterFromEasel = createAction('[Players] Remove Letter From Easel', props<{ letter: Letter }>());
 
-export const addLettersToEasel = createAction('[Players] Add Letters From Easel', props<{ letters: Letter[] }>());
+export const addLettersToEasel = createAction('[Players] Add Letters To Easel', props<{ letters: Letter[] }>());
 
 export const switchLettersEasel = createAction('[Players] Switch Letters Easel', props<{ positionIndex: number; destinationIndex: number }>());
 

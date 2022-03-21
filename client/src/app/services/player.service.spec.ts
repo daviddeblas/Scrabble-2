@@ -40,7 +40,14 @@ describe('PlayerService', () => {
         board[14][14] = 'E';
 
         socketService = new SocketTestHelper();
-        const boardState: BoardState = { board, pointsPerLetter: new Map(), multipliers: [], blanks: [], selection: new BoardSelection() };
+        const boardState: BoardState = {
+            board,
+            pointsPerLetter: new Map(),
+            multipliers: [],
+            blanks: [],
+            lastPlacedWord: [],
+            selection: new BoardSelection(),
+        };
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
@@ -282,5 +289,11 @@ describe('PlayerService', () => {
     it('letterOnBoard should return a undefined if a letter does not exists on the board at the given position', () => {
         const noLetterPosition = 9;
         expect(service.letterOnBoard(noLetterPosition, noLetterPosition)).toBeUndefined();
+    });
+
+    it('should return the player easel', () => {
+        const playerEasel = service.getEasel();
+
+        expect(playerEasel).toEqual(['A', 'B', 'C', '*']);
     });
 });

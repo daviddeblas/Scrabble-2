@@ -17,7 +17,7 @@
             <mat-list-item *ngFor="let room of roomList$ | async" class="room-list">
                 <p class="room">
                     <strong>Hôte</strong>: {{ room.gameOptions.hostname }} <br />
-                    <strong>Temps</strong>: {{ room.gameOptions.timePerRound }} secondes<br />
+                    <strong>Temps</strong>: {{ timerToString(room.gameOptions.timePerRound) }}<br />
                     <strong>Dictionnaire</strong>: {{ room.gameOptions.dictionaryType }}
                 </p>
                 <button mat-raised-button matStepperNext color="primary" class="button join-room" (click)="selectRoom(room)">Rejoindre</button>
@@ -30,7 +30,7 @@
                 <ng-template matStepLabel>Entrez votre nom</ng-template>
                 <p class="room">
                     <strong>Hôte</strong>: {{ selectedRoom?.gameOptions?.hostname }} <br />
-                    <strong>Temps</strong>: {{ selectedRoom?.gameOptions?.timePerRound }} secondes<br />
+                    <strong>Temps</strong>: {{ timerToString(selectedRoom?.gameOptions?.timePerRound) }}<br />
                     <strong>Dictionnaire</strong>: {{ selectedRoom?.gameOptions?.dictionaryType }}
                 </p>
                 <mat-form-field centered class="parameter-container" appearance="fill">

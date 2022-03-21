@@ -1,5 +1,5 @@
 <div class="sidebar">
-    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.opponent)">
+    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.opponent) && !(gameStatus$ | async)?.gameEnded">
         <h2>{{ (players$ | async)?.opponent?.name }}</h2>
         <h3 *ngIf="(players$ | async)?.botLevel !== undefined">Niveau du JV: {{ (players$ | async)?.botLevel }}</h3>
         <div *ngIf="!(gameStatus$ | async)?.gameEnded; else end_opponent_message">
@@ -52,14 +52,14 @@
             class="commandButton"
             color="primary"
             (click)="getHint()"
-            [disabled]="!isActivePlayer((players$ | async)?.player)"
+            [disabled]="!isActivePlayer((players$ | async)?.player) || (gameStatus$ | async)?.gameEnded"
             aria-label="Prendre un indice"
         >
             Indice
         </button>
     </div>
 
-    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.player)">
+    <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.player) && !(gameStatus$ | async)?.gameEnded">
         <p *ngIf="((players$ | async)?.player?.easel?.length ?? 0) < 7">{{ (players$ | async)?.player?.easel?.length }} lettres</p>
         <p>{{ (players$ | async)?.player?.score }}pts</p>
         <div *ngIf="!(gameStatus$ | async)?.gameEnded; else end_player_message">

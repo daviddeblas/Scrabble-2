@@ -60,6 +60,17 @@ describe('GameJoinPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('timerTString should return a timer in minute format', () => {
+        const time = 60;
+        const expectedResult = '1:00 min';
+        expect(component.timerToString(time)).toEqual(expectedResult);
+    });
+
+    it('timerTString should return one minute in string if no timer is given', () => {
+        const expectedResult = '1:00 min';
+        expect(component.timerToString()).toEqual(expectedResult);
+    });
+
     it('should dispatch "[Room] Load Rooms" when constructor', () => {
         const expectedAction = cold('a', { a: loadRooms() });
         expect(store.scannedActions$).toBeObservable(expectedAction);

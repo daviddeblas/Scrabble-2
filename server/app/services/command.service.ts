@@ -3,6 +3,7 @@ import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { copyLetterConfigItem, LetterConfigItem } from '@app/classes/letter-config-item';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Room } from '@app/classes/room';
 import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
@@ -15,8 +16,30 @@ import { DictionaryService } from './dictionary.service';
 @Service()
 export class CommandService {
     constructor(public dictionaryService: DictionaryService) {}
+    async onCommand(game: Game, sockets: io.Socket[], command: string, playerNumber: number): Promise<void> {
+        try {
+            await this.processCommand(game, sockets, command, playerNumber);
+            this.postCommand(game, sockets);
+        } catch (error) {
+            this.errorOnCommand(game, sockets, error, playerNumber);
+        }
+        if (game.needsToEnd()) {
+            this.endGame(game, sockets);
+        }
+    }
 
-    processCommand(game: Game, sockets: io.Socket[], fullCommand: string, playerNumber: number): void {
+    actionAfterTimeout(room: Room) {
+        return () => {
+            const game = room.game as Game;
+            room.commandService.processSkip(game, room.sockets, [], game.activePlayer as number);
+            room.commandService.postCommand(game, room.sockets);
+            if (game.needsToEnd()) {
+                room.commandService.endGame(game, room.sockets);
+            }
+        };
+    }
+
+    private async processCommand(game: Game, sockets: io.Socket[], fullCommand: string, playerNumber: number): Promise<void> {
         if (game.gameFinished) throw new GameError(GameErrorType.GameIsFinished);
         const [command, ...args] = fullCommand.split(' ');
         switch (command) {
@@ -33,24 +56,12 @@ export class CommandService {
                 this.processBag(game, sockets, args, playerNumber);
                 break;
             case 'indice':
-                this.processHint(game, sockets, args, playerNumber);
+                await this.processHint(game, sockets, args, playerNumber);
                 break;
         }
     }
 
-    onCommand(game: Game, sockets: io.Socket[], command: string, playerNumber: number) {
-        try {
-            this.processCommand(game, sockets, command, playerNumber);
-            this.postCommand(game, sockets);
-        } catch (error) {
-            this.errorOnCommand(game, sockets, error, playerNumber);
-        }
-        if (game.needsToEnd()) {
-            this.endGame(game, sockets);
-        }
-    }
-
-    processBag(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private processBag(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         const lettersToSend = [...game.bag.letters];
         lettersToSend.push(...game.players[(playerNumber + 1) % game.players.length].easel);
         const originalConfig = game.config.letters.map((item) => copyLetterConfigItem(item));
@@ -67,16 +78,19 @@ export class CommandService {
         sockets[playerNumber].emit('receive message', { username: '', message, messageType: 'System' });
     }
 
-    processPlace(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private processPlace(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         if (!this.validatePlace(game.config, args)) throw new GameError(GameErrorType.WrongPlaceArgument);
+        const pointBeforePlacement = game.players[playerNumber].score;
         const argsForParsePlaceCall = this.parsePlaceCall(game, args);
         game.place(argsForParsePlaceCall[0], argsForParsePlaceCall[1], playerNumber);
+        const pointsWon = game.players[playerNumber].score - pointBeforePlacement;
+        args.push('- ' + pointsWon + ' points');
         sockets.forEach((s) => {
             s.emit('place success', { args, username: game.players[playerNumber].name });
         });
     }
 
-    processDraw(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private processDraw(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) throw new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
@@ -91,7 +105,7 @@ export class CommandService {
         });
     }
 
-    processSkip(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private processSkip(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
         if (args.length > 0) throw new GameError(GameErrorType.WrongSkipArgument);
         game.skip(playerNumber);
         sockets.forEach((s) => {
@@ -99,14 +113,14 @@ export class CommandService {
         });
     }
 
-    processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
+    private async processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): Promise<void> {
         if (args.length > 0) throw new GameError(GameErrorType.WrongHintArgument);
         const solver = new Solver(game.config.dictionary, game.board, game.players[playerNumber].easel);
-        const hints = solver.getHints();
+        const hints = await solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
     }
 
-    postCommand(game: Game, sockets: io.Socket[]): void {
+    private postCommand(game: Game, sockets: io.Socket[]): void {
         game.resetTimer();
         sockets.forEach((s) => {
             s.emit('turn ended');
@@ -114,7 +128,7 @@ export class CommandService {
         game.actionAfterTurn();
     }
 
-    endGame(game: Game, sockets: io.Socket[]): void {
+    private endGame(game: Game, sockets: io.Socket[]): void {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             const highscore = { name: game.players[i].name, score: game.players[i].score };

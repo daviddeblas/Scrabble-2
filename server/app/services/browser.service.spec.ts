@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { assert, expect } from 'chai';
@@ -32,7 +33,7 @@ describe('Browser service tests', () => {
         });
         service = new BrowserService();
         clientSocket = ioClient(urlString);
-        roomsManager.rooms = [];
+        roomsManager['rooms'] = [];
     });
 
     afterEach(() => {
@@ -51,11 +52,11 @@ describe('Browser service tests', () => {
         const timeoutSpy = sinon.spy(global, 'clearTimeout');
         const roomsManagerMock = sinon.mock(roomsManager);
         roomsManagerMock.expects('switchPlayerSocket').once();
-        service.tempClientSocketId = oldClientId;
+        service['tempClientSocketId'] = oldClientId;
         const testTimeoutId = setTimeout(() => {
             assert(false);
         }, RESPONSE_DELAY);
-        service.timeoutId = testTimeoutId;
+        service['timeoutId'] = testTimeoutId;
         clientSocket.emit('browser reconnection', oldClientId);
         setTimeout(() => {
             assert(timeoutSpy.calledWith(testTimeoutId) === true);
@@ -72,8 +73,8 @@ describe('Browser service tests', () => {
             assert(timeoutSpy.calledWith(testTimeoutId) === false);
             done();
         }, RESPONSE_DELAY);
-        service.timeoutId = testTimeoutId;
-        service.tempClientSocketId = '100';
+        service['timeoutId'] = testTimeoutId;
+        service['tempClientSocketId'] = '100';
         clientSocket.emit('browser reconnection', oldClientId);
     });
 
@@ -88,7 +89,7 @@ describe('Browser service tests', () => {
             },
         } as unknown as Room;
         const spyOnQuitRoomHost = stub(room, 'quitRoomHost');
-        roomsManager.rooms.push(room);
+        roomsManager['rooms'].push(room);
         const userId = '123';
         stub(roomsManager, 'getRoom').callsFake(() => room);
         clientSocket.emit('closed browser', userId);
@@ -102,8 +103,8 @@ describe('Browser service tests', () => {
         const userId = '123';
         clientSocket.emit('closed browser', userId);
         setTimeout(() => {
-            expect(service.tempClientSocketId).to.deep.equal(userId);
-            expect(service.tempServerSocket.id).to.deep.equal(clientSocket.id);
+            expect(service['tempClientSocketId']).to.deep.equal(userId);
+            expect(service['tempServerSocket'].id).to.deep.equal(clientSocket.id);
             done();
         }, RESPONSE_DELAY);
     });

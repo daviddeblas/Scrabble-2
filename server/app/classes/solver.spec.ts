@@ -1,15 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { Dictionary } from '@app/classes/dictionary';
+import { Line } from '@app/interfaces/line';
+import { Solution } from '@app/interfaces/solution';
+import { Word } from '@app/interfaces/word';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
-import { BOARD_SIZE, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
+import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
-import { HINT_COUNT, Line, Solution, Solver, Word } from './solver';
+import { Solver } from './solver';
 
 describe('solver', () => {
     const dictionary: Dictionary = new Dictionary('', '', []);
@@ -27,7 +32,7 @@ describe('solver', () => {
     it('should return all segments from line', () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        const segments = solver.generateSegments([null, 'A', 'B', null, 'C', 'D', null, null, null, 'E', null, null, null, null, 'F']);
+        const segments = solver['generateSegments']([null, 'A', 'B', null, 'C', 'D', null, null, null, 'E', null, null, null, null, 'F']);
         expect(segments).to.deep.equal([
             {
                 value: 'AB',
@@ -54,7 +59,7 @@ describe('solver', () => {
 
     it('should return correct regex from segments', () => {
         const solver: Solver = new Solver(dictionary, board, ['A', 'C', 'D']);
-        const regex = solver.generateRegex([
+        const regex = solver['generateRegex']([
             {
                 start: 2,
                 end: 3,
@@ -73,7 +78,7 @@ describe('solver', () => {
 
     it('should return correct regex from segments when blanks', () => {
         const solver: Solver = new Solver(dictionary, board, ['*', 'C', 'D']);
-        const regex = solver.generateRegex([
+        const regex = solver['generateRegex']([
             {
                 start: 2,
                 end: 3,
@@ -85,7 +90,7 @@ describe('solver', () => {
 
     it('should return correct regex from segments when starting line', () => {
         const solver: Solver = new Solver(dictionary, board, ['C', 'D']);
-        const regex = solver.generateRegex([
+        const regex = solver['generateRegex']([
             {
                 start: 0,
                 end: 1,
@@ -97,7 +102,7 @@ describe('solver', () => {
 
     it('should return correct regex from segments when ending line', () => {
         const solver: Solver = new Solver(dictionary, board, ['C', 'D']);
-        const regex = solver.generateRegex([
+        const regex = solver['generateRegex']([
             {
                 start: 14,
                 end: 15,
@@ -110,7 +115,7 @@ describe('solver', () => {
     it('should search in dictionary with regex', () => {
         const dictionarySample = { words: ['arbre', 'cactus', 'sapin'] } as Dictionary;
         const solver: Solver = new Solver(dictionarySample, board, []);
-        const words = solver.dictionarySearch(/^(.*)b/i, [{ start: 4, end: 5, value: 'B' }]);
+        const words = solver['dictionarySearch'](/^(.*)b/i, [{ start: 4, end: 5, value: 'B' }]);
 
         expect(words).to.deep.equal([
             {
@@ -139,7 +144,7 @@ describe('solver', () => {
                 blanks: [5],
             },
         ];
-        expect(solver.filterDuplicateLetters(fakeLine, fakeWords)).to.deep.equals(expectedLines);
+        expect(solver['filterDuplicateLetters'](fakeLine, fakeWords)).to.deep.equals(expectedLines);
     });
 
     it('should filter invalid affected words', () => {
@@ -153,7 +158,7 @@ describe('solver', () => {
             board.board[7] = [null, null, null, null, null, null, null, null,  'B', null, null, null, null, null, null];
         }
         const solver: Solver = new Solver(dictionarySample, board, []);
-        const solutions = solver.filterInvalidAffectedWords(
+        const solutions = solver['filterInvalidAffectedWords'](
             [
                 { letters: [null, null, null, null, null, null, 'A', null, 'B', 'C', null, null, null, null, null], blanks: [] },
                 { letters: [null, null, null, null, null, null, 'A', null, 'B', null, null, null, null, null, null], blanks: [8] },
@@ -177,13 +182,13 @@ describe('solver', () => {
         const dictionarySample = { words: ['aaa'] } as Dictionary;
         const solver: Solver = new Solver(dictionarySample, board, []);
 
-        const generateSegmentsSpy = spy(solver, 'generateSegments');
-        const generateRegexSpy = spy(solver, 'generateRegex');
-        const dictionarySearchSpy = spy(solver, 'dictionarySearch');
-        const filterDuplicateLettersSpy = spy(solver, 'filterDuplicateLetters');
-        const filterInvalidAffectedWordsSpy = spy(solver, 'filterInvalidAffectedWords');
+        const generateSegmentsSpy = spy(solver as any, 'generateSegments');
+        const generateRegexSpy = spy(solver as any, 'generateRegex');
+        const dictionarySearchSpy = spy(solver as any, 'dictionarySearch');
+        const filterDuplicateLettersSpy = spy(solver as any, 'filterDuplicateLetters');
+        const filterInvalidAffectedWordsSpy = spy(solver as any, 'filterInvalidAffectedWords');
 
-        const solutions = solver.findLineSolutions(
+        const solutions = solver['findLineSolutions'](
             [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
             5,
             new Vec2(1, 0),
@@ -202,13 +207,13 @@ describe('solver', () => {
         board.board[7] = [null, null, null, null, null, 'A', 'B', 'C', null, null, null, null, null, null, null];
         const solver: Solver = new Solver(dictionarySample, board, ['D', 'Z', 'R', 'E', 'N', 'E', 'E']);
 
-        const generateSegmentsSpy = spy(solver, 'generateSegments');
-        const generateRegexSpy = spy(solver, 'generateRegex');
-        const dictionarySearchSpy = spy(solver, 'dictionarySearch');
-        const filterDuplicateLettersSpy = spy(solver, 'filterDuplicateLetters');
-        const filterInvalidAffectedWordsSpy = spy(solver, 'filterInvalidAffectedWords');
+        const generateSegmentsSpy = spy(solver as any, 'generateSegments');
+        const generateRegexSpy = spy(solver as any, 'generateRegex');
+        const dictionarySearchSpy = spy(solver as any, 'dictionarySearch');
+        const filterDuplicateLettersSpy = spy(solver as any, 'filterDuplicateLetters');
+        const filterInvalidAffectedWordsSpy = spy(solver as any, 'filterInvalidAffectedWords');
 
-        const solutions = solver.findLineSolutions(
+        const solutions = solver['findLineSolutions'](
             [null, null, null, null, null, 'A', 'B', 'C', null, null, null, null, null, null, null],
             7,
             new Vec2(0, 1),
@@ -235,13 +240,13 @@ describe('solver', () => {
         assert(filterInvalidAffectedWordsSpy.calledOnce);
     });
 
-    it('should search solution for each line', () => {
+    it('should search solution for each line', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const expected: Solution[] = [];
 
-        stub(solver, 'isBoardEmpty').returns(false);
+        stub(solver as any, 'isBoardEmpty').returns(false);
 
-        const findLineStub = stub(solver, 'findLineSolutions');
+        const findLineStub = stub(solver as any, 'findLineSolutions');
         findLineStub.callsFake((_line: (Letter | null)[], _index: number, direction: Vec2) => {
             const sol: Solution = {
                 letters: [],
@@ -252,29 +257,29 @@ describe('solver', () => {
             return [sol];
         });
 
-        const solutions = solver.findAllSolutions();
+        const solutions = await solver['findAllSolutions']();
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
     });
 
-    it('should call findFistSolutions when board empty', () => {
+    it('should call findFistSolutions when board empty', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        stub(solver, 'isBoardEmpty').returns(true);
-        const findFirstSolutionsStub = stub(solver, 'findFirstSolutions').returns([]);
+        stub(solver as any, 'isBoardEmpty').returns(true);
+        const findFirstSolutionsStub = stub(solver as any, 'findFirstSolutions').returns([]);
 
-        const solutions = solver.findAllSolutions();
+        const solutions = await solver['findAllSolutions']();
         expect(solutions).to.deep.equal([]);
         assert(findFirstSolutionsStub.calledOnce);
     });
 
-    it('should return nothing if time expire', () => {
+    it('should return nothing if time expire', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        stub(solver, 'isBoardEmpty').returns(false);
+        stub(solver as any, 'isBoardEmpty').returns(false);
 
-        const findLineStub = stub(solver, 'findLineSolutions');
+        const findLineStub = stub(solver as any, 'findLineSolutions');
         findLineStub.callsFake((_line: (Letter | null)[], _index: number, direction: Vec2) => {
             const sol: Solution = {
                 letters: [],
@@ -293,12 +298,12 @@ describe('solver', () => {
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 2;
-        let result = solver.findAllSolutions();
+        let result = await solver['findAllSolutions']();
         expect(result).to.deep.equal([]);
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 0.75;
-        result = solver.findAllSolutions();
+        result = await solver['findAllSolutions']();
         expect(result).to.deep.equal([]);
 
         dateNowStub.restore();
@@ -317,7 +322,7 @@ describe('solver', () => {
             };
         });
 
-        const result = solver.pickRandomSolutions(solutions);
+        const result = solver['pickRandomSolutions'](solutions);
         expect(result).to.deep.equal([solutions[1], solutions[4], solutions[7]]);
 
         mathRandomStub.restore();
@@ -334,7 +339,7 @@ describe('solver', () => {
             };
         });
 
-        const result = solver.pickRandomSolutions(solutions);
+        const result = solver['pickRandomSolutions'](solutions);
         expect(result).to.deep.equal(solutions);
     });
 
@@ -365,19 +370,19 @@ describe('solver', () => {
             },
         ];
 
-        const hints = solver.solutionsToHints(solutions);
+        const hints = solver['solutionsToHints'](solutions);
         expect(hints).to.deep.equal(['!placer i8v ab', '!placer h5h cDe']);
     });
 
-    it('should return no hints when no solutions', () => {
+    it('should return no hints when no solutions', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
-        const findSolutionStub = stub(solver, 'findAllSolutions').returns([]);
+        const findSolutionStub = stub(solver as any, 'findAllSolutions').returns([]);
 
-        const pickRandomSolutionsSpy = spy(solver, 'pickRandomSolutions');
-        const solutionsToHintsSpy = spy(solver, 'solutionsToHints');
+        const pickRandomSolutionsSpy = spy(solver as any, 'pickRandomSolutions');
+        const solutionsToHintsSpy = spy(solver as any, 'solutionsToHints');
 
-        const results = solver.getHints();
+        const results = await solver.getHints();
         expect(results).to.deep.equals([]);
 
         assert(findSolutionStub.calledOnce);
@@ -385,7 +390,7 @@ describe('solver', () => {
         assert(solutionsToHintsSpy.notCalled);
     });
 
-    it('should hints', () => {
+    it('should hints', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const solutions: Solution[] = [...new Array(2)].map((_v, i) => {
@@ -396,11 +401,11 @@ describe('solver', () => {
             };
         });
 
-        const findSolutionStub = stub(solver, 'findAllSolutions').returns(solutions);
-        const pickRandomSolutionsSpy = spy(solver, 'pickRandomSolutions');
-        const solutionsToHintsStub = stub(solver, 'solutionsToHints').returns(['abcdef']);
+        const findSolutionStub = stub(solver as any, 'findAllSolutions').returns(solutions);
+        const pickRandomSolutionsSpy = spy(solver as any, 'pickRandomSolutions');
+        const solutionsToHintsStub = stub(solver as any, 'solutionsToHints').returns(['abcdef']);
 
-        const results = solver.getHints();
+        const results = await solver.getHints();
         expect(results).to.deep.equals(['abcdef']);
 
         assert(findSolutionStub.calledOnce);
@@ -408,7 +413,7 @@ describe('solver', () => {
         assert(solutionsToHintsStub.calledWith(solutions));
     });
 
-    it('should return easy bot solution', () => {
+    it('should return easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
 
         const solutions: Solution[] = [...new Array(2)].map((v, i) => {
@@ -420,19 +425,19 @@ describe('solver', () => {
         });
 
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
-        const findAllSolutionsStub = stub(solver, 'findAllSolutions').returns(solutions);
+        const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);
 
-        const results = solver.getEasyBotSolutions();
+        const results = await solver.getEasyBotSolutions();
         expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
 
         assert(scorePositionStub.calledTwice);
         assert(findAllSolutionsStub.calledOnce);
     });
 
-    it('should return no easy bot solution', () => {
+    it('should return no easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
-        const findAllSolutionsStub = stub(solver, 'findAllSolutions').returns([]);
-        const results = solver.getEasyBotSolutions();
+        const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([]);
+        const results = await solver.getEasyBotSolutions();
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
     });
@@ -441,10 +446,10 @@ describe('solver', () => {
         const dictionarySample = { words: ['c', 'abcfdd', 'zabcdr', 'adgbcx', 'rabcx'] } as Dictionary;
         const solver: Solver = new Solver(dictionarySample, board, ['A', 'B', 'C', '*']);
 
-        expect(solver.isBoardEmpty()).to.equal(true);
+        expect(solver['isBoardEmpty']()).to.equal(true);
 
         board.board[7] = [null, null, null, null, null, null, null, 'A', null, null, null, null, null, null, null];
-        expect(solver.isBoardEmpty()).to.equal(false);
+        expect(solver['isBoardEmpty']()).to.equal(false);
     });
 
     it('should generate first solution from words', () => {
@@ -459,10 +464,10 @@ describe('solver', () => {
             },
         ];
 
-        const firstSolutionTransformStub = stub(solver, 'firstSolutionTransform').returns(fakeSolution);
-        const firstSolutionRegexSpy = spy(solver, 'firstSolutionRegex');
+        const firstSolutionTransformStub = stub(solver as any, 'firstSolutionTransform').returns(fakeSolution);
+        const firstSolutionRegexSpy = spy(solver as any, 'firstSolutionRegex');
 
-        const solution = solver.findFirstSolutions();
+        const solution = solver['findFirstSolutions']();
         expect(solution).to.equal(fakeSolution);
 
         assert(firstSolutionTransformStub.called);
@@ -471,13 +476,13 @@ describe('solver', () => {
 
     it('should generate first solution regex', () => {
         const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
-        const regex = solver.firstSolutionRegex();
+        const regex = solver['firstSolutionRegex']();
         expect(regex.source).to.equal('^(?!(?:[^A]*A){2})(?!(?:[^B]*B){2})(?!(?:[^C]*C){2}).{1,3}$');
     });
 
     it('should generate first solution regex with blank', () => {
         const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C', '*']);
-        const regex = solver.firstSolutionRegex();
+        const regex = solver['firstSolutionRegex']();
         expect(regex.source).to.equal('^(?!(?:[^A]*A){3})(?!(?:[^B]*B){3})(?!(?:[^C]*C){3})(?!(?:[ABC]*[^ABC]){2}).{1,4}$');
     });
 
@@ -507,7 +512,7 @@ describe('solver', () => {
             },
         ];
 
-        const results = solver.firstSolutionTransform(words);
+        const results = solver['firstSolutionTransform'](words);
         expect(results).to.deep.equal(expected);
     });
 });

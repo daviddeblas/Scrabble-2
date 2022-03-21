@@ -49,14 +49,14 @@ describe('Individual functions', () => {
         sockets.push(createFakeSocket(1));
     });
 
-    it('onCommand should call processCommand, postCommand and EndGame if game needs to end', () => {
-        const endGameStub = stub(commandService, 'endGame').callsFake(() => {
+    it('onCommand should call processCommand, postCommand and EndGame if game needs to end', async () => {
+        const endGameStub = stub(commandService as any, 'endGame').callsFake(() => {
             return;
         });
-        const processStub = stub(commandService, 'processCommand').callsFake(() => {
+        const processStub = stub(commandService as any, 'processCommand').callsFake(() => {
             return;
         });
-        const postCommandStub = stub(commandService, 'postCommand').callsFake(() => {
+        const postCommandStub = stub(commandService, 'postCommand' as any).callsFake(() => {
             return;
         });
 
@@ -71,13 +71,13 @@ describe('Individual functions', () => {
             },
         } as unknown as Game;
 
-        commandService.onCommand(game, sockets, 'passer', 0);
+        await commandService.onCommand(game, sockets, 'passer', 0);
         expect(processStub.calledOnce && postCommandStub.calledOnce).to.equal(true);
         expect(endGameStub.calledOnce).to.equal(true);
     });
 
     it('onCommand should call errorOnCommand if an error was thrown and gameEnded if game exists', () => {
-        const processStub = stub(commandService, 'processCommand').callsFake(() => {
+        const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
             throw new Error('Error de test');
         });
         const errorOnCommandStub = stub(commandService as any, 'errorOnCommand').callsFake(() => {
@@ -96,6 +96,17 @@ describe('Individual functions', () => {
         expect(processStub.calledOnce && gameEndedCalled && errorOnCommandStub.calledOnce).to.equal(true);
     });
 
+    it('actionAfterTimeout should call processSkip and postCommand', async () => {
+        const skipStub = stub(commandService as any, 'processSkip');
+        const postCommandStub = stub(commandService as any, 'postCommand');
+        const fakeGame = { activePlayer: 0, needsToEnd: () => false } as unknown as Game;
+        const roomStub = { game: fakeGame, commandService } as unknown as Room;
+
+        commandService['actionAfterTimeout'](roomStub)();
+        expect(skipStub.calledOnce).to.equal(true);
+        expect(postCommandStub.calledOnce).to.equal(true);
+    });
+
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
         const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
             return;
@@ -111,7 +122,7 @@ describe('Individual functions', () => {
             },
         } as unknown as io.Socket;
 
-        const processStub = stub(commandService, 'processCommand').callsFake(() => {
+        const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
             throw new Error('Error de test');
         });
         const errorOnCommandStub = stub(commandService as any, 'errorOnCommand').callsFake(() => {
@@ -187,9 +198,9 @@ describe('Individual functions', () => {
         const clk = useFakeTimers();
         const playerNumber = 1;
         sockets[playerNumber] = fakeSocket;
-        commandService.postCommand = () => done();
+        commandService['postCommand'] = () => done();
         commandService['errorOnCommand'](game, sockets, new GameError(GameErrorType.InvalidWord), playerNumber);
-        clk.tick(game.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
+        clk.tick(game['gameOptions'].timePerRound * MILLISECONDS_PER_SEC);
         clk.restore();
     });
 
@@ -260,7 +271,7 @@ describe('commands', () => {
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
         room.join(sockets[1], 'player 2');
-        room.inviteAccepted(sockets[1]);
+        room['inviteAccepted'](sockets[1]);
         game = room.game as Game;
     });
 
@@ -275,49 +286,49 @@ describe('commands', () => {
 
     describe('process command', () => {
         it('string with place calls processPlace', (done) => {
-            commandService.processPlace = () => {
+            commandService['processPlace'] = () => {
                 done();
             };
             const fullCommand = 'placer h3h h';
-            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
         it('string with draw calls processDraw', (done) => {
-            commandService.processDraw = () => {
+            commandService['processDraw'] = () => {
                 done();
             };
             const fullCommand = 'échanger abc';
-            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
         it('string with skip calls processSkip', (done) => {
-            commandService.processSkip = () => {
+            commandService['processSkip'] = () => {
                 done();
             };
             const fullCommand = 'passer';
-            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
-        it('string with place calls processPlace', () => {
+        it('string with place calls processPlace', (done) => {
             const fullCommand = 'placer h3h h';
             game.gameFinished = true;
-            expect(() => commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer)).to.throw();
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer).catch(() => done());
         });
 
         it('string with skip calls processBag', (done) => {
-            commandService.processBag = () => {
+            commandService['processBag'] = () => {
                 done();
             };
             const fullCommand = 'réserve';
-            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
 
         it('string with hint calls processHint', (done) => {
-            commandService.processHint = () => {
+            commandService['processHint'] = async () => {
                 done();
             };
             const fullCommand = 'indice';
-            commandService.processCommand(game, room.sockets, fullCommand, game.activePlayer);
+            commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
         });
     });
 
@@ -326,26 +337,26 @@ describe('commands', () => {
             done();
         };
         const commandArgs = ['h7h', 'con'];
-        commandService.processPlace(game, room.sockets, commandArgs, game.activePlayer);
+        commandService['processPlace'](game, room.sockets, commandArgs, game.activePlayer);
     });
 
     it('processPlace not valid should emit an Error', () => {
         commandService['validatePlace'] = () => {
             return false;
         };
-        expect(() => commandService.processPlace(game, room.sockets, ['a'], 0)).to.throw();
+        expect(() => commandService['processPlace'](game, room.sockets, ['a'], 0)).to.throw();
     });
 
     it('processDraw with wrong arguments should throw an error', () => {
-        expect(() => commandService.processDraw(game, room.sockets, ['a8'], 0)).to.throw();
+        expect(() => commandService['processDraw'](game, room.sockets, ['a8'], 0)).to.throw();
     });
 
     it('processSkip with arguments should throw an error', () => {
-        expect(() => commandService.processSkip(game, room.sockets, ['a', 'b'], 0)).to.throw();
+        expect(() => commandService['processSkip'](game, room.sockets, ['a', 'b'], 0)).to.throw();
     });
 
-    it('processHint with arguments should throw an error', () => {
-        expect(() => commandService.processHint(game, room.sockets, ['a', 'b'], 0)).to.throw();
+    it('processHint with arguments should throw an error', (done) => {
+        commandService['processHint'](game, room.sockets, ['a', 'b'], 0).catch(() => done());
     });
 
     it('ProcessSkip should emit skip success when player number is 0', (done) => {
@@ -359,7 +370,7 @@ describe('commands', () => {
         stub(room.game as any, 'skip').callsFake(() => {
             return;
         });
-        commandService.processSkip(game, room.sockets, [], 0);
+        commandService['processSkip'](game, room.sockets, [], 0);
     });
 
     it('processHint should emit hint success', (done) => {
@@ -370,7 +381,7 @@ describe('commands', () => {
             },
         } as io.Socket;
         room.sockets[0] = fakeSocket;
-        commandService.processHint(game, room.sockets, [], 0);
+        commandService['processHint'](game, room.sockets, [], 0);
     });
 
     it('ProcessSkip should emit skip success when player number is 1', (done) => {
@@ -384,7 +395,7 @@ describe('commands', () => {
         stub(game as any, 'skip').callsFake(() => {
             return;
         });
-        commandService.processSkip(game, room.sockets, [], 1);
+        commandService['processSkip'](game, room.sockets, [], 1);
     });
 
     it('processPlace should emit place success playerNumber is 1', (done) => {
@@ -404,7 +415,7 @@ describe('commands', () => {
         stub(commandService as any, 'validatePlace').callsFake(() => {
             return true;
         });
-        commandService.processPlace(game, room.sockets, [], 1);
+        commandService['processPlace'](game, room.sockets, [], 1);
     });
 
     it('processPlace should emit place success when playerNumber is 0', (done) => {
@@ -424,7 +435,7 @@ describe('commands', () => {
         stub(commandService as any, 'validatePlace').callsFake(() => {
             return true;
         });
-        commandService.processPlace(game, room.sockets, [], 0);
+        commandService['processPlace'](game, room.sockets, [], 0);
     });
 
     it('validatePlace should return false if there is not two arguments', () => {
@@ -440,21 +451,21 @@ describe('commands', () => {
         game.draw = () => {
             done();
         };
-        commandService.processDraw(game, room.sockets, ['a'], 0);
+        commandService['processDraw'](game, room.sockets, ['a'], 0);
     });
 
     it('process draw calls game draw on correctly formed arguments with another player number', (done) => {
         game.draw = () => {
             done();
         };
-        commandService.processDraw(game, room.sockets, ['a'], 1);
+        commandService['processDraw'](game, room.sockets, ['a'], 1);
     });
 
     it('process skip calls game skip on correctly formed arguments', (done) => {
         game.skip = () => {
             done();
         };
-        commandService.processSkip(game, room.sockets, [], game.activePlayer);
+        commandService['processSkip'](game, room.sockets, [], game.activePlayer);
     });
 
     it('process bag calls game emits on correctly formed arguments', (done) => {
@@ -462,6 +473,6 @@ describe('commands', () => {
             done();
             return true;
         };
-        commandService.processBag(game, room.sockets, [], 0);
+        commandService['processBag'](game, room.sockets, [], 0);
     });
 });
