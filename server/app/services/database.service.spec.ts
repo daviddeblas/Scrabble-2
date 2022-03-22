@@ -174,27 +174,24 @@ describe('Database service', () => {
         });
 
         it('should emit receive classic highscores when receiving get highScores', (done) => {
-            const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
+            let classicReceived = false;
+            let log2990Received = false;
+            stub(databaseService, 'getHighscores').resolves([player1, player2]);
             server.on('connection', (socket) => {
                 databaseService.setupSocketConnection(socket);
                 hostSocket.emit('get highScores');
                 hostSocket.once('receive classic highscores', () => {
-                    expect(getHighScoresStub.called);
-                    done();
+                    classicReceived = true;
                 });
-            });
-        });
-
-        it('should emit receive log2990 highscores when receiving get highScores', (done) => {
-            const getHighScoresStub = stub(databaseService, 'getHighscores').resolves([player1, player2]);
-            server.on('connection', (socket) => {
-                databaseService.setupSocketConnection(socket);
-                hostSocket.emit('get highScores');
                 hostSocket.once('receive log2990 highscores', () => {
-                    expect(getHighScoresStub.called);
-                    done();
+                    log2990Received = true;
                 });
             });
+            const responseDelay = 400;
+            setTimeout(() => {
+                expect(classicReceived && log2990Received).to.equal(true);
+                done();
+            }, responseDelay);
         });
     });
 });
