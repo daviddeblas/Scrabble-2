@@ -427,7 +427,7 @@ describe('solver', () => {
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);
 
-        const results = await solver.getEasyBotSolutions();
+        const results = await solver.getBotSolutions();
         expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
 
         assert(scorePositionStub.calledTwice);
@@ -437,7 +437,7 @@ describe('solver', () => {
     it('should return no easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([]);
-        const results = await solver.getEasyBotSolutions();
+        const results = await solver.getBotSolutions();
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
     });
