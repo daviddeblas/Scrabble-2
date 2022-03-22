@@ -1,3 +1,4 @@
+import { GameConfig } from '@app/classes/game-config';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
@@ -13,7 +14,7 @@ describe('Letter config service', () => {
     it('getConfigFromName with "Classic" as input should return the classic letter config', () => {
         const config = service.getConfigFromName('Classic');
         expect(config.name).to.eq('Classic');
-        const letterConfigItem = config.letters.find((l) => l.letter === ('A' as Letter));
+        const letterConfigItem = (config as GameConfig).letters.find((l) => l.letter === ('A' as Letter));
         expect(letterConfigItem).to.not.eq(undefined);
         expect(letterConfigItem?.letter).to.eq('A' as Letter);
         expect(letterConfigItem?.points).to.eq(1);
@@ -21,9 +22,7 @@ describe('Letter config service', () => {
         expect(letterConfigItem?.amount).to.eq(9);
     });
 
-    it('getConfigFromName with invalid input should throw', () => {
-        expect(() => {
-            service.getConfigFromName('a');
-        }).to.throw();
+    it('getConfigFromName with invalid input should return an error', () => {
+        expect(service.getConfigFromName('a') instanceof Error).to.equal(true);
     });
 });

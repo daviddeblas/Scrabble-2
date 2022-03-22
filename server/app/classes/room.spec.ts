@@ -13,6 +13,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
+import { GameError } from './game.exception';
 import { Game } from './game/game';
 
 describe('room', () => {
@@ -87,9 +88,9 @@ describe('room', () => {
             expect(room.clients[0]).to.deep.equal(socket);
         });
 
-        it('surrenderGame should throw error if the game is null', () => {
+        it('surrenderGame should return error if the game is null', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            expect(() => room.surrenderGame(socket.id)).to.throw();
+            expect(room.surrenderGame(socket.id) instanceof GameError).to.equal(true);
         });
 
         it('surrenderGame should emit endGame if the game is not null', (done) => {
@@ -391,7 +392,7 @@ describe('room', () => {
                 let surrenderGameStub: SinonStub;
                 hostSocket.on('player joining', () => {
                     surrenderGameStub = stub(room, 'surrenderGame').callsFake(() => {
-                        return;
+                        return undefined;
                     });
                     hostSocket.emit('accept');
                 });

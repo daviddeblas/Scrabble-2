@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
+import { GameError } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
@@ -53,7 +54,7 @@ describe('board', async () => {
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 7))).to.deep.eq(lettersToPlace);
     });
 
-    it('getAffectedWordFromSinglePlacement should not throw on border placements', () => {
+    it('getAffectedWordFromSinglePlacement should not return an error on border placements', () => {
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 0)), new PlacedLetter('O', new Vec2(7, 0)), new PlacedLetter('N', new Vec2(8, 0))];
         lettersToPlace.forEach((l) => (board.board[l.position.x][l.position.y] = l.letter));
         expect(board['getAffectedWordFromSinglePlacement'](new Vec2(1, 0), new Vec2(7, 0))).to.deep.eq(lettersToPlace);
@@ -89,19 +90,19 @@ describe('board', async () => {
         expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
     });
 
-    it('place throws on wrong word', () => {
+    it('place should return an game error on wrong word', () => {
         const lettersToPlace = [new PlacedLetter('O', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        expect(() => board.place(lettersToPlace, [], true)).to.throw();
+        expect(board.place(lettersToPlace, [], true) instanceof GameError).to.equal(true);
     });
 
-    it('place throws on invalid placement', () => {
+    it('place should return an game error on invalid placement', () => {
         const lettersToPlace = [new PlacedLetter('N', new Vec2(100, 7))];
-        expect(() => board.place(lettersToPlace, [], true)).to.throw();
+        expect(board.place(lettersToPlace, [], true) instanceof GameError).to.equal(true);
     });
 
-    it('place throws on invalid input', () => {
+    it('place should return an game error on invalid input', () => {
         const lettersToPlace = [new PlacedLetter('C', new Vec2(6, 7)), new PlacedLetter('O', new Vec2(7, 7)), new PlacedLetter('N', new Vec2(8, 7))];
-        expect(() => board.place(lettersToPlace, [], false)).to.throw();
+        expect(board.place(lettersToPlace, [], false) instanceof GameError).to.equal(true);
     });
 
     it('place should add a blank to the blanks field', () => {
@@ -116,8 +117,8 @@ describe('board', async () => {
         expect(board.blanks.length).to.eq(1);
     });
 
-    it('scoreWord throws on invalid position', () => {
-        expect(() => board.scorePosition([{ letter: null, position: new Vec2(0, 0) } as unknown as PlacedLetter])).to.throw();
+    it('scoreWord return an game error on invalid position', () => {
+        expect(board.scorePosition([{ letter: null, position: new Vec2(0, 0) } as unknown as PlacedLetter]) instanceof GameError).to.equal(true);
     });
 
     it('scorePositions should score accordingly on correct placement with multiple word multiplier', () => {

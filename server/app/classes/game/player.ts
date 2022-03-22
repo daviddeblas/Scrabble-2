@@ -22,8 +22,8 @@ export class Player {
         return returnValue;
     }
 
-    removeLetters(letters: Letter[]): void {
-        if (!this.canRemoveLetters(letters)) throw new GameError(GameErrorType.LettersAreNotInEasel);
+    removeLetters(letters: Letter[]): GameError | undefined {
+        if (!this.canRemoveLetters(letters)) return new GameError(GameErrorType.LettersAreNotInEasel);
 
         // execution
         letters.forEach((l) => {
@@ -32,6 +32,7 @@ export class Player {
                 1,
             );
         });
+        return;
     }
 
     addLetters(letters: Letter[]): void {

@@ -32,8 +32,10 @@ export class RoomsManager {
         });
 
         socket.on('join room', (data) => {
-            this.joinRoom(data.roomId, socket, data.playerName);
+            const error = this.joinRoom(data.roomId, socket, data.playerName);
+            if (error) return error;
             socket.emit('player joining', data.playerName);
+            return;
         });
     }
 
@@ -85,10 +87,11 @@ export class RoomsManager {
         return newRoom;
     }
 
-    private joinRoom(roomId: string, socket: io.Socket, name: string): void {
+    private joinRoom(roomId: string, socket: io.Socket, name: string): GameError | undefined {
         const room = this.getRoom(roomId);
         if (room) {
             room.join(socket, name);
-        } else throw new GameError(GameErrorType.GameNotExists);
+        } else return new GameError(GameErrorType.GameNotExists);
+        return;
     }
 }
