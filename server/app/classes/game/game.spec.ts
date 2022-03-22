@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { GameError } from '@app/classes/game.exception';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
@@ -115,6 +115,26 @@ describe('game', () => {
         ).to.equal(true);
     });
 
+    it('place should return an error on correct placement as second placement if not connected to other words', () => {
+        const lettersToPlace: Letter[] = ['C', 'O', 'N'];
+        game['placeCounter'] = 1;
+        lettersToPlace.forEach((l) => {
+            game['getActivePlayer']().easel.push(l);
+        });
+
+        stub(game, 'checkMove' as any).callsFake(() => {
+            return new GameError(GameErrorType.InvalidWord);
+        });
+
+        expect(
+            game.place(
+                lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
+                [],
+                game.activePlayer,
+            ) instanceof GameError,
+        ).to.equal(true);
+    });
+
     it('place should score according to scorePosition added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
         game.players[activePlayer].easel = stringToLetters('abacost');
         const oldEasel = game.players[activePlayer].easel;
@@ -177,12 +197,22 @@ describe('game', () => {
         expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
     });
 
+    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
+        stub(game, 'checkMove' as any).callsFake(() => new GameError(GameErrorType.LettersAreNotInEasel));
+        expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
+    });
+
     it('skip', () => {
         const oldActivePlayer = game.activePlayer;
         game.skip(game.activePlayer);
 
         expect(game.activePlayer).to.not.eq(oldActivePlayer);
         expect(game['turnsSkipped']).to.eq(1);
+    });
+
+    it('skip should return an error if it is not the players turn', () => {
+        const wrongAtivePlayer = (game.activePlayer + 1) % 2;
+        expect(game.skip(wrongAtivePlayer) instanceof GameError).to.equal(true);
     });
 
     it('gameEnded should be true when one players easel is empty', () => {

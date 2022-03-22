@@ -68,10 +68,9 @@ export class Board {
                 error = scoreToAdd;
                 return;
             }
-            if (error) return;
             score += scoreToAdd;
-            return;
         });
+        if (error) return error;
 
         letters.forEach((l) => {
             this.multipliers[l.position.x][l.position.y] = null;
@@ -85,9 +84,8 @@ export class Board {
         let multiplier = 1;
         let error: GameError | undefined;
         word.forEach((placedLetter) => {
-            if (error) return;
             const letter = placedLetter.letter;
-            if (letter === null) {
+            if (letter === null || error) {
                 error = new GameError(GameErrorType.LetterIsNull);
                 return;
             }

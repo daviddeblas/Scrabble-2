@@ -13,7 +13,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
-import { GameError } from './game.exception';
+import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
 
 describe('room', () => {
@@ -255,6 +255,19 @@ describe('room', () => {
             room.game = stubbedGame;
             await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
+        });
+
+        it('actionAfterTurnWithBot should return an error if the botservice return an error', async () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                activePlayer: 1,
+                gameFinished: false,
+            } as unknown as Game;
+            stub(room['botService'], 'move').callsFake(async () => {
+                return new GameError(GameErrorType.OutOfBoundPosition);
+            });
+            room.game = stubbedGame;
+            expect((await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)()) instanceof GameError).to.equal(true);
         });
     });
 

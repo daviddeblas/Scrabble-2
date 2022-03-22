@@ -1,13 +1,14 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import { GameError } from '@app/classes/game.exception';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
+import { stub } from 'sinon';
 import { Container } from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
@@ -88,6 +89,14 @@ describe('board', async () => {
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
         const wordMultiplier = 2;
         expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
+    });
+
+    it('scorePositions should return an error if scorePosition returns one', () => {
+        board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
+        stub(board, 'scorePosition').callsFake(() => {
+            return new GameError(GameErrorType.LetterIsNull);
+        });
+        expect(board.place(correctLettersToPlace, [], true) instanceof GameError).to.eq(true);
     });
 
     it('place should return an game error on wrong word', () => {
