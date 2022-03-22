@@ -15,6 +15,7 @@ import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, use
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 import Container from 'typedi';
+import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
 
 describe('room', () => {
@@ -89,9 +90,9 @@ describe('room', () => {
             expect(room.clients[0]).to.deep.equal(socket);
         });
 
-        it('surrenderGame should throw error if the game is null', () => {
+        it('surrenderGame should return error if the game is null', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            expect(() => room.surrenderGame(socket.id)).to.throw();
+            expect(room.surrenderGame(socket.id) instanceof GameError).to.equal(true);
         });
 
         it('surrenderGame should emit endGame if the game is not null', (done) => {
@@ -261,6 +262,19 @@ describe('room', () => {
             await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
             expect(moveStub.called).to.equal(false);
         });
+
+        it('actionAfterTurnWithBot should return an error if the botservice return an error', async () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const stubbedGame = {
+                activePlayer: 1,
+                gameFinished: false,
+            } as unknown as Game;
+            stub(room['botService'], 'move').callsFake(async () => {
+                return new GameError(GameErrorType.OutOfBoundPosition);
+            });
+            room.game = stubbedGame;
+            expect((await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)()) instanceof GameError).to.equal(true);
+        });
     });
 
     describe('Room events', () => {
@@ -397,7 +411,7 @@ describe('room', () => {
                 let surrenderGameStub: SinonStub;
                 hostSocket.on('player joining', () => {
                     surrenderGameStub = stub(room, 'surrenderGame').callsFake(() => {
-                        return;
+                        return undefined;
                     });
                     hostSocket.emit('accept');
                 });

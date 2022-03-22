@@ -86,7 +86,7 @@ export class Room {
             this.gameOptions,
             this.actionAfterTimeout(),
             async () => {
-                return;
+                return undefined;
             },
         );
 
@@ -96,8 +96,8 @@ export class Room {
         this.initiateRoomEvents();
     }
 
-    surrenderGame(looserId: string) {
-        if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
+    surrenderGame(looserId: string): GameError | undefined {
+        if (!this.game?.players) return new GameError(GameErrorType.GameNotExists);
 
         const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
         this.game.stopTimer();
@@ -118,6 +118,7 @@ export class Room {
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
+        return;
     }
 
     initSoloGame(diff: BotDifficulty): void {
@@ -178,27 +179,29 @@ export class Room {
 
         // Initialise l'abbandon de la partie
         socket.on('surrender game', () => {
-            this.surrenderGame(socket.id);
+            return this.surrenderGame(socket.id);
         });
     }
 
-    private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => Promise<void> {
+    private actionAfterTurnWithBot(room: Room, diff: BotDifficulty): () => Promise<undefined | GameError> {
         return async () => {
             const game = this.game as Game;
             if (game.activePlayer === 1 && !game.gameFinished) {
                 let date = new Date();
                 const startDate = date.getTime();
                 const botCommand = await room.botService.move(game, diff);
+                if (botCommand instanceof GameError) return botCommand;
                 date = new Date();
                 const timeTaken = date.getTime() - startDate;
                 setTimeout(() => {
                     room.commandService.onCommand(game, room.sockets, botCommand, 1);
                 }, Math.max(MIN_BOT_PLACEMENT_TIME - timeTaken, 0));
             }
+            return;
         };
     }
 
-    private actionAfterTimeout(): () => void {
+    private actionAfterTimeout(): () => undefined {
         return this.commandService.actionAfterTimeout(this);
     }
 }

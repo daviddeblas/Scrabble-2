@@ -29,8 +29,8 @@ export class Game {
         public config: GameConfig,
         playerNames: string[],
         private gameOptions: GameOptions,
-        private actionAfterTimeout: () => void,
-        public actionAfterTurn: () => Promise<void>,
+        private actionAfterTimeout: () => undefined | GameError,
+        public actionAfterTurn: () => Promise<undefined | GameError>,
     ) {
         this.bag = new Bag(config);
         this.board = new Board(config);
@@ -48,19 +48,23 @@ export class Game {
         }, creationDelay);
     }
 
-    place(letters: PlacedLetter[], blanks: number[], player: number): void {
+    place(letters: PlacedLetter[], blanks: number[], player: number): GameError | undefined {
         const easelLettersForMove = letters.map((l, index) => {
             if (blanks.filter((b) => b === index).length > 0) return '*' as Letter;
             return l.letter;
         });
-        this.checkMove(easelLettersForMove, player);
+        const error = this.checkMove(easelLettersForMove, player);
+        if (error) return error;
         if (this.placeCounter === 0) {
             const lettersInCenter = letters.filter((l) =>
                 l.position.equals(new Vec2((this.config.boardSize.x - 1) / 2, (this.config.boardSize.y - 1) / 2)),
             );
-            if (lettersInCenter.length === 0) throw new GameError(GameErrorType.BadStartingMove);
+            if (lettersInCenter.length === 0) return new GameError(GameErrorType.BadStartingMove);
         }
-        this.getActivePlayer().score += this.board.place(letters, blanks, this.placeCounter === 0);
+
+        const scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
+        if (scoreToAdd instanceof GameError) return scoreToAdd;
+        this.getActivePlayer().score += scoreToAdd;
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);
         this.getActivePlayer().addLetters(this.bag.getLetters(letters.length));
@@ -68,21 +72,26 @@ export class Game {
         this.nextTurn();
         this.turnsSkipped = 0;
         this.placeCounter++;
+        return;
     }
 
-    draw(letters: Letter[], player: number): void {
-        if (this.bag.letters.length < MAX_LETTERS_IN_EASEL) throw new GameError(GameErrorType.NotEnoughLetters);
-        this.checkMove(letters, player);
+    draw(letters: Letter[], player: number): GameError | undefined {
+        if (this.bag.letters.length < MAX_LETTERS_IN_EASEL) return new GameError(GameErrorType.NotEnoughLetters);
+        const error = this.checkMove(letters, player);
+        if (error) return error;
         this.getActivePlayer().removeLetters(letters);
         this.getActivePlayer().addLetters(this.bag.exchangeLetters(letters));
         this.nextTurn();
         this.turnsSkipped = 0;
+        return;
     }
 
-    skip(player: number): void {
-        this.checkMove([], player);
+    skip(player: number): GameError | undefined {
+        const error = this.checkMove([], player);
+        if (error) return error;
         this.nextTurn();
         this.turnsSkipped++;
+        return;
     }
 
     needsToEnd(): boolean {
@@ -167,14 +176,19 @@ export class Game {
         return winningPlayer.name;
     }
 
-    private checkMove(letters: Letter[], player: number): void {
-        if (player !== this.activePlayer) throw new GameError(GameErrorType.WrongPlayer);
+    private checkMove(letters: Letter[], player: number): GameError | undefined {
+        if (player !== this.activePlayer) return new GameError(GameErrorType.WrongPlayer);
         const playerTempEasel = [...this.players[player].easel];
+        let letterNotEasel = false;
         letters.forEach((l) => {
             const index = playerTempEasel.indexOf(l);
-            if (index < 0) throw new GameError(GameErrorType.LettersAreNotInEasel);
+            if (index < 0) {
+                letterNotEasel = true;
+                return;
+            }
             playerTempEasel.splice(index, 1);
         });
+        return letterNotEasel ? new GameError(GameErrorType.LettersAreNotInEasel) : undefined;
     }
 
     private nextPlayer(): number {

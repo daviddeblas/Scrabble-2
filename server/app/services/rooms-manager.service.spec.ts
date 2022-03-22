@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
-import { GameErrorType } from '@app/classes/game.exception';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
 import { PORT } from '@app/environnement';
@@ -60,16 +60,11 @@ describe('Rooms Manager Service', () => {
         expect(roomsManager['rooms'][0].clients[0]).to.deep.equal(socket);
     });
 
-    it('joinRoom should throw Game not found error if the Room does not exist', () => {
-        let errorMessage = 'Not the right message';
+    it('joinRoom should return Game not found error if the Room does not exist', () => {
         const expectedMessage = GameErrorType.GameNotExists;
-        try {
-            const playerName = 'Second player';
-            roomsManager['joinRoom']('1', socket, playerName);
-        } catch (error) {
-            errorMessage = error.message;
-        }
-        expect(errorMessage).to.be.equal(expectedMessage);
+        const playerName = 'Second player';
+        const error = roomsManager['joinRoom']('1', socket, playerName);
+        expect(error?.message).to.be.equal(expectedMessage);
     });
 
     it('getRooms should return the hostname of all rooms', () => {
@@ -99,7 +94,7 @@ describe('Rooms Manager Service', () => {
         const room = roomsManager['rooms'][1];
         // eslint-disable-next-line dot-notation
         room.game = new Game(new GameConfig(), [''], room['gameOptions'], room['actionAfterTimeout'](), async () => {
-            return;
+            return undefined;
         });
         assert(spyOnSocket.calledWith('get list', expectedResult));
     });
@@ -293,6 +288,21 @@ describe('Rooms Manager Service', () => {
             clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
             setTimeout(() => {
                 expect(joinRoomStub.calledOnce).to.equal(true);
+                done();
+            }, RESPONSE_DELAY);
+        });
+
+        it('emitting join room should call the joinRoom function', (done) => {
+            stub(roomsManager, 'joinRoom' as any).callsFake(() => {
+                return new GameError(GameErrorType.GameNotExists);
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            const socketEmit = stub(server, 'emit');
+            clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
+            setTimeout(() => {
+                expect(socketEmit.calledOnce).to.equal(false);
                 done();
             }, RESPONSE_DELAY);
         });

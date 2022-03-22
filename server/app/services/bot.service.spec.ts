@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Solution } from '@app/interfaces/solution';
@@ -89,6 +90,13 @@ describe('Bot service tests', () => {
         fakeGame.players[1].easel = ['L'];
         stub(service as any, 'determineWord').callsFake(() => done());
         service['placeCommand'](fakeGame, BotDifficulty.Easy);
+    });
+
+    it('placeCommand should return an error if solver get easy solution return an error', async () => {
+        fakeGame.board.board[7][7] = 'E';
+        fakeGame.players[1].easel = ['L'];
+        stub(fakeGame.board, 'scorePosition').callsFake(() => new GameError(GameErrorType.LetterIsNull));
+        expect((await service['placeCommand'](fakeGame, BotDifficulty.Easy)) instanceof GameError).to.equal(true);
     });
 
     it('placeCommand should not call determineWord if there is no solution and return passer', async () => {
