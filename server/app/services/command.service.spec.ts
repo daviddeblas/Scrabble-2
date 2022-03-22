@@ -13,10 +13,11 @@ import { GameOptions } from 'common/classes/game-options';
 import { stringToLetter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
-import { stub, useFakeTimers } from 'sinon';
+import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { CommandService } from './command.service';
+import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
 import { RoomsManager } from './rooms-manager.service';
 
@@ -49,19 +50,12 @@ describe('Individual functions', () => {
     });
 
     it('onCommand should call processCommand', async () => {
-        const processStub = stub(commandService, 'processCommand' as any).callsFake(() => {
+        const processStub = stub(commandService as any, 'processCommand').callsFake(() => {
             return;
         });
 
         const game = {
-            needsToEnd: () => true,
-            endGame: () => {
-                return {
-                    toEndGameStatus: () => {
-                        return;
-                    },
-                };
-            },
+            needsToEnd: () => false,
         } as unknown as Game;
 
         await commandService.onCommand(game, sockets, 'passer', 0);
@@ -104,10 +98,15 @@ describe('Individual functions', () => {
     });
 
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
+        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+            return;
+        });
         sockets[0] = {
             emit: (event: string) => {
                 expect(event === 'end game').to.equal(true);
                 expect(processStub.calledOnce && errorOnCommandStub.calledOnce).to.equal(true);
+                expect(dataStub.called).to.equal(true);
+                restore();
                 done();
                 return;
             },
@@ -121,6 +120,7 @@ describe('Individual functions', () => {
         });
 
         const game = {
+            players: [{ name: 'player', score: 5 }],
             needsToEnd: () => {
                 return true;
             },

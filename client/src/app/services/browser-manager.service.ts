@@ -5,6 +5,7 @@ import { ChatBox } from '@app/reducers/chat.reducer';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 const waitingTime = 200;
@@ -13,7 +14,12 @@ const thousandMilliseconds = 1000;
     providedIn: 'root',
 })
 export class BrowserManagerService {
-    constructor(public socketService: SocketClientService, private store: Store<{ gameStatus: GameStatus; chat: ChatBox }>) {}
+    private gameStatus$: Observable<GameStatus>;
+    private chat$: Observable<ChatBox>;
+    constructor(public socketService: SocketClientService, private store: Store<{ gameStatus: GameStatus; chat: ChatBox }>) {
+        this.gameStatus$ = this.store.select('gameStatus');
+        this.chat$ = this.store.select('chat');
+    }
     onBrowserClosed(): void {
         this.socketService.send('closed browser', this.socketService.socket.id);
         const date = new Date();
@@ -39,16 +45,13 @@ export class BrowserManagerService {
             const parsedTimer = JSON.parse(oldTimer);
             const diffDate = Math.round((date.getTime() - parsedTimer.date) / thousandMilliseconds);
             let timer = 0;
-            this.store.select('gameStatus').subscribe((gameStatus) => (timer = gameStatus.timer));
+            this.gameStatus$.subscribe((gameStatus) => (timer = gameStatus.timer));
             this.store.dispatch(refreshTimer({ timer: (parsedTimer.countdown - diffDate) % timer }));
         }, waitingTime);
     }
 
     private storeSelectors(): void {
-        this.store
-            .select('chat')
-            .pipe(take(1))
-            .subscribe((messages) => localStorage.setItem('chatMessages', JSON.stringify(messages.chatMessage)));
+        this.chat$.pipe(take(1)).subscribe((messages) => localStorage.setItem('chatMessages', JSON.stringify(messages.chatMessage)));
     }
 
     private retrieveSelectors(): void {
