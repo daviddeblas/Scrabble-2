@@ -117,6 +117,7 @@ describe('room', () => {
                     return;
                 },
             } as unknown as Game;
+            room['botLevel'] = BotDifficulty.Easy;
             room.sockets = [clientSocket, hostSocket];
             room.surrenderGame(socket.id);
             room.surrenderGame('player2');
@@ -139,9 +140,22 @@ describe('room', () => {
                     return;
                 },
             } as unknown as Game;
+            room['botLevel'] = BotDifficulty.Easy;
             room.sockets = [];
             room.surrenderGame('socket id');
             expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+        });
+
+        it('surrenderGame should call convertToSolo if botLevel undefined', () => {
+            const room = new Room(socket, roomsManager, gameOptions);
+            const convertToSoloStub = stub(room as any, 'convertToSolo');
+            room.game = {
+                players: ['player1', 'player2'],
+            } as unknown as Game;
+            room['botLevel'] = undefined;
+            room.sockets = [];
+            room.surrenderGame('socket id');
+            expect(convertToSoloStub.calledOnceWith(1)).to.equal(true);
         });
 
         it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
