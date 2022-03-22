@@ -9,7 +9,8 @@ import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import io from 'socket.io';
-import { Service } from 'typedi';
+import { Container, Service } from 'typedi';
+import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
 
 @Service()
@@ -132,6 +133,8 @@ export class CommandService {
     private endGame(game: Game, sockets: io.Socket[]): void {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
+            const highscore = { name: game.players[i].name, score: game.players[i].score };
+            Container.get(DatabaseService).updateHighScore(highscore, 'classical');
             s.emit('end game', endGameStatus);
         });
     }
