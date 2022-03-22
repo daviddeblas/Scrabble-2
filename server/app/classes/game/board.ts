@@ -90,9 +90,9 @@ export class Board {
                 return;
             }
             // prends le nombre de points associe a cette lettre
-            const letterPoints = this.pointsPerLetter.get(letter) as number;
+            let letterPoints = this.pointsPerLetter.get(letter) as number;
             // annule s'il s'agit d'un blank
-            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) return;
+            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) letterPoints = 0;
             // obtient le multiplieur a cette position
             const multi = this.multipliers[placedLetter.position.x][placedLetter.position.y];
             if (multi === null) {
