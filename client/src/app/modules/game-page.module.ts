@@ -57,7 +57,6 @@ import { StoreModule } from '@ngrx/store';
         StoreModule.forFeature(chatReducer.chatFeatureKey, chatReducer.reducer),
         StoreModule.forFeature(leaderboardReducer.leaderboardFeatureKey, leaderboardReducer.reducer),
         StoreModule.forFeature(localSettingsReducer.localSettingsFeatureKey, localSettingsReducer.reducer),
-        EffectsModule.forFeature([ChatEffects]),
         EffectsModule.forFeature([ChatEffects, PlayerEffects, BrowserEffects]),
     ],
 })

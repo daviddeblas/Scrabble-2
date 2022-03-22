@@ -189,7 +189,6 @@ describe('KeyManagerService', () => {
         it('onEnter should set the orientation depending on the modified cells position', () => {
             // Horizontal
             selectionStub.orientation = null;
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
             service.onEnter();
 
@@ -200,7 +199,6 @@ describe('KeyManagerService', () => {
             actions = [];
             selectionStub.orientation = null;
             selectionStub.modifiedCells = [new Vec2(0, 0), new Vec2(0, 1)];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
             service.onEnter();
 
@@ -222,9 +220,6 @@ describe('KeyManagerService', () => {
 
         it('onEnter should set blank letters in capital when place word action is called', () => {
             selectionStub.modifiedCells = [];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
-            service['board$'] = store.select('board');
-
             service.onEnter();
 
             expect(dispatchSpy).not.toHaveBeenCalled();
@@ -272,9 +267,6 @@ describe('KeyManagerService', () => {
 
         it("onBackspace shouldn't dispatch anything if there are no modifiedCells", () => {
             selectionStub.modifiedCells = [];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
-            service['board$'] = store.select('board');
-
             service.onBackspace();
 
             expect(dispatchSpy).not.toHaveBeenCalled();
