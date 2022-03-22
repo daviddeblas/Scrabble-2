@@ -6,7 +6,7 @@ import { PlacedLetter } from '@app/classes/placed-letter';
 import { Solution } from '@app/interfaces/solution';
 import { expect } from 'chai';
 import { Vec2 } from 'common/classes/vec2';
-import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
+import { BOARD_SIZE } from 'common/constants';
 import { restore, stub } from 'sinon';
 import { Container } from 'typedi';
 import { BotDifficulty, BotService } from './bot.service';
@@ -68,11 +68,6 @@ describe('Bot service tests', () => {
         const hardBotMoveStub = stub(service as any, 'hardBotMove').callsFake(() => '');
         service.move(fakeGame, BotDifficulty.Hard);
         expect(hardBotMoveStub.calledOnce).to.equal(true);
-    });
-
-    it('getName should return one of the bot names', () => {
-        const nameChosen = service.getName();
-        expect(BOT_NAMES.includes(nameChosen)).to.equal(true);
     });
 
     it('easyBotMove should return pass command if the random generated number is between 0 and 0.1', async () => {

@@ -1,3 +1,4 @@
+import { BotNameService } from '@app/services/bot-name.service';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { GameConfigService } from '@app/services/game-config.service';
@@ -19,7 +20,6 @@ export class Room {
     commandService: CommandService;
 
     private clientName: string | null;
-    private botService: BotService;
     private botLevel: string | undefined;
     private playersLeft: number;
 
@@ -34,7 +34,6 @@ export class Room {
         this.game = null;
         this.clientName = null;
         this.commandService = Container.get(CommandService);
-        this.botService = Container.get(BotService);
         this.botLevel = undefined;
         this.playersLeft = 2;
     }
@@ -117,9 +116,8 @@ export class Room {
     initSoloGame(diff: BotDifficulty): void {
         this.sockets = [this.host];
         this.playersLeft--;
-        let botName: string;
 
-        while ((botName = this.botService.getName()) === this.gameOptions.hostname);
+        const botName = Container.get(BotNameService).getBotName(diff, this.gameOptions.hostname);
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
             [this.gameOptions.hostname, botName],
@@ -182,7 +180,8 @@ export class Room {
             if (game.activePlayer === 1 && !game.gameFinished) {
                 let date = new Date();
                 const startDate = date.getTime();
-                const botCommand = await room.botService.move(game, diff);
+                const botService = Container.get(BotService);
+                const botCommand = await botService.move(game, diff);
                 date = new Date();
                 const timeTaken = date.getTime() - startDate;
                 setTimeout(() => {

@@ -2,7 +2,6 @@ import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from '@app/cl
 import { Solver } from '@app/classes/solver';
 import { Solution } from '@app/interfaces/solution';
 import { Letter, lettersToString } from 'common/classes/letter';
-import { BOT_NAMES } from 'common/constants';
 import { Service } from 'typedi';
 
 const passCommandName = 'passer';
@@ -33,10 +32,6 @@ export class BotService {
             decidedMove = await this.hardBotMove(game);
         }
         return decidedMove;
-    }
-
-    getName(): string {
-        return BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
     }
 
     private async easyBotMove(game: Game): Promise<string> {
