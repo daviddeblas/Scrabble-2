@@ -33,7 +33,7 @@ export class RoomsManager {
 
         socket.on('join room', (data) => {
             const error = this.joinRoom(data.roomId, socket, data.playerName);
-            if (error) return error;
+            if (error) return;
             socket.emit('player joining', data.playerName);
             return;
         });

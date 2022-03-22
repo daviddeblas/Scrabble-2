@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable import/no-deprecated */
 import { GameConfig } from '@app/classes/game-config';
-import { GameErrorType } from '@app/classes/game.exception';
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { Room } from '@app/classes/room';
 import { PORT } from '@app/environnement';
@@ -288,6 +288,21 @@ describe('Rooms Manager Service', () => {
             clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
             setTimeout(() => {
                 expect(joinRoomStub.calledOnce).to.equal(true);
+                done();
+            }, RESPONSE_DELAY);
+        });
+
+        it('emitting join room should call the joinRoom function', (done) => {
+            stub(roomsManager, 'joinRoom' as any).callsFake(() => {
+                return new GameError(GameErrorType.GameNotExists);
+            });
+            server.on('connection', (serverSocket) => {
+                roomsManager.setupSocketConnection(serverSocket);
+            });
+            const socketEmit = stub(server, 'emit');
+            clientSocket.emit('join room', { roomId: '1', playerName: 'player 2' });
+            setTimeout(() => {
+                expect(socketEmit.calledOnce).to.equal(false);
                 done();
             }, RESPONSE_DELAY);
         });

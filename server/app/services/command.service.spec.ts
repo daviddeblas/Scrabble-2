@@ -345,6 +345,12 @@ describe('commands', () => {
         expect(commandService['processPlace'](game, room.sockets, ['a'], 0) instanceof GameError).to.equal(true);
     });
 
+    it('processPlace should return an Error if game.place returns an error', () => {
+        stub(game, 'place').callsFake(() => new GameError(GameErrorType.BadStartingMove));
+        const commandArgs = ['h7h', 'con'];
+        expect(commandService['processPlace'](game, room.sockets, commandArgs, game.activePlayer) instanceof GameError).to.equal(true);
+    });
+
     it('processDraw with wrong arguments should return an error', () => {
         expect(commandService['processDraw'](game, room.sockets, ['a8'], 0) instanceof GameError).to.equal(true);
     });
