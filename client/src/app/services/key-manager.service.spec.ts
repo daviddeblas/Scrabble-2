@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { removeLetterFromEasel } from '@app/actions/player.actions';
 import { BoardSelection } from '@app/classes/board-selection';
@@ -57,6 +58,7 @@ describe('KeyManagerService', () => {
     describe('KeyManager.onKey', () => {
         it("onKey shouldn't do anything if the board selection cell is null", () => {
             store.overrideSelector('board', { selection: new BoardSelection() });
+            service['board$'] = store.select('board');
             const dispatchSpy = spyOn(store, 'dispatch');
 
             service.onKey('a');
@@ -84,6 +86,17 @@ describe('KeyManagerService', () => {
             expect(dispatchSpy).not.toHaveBeenCalled();
         });
 
+        it("onKey shouldn't do anything the focus is on something else than the body", () => {
+            const testButton = document.createElement('button');
+            document.body.appendChild(testButton);
+            testButton.focus();
+            const dispatchSpy = spyOn(store, 'dispatch');
+            service.onKey('a');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+            document.body.removeChild(testButton);
+            document.body.focus();
+        });
+
         it("onKey shouldn't do anything if the selection is filed with a letter and is at board limit", () => {
             const customBoard = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
             customBoard[BOARD_SIZE - 1][0] = 'a';
@@ -92,6 +105,7 @@ describe('KeyManagerService', () => {
                 board: customBoard,
                 selection: new BoardSelection(new Vec2(BOARD_SIZE - 1, 0), Direction.HORIZONTAL, [new Vec2(BOARD_SIZE - 1, 0)]),
             });
+            service['board$'] = store.select('board');
 
             const dispatchSpy = spyOn(store, 'dispatch');
 
@@ -175,7 +189,6 @@ describe('KeyManagerService', () => {
         it('onEnter should set the orientation depending on the modified cells position', () => {
             // Horizontal
             selectionStub.orientation = null;
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
             service.onEnter();
 
@@ -186,7 +199,6 @@ describe('KeyManagerService', () => {
             actions = [];
             selectionStub.orientation = null;
             selectionStub.modifiedCells = [new Vec2(0, 0), new Vec2(0, 1)];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
 
             service.onEnter();
 
@@ -196,7 +208,7 @@ describe('KeyManagerService', () => {
 
         it('onEnter should set blank letters in capital when place word action is called', () => {
             store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
-
+            service['board$'] = store.select('board');
             service.onEnter();
 
             const addLettersToEaselAction = actions[0] as unknown as { type: string; letters: Letter[] };
@@ -208,8 +220,6 @@ describe('KeyManagerService', () => {
 
         it('onEnter should set blank letters in capital when place word action is called', () => {
             selectionStub.modifiedCells = [];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
-
             service.onEnter();
 
             expect(dispatchSpy).not.toHaveBeenCalled();
@@ -234,6 +244,7 @@ describe('KeyManagerService', () => {
 
         it('onEsc should dispatch addLettersToEasel with a blank letter with a blank was placed', () => {
             store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
+            service['board$'] = store.select('board');
 
             service.onEsc();
 
@@ -256,8 +267,6 @@ describe('KeyManagerService', () => {
 
         it("onBackspace shouldn't dispatch anything if there are no modifiedCells", () => {
             selectionStub.modifiedCells = [];
-            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
-
             service.onBackspace();
 
             expect(dispatchSpy).not.toHaveBeenCalled();
@@ -265,6 +274,7 @@ describe('KeyManagerService', () => {
 
         it('onBackspace should dispatch addLettersToEasel with a blank letter with a blank was placed', () => {
             store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [new Vec2(1, 0)] });
+            service['board$'] = store.select('board');
 
             service.onBackspace();
 

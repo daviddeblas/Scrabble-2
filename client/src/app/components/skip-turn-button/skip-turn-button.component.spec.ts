@@ -14,7 +14,20 @@ describe('SkipTurnButtonComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [SkipTurnButtonComponent],
             imports: [AppMaterialModule],
-            providers: [provideMockStore()],
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameStatus',
+                            value: { activePlayer: 'moi', gameEnded: false },
+                        },
+                        {
+                            selector: 'players',
+                            value: { player: { name: 'VanDamne' } },
+                        },
+                    ],
+                }),
+            ],
         }).compileComponents();
 
         store = TestBed.inject(MockStore);
