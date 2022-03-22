@@ -56,8 +56,8 @@ export class BotService {
 
         if (command !== passCommandName) return command;
         const bagSize = game.bag.letters.length;
-        if (bagSize > game.players[1].easel.length) {
-            return exchangeCommandName + ' ' + lettersToString(game.players[1].easel);
+        if (bagSize >= game.players[1].easel.length) {
+            return exchangeCommandName + ' ' + lettersToString(game.players[1].easel).toLowerCase();
         } else if (bagSize === 0) {
             return passCommandName;
         }
