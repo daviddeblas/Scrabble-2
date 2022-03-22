@@ -37,7 +37,7 @@ describe('Bot service tests', () => {
         fakeGame = {
             players: [{}, { easel: ['A', 'B', 'C', 'D', 'E', '*'] }],
             bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
-            board: { board: fakeBoard, scorePosition: () => 2 },
+            board: { board: fakeBoard, scorePosition: () => 2, getAffectedWords: (letters: PlacedLetter[]) => [letters] },
             config: Container.get(GameConfigService).configs[0],
         } as unknown as Game;
     });

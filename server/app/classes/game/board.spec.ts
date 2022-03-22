@@ -66,7 +66,7 @@ describe('board', async () => {
     });
 
     it('getAffectedWords should be correct', () => {
-        const words = board['getAffectedWords'](correctLettersToPlace);
+        const words = board.getAffectedWords(correctLettersToPlace);
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
     });
 
