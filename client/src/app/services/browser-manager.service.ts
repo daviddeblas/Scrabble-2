@@ -14,8 +14,8 @@ const thousandMilliseconds = 1000;
     providedIn: 'root',
 })
 export class BrowserManagerService {
-    gameStatus$: Observable<GameStatus>;
-    chat$: Observable<ChatBox>;
+    private gameStatus$: Observable<GameStatus>;
+    private chat$: Observable<ChatBox>;
     constructor(public socketService: SocketClientService, private store: Store<{ gameStatus: GameStatus; chat: ChatBox }>) {
         this.gameStatus$ = this.store.select('gameStatus');
         this.chat$ = this.store.select('chat');
