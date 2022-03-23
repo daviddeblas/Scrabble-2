@@ -48,8 +48,10 @@ export class KeyManagerService {
         this.store.dispatch(addLettersToEasel({ letters: [...letters] }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
-        if (orientation === null && modifiedCells.length > 1)
-            orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.VERTICAL : Direction.HORIZONTAL;
+        if (orientation === null) {
+            if (modifiedCells.length > 1) orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.VERTICAL : Direction.HORIZONTAL;
+            else orientation = Direction.NONE;
+        }
 
         const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${orientation}`;
 
