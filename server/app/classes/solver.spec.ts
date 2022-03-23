@@ -26,6 +26,7 @@ describe('solver', () => {
             scorePosition: (word: PlacedLetter[]) => {
                 return 0;
             },
+            getAffectedWords: (letters: PlacedLetter[]) => [letters],
         } as Board;
         board.board = [...new Array(BOARD_SIZE)].map(() => new Array(BOARD_SIZE).fill(null));
     });

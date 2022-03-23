@@ -136,7 +136,7 @@ export class Board {
         return returnValue;
     }
 
-    private getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
+    getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
         const tempBoard = this.copy();
         letters.forEach((l) => {
             tempBoard.board[l.position.x][l.position.y] = l.letter;

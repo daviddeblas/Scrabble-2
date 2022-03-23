@@ -45,8 +45,18 @@ export class Solver {
         const allSolutions: Solution[] = await this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
-            const score = this.board.scorePosition(solution.letters);
-            if (score instanceof GameError) return score;
+            const wordsCreated = this.board.getAffectedWords(solution.letters);
+            let score = 0;
+            let error: GameError | undefined;
+            wordsCreated.forEach((word) => {
+                const scoreToAdd = this.board.scorePosition(word);
+                if (scoreToAdd instanceof GameError) {
+                    error = scoreToAdd;
+                    return;
+                }
+                score += scoreToAdd;
+            });
+            if (error) return error;
             result.push([solution, score]);
         }
         return result;
