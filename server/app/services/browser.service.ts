@@ -25,7 +25,7 @@ export class BrowserService {
             this.tempServerSocket = socket;
             const maxTimeForReload = 5000;
             this.timeoutId = setTimeout(() => {
-                room?.surrenderGame(socket.id);
+                return room?.surrenderGame(socket.id);
             }, maxTimeForReload);
         });
 

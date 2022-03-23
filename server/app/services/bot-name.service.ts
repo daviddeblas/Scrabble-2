@@ -51,4 +51,9 @@ export class BotNameService {
                 break;
         }
     }
+
+    resetAllNames(): void {
+        this.addedEasyNames = [];
+        this.addedHardNames = [];
+    }
 }

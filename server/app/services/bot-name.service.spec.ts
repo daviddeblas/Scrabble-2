@@ -68,4 +68,13 @@ describe('Bot Name service tests', () => {
         service.removeBotName(BotDifficulty.Hard, 'Player 1');
         expect(service['addedHardNames']).to.equal(oldArrayNames);
     });
+
+    it('resetAllNames should reset all modifiable lists to empty', () => {
+        const addedName = 'Player';
+        service['addedHardNames'].push(addedName);
+        service['addedEasyNames'].push(addedName);
+        service.resetAllNames();
+        expect(service['addedEasyNames'].length).to.equal(0);
+        expect(service['addedHardNames'].length).to.equal(0);
+    });
 });

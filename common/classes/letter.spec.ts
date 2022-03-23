@@ -3,17 +3,8 @@ import { describe } from 'mocha';
 import { Letter, lettersToString, stringToLetter, stringToLetters } from './letter';
 
 describe('stringToLetter', () => {
-    it('should throw error if input of string is larger than one char', () => {
-        expect(() => stringToLetter('aa')).to.throw();
-    });
     it('should be equal to its correct character', () => {
         expect(stringToLetter('a')).to.eq('A' as Letter);
-    });
-});
-
-describe('stringToLetters', () => {
-    it('should throw error if input of string contains unwanted characters', () => {
-        expect(() => stringToLetters('aAaAiiIlkK&!@#$')).to.throw();
     });
 });
 

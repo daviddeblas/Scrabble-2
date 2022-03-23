@@ -9,13 +9,17 @@ import { Store } from '@ngrx/store';
 import { BLANK_LETTER, Letter, lettersToString, stringToLetter } from 'common/classes/letter';
 import { iVec2, Vec2 } from 'common/classes/vec2';
 import { ASCII_ALPHABET_POSITION } from 'common/constants';
+import { Observable } from 'rxjs';
 import { PlayerService } from './player.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class KeyManagerService {
-    constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {}
+    private board$: Observable<BoardState>;
+    constructor(private store: Store<{ board: BoardState; gameStatus: GameStatus; players: Players }>, private playerService: PlayerService) {
+        this.board$ = store.select('board');
+    }
 
     onEnter(): void {
         let modifiedCells: Vec2[] = [];
@@ -23,7 +27,7 @@ export class KeyManagerService {
         const placedLetters: Letter[] = [];
         let blanks: iVec2[] = [];
         let board: (Letter | null)[][] = [];
-        this.store.select('board').subscribe((state) => {
+        this.board$.subscribe((state) => {
             modifiedCells = state.selection.modifiedCells;
             orientation = state.selection.orientation;
             blanks = state.blanks;
@@ -44,8 +48,10 @@ export class KeyManagerService {
         this.store.dispatch(addLettersToEasel({ letters: [...letters] }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
 
-        if (orientation === null && modifiedCells.length > 1)
-            orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.VERTICAL : Direction.HORIZONTAL;
+        if (orientation === null) {
+            if (modifiedCells.length > 1) orientation = modifiedCells[0].x === modifiedCells[1].x ? Direction.VERTICAL : Direction.HORIZONTAL;
+            else orientation = Direction.NONE;
+        }
 
         const encodedPosition = `${String.fromCharCode(modifiedCells[0].y + ASCII_ALPHABET_POSITION)}${modifiedCells[0].x + 1}${orientation}`;
 
@@ -68,7 +74,7 @@ export class KeyManagerService {
         let letters: Letter[] = [];
         let modifiedCells: Vec2[] = [];
         let blanks: iVec2[] = [];
-        this.store.select('board').subscribe((state) => {
+        this.board$.subscribe((state) => {
             modifiedCells = state.selection.modifiedCells;
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
             blanks = state.blanks;
@@ -87,7 +93,7 @@ export class KeyManagerService {
         let lastCell: Vec2 | null = null;
         let blanks: iVec2[] = [];
         let hasModifiedCells = true;
-        this.store.select('board').subscribe((state) => {
+        this.board$.subscribe((state) => {
             hasModifiedCells = state.selection.modifiedCells.length > 0;
             if (!hasModifiedCells) return;
             lastCell = state.selection.modifiedCells[state.selection.modifiedCells.length - 1] as Vec2;
@@ -106,7 +112,7 @@ export class KeyManagerService {
         if (document.activeElement !== null && document.activeElement.nodeName !== 'BODY') return;
 
         let selectedCell: Vec2 | null = null;
-        this.store.select('board').subscribe((state) => {
+        this.board$.subscribe((state) => {
             selectedCell = state.selection.cell;
         });
         if (!selectedCell) return;
@@ -130,7 +136,7 @@ export class KeyManagerService {
         let board: (Letter | null)[][] = [];
         let orientation: Direction | null = null;
         selectedCell = selectedCell as Vec2;
-        this.store.select('board').subscribe((state) => {
+        this.board$.subscribe((state) => {
             board = state.board;
             orientation = state.selection.orientation;
         });

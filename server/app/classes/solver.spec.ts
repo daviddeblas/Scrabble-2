@@ -12,6 +12,7 @@ import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { assert } from 'console';
 import { spy, stub } from 'sinon';
+import { GameError, GameErrorType } from './game.exception';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 import { Solver } from './solver';
@@ -25,6 +26,7 @@ describe('solver', () => {
             scorePosition: (word: PlacedLetter[]) => {
                 return 0;
             },
+            getAffectedWords: (letters: PlacedLetter[]) => [letters],
         } as Board;
         board.board = [...new Array(BOARD_SIZE)].map(() => new Array(BOARD_SIZE).fill(null));
     });
@@ -440,6 +442,23 @@ describe('solver', () => {
         const results = await solver.getBotSolutions();
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
+    });
+
+    it('should return an error if scorePosition returns an error', async () => {
+        const solutions: Solution[] = [...new Array(2)].map((v, i) => {
+            return {
+                letters: [],
+                blanks: [],
+                direction: new Vec2(0, i),
+            };
+        });
+        const solver: Solver = new Solver(dictionary, board, []);
+        stub(solver as any, 'findAllSolutions').returns(solutions);
+        stub(solver['board'], 'scorePosition').callsFake(() => {
+            return new GameError(GameErrorType.LetterIsNull);
+        });
+        const results = await solver.getBotSolutions();
+        expect(results instanceof GameError).to.equals(true);
     });
 
     it('should return if board is empty', () => {
