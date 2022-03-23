@@ -7,6 +7,7 @@ import { Vec2, vec2ToBoardPosition } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
 import { promisify } from 'util';
 import { Dictionary } from './dictionary';
+import { GameError } from './game.exception';
 import { Board } from './game/board';
 import { PlacedLetter } from './placed-letter';
 
@@ -39,12 +40,23 @@ export class Solver {
         return this.solutionsToHints(randomSolutions);
     }
 
-    async getEasyBotSolutions(): Promise<[Solution, number][]> {
+    async getEasyBotSolutions(): Promise<[Solution, number][] | GameError> {
         const result: [Solution, number][] = [];
         const allSolutions: Solution[] = await this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
-            const score = this.board.scorePosition(solution.letters);
+            const wordsCreated = this.board.getAffectedWords(solution.letters);
+            let score = 0;
+            let error: GameError | undefined;
+            wordsCreated.forEach((word) => {
+                const scoreToAdd = this.board.scorePosition(word);
+                if (scoreToAdd instanceof GameError) {
+                    error = scoreToAdd;
+                    return;
+                }
+                score += scoreToAdd;
+            });
+            if (error) return error;
             result.push([solution, score]);
         }
         return result;

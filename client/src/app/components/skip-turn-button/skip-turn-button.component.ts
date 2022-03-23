@@ -16,13 +16,11 @@ export class SkipTurnButtonComponent {
 
     constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
         store.select('players').subscribe((state) => {
-            if (state) this.username = state.player.name;
+            this.username = state.player.name;
         });
         store.select('gameStatus').subscribe((state) => {
-            if (state) {
-                this.activePlayer = state.activePlayer;
-                this.gameEnded = state.gameEnded;
-            }
+            this.activePlayer = state.activePlayer;
+            this.gameEnded = state.gameEnded;
         });
     }
 
