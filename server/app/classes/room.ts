@@ -95,8 +95,8 @@ export class Room {
         this.initiateRoomEvents();
     }
 
-    surrenderGame(looserId: string) {
-        if (!this.game?.players) throw new GameError(GameErrorType.GameNotExists);
+    surrenderGame(looserId: string): GameError | undefined {
+        if (!this.game?.players) return new GameError(GameErrorType.GameNotExists);
         if (!this.botLevel) {
             this.convertToSolo(looserId === this.host.id ? 0 : 1);
             return;
@@ -160,7 +160,7 @@ export class Room {
         const surrenderMessage = game.players[1].name + ' à abandonné, conversion en partie solo débutant';
         this.sockets[0].emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
         game.players[1].name = Container.get(BotNameService).getBotName(BotDifficulty.Easy, game.players[0].name);
-        this.sockets[0].emit('game status', game.getGameStatus(0, this.botLevel));
+        this.sockets[0].emit('game status', game.getGameStatus(0, this.botLevel, true));
         this.removeUnneededListeners(this.sockets[0]);
         this.setupSocket(this.sockets[0], 0);
         if (game.activePlayer === 1) game.actionAfterTurn();
