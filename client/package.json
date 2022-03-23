@@ -12,6 +12,9 @@
         "lint": "ng lint --format stylish",
         "lint:fix": "npm run lint -- --fix"
     },
+    "_moduleAliases": {
+        "common": "../common/"
+    },
     "private": true,
     "dependencies": {
         "@angular/animations": "12.1.5",

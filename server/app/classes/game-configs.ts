@@ -1,5 +1,5 @@
-import { GameConfig } from '@app/classes/game-config';
-
-export class GameConfigs {
-    configs: GameConfig[];
+export enum GameMode {
+    None = 'none',
+    Classical = 'classical',
+    Log2990 = 'log2990',
 }

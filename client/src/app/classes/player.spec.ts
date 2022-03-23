@@ -1,4 +1,4 @@
-import { Letter } from './letter';
+import { Letter } from 'common/classes/letter';
 import { Player } from './player';
 
 describe('Player', () => {
@@ -27,18 +27,16 @@ describe('Player', () => {
             expect(player.easel).toEqual([...letters, ...letters]);
         });
 
-        it('should cause error if exceed easel capacity', () => {
-            player.addLettersToEasel(letters);
-            player.addLettersToEasel(letters);
-            expect(() => {
-                player.addLettersToEasel(letters);
-            }).toThrow(new Error('The easel capacity has been exceeded: 9'));
-        });
-
         it('should remove letter from easel', () => {
             player.easel = ['I', 'A', 'O', 'U', 'Y', 'W'];
             player.removeLettersFromEasel(letters);
             expect(player.easel).toEqual(['A', 'Y', 'W']);
+        });
+
+        it("shouldn't do anything if the easel doesn't contain the letters to remove", () => {
+            player.easel = ['I', 'A', 'O', 'U', 'Y', 'W'];
+            player.removeLettersFromEasel(['E', 'H', 'L']);
+            expect(player.easel).toEqual(['I', 'A', 'O', 'U', 'Y', 'W']);
         });
     });
 });

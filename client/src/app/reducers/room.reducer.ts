@@ -1,16 +1,16 @@
 import { resetAllState } from '@app/actions/game-status.actions';
 import * as roomActions from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { createReducer, on } from '@ngrx/store';
+import { RoomInfo } from 'common/classes/room-info';
 
 export const roomsFeatureKey = 'room';
 
 export interface RoomState {
-    // For Hosting
+    // Pour hébergement (Hosting)
     roomInfo?: RoomInfo;
     pendingPlayer?: string;
 
-    // For Joining
+    // Pour joindre (Joining)
     roomList: RoomInfo[];
     pendingRoom?: RoomInfo;
 }
@@ -22,14 +22,14 @@ export const initialState: RoomState = {
 export const reducer = createReducer(
     initialState,
     on(resetAllState, () => initialState),
-    // For hosting
+    // Pour hébergement (Hosting)
     on(roomActions.createRoomSuccess, (state, { roomInfo }) => ({ ...state, roomInfo })),
     on(roomActions.closeRoom, () => initialState),
     on(roomActions.joinInviteReceived, (state, { playerName }) => ({ ...state, pendingPlayer: playerName })),
     on(roomActions.refuseInvite, (state) => ({ ...state, pendingPlayer: undefined })),
     on(roomActions.joinInviteCanceled, (state) => ({ ...state, pendingPlayer: undefined })),
 
-    // For joining
+    // Pour joindre (Joining)
     on(roomActions.loadRoomsSuccess, (state, { rooms }) => ({ ...state, roomList: rooms })),
     on(roomActions.joinRoom, (state, { roomInfo }) => ({ ...state, pendingRoom: roomInfo })),
     on(roomActions.cancelJoinRoom, (state) => ({ ...state, pendingRoom: undefined })),

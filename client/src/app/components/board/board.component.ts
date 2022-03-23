@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { Letter } from '@app/classes/letter';
-import { Multiplier, MultiplierType } from '@app/classes/multiplier';
-import { BOARD_SIZE } from '@app/constants';
+import { Component, HostListener } from '@angular/core';
 import { BoardState } from '@app/reducers/board.reducer';
 import { LocalSettings } from '@app/reducers/local-settings.reducer';
+import { KeyManagerService } from '@app/services/key-manager.service';
 import { Store } from '@ngrx/store';
+import { Letter } from 'common/classes/letter';
+import { Multiplier, MultiplierType } from 'common/classes/multiplier';
+import { BOARD_SIZE } from 'common/constants';
 import { Observable } from 'rxjs';
 
 const LETTER_A = 'A'.charCodeAt(0);
@@ -23,11 +24,16 @@ export class BoardComponent {
     multipliers$: Observable<(Multiplier | null)[][]>;
     localSettings$: Observable<LocalSettings>;
 
-    constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }>) {
+    constructor(store: Store<{ board: BoardState; localSettings: LocalSettings }>, private keyManager: KeyManagerService) {
         this.boardState$ = store.select('board');
         this.pointsPerLetter$ = store.select('board', 'pointsPerLetter');
         this.multipliers$ = store.select('board', 'multipliers');
         this.localSettings$ = store.select('localSettings');
+    }
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyDown(e: KeyboardEvent): void {
+        this.keyManager.onKey(e.key);
     }
 
     numberSequence(n: number): number[] {

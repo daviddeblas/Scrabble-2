@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { CdkStep } from '@angular/cdk/stepper';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -5,10 +6,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { cancelJoinRoom, joinRoom, loadRooms } from '@app/actions/room.actions';
-import { RoomInfo } from '@app/classes/room-info';
 import { RoomEffects } from '@app/effects/room.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { RoomInfo } from 'common/classes/room-info';
 import { cold } from 'jasmine-marbles';
 import { forbiddenNameValidator, GameJoinPageComponent } from './game-join-page.component';
 const FIXTURE_COOLDOWN = 10;
@@ -47,7 +48,7 @@ describe('GameJoinPageComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameJoinPageComponent);
         component = fixture.componentInstance;
-        component.stepper = stepperMock;
+        component['stepper'] = stepperMock;
         setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
     });
 
@@ -57,6 +58,17 @@ describe('GameJoinPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('timerTString should return a timer in minute format', () => {
+        const time = 60;
+        const expectedResult = '1:00 min';
+        expect(component.timerToString(time)).toEqual(expectedResult);
+    });
+
+    it('timerTString should return one minute in string if no timer is given', () => {
+        const expectedResult = '1:00 min';
+        expect(component.timerToString()).toEqual(expectedResult);
     });
 
     it('should dispatch "[Room] Load Rooms" when constructor', () => {
@@ -132,7 +144,7 @@ describe('GameJoinPageComponent', () => {
 
     it('onStepChange should closeRoom if stepper is selecting the first page', () => {
         let stepper = { selected: { editable: true } as CdkStep } as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         const spyOnCloseRoom = spyOn(component, 'cancelJoin');
 
@@ -140,7 +152,7 @@ describe('GameJoinPageComponent', () => {
         expect(spyOnCloseRoom).not.toHaveBeenCalled();
 
         stepper = { selected: { editable: false } as CdkStep } as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         component.onStepChange();
         expect(spyOnCloseRoom).toHaveBeenCalled();
@@ -148,7 +160,7 @@ describe('GameJoinPageComponent', () => {
 
     it('onStepChange should closeRoom if selected is undefined', () => {
         const stepper = {} as MatStepper;
-        component.stepper = stepper;
+        component['stepper'] = stepper;
 
         const spyOnCloseRoom = spyOn(component, 'cancelJoin');
 
@@ -167,14 +179,7 @@ describe('Join room in Join Page Component with undefined selector', () => {
             declarations: [GameJoinPageComponent],
             imports: [ReactiveFormsModule, FormsModule, AppMaterialModule, BrowserAnimationsModule],
             providers: [
-                provideMockStore({
-                    selectors: [
-                        {
-                            selector: 'room',
-                            value: { pending: {} },
-                        },
-                    ],
-                }),
+                provideMockStore(),
                 {
                     provide: RoomEffects,
                     useValue: jasmine.createSpyObj('roomEffects', [], ['dialogRef']),
@@ -188,11 +193,31 @@ describe('Join room in Join Page Component with undefined selector', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameJoinPageComponent);
         component = fixture.componentInstance;
-        component.stepper = stepperMock;
+        component['stepper'] = stepperMock;
         setTimeout(() => fixture.detectChanges, FIXTURE_COOLDOWN);
     });
 
+    it('roomListLength should return the length of roomList', () => {
+        store.overrideSelector('room', [{} as RoomInfo]);
+        component.roomList$ = store.select('room');
+        const expectedLength = 1;
+        expect(component.roomListLength()).toEqual(expectedLength);
+    });
+
+    it('selectRandomRoom should call selectRoom with a number between 0 and the roomList size - 1', () => {
+        store.overrideSelector('room', [{}, {}, {}]);
+        component.roomList$ = store.select('room');
+        const selectRoomSpy = spyOn(component, 'selectRoom');
+        const roomLength = 3;
+        component.selectRandomRoom();
+        expect(selectRoomSpy).toHaveBeenCalled();
+        expect(selectRoomSpy.arguments).toBeLessThanOrEqual(roomLength - 1);
+        expect(selectRoomSpy.arguments).toBeGreaterThanOrEqual(0);
+    });
+
     it('joinRoom should not dispatch "[Room] Join Room" if the selected room is undefined', () => {
+        store.overrideSelector('room', {});
+        component.pendingRoom$ = store.select('room');
         const roomInfoStub = { roomId: 'id', gameOptions: { dictionaryType: 'dict', hostname: 'host', timePerRound: 60 } };
         component.selectRoom(roomInfoStub);
         const username = 'username';

@@ -6,13 +6,32 @@
     color: #fff;
 }
 
-.room-name {
-    display: contents;
+.error {
+    color: red;
+}
+
+.room {
+    display: block;
+    padding-right: 20px;
+}
+
+.join-room {
+    float: right;
+}
+
+.room-list {
+    margin-top: 2vh;
+    margin-bottom: 3vh;
 }
 
 .button {
     width: 120px;
     height: 36px;
+}
+
+#choose-randomly {
+    float: right;
+    margin-left: 2vw;
 }
 
 .cancel {

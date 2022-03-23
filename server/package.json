@@ -15,7 +15,8 @@
         "check-coverage": true,
         "per-file": true,
         "include": [
-            "app/**/*.ts"
+            "app/**/*.ts",
+            "../common/**/*.ts"
         ],
         "extension": [
             ".ts"
@@ -41,7 +42,8 @@
         "instrument": true
     },
     "_moduleAliases": {
-        "@app": "out/app/"
+        "@app": "out/server/app/",
+        "common": "out/common/"
     },
     "dependencies": {
         "cookie-parser": "1.4.5",
@@ -69,7 +71,7 @@
         "@types/express": "4.17.13",
         "@types/mocha": "^9.0.0",
         "@types/morgan": "~1.9.3",
-        "@types/node": "^16.6.1",
+        "@types/node": "^16.11.26",
         "@types/node-uuid": "0.0.29",
         "@types/sinon": "^10.0.2",
         "@types/supertest": "^2.0.11",
@@ -89,6 +91,7 @@
         "eslint-plugin-prettier": "^3.4.0",
         "eslint-plugin-unicorn": "^35.0.0",
         "mocha": "^9.0.3",
+        "mongodb-memory-server": "^8.4.1",
         "nodemon": "^2.0.12",
         "nyc": "^15.1.0",
         "rimraf": "3.0.2",

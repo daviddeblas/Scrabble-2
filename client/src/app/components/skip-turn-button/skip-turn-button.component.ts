@@ -3,7 +3,6 @@ import { messageWritten } from '@app/actions/chat.actions';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-skip-turn-button',
@@ -11,19 +10,17 @@ import { Observable } from 'rxjs';
     styleUrls: ['./skip-turn-button.component.scss'],
 })
 export class SkipTurnButtonComponent {
-    players$: Observable<Players>;
-    gameStatus$: Observable<GameStatus>;
     username: string;
     activePlayer: string;
+    gameEnded: boolean;
 
     constructor(private store: Store<{ players: Players; gameStatus: GameStatus }>) {
-        this.players$ = store.select('players');
-        this.players$.subscribe((state) => {
-            if (state) this.username = state.player.name;
+        store.select('players').subscribe((state) => {
+            this.username = state.player.name;
         });
-        this.gameStatus$ = store.select('gameStatus');
-        this.gameStatus$.subscribe((state) => {
-            if (state) this.activePlayer = state.activePlayer;
+        store.select('gameStatus').subscribe((state) => {
+            this.activePlayer = state.activePlayer;
+            this.gameEnded = state.gameEnded;
         });
     }
 
@@ -32,6 +29,6 @@ export class SkipTurnButtonComponent {
     }
 
     isPlayerTurn(): boolean {
-        return this.username === this.activePlayer;
+        return this.username === this.activePlayer && !this.gameEnded;
     }
 }

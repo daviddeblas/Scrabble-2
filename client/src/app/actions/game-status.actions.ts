@@ -12,4 +12,6 @@ export const gameStatusReceived = createAction(
     props<{ status: GameStatus; players: Players; board: BoardState }>(),
 );
 
+export const refreshTimer = createAction('[Game Status] Refresh timer', props<{ timer: number }>());
+
 export const endGame = createAction('[Game Status] End Game', props<{ players: Players; remainingLetters: number; winner: string }>());

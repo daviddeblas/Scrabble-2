@@ -1,8 +1,11 @@
 import { gameStatusReceived, resetAllState } from '@app/actions/game-status.actions';
-import { exchangeLettersSuccess, placeWordSuccess } from '@app/actions/player.actions';
-import { Letter } from '@app/classes/letter';
+import { addLettersToEasel, exchangeLettersSuccess, placeWordSuccess, removeLetterFromEasel, switchLettersEasel } from '@app/actions/player.actions';
+import { BoardSelection } from '@app/classes/board-selection';
 import { Player } from '@app/classes/player';
-import { Direction, Word } from '@app/classes/word';
+import { Word } from '@app/classes/word';
+import { Direction } from '@app/enums/direction';
+import { Letter } from 'common/classes/letter';
+import { Vec2 } from 'common/classes/vec2';
 import { BoardState } from './board.reducer';
 import { GameStatus } from './game-status.reducer';
 import { initialState, Players, reducer } from './player.reducer';
@@ -12,6 +15,7 @@ function createInitialPlayersState() {
     const players: Players = {
         player: new Player('Player 1'),
         opponent: new Player('Player 2'),
+        botLevel: 'Débutant',
     };
 
     players.player.easel = ['A', 'S', 'S', 'L', 'L', 'P', 'O'];
@@ -25,6 +29,7 @@ describe('[Players] Reducer', () => {
         const playersStub: Players = {
             player: new Player('Player 1'),
             opponent: new Player('Player 2'),
+            botLevel: 'Débutant',
         };
 
         const gameStatusStub: GameStatus = {
@@ -32,6 +37,7 @@ describe('[Players] Reducer', () => {
             winner: null,
             gameEnded: false,
             letterPotLength: 0,
+            timer: 0,
         };
 
         const boardState: BoardState = {
@@ -39,6 +45,8 @@ describe('[Players] Reducer', () => {
             multipliers: [],
             pointsPerLetter: new Map(),
             blanks: [],
+            lastPlacedWord: [],
+            selection: new BoardSelection(),
         };
 
         it('should return the loaded players', () => {
@@ -55,7 +63,7 @@ describe('[Players] Reducer', () => {
     });
 
     describe('[Players] Place Word Success', () => {
-        const word = new Word(['A', 'L', 'L', 'O'], { x: 0, y: 0 }, Direction.VERTICAL);
+        const word = new Word('allo', new Vec2(0, 0), Direction.VERTICAL);
 
         it('should remove used letters and add new letters to easel', () => {
             const initialPlayers: Players = createInitialPlayersState();
@@ -65,7 +73,7 @@ describe('[Players] Reducer', () => {
             const result = reducer(initialPlayers, action);
 
             const expectedResult = createInitialPlayersState();
-            expectedResult.player.removeLettersFromEasel(word.letters);
+            expectedResult.player.removeLettersFromEasel(['A', 'L', 'L', 'O']);
             expectedResult.player.addLettersToEasel(newLetters);
 
             expect(result).toEqual(expectedResult);
@@ -79,8 +87,41 @@ describe('[Players] Reducer', () => {
             const result = reducer(initialPlayers, action);
 
             const expectedResult = createInitialPlayersState();
-            expectedResult.player.removeLettersFromEasel(word.letters);
+            expectedResult.player.removeLettersFromEasel(['A', 'L', 'L', 'O']);
             expectedResult.player.score = newScore;
+
+            expect(result).toEqual(expectedResult);
+        });
+    });
+
+    describe('[Players] Remove Letter From Easel', () => {
+        it('should remove letter from easel', () => {
+            const letterToRemove: Letter = 'A';
+
+            const initialPlayers: Players = createInitialPlayersState();
+            const action = removeLetterFromEasel({ letter: letterToRemove });
+
+            const result = reducer(initialPlayers, action);
+
+            const expectedResult = createInitialPlayersState();
+            expectedResult.player.removeLettersFromEasel([letterToRemove]);
+
+            expect(result).toEqual(expectedResult);
+        });
+    });
+
+    describe('[Players] Add Letters To Easel', () => {
+        it('should add letters to easel', () => {
+            const lettersToAdd: Letter[] = ['A', 'H'];
+
+            const initialPlayers: Players = createInitialPlayersState();
+            initialPlayers.player.easel = [];
+            const action = addLettersToEasel({ letters: lettersToAdd });
+
+            const result = reducer(initialPlayers, action);
+
+            const expectedResult = initialPlayers;
+            expectedResult.player.addLettersToEasel(lettersToAdd);
 
             expect(result).toEqual(expectedResult);
         });
@@ -101,6 +142,15 @@ describe('[Players] Reducer', () => {
             expectedResult.player.addLettersToEasel(newLetters);
 
             expect(result).toEqual(expectedResult);
+        });
+    });
+
+    describe('[Players] Switch Letters Easel', () => {
+        it('should exchange the letters in the easel', () => {
+            const action = switchLettersEasel({ positionIndex: 0, destinationIndex: 1 });
+            const expectedResult = ['S', 'A', 'S', 'L', 'L', 'P', 'O'] as Letter[];
+            const result = reducer(createInitialPlayersState(), action);
+            expect(result.player.easel).toEqual(expectedResult);
         });
     });
 

@@ -1,25 +1,28 @@
 /* eslint-disable no-console */
+// permet l'utilisation des consoles logs
 import { Application } from '@app/app';
+import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
 import { AddressInfo } from 'net';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
+import { DATABASE } from './classes/highscore';
 import { BrowserService } from './services/browser.service';
+import { DatabaseService } from './services/database.service';
 import { DictionaryService } from './services/dictionary.service';
+import { GameConfigService } from './services/game-config.service';
 import { RoomsManager } from './services/rooms-manager.service';
 import { SocketService } from './services/socket-manager.service';
 
 @Service()
 export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly baseDix: number = 10;
     private server: http.Server;
     private socketService: SocketService;
 
     constructor(private readonly application: Application) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
-        const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
+        const port: number = typeof val === 'string' ? parseInt(val, DECIMAL_BASE) : val;
         if (isNaN(port)) {
             return val;
         } else if (port >= 0) {
@@ -28,16 +31,20 @@ export class Server {
             return false;
         }
     }
-    init(): void {
+    init() {
         this.application.app.set('port', Server.appPort);
-
         this.server = http.createServer(this.application.app);
+        Container.get(DictionaryService).init();
+        Container.get(GameConfigService).init();
         this.socketService = new SocketService(
             this.server,
             Container.get(RoomsManager),
             Container.get(DictionaryService),
             Container.get(BrowserService),
+            Container.get(DatabaseService),
+            Container.get(GameConfigService),
         );
+        Container.get(DatabaseService).start(DATABASE.uri);
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

@@ -31,7 +31,6 @@
     </text>
 
     <g transform="translate(50, 50)">
-        <g app-cell-star [pos]="{ x: (boardSize - 1) / 2, y: (boardSize - 1) / 2 }"></g>
         <ng-container *ngFor="let multipliersColumn of multipliers$ | async; let i = index">
             <ng-container *ngFor="let multiplier of multipliersColumn; let j = index">
                 <g *ngIf="multiplier?.amount === 2 && multiplier?.type === multiplierType.Letter" app-cell-letter-x2 [pos]="{ x: i, y: j }"></g>
@@ -40,6 +39,7 @@
                 <g *ngIf="multiplier?.amount === 3 && multiplier?.type === multiplierType.Word" app-cell-word-x3 [pos]="{ x: i, y: j }"></g>
             </ng-container>
         </ng-container>
+        <g app-cell-star [pos]="{ x: (boardSize - 1) / 2, y: (boardSize - 1) / 2 }"></g>
     </g>
 
     <g transform="translate(50, 50)" style="font-size: 20px" [style.font-size]="(localSettings$ | async)?.zoom + 'em'">
@@ -50,6 +50,15 @@
             [letter]="letter.letter"
             [value]="(pointsPerLetter$ | async)?.get(letter.letter)"
             [blank]="letter.blank"
+            [color]="letter.lastPlacedWord"
         ></g>
+    </g>
+
+    <g transform="translate(50, 50)">
+        <ng-container *ngFor="let multipliersColumn of multipliers$ | async; let i = index">
+            <ng-container *ngFor="let multiplier of multipliersColumn; let j = index">
+                <g app-cell-empty [pos]="{ x: i, y: j }"></g>
+            </ng-container>
+        </ng-container>
     </g>
 </svg>

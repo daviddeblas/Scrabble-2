@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
-import { GameOptions } from '@app/classes/game-options';
-import { RoomInfo } from '@app/classes/room-info';
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
+import { GameOptions } from 'common/classes/game-options';
+import { RoomInfo } from 'common/classes/room-info';
 import * as sinon from 'sinon';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -23,23 +23,12 @@ describe('SocketManager service tests', () => {
     });
 
     afterEach(() => {
-        service.roomManager.rooms = [];
+        service.roomManager['rooms'] = [];
         clientSocket.close();
         service['sio'].close();
         sinon.restore();
     });
 
-    it('should handle create room event and create a new Room', (done) => {
-        const roomManagerSpy = sinon.spy(service.roomManager, 'createRoom');
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
-        clientSocket.emit('create room', defaultOptions);
-        setTimeout(() => {
-            assert(roomManagerSpy.calledOnce);
-            assert(service.roomManager.rooms.length === 1); // Une salle a bien été ajouté
-            roomManagerSpy.restore();
-            done();
-        }, RESPONSE_DELAY);
-    });
     it('should handle create room event and emit game settings event', (done) => {
         const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
