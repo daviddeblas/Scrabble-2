@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
-import { BotDifficulty } from '@app/services/bot.service';
+import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { DatabaseService } from '@app/services/database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
@@ -14,7 +14,7 @@ import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
 
@@ -223,7 +223,7 @@ describe('room', () => {
             const stubbedGame = {
                 activePlayer: 1,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
+            const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
                 return '';
             });
             const onCommandStub = stub(room.commandService, 'onCommand');
@@ -241,7 +241,7 @@ describe('room', () => {
             const stubbedGame = {
                 activePlayer: 0,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
+            const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
@@ -255,7 +255,7 @@ describe('room', () => {
                 activePlayer: 0,
                 gameFinished: true,
             } as unknown as Game;
-            const moveStub = stub(room['botService'], 'move').callsFake(async () => {
+            const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
                 return '';
             });
             room.game = stubbedGame;
@@ -269,7 +269,7 @@ describe('room', () => {
                 activePlayer: 1,
                 gameFinished: false,
             } as unknown as Game;
-            stub(room['botService'], 'move').callsFake(async () => {
+            stub(Container.get(BotService), 'move').callsFake(async () => {
                 return new GameError(GameErrorType.OutOfBoundPosition);
             });
             room.game = stubbedGame;

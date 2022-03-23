@@ -1,9 +1,8 @@
 import { GameError } from '@app/classes/game.exception';
-import { Game } from '@app/classes/game/game';
+import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL } from '@app/classes/game/game';
 import { Solver } from '@app/classes/solver';
 import { Solution } from '@app/interfaces/solution';
 import { Letter, lettersToString } from 'common/classes/letter';
-import { BOT_NAMES } from 'common/constants';
 import { Service } from 'typedi';
 
 const passCommandName = 'passer';
@@ -30,12 +29,10 @@ export class BotService {
         let decidedMove: string | GameError = passCommandName;
         if (difficulty === BotDifficulty.Easy) {
             decidedMove = await this.easyBotMove(game);
+        } else {
+            decidedMove = await this.hardBotMove(game);
         }
         return decidedMove;
-    }
-
-    getName(): string {
-        return BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
     }
 
     private async easyBotMove(game: Game): Promise<string | GameError> {
@@ -50,13 +47,31 @@ export class BotService {
         }
     }
 
+    private async hardBotMove(game: Game): Promise<string | GameError> {
+        const command = await this.placeCommand(game, BotDifficulty.Hard);
+
+        if (command !== passCommandName) return command;
+        const bagSize = game.bag.letters.length;
+        if (bagSize >= game.players[1].easel.length) {
+            return exchangeCommandName + ' ' + lettersToString(game.players[1].easel).toLowerCase();
+        } else if (bagSize === 0) {
+            return passCommandName;
+        }
+        const playerEasel = [...game.players[1].easel];
+        return this.findLettersToExchange(bagSize, playerEasel);
+    }
+
     private exchangeCommand(game: Game): string {
-        const playerEasel = JSON.parse(JSON.stringify(game.players[1].easel));
+        const playerEasel = [...game.players[1].easel];
         const amountLettersToExchange = Math.floor(Math.random() * playerEasel.length + 1);
         if (amountLettersToExchange > game.bag.letters.length) return passCommandName;
+        return this.findLettersToExchange(amountLettersToExchange, playerEasel);
+    }
+
+    private findLettersToExchange(amountOfLetters: number, playerEasel: Letter[]): string {
         const lettersToExchange: Letter[] = [];
         let indexLetterToRemove: number;
-        while (lettersToExchange.length < amountLettersToExchange) {
+        while (lettersToExchange.length < amountOfLetters) {
             indexLetterToRemove = Math.floor(Math.random() * playerEasel.length);
             lettersToExchange.push(playerEasel[indexLetterToRemove]);
             playerEasel.splice(indexLetterToRemove, 1);
@@ -67,7 +82,7 @@ export class BotService {
 
     private async placeCommand(game: Game, difficulty: BotDifficulty): Promise<string | GameError> {
         const solver = new Solver(game.config.dictionary, game.board, game.players[1].easel);
-        const foundPlacements: [Solution, number][] | GameError = await solver.getEasyBotSolutions();
+        const foundPlacements: [Solution, number][] | GameError = await solver.getBotSolutions();
         if (foundPlacements instanceof GameError) return foundPlacements;
         if (foundPlacements.length === 0) return 'passer';
         const command = this.determineWord(foundPlacements, difficulty);
@@ -76,7 +91,11 @@ export class BotService {
     }
 
     private determineWord(placements: [Solution, number][], difficulty: BotDifficulty): string {
-        if (difficulty === BotDifficulty.Hard) return 'passer';
+        if (difficulty === BotDifficulty.Hard) return this.determineHardBotWord(placements);
+        return this.determineEasyBotWord(placements);
+    }
+
+    private determineEasyBotWord(placements: [Solution, number][]): string {
         const firstPointCategory = 0.4;
         const secondPointCategory = 0.7;
         let lowestPoints: number;
@@ -107,6 +126,15 @@ export class BotService {
         }
         if (wordPossibilities.length === 0) return passCommandName;
         return Solver.solutionToCommandArguments(wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)]);
+    }
+
+    private determineHardBotWord(placements: [Solution, number][]): string {
+        const maxValue = placements.sort((previous, current) => {
+            if (previous[0].letters.length === MAX_LETTERS_IN_EASEL) previous[1] += BONUS_POINTS_FOR_FULL_EASEL;
+            if (current[0].letters.length === MAX_LETTERS_IN_EASEL) current[1] += BONUS_POINTS_FOR_FULL_EASEL;
+            return current[1] - previous[1];
+        })[0];
+        return Solver.solutionToCommandArguments(maxValue[0]);
     }
 
     private arrayIncludesAllThreeIndex(array: number[]): boolean {

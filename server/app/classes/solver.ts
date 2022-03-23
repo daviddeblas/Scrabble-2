@@ -40,7 +40,7 @@ export class Solver {
         return this.solutionsToHints(randomSolutions);
     }
 
-    async getEasyBotSolutions(): Promise<[Solution, number][] | GameError> {
+    async getBotSolutions(): Promise<[Solution, number][] | GameError> {
         const result: [Solution, number][] = [];
         const allSolutions: Solution[] = await this.findAllSolutions();
         if (allSolutions.length < 1) return result;
