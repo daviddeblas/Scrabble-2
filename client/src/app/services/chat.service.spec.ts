@@ -27,7 +27,7 @@ describe('ChatService', () => {
                     selectors: [
                         {
                             selector: 'gameStatus',
-                            value: { activePlayer: username, letterPotLength: 0, gameEnded: false },
+                            value: { activePlayer: username, letterPotLength: 9, gameEnded: false },
                         },
                     ],
                 }),
@@ -398,5 +398,10 @@ describe('ChatService', () => {
 
     it('handleNonTurnSpecificCommand should return false on correct call', () => {
         expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeFalsy();
+    });
+
+    it('validateExchangeCommand should return false if there is less than 7 letters in pot', () => {
+        const exampleCommand = ['!échanger', 'abcpzoe'];
+        expect(service['validateExchangeCommand'](exampleCommand)).toBeFalse();
     });
 });
