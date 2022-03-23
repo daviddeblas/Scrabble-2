@@ -6,12 +6,11 @@ import { MAX_NAME_LENGTH, MIN_NAME_LENGTH } from '@app/constants';
 import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
-import { SECONDS_IN_MINUTE } from 'common/constants';
+import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
 import { Observable } from 'rxjs';
 
 export const MAX_TIME = 300;
 export const MIN_TIME = 30;
-export const DEFAULT_TIMER = 60;
 export const TIMER_INCREMENT = 30;
 
 @Component({

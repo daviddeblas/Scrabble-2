@@ -9,6 +9,7 @@ import { RoomEffects } from '@app/effects/room.effects';
 import { RoomState } from '@app/reducers/room.reducer';
 import { Store } from '@ngrx/store';
 import { RoomInfo } from 'common/classes/room-info';
+import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
 import { Observable } from 'rxjs';
 
 export const forbiddenNameValidator = (name: string) => {
@@ -122,5 +123,9 @@ export class GameJoinPageComponent implements OnDestroy {
 
     onStepChange() {
         if (!this.stepper.selected?.editable) this.cancelJoin();
+    }
+
+    timerToString(timer: number = DEFAULT_TIMER): string {
+        return `${Math.floor(timer / SECONDS_IN_MINUTE)}:${(timer % SECONDS_IN_MINUTE).toString().padStart(2, '0')} min`;
     }
 }

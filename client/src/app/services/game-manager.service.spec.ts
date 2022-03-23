@@ -24,7 +24,14 @@ describe('GameManagerService', () => {
         letterPotLength: 10,
         timer: 0,
     };
-    const boardState: BoardState = { board: [], multipliers: [], pointsPerLetter: new Map(), blanks: [], selection: new BoardSelection() };
+    const boardState: BoardState = {
+        board: [],
+        multipliers: [],
+        pointsPerLetter: new Map(),
+        blanks: [],
+        lastPlacedWord: [],
+        selection: new BoardSelection(),
+    };
     const status = { status: gameStatus, players, board: boardState };
 
     let service: GameManagerService;
