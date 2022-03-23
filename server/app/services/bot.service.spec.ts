@@ -92,6 +92,13 @@ describe('Bot service tests', () => {
         service['placeCommand'](fakeGame, BotDifficulty.Easy);
     });
 
+    it('placeCommand should call determineWord if there is at least a solution and return passer if it returns passer', async () => {
+        fakeGame.board.board[7][7] = 'E';
+        fakeGame.players[1].easel = ['L'];
+        stub(service as any, 'determineWord').callsFake(() => 'passer');
+        expect(await service['placeCommand'](fakeGame, BotDifficulty.Easy)).to.equal('passer');
+    });
+
     it('placeCommand should return an error if solver get easy solution return an error', async () => {
         fakeGame.board.board[7][7] = 'E';
         fakeGame.players[1].easel = ['L'];
@@ -126,6 +133,12 @@ describe('Bot service tests', () => {
         fakePlacements.push([solutionA, 2]);
         fakePlacements.push([solutionB, 10]);
         expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
+    });
+
+    it('determineWord should return passer if all solutions found are greater than 18 points', () => {
+        const fakePlacements: [Solution, number][] = [];
+        fakePlacements.push([solutionB, 30]);
+        expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('passer');
     });
 
     it('determineWord should send the exchange with middle amount of points with random number between 0.4 and 0.7 with botLevel easy', () => {
