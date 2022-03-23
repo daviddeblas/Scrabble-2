@@ -204,6 +204,17 @@ describe('KeyManagerService', () => {
 
             placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
             expect(placeWordAction.position).toEqual('a1v');
+
+            // Vertical
+            actions = [];
+            selectionStub.orientation = null;
+            selectionStub.modifiedCells = [new Vec2(0, 0)];
+            store.overrideSelector('board', { board: boardStub, selection: selectionStub, blanks: [] });
+
+            service.onEnter();
+
+            placeWordAction = actions[2] as unknown as { type: string; position: string; letters: string };
+            expect(placeWordAction.position).toEqual('a1');
         });
 
         it('onEnter should set blank letters in capital when place word action is called', () => {

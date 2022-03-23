@@ -70,7 +70,9 @@ export class BotService {
         const foundPlacements: [Solution, number][] | GameError = await solver.getEasyBotSolutions();
         if (foundPlacements instanceof GameError) return foundPlacements;
         if (foundPlacements.length === 0) return 'passer';
-        return placeCommandName + ' ' + this.determineWord(foundPlacements, difficulty);
+        const command = this.determineWord(foundPlacements, difficulty);
+        if (command === passCommandName) return command;
+        return placeCommandName + ' ' + command;
     }
 
     private determineWord(placements: [Solution, number][], difficulty: BotDifficulty): string {
@@ -103,6 +105,7 @@ export class BotService {
                 if (lowestPoints < value[1] && value[1] < maxPoints) wordPossibilities.push(value[0]);
             });
         }
+        if (wordPossibilities.length === 0) return passCommandName;
         return Solver.solutionToCommandArguments(wordPossibilities[Math.floor(Math.random() * wordPossibilities.length)]);
     }
 
