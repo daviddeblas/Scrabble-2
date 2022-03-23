@@ -2,6 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
+import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
@@ -18,10 +19,10 @@ describe('game', () => {
     let activePlayer: number;
     const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
     const timerCallbackMock = () => {
-        return;
+        return undefined;
     };
-    const afterTurnCallbackMock: () => Promise<void> = async () => {
-        return;
+    const afterTurnCallbackMock: () => Promise<undefined> = async () => {
+        return undefined;
     };
 
     before(() => {
@@ -53,19 +54,19 @@ describe('game', () => {
             game['getActivePlayer']().easel.push(l);
         });
 
-        expect(() => {
+        expect(
             // place 'con' across in the middle
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 [],
                 game.activePlayer,
-            );
-        }).to.not.throw();
+            ) instanceof GameError,
+        ).to.equal(false);
 
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
         const wordMultiplier = 2;
-        const expectedPoints = game.board['scorePosition'](positionsOfPlacement) * wordMultiplier;
+        const expectedPoints = (game.board['scorePosition'](positionsOfPlacement) as number) * wordMultiplier;
         expect(thisPlayerScore).to.eq(expectedPoints);
 
         // ce n'est plus le tour du joueur actif
@@ -81,37 +82,57 @@ describe('game', () => {
 
         game['getActivePlayer']().easel.push(BLANK_LETTER);
 
-        expect(() => {
+        expect(
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 [0],
                 game.activePlayer,
-            );
-        }).to.not.throw();
+            ) instanceof GameError,
+        ).to.equal(false);
 
         const thisPlayerScore = game.players[activePlayer].score;
         const positionsOfPlacement = lettersToPlace.map((_l, i) => new PlacedLetter(lettersToPlace[i], new Vec2(6 + i, 7)));
-        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement) as number;
         const wordMultiplier = 2;
         expect(thisPlayerScore).to.eq(expectedPoints * wordMultiplier);
 
         expect(game.activePlayer).to.not.eq(activePlayer);
     });
 
-    it('place should throw on correct placement as second placement if not connected to other words', () => {
+    it('place should return an error on correct placement as second placement if not connected to other words', () => {
         const lettersToPlace: Letter[] = ['C', 'O', 'N'];
         game['placeCounter'] = 1;
         lettersToPlace.forEach((l) => {
             game['getActivePlayer']().easel.push(l);
         });
 
-        expect(() => {
+        expect(
             game.place(
                 lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
                 [],
                 game.activePlayer,
-            );
-        }).to.throw();
+            ) instanceof GameError,
+        ).to.equal(true);
+    });
+
+    it('place should return an error on correct placement as second placement if not connected to other words', () => {
+        const lettersToPlace: Letter[] = ['C', 'O', 'N'];
+        game['placeCounter'] = 1;
+        lettersToPlace.forEach((l) => {
+            game['getActivePlayer']().easel.push(l);
+        });
+
+        stub(game, 'checkMove' as any).callsFake(() => {
+            return new GameError(GameErrorType.InvalidWord);
+        });
+
+        expect(
+            game.place(
+                lettersToPlace.map((l, i) => new PlacedLetter(l, new Vec2(6 + i, 7))),
+                [],
+                game.activePlayer,
+            ) instanceof GameError,
+        ).to.equal(true);
     });
 
     it('place should score according to scorePosition added from the BONUS_POINTS_FOR_FULL_EASEL on correct placement with full easel placement', () => {
@@ -123,7 +144,7 @@ describe('game', () => {
         game.place(positionsOfPlacement, [], game.activePlayer);
 
         const thisPlayerScore = game.players[activePlayer].score;
-        const expectedPoints = game.board['scorePosition'](positionsOfPlacement);
+        const expectedPoints = game.board['scorePosition'](positionsOfPlacement) as number;
         expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
     });
 
@@ -140,7 +161,7 @@ describe('game', () => {
         const thisPlayerScore = game.players[activePlayer].score;
 
         const positionsOfPlacement = oldEasel.map((_l, i) => new PlacedLetter(oldEasel[i], new Vec2(6 + i, 7)));
-        const normalScorePosition = game.board['scorePosition'](positionsOfPlacement);
+        const normalScorePosition = game.board['scorePosition'](positionsOfPlacement) as number;
 
         const othersEasel = game.players[game.activePlayer].easel;
         const pointsArrayOfOtherEasel = othersEasel.map((l) => game.board.pointsPerLetter.get(l) as number);
@@ -150,30 +171,35 @@ describe('game', () => {
         expect(thisPlayerScore).to.eq(expectedPoints);
     });
 
-    it('place should throw if initial place is not in the center', () => {
+    it('place should return an error if initial place is not in the center', () => {
         game.players[activePlayer].easel = stringToLetters('aa');
         const oldEasel = [...game.players[activePlayer].easel];
-        expect(() => {
+        expect(
             game.place(
                 oldEasel.map((letter, index) => new PlacedLetter(letter, new Vec2(index + 0, 7))),
                 [],
                 game.activePlayer,
-            );
-        }).to.throw();
+            ) instanceof GameError,
+        ).to.equal(true);
     });
 
-    it('draw should not throw on correct call', () => {
+    it('draw should not return an error on correct call', () => {
         const ogActivePlayer = game.activePlayer;
 
         const lettersToDraw = game['getActivePlayer']().easel[0];
 
-        expect(() => game.draw([lettersToDraw], game.activePlayer)).to.not.throw();
+        expect(game.draw([lettersToDraw], game.activePlayer) instanceof GameError).to.equal(false);
         expect(game.activePlayer).to.not.eq(ogActivePlayer);
     });
 
-    it('draw should throw if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
+    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
         game.bag.letters = ['A'];
-        expect(() => game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer)).to.throw();
+        expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
+    });
+
+    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
+        stub(game, 'checkMove' as any).callsFake(() => new GameError(GameErrorType.LettersAreNotInEasel));
+        expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
     });
 
     it('skip', () => {
@@ -182,6 +208,11 @@ describe('game', () => {
 
         expect(game.activePlayer).to.not.eq(oldActivePlayer);
         expect(game['turnsSkipped']).to.eq(1);
+    });
+
+    it('skip should return an error if it is not the players turn', () => {
+        const wrongAtivePlayer = (game.activePlayer + 1) % 2;
+        expect(game.skip(wrongAtivePlayer) instanceof GameError).to.equal(true);
     });
 
     it('gameEnded should be true when one players easel is empty', () => {
@@ -251,18 +282,18 @@ describe('game', () => {
         expect(game['determineWinner']()).to.eq('player 2');
     });
 
-    it('checkMove should throw when it is not this players turn', () => {
-        expect(() => game['checkMove']([], game['nextPlayer']())).to.throw();
+    it('checkMove should return an error when it is not this players turn', () => {
+        expect(game['checkMove']([], game['nextPlayer']()) instanceof GameError).to.equal(true);
     });
 
-    it('checkMove should throw when asked letters are not in players easel', () => {
-        expect(() => game['checkMove'](['Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z'], game.activePlayer)).to.throw();
+    it('checkMove should return an error when asked letters are not in players easel', () => {
+        expect(game['checkMove'](['Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z', 'Z'], game.activePlayer) instanceof GameError).to.equal(true);
     });
 
-    it('checkMove should not throw on correct call', () => {
+    it('checkMove should not return an error on correct call', () => {
         const activePlayerEasel = game['getActivePlayer']().easel;
         const firstLetterOfEasel = activePlayerEasel[0];
-        expect(() => game['checkMove']([firstLetterOfEasel], game.activePlayer)).to.not.throw();
+        expect(game['checkMove']([firstLetterOfEasel], game.activePlayer) instanceof GameError).to.equal(false);
     });
 
     it('nextTurn should put next player in activePlayer field', () => {
@@ -296,7 +327,10 @@ describe('game', () => {
 
     it('init timer should wait the right amount of ', (done) => {
         const clk = useFakeTimers();
-        game['actionAfterTimeout'] = () => done();
+        game['actionAfterTimeout'] = () => {
+            done();
+            return undefined;
+        };
         game.initTimer();
         clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
         clk.restore();

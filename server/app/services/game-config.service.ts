@@ -26,9 +26,9 @@ export class GameConfigService {
         });
     }
 
-    getConfigFromName(name: string): GameConfig {
+    getConfigFromName(name: string): GameConfig | Error {
         const config = this.configs.find((c) => c.name === name);
-        if (config === undefined) throw new Error('config not found');
+        if (config === undefined) return new Error('config not found');
         return config;
     }
 }

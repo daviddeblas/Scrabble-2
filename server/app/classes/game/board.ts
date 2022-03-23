@@ -39,16 +39,19 @@ export class Board {
         this.lastPlacedWord = [];
     }
 
-    place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number {
+    place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number | GameError {
         this.lastPlacedWord = [];
         if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
-            throw new GameError(GameErrorType.WrongPosition);
+            return new GameError(GameErrorType.WrongPosition);
         const words = this.getAffectedWords(letters);
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
-        if (!firstMove && allPlacedLetters.length === letters.length) throw new GameError(GameErrorType.WordNotConnected);
+        if (!firstMove && allPlacedLetters.length === letters.length) return new GameError(GameErrorType.WordNotConnected);
+
+        let wordValid = true;
         words.forEach((w) => {
-            if (!this.config.dictionary.isWord(w.map((l) => l.letter))) throw new GameError(GameErrorType.InvalidWord);
+            if (!this.config.dictionary.isWord(w.map((l) => l.letter))) wordValid = false;
         });
+        if (!wordValid) return new GameError(GameErrorType.InvalidWord);
 
         letters.forEach((l) => {
             this.board[l.position.x][l.position.y] = l.letter;
@@ -58,9 +61,16 @@ export class Board {
         blanks.forEach((v) => this.blanks.push(letters[v].position.copy()));
 
         let score = 0;
+        let error: GameError | undefined;
         words.forEach((w) => {
-            score += this.scorePosition(w);
+            const scoreToAdd = this.scorePosition(w);
+            if (scoreToAdd instanceof GameError) {
+                error = scoreToAdd;
+                return;
+            }
+            score += scoreToAdd;
         });
+        if (error) return error;
 
         letters.forEach((l) => {
             this.multipliers[l.position.x][l.position.y] = null;
@@ -69,16 +79,20 @@ export class Board {
         return score;
     }
 
-    scorePosition(word: PlacedLetter[]): number {
+    scorePosition(word: PlacedLetter[]): number | GameError {
         let score = 0;
         let multiplier = 1;
+        let error: GameError | undefined;
         word.forEach((placedLetter) => {
             const letter = placedLetter.letter;
-            if (letter === null) throw new GameError(GameErrorType.LetterIsNull);
+            if (letter === null || error) {
+                error = new GameError(GameErrorType.LetterIsNull);
+                return;
+            }
             // prends le nombre de points associe a cette lettre
-            const letterPoints = this.pointsPerLetter.get(letter) as number;
+            let letterPoints = this.pointsPerLetter.get(letter) as number;
             // annule s'il s'agit d'un blank
-            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) return;
+            if (this.blanks.findIndex((p) => p.equals(placedLetter.position)) >= 0) letterPoints = 0;
             // obtient le multiplieur a cette position
             const multi = this.multipliers[placedLetter.position.x][placedLetter.position.y];
             if (multi === null) {
@@ -95,6 +109,7 @@ export class Board {
                     break;
             }
         });
+        if (error) return error;
         score *= multiplier;
         return score;
     }
@@ -121,7 +136,7 @@ export class Board {
         return returnValue;
     }
 
-    private getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
+    getAffectedWords(letters: PlacedLetter[]): PlacedLetter[][] {
         const tempBoard = this.copy();
         letters.forEach((l) => {
             tempBoard.board[l.position.x][l.position.y] = l.letter;

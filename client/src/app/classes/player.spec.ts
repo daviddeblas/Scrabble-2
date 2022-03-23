@@ -27,14 +27,6 @@ describe('Player', () => {
             expect(player.easel).toEqual([...letters, ...letters]);
         });
 
-        it('should cause error if exceed easel capacity', () => {
-            player.addLettersToEasel(letters);
-            player.addLettersToEasel(letters);
-            expect(() => {
-                player.addLettersToEasel(letters);
-            }).toThrow(new Error('The easel capacity has been exceeded: 9'));
-        });
-
         it('should remove letter from easel', () => {
             player.easel = ['I', 'A', 'O', 'U', 'Y', 'W'];
             player.removeLettersFromEasel(letters);

@@ -1,3 +1,4 @@
+import { GameError } from '@app/classes/game.exception';
 import { expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Player } from './player';
@@ -27,9 +28,9 @@ describe('bag constructor', () => {
         expect(player.easel).to.deep.eq(['C', 'A']);
     });
 
-    it('remove letters throws on incorrect call', () => {
+    it('remove letters return an error on incorrect call', () => {
         const lettersToAdd: Letter[] = ['A', 'A', 'A', 'A'];
-        expect(() => player.removeLetters(lettersToAdd)).to.throw();
+        expect(player.removeLetters(lettersToAdd) instanceof GameError).to.equal(true);
     });
 
     it('canRemoveLetter returns true when the letters are present in easel', () => {
