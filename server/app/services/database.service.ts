@@ -1,5 +1,5 @@
-import { GameMode } from '@app/classes/game-configs';
 import { DATABASE, DEFAULT_HIGHSCORE, HighScore, NUMBER_OF_SCORES } from '@app/classes/highscore';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Db, MongoClient, WithId } from 'mongodb';
 import io from 'socket.io';
 import { Service } from 'typedi';
