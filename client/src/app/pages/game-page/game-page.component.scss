@@ -8,7 +8,7 @@
 
 .game-toolbar {
     grid-column: 1 / 4;
-    grid-row: 1;
+    grid-row: 1/2;
     height: 56px;
     gap: 0.5rem;
 }
@@ -33,7 +33,19 @@
     grid-row: 3 / 4;
 }
 
-.game-chatbox {
+.game-objective {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+    width: 60%;
+}
+
+.game-chatbox-log2990 {
+    margin-top: 220px;
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+}
+
+.game-chatbox-classic {
     grid-column: 1 / 2;
     grid-row: 2 / 4;
 }
