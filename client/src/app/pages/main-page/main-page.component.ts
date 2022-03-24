@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { ObjectiveManagerService } from '@app/services/objective-manager.service';
+import { Component } from '@angular/core';
+import { changeGameMode } from '@app/actions/game-status.actions';
+import { Store } from '@ngrx/store';
+import { GameMode } from 'common/interfaces/game-mode';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
 })
-export class MainPageComponent implements OnInit {
-    mode2990Chosen: boolean = false;
+export class MainPageComponent {
+    constructor(private store: Store) {}
 
-    constructor(private objectiveService: ObjectiveManagerService) {}
-
-    ngOnInit() {
-        this.objectiveService.mode.subscribe((message) => (this.mode2990Chosen = message));
+    classicModeChosen(): void {
+        this.store.dispatch(changeGameMode({ gameMode: GameMode.Classical }));
     }
 
-    chooseMode2990() {
-        this.mode2990Chosen = true;
-        this.objectiveService.nextMessage(this.mode2990Chosen);
+    log2990ModeChosen(): void {
+        this.store.dispatch(changeGameMode({ gameMode: GameMode.Log2990 }));
     }
 }

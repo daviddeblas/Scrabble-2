@@ -11,12 +11,12 @@
         </p>
 
         <div class="main-menu">
-            <button routerLink="/game-selection" mat-raised-button color="primary">
+            <button routerLink="/game-selection" mat-raised-button color="primary" (click)="classicModeChosen()">
                 <mat-icon>play_arrow</mat-icon>
                 Scrabble classique
             </button>
 
-            <button routerLink="/game-selection" mat-raised-button color="primary" (click)="chooseMode2990()">
+            <button routerLink="/game-selection" mat-raised-button color="primary" (click)="log2990ModeChosen()">
                 <mat-icon>play_arrow</mat-icon>
                 Scrabble LOG2990
             </button>

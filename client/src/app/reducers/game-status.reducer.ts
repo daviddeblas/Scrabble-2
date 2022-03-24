@@ -1,6 +1,7 @@
 import * as gameActions from '@app/actions/game-status.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { createReducer, on } from '@ngrx/store';
+import { GameMode } from 'common/interfaces/game-mode';
 
 export const gameStatusFeatureKey = 'gameStatus';
 
@@ -10,6 +11,7 @@ export interface GameStatus {
     gameEnded: boolean;
     winner: string | null;
     timer: number;
+    gameMode: GameMode;
 }
 
 export const initialState: GameStatus = {
@@ -18,6 +20,7 @@ export const initialState: GameStatus = {
     gameEnded: false,
     winner: null,
     timer: 0,
+    gameMode: GameMode.Classical,
 };
 
 export const reducer = createReducer(
@@ -33,5 +36,6 @@ export const reducer = createReducer(
         ...state,
         timer,
     })),
+    on(gameActions.changeGameMode, (state, { gameMode }) => ({ ...state, gameMode })),
     on(resetAllState, () => initialState),
 );
