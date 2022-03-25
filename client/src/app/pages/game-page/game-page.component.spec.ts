@@ -4,16 +4,14 @@ import { Router } from '@angular/router';
 import { browserReload } from '@app/actions/browser.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { EffectsRootModule } from '@ngrx/effects';
-import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { GameMode } from 'common/interfaces/game-mode';
 import { cold } from 'jasmine-marbles';
-import { Observable } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
-    let actions$: Observable<unknown>;
     let store: MockStore;
 
     beforeEach(async () => {
@@ -24,7 +22,14 @@ describe('GamePageComponent', () => {
                     provide: Router,
                     useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
                 },
-                provideMockActions(() => actions$),
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameMode',
+                            value: GameMode.Classical,
+                        },
+                    ],
+                }),
                 {
                     provide: EffectsRootModule,
                     useValue: {
