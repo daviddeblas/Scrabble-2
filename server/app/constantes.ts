@@ -42,3 +42,5 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
         isValidated: false,
     },
 ];
+
+export const VOWELS = ['a', 'e', 'i', 'o', 'u', 'y'];

@@ -69,7 +69,7 @@ export class Game {
 
         let scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
         if (scoreToAdd instanceof GameError) return scoreToAdd;
-        if (this.log2990Objectives) scoreToAdd = this.log2990Objectives?.verifyObjectives(player, letters, scoreToAdd);
+        if (this.log2990Objectives) scoreToAdd = this.log2990Objectives.verifyObjectives(player, letters, scoreToAdd, this);
         this.getActivePlayer().score += scoreToAdd;
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);

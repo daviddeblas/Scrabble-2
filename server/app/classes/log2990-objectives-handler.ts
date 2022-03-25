@@ -1,24 +1,74 @@
 import { LOG2990OBJECTIVES } from '@app/constantes';
+import { ObjectivesVerifier } from '@app/services/objectives-verifier.service';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
+import Container from 'typedi';
+import { Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
 
 export enum Objectives {
-    OBJECTIVE0,
-    OBJECTIVE1,
-    OBJECTIVE2,
-    OBJECTIVE3,
-    OBJECTIVE4,
-    OBJECTIVE5,
-    OBJECTIVE6,
-    OBJECTIVE7,
+    OBJECTIVE0 = 'Créer un palindrome de 4 lettres ou plus',
+    OBJECTIVE1 = 'Placer 3 ou plus consonnes seulement',
+    OBJECTIVE2 = "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
+    OBJECTIVE3 = 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
+    OBJECTIVE4 = '?',
+    OBJECTIVE5 = 'Faire un mot de plus de 10 lettres',
+    OBJECTIVE6 = 'Avoir exactement 69 points',
+    OBJECTIVE7 = 'Placer le mot : ',
 }
 
 export class Log2990ObjectivesHandler {
     hostObjectives: Log2990Objective[];
     clientObjectives: Log2990Objective[];
+    objectivesVerifier: ObjectivesVerifier;
     constructor() {
         this.hostObjectives = [];
         this.clientObjectives = [];
+        this.objectivesVerifier = Container.get(ObjectivesVerifier);
+        this.setUpPlayerObjectives();
+    }
+
+    verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], score: number, game: Game): number {
+        const objectiveList = playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
+        const createdWords = game.board.getAffectedWords(placedLetters);
+        for (const objective of objectiveList) {
+            if (objective.isValidated) continue;
+            switch (objective.description) {
+                case Objectives.OBJECTIVE0:
+                    score *= this.objectivesVerifier.verifyFirstObjective(createdWords);
+                    break;
+                case Objectives.OBJECTIVE1:
+                    score += this.objectivesVerifier.verifySecondObjective(placedLetters);
+                    break;
+                case Objectives.OBJECTIVE2:
+                    score += this.objectivesVerifier.verifyThirdObjective(placedLetters);
+                    break;
+                case Objectives.OBJECTIVE3:
+                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                    break;
+                case Objectives.OBJECTIVE4:
+                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                    break;
+                case Objectives.OBJECTIVE5:
+                    score += this.objectivesVerifier.verifySixthObjective(createdWords);
+                    break;
+                case Objectives.OBJECTIVE6:
+                    score += this.objectivesVerifier.verifySeventhObjective(score);
+                    break;
+                case Objectives.OBJECTIVE7:
+                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                    break;
+            }
+        }
+        return score;
+    }
+
+    switchingPlayersObjectives(): void {
+        const tempList = this.hostObjectives;
+        this.hostObjectives = this.clientObjectives;
+        this.clientObjectives = tempList;
+    }
+
+    private setUpPlayerObjectives(): void {
         const amountObjectivesToFind = 4;
         const totalAmountObjectives = 8;
         const objectives = new Set<number>();
@@ -37,14 +87,11 @@ export class Log2990ObjectivesHandler {
         this.clientObjectives.push(this.determineObjective([...objectives][clientPrivateObjectiveIndex]));
     }
 
-    verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], currentScore: number): number {
-        return playerNumber;
-    }
-
     private determineObjective(objectiveNumber: number): Log2990Objective {
-        if (objectiveNumber === Objectives.OBJECTIVE7) {
+        const objective = LOG2990OBJECTIVES[objectiveNumber];
+        if (objective.description === Objectives.OBJECTIVE7) {
             // get a word
         }
-        return LOG2990OBJECTIVES[objectiveNumber];
+        return objective;
     }
 }
