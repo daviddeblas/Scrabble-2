@@ -10,6 +10,7 @@ import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { MIN_BOT_PLACEMENT_TIME, SECONDS_IN_MINUTE } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
@@ -43,7 +44,7 @@ describe('room', () => {
                     return socket;
                 },
             } as unknown as io.Socket;
-            gameOptions = new GameOptions('player1', 'b', SECONDS_IN_MINUTE);
+            gameOptions = new GameOptions('player1', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
         });
 
         it('constructor should create a Room', () => {
@@ -308,7 +309,7 @@ describe('room', () => {
             let room: Room;
 
             beforeEach(() => {
-                const gameOptions = new GameOptions('a', 'b', 60);
+                const gameOptions = new GameOptions('a', 'b', GameMode.Classical, 60);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -430,7 +431,7 @@ describe('room', () => {
         describe('getGameInfo', () => {
             it('client should receive game info when requested', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('a', 'b', SECONDS_IN_MINUTE);
+                const gameOptions = new GameOptions('a', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -456,7 +457,7 @@ describe('room', () => {
 
         describe('Receiving', () => {
             it('quit should call quitRoomHost() when emitted', (done) => {
-                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
+                const gameOptions = new GameOptions('player 1', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         const room = new Room(socket, roomsManager, gameOptions);
@@ -472,7 +473,7 @@ describe('room', () => {
             });
 
             it('switch to solo room should call initSoloGame when emitted and emit switched to solo', (done) => {
-                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
+                const gameOptions = new GameOptions('player 1', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         const room = new Room(socket, roomsManager, gameOptions);
@@ -489,7 +490,7 @@ describe('room', () => {
 
             it('accept should call inviteAccepted()', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
+                const gameOptions = new GameOptions('player 1', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
                 server.on('connection', (socket) => {
                     socket.on('create room', () => {
                         room = new Room(socket, roomsManager, gameOptions);
@@ -507,7 +508,7 @@ describe('room', () => {
 
             it('client quit should call quitRoomClient', (done) => {
                 let room: Room;
-                const gameOptions = new GameOptions('player 1', 'b', SECONDS_IN_MINUTE);
+                const gameOptions = new GameOptions('player 1', 'b', GameMode.Classical, SECONDS_IN_MINUTE);
                 roomsManager.removeRoom.callsFake(() => {
                     return;
                 });

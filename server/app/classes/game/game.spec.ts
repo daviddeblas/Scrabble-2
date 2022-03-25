@@ -10,6 +10,7 @@ import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { GameMode } from 'common/interfaces/game-mode';
 import { spy, stub, useFakeTimers } from 'sinon';
 import { Container } from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
@@ -17,7 +18,7 @@ import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_P
 describe('game', () => {
     let game: Game;
     let activePlayer: number;
-    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', GameMode.Classical, 60);
     const timerCallbackMock = () => {
         return undefined;
     };

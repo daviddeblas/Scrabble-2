@@ -13,6 +13,7 @@ import { GameOptions } from 'common/classes/game-options';
 import { stringToLetter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
@@ -25,7 +26,7 @@ describe('Individual functions', () => {
     let sockets: io.Socket[];
     let commandService: CommandService;
     const gameConfig: GameConfig = new GameConfig('gameConfig', [], new Vec2(BOARD_SIZE, BOARD_SIZE));
-    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', GameMode.Classical, 60);
 
     const createFakeSocket = (index: number) => {
         return {
@@ -256,7 +257,7 @@ describe('commands', () => {
         sockets.push(createFakeSocket(0));
         sockets.push(createFakeSocket(1));
 
-        gameOptions = new GameOptions('a', 'b');
+        gameOptions = new GameOptions('a', 'b', GameMode.Classical);
         commandService = new CommandService(Container.get(DictionaryService));
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
