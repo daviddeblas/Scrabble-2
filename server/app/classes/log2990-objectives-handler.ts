@@ -1,7 +1,7 @@
 import { LOG2990OBJECTIVES } from '@app/constantes';
 import { ObjectivesVerifier } from '@app/services/objectives-verifier.service';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
 

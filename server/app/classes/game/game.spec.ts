@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -166,8 +167,7 @@ describe('game', () => {
     });
 
     it('place should call verifyObjectives if log2990Objectives is not null', () => {
-        const options = new GameOptions('host', 'dict', GameMode.Log2990, 60);
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], options, timerCallbackMock, afterTurnCallbackMock);
+        game['log2990Objectives'] = new Log2990ObjectivesHandler();
         game.players[activePlayer].easel = stringToLetters('abacost');
         const verifyObjectivesStub = stub(game['log2990Objectives'] as Log2990ObjectivesHandler, 'verifyObjectives');
         const positionsOfPlacement = game.players[activePlayer].easel.map((l, i) => new PlacedLetter(l, new Vec2(3 + i, 7)));
