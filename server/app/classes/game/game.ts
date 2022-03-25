@@ -67,8 +67,9 @@ export class Game {
             if (lettersInCenter.length === 0) return new GameError(GameErrorType.BadStartingMove);
         }
 
-        const scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
+        let scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
         if (scoreToAdd instanceof GameError) return scoreToAdd;
+        if (this.log2990Objectives) scoreToAdd = this.log2990Objectives?.verifyObjectives(player, letters, scoreToAdd);
         this.getActivePlayer().score += scoreToAdd;
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);

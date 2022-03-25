@@ -1,5 +1,6 @@
 import { LOG2990OBJECTIVES } from '@app/constantes';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
+import { PlacedLetter } from './placed-letter';
 
 export enum Objectives {
     OBJECTIVE0,
@@ -34,7 +35,7 @@ export class Log2990ObjectivesHandler {
         this.clientObjectives.push(this.determineObjective([...objectives][clientPrivateObjectiveIndex]));
     }
 
-    verifyObjectives(playerNumber: number): number {
+    verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], currentScore: number): number {
         return playerNumber;
     }
 
