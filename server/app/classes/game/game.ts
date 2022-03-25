@@ -1,10 +1,12 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
@@ -24,6 +26,7 @@ export class Game {
     private turnsSkipped: number;
     private placeCounter: number;
     private currentTimer: NodeJS.Timeout;
+    private log2990Objectives: Log2990ObjectivesHandler | undefined;
 
     constructor(
         public config: GameConfig,
@@ -46,6 +49,8 @@ export class Game {
         setTimeout(() => {
             actionAfterTurn();
         }, creationDelay);
+
+        if (gameOptions.gameMode === GameMode.Log2990) this.log2990Objectives = new Log2990ObjectivesHandler();
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): GameError | undefined {
