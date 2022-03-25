@@ -1,11 +1,10 @@
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
-import { VOWELS } from '@app/constantes';
+import { NO_POINTS, VOWELS } from '@app/constantes';
 import { Service } from 'typedi';
-
 @Service()
 export class ObjectivesVerifier {
-    readonly objectiveNotCompletedScore = 0;
+    readonly objectiveNotCompletedScore = NO_POINTS;
     verifyFirstObjective(createdWords: PlacedLetter[][]): number {
         const objectiveValue = 2;
         const minPalindromeLength = 4;

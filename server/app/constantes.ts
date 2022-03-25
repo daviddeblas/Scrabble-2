@@ -44,3 +44,5 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
 ];
 
 export const VOWELS = ['a', 'e', 'i', 'o', 'u', 'y'];
+
+export const NO_POINTS = 0;
