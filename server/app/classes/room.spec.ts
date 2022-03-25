@@ -95,80 +95,6 @@ describe('room', () => {
             expect(room.surrenderGame(socket.id) instanceof GameError).to.equal(true);
         });
 
-        it('surrenderGame should emit endGame if the game is not null', (done) => {
-            const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
-                return;
-            });
-            const room = new Room(socket, roomsManager, gameOptions);
-            let clientReceived = false;
-            const clientSocket = {
-                emit: () => {
-                    clientReceived = true;
-                },
-            } as unknown as io.Socket;
-            let hostReceived = false;
-            const hostSocket = {
-                emit: () => {
-                    hostReceived = true;
-                },
-            } as unknown as io.Socket;
-            room.game = {
-                players: [{ name: 'player1' }, { name: 'player2' }],
-                bag: { letters: [] },
-                stopTimer: () => {
-                    return;
-                },
-                endGame: () => {
-                    return;
-                },
-            } as unknown as Game;
-            room.sockets = [clientSocket, hostSocket];
-            room.surrenderGame(socket.id);
-            room.surrenderGame('player2');
-            setTimeout(() => {
-                expect(clientReceived && hostReceived).to.deep.equal(true);
-                expect(dataStub.called).to.equal(true);
-                done();
-            }, RESPONSE_DELAY * 3);
-        });
-
-        it('surrenderGame should call RoomsManager.removeRoom if no players are left', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            room['playersLeft'] = 0;
-            room.game = {
-                players: ['player1', 'player2'],
-                bag: { letters: [] },
-                stopTimer: () => {
-                    return;
-                },
-                endGame: () => {
-                    return;
-                },
-            } as unknown as Game;
-            room.sockets = [];
-            room.surrenderGame('socket id');
-            expect(roomsManager.removeRoom.calledOnce).to.equal(true);
-        });
-
-        it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const socketStub = stub(socket, 'removeAllListeners').callThrough();
-            room.removeUnneededListeners(socket);
-            expect(socketStub.calledWith('send message')).to.equal(true);
-            expect(socketStub.calledWith('surrender game')).to.equal(true);
-            expect(socketStub.calledWith('get game status')).to.equal(true);
-        });
-
-        it('quitRoomClient should not emit if game is not null', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            room.game = {} as unknown as Game;
-            const emitStub = stub(socket, 'emit').callsFake(() => {
-                return true;
-            });
-            room.quitRoomClient();
-            expect(emitStub.called).to.equal(false);
-        });
-
         it('initiateRoomEvents should call setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const setupSocketStub = stub(room as any, 'setupSocket').callsFake(() => {
@@ -188,26 +114,6 @@ describe('room', () => {
             expect(setupSocketStub.calledOnce).to.equal(true);
         });
 
-        it('actionAfterTimeout should call end game if game is ended', () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const stubbedGame = {
-                needsToEnd: () => true,
-                skip: () => {
-                    return;
-                },
-            } as unknown as Game;
-            stub(room.commandService, 'processSkip' as any).callsFake(() => {
-                return;
-            });
-            stub(room.commandService, 'postCommand' as any).callsFake(() => {
-                return;
-            });
-            room.game = stubbedGame;
-            const endGame = stub(room.commandService, 'endGame' as any);
-            room['actionAfterTimeout']()();
-            expect(endGame.calledOnce).to.equal(true);
-        });
-
         it('initSoloGame should put the correct attributes and call notifyAvailableRoomsChanges and setupSocket', () => {
             const room = new Room(socket, roomsManager, gameOptions);
             const setUpSocketStub = stub(room as any, 'setupSocket');
@@ -218,35 +124,13 @@ describe('room', () => {
             expect(room.sockets.includes(socket)).to.equal(true);
         });
 
-        it('actionAfterTurnWithBot should call move from botService if it is the bot turn', async () => {
+        it('removeUnneededListeners should remove the listeners that are going to be reinstated', () => {
             const room = new Room(socket, roomsManager, gameOptions);
-            const stubbedGame = {
-                activePlayer: 1,
-            } as unknown as Game;
-            const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
-                return '';
-            });
-            const onCommandStub = stub(room.commandService, 'onCommand');
-            room.game = stubbedGame;
-            const clk = useFakeTimers();
-            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
-            clk.tick(MIN_BOT_PLACEMENT_TIME);
-            clk.restore();
-            expect(onCommandStub.calledOnce).to.equal(true);
-            expect(moveStub.calledOnce).to.equal(true);
-        });
-
-        it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', async () => {
-            const room = new Room(socket, roomsManager, gameOptions);
-            const stubbedGame = {
-                activePlayer: 0,
-            } as unknown as Game;
-            const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
-                return '';
-            });
-            room.game = stubbedGame;
-            await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
-            expect(moveStub.called).to.equal(false);
+            const socketStub = stub(socket, 'removeAllListeners').callThrough();
+            room.removeUnneededListeners(socket);
+            expect(socketStub.calledWith('send message')).to.equal(true);
+            expect(socketStub.calledWith('surrender game')).to.equal(true);
+            expect(socketStub.calledWith('get game status')).to.equal(true);
         });
 
         it('actionAfterTurnWithBot should not call move from botService if the game has ended', async () => {
@@ -265,15 +149,165 @@ describe('room', () => {
 
         it('actionAfterTurnWithBot should return an error if the botservice return an error', async () => {
             const room = new Room(socket, roomsManager, gameOptions);
+            stub(Container.get(BotService), 'move').callsFake(async () => {
+                return new GameError(GameErrorType.OutOfBoundPosition);
+            });
             const stubbedGame = {
                 activePlayer: 1,
                 gameFinished: false,
             } as unknown as Game;
-            stub(Container.get(BotService), 'move').callsFake(async () => {
-                return new GameError(GameErrorType.OutOfBoundPosition);
-            });
             room.game = stubbedGame;
             expect((await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)()) instanceof GameError).to.equal(true);
+        });
+
+        describe('Functions Needing fake games', () => {
+            let fakeGame: Game;
+            let room: Room;
+
+            beforeEach(() => {
+                fakeGame = {
+                    players: [{ name: 'player1' }, { name: 'player2' }],
+                    bag: { letters: [] },
+                    activePlayer: 1,
+                    gameFinished: false,
+                    stopTimer: () => {
+                        return;
+                    },
+                    endGame: () => {
+                        return;
+                    },
+                    skip: () => {
+                        return;
+                    },
+                    getGameStatus: () => {
+                        return;
+                    },
+                    needsToEnd: () => true,
+                } as unknown as Game;
+                room = new Room(socket, roomsManager, gameOptions);
+                room.game = fakeGame;
+            });
+
+            it('convertToSolo should emit receive message and game status with a bot as second player and reset event listeners', (done) => {
+                const removeEventStub = stub(room, 'removeUnneededListeners');
+                const setupSocketStub = stub(room as any, 'setupSocket');
+                const otherSocket = {} as io.Socket;
+                const emitStub = stub(socket, 'emit');
+                room.sockets = [socket, otherSocket];
+                room['convertToSolo'](1);
+                setTimeout(() => {
+                    expect(emitStub.calledTwice).to.equal(true);
+                    expect(removeEventStub.calledOnce).to.equal(true);
+                    expect(setupSocketStub.calledOnce).to.equal(true);
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
+            it('convertToSolo should switch client to be host if host surrenders and reset event listeners', (done) => {
+                const removeEventStub = stub(room, 'removeUnneededListeners');
+                const setupSocketStub = stub(room as any, 'setupSocket');
+                const otherSocket = {} as io.Socket;
+                room.sockets = [otherSocket, socket];
+                room['convertToSolo'](0);
+                setTimeout(() => {
+                    expect(removeEventStub.calledOnce).to.equal(true);
+                    expect(setupSocketStub.calledOnce).to.equal(true);
+                    expect(room.game?.players[0].name).to.equal('player2');
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
+            it('surrenderGame should emit endGame if the game is not null', (done) => {
+                const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+                    return;
+                });
+                let clientReceived = false;
+                const clientSocket = {
+                    emit: () => {
+                        clientReceived = true;
+                    },
+                } as unknown as io.Socket;
+                let hostReceived = false;
+                const hostSocket = {
+                    emit: () => {
+                        hostReceived = true;
+                    },
+                } as unknown as io.Socket;
+                room['botLevel'] = BotDifficulty.Easy;
+                room.sockets = [clientSocket, hostSocket];
+                room.surrenderGame(socket.id);
+                room.surrenderGame('player2');
+                setTimeout(() => {
+                    expect(clientReceived && hostReceived).to.deep.equal(true);
+                    expect(dataStub.called).to.equal(true);
+                    done();
+                }, RESPONSE_DELAY * 3);
+            });
+
+            it('surrenderGame should call RoomsManager.removeRoom if no players are left', () => {
+                room['playersLeft'] = 0;
+                room['botLevel'] = BotDifficulty.Easy;
+                room.sockets = [];
+                room.surrenderGame('socket id');
+                expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+            });
+
+            it('surrenderGame should call convertToSolo if botLevel undefined with 0 if host surrenders', () => {
+                const convertToSoloStub = stub(room as any, 'convertToSolo');
+                room['botLevel'] = undefined;
+                room.surrenderGame(socket.id);
+                expect(convertToSoloStub.calledOnceWith(0)).to.equal(true);
+            });
+
+            it('surrenderGame should call convertToSolo if botLevel undefined with 1 if client surrenders', () => {
+                const convertToSoloStub = stub(room as any, 'convertToSolo');
+                room['botLevel'] = undefined;
+                room.surrenderGame('client id');
+                expect(convertToSoloStub.calledOnceWith(1)).to.equal(true);
+            });
+
+            it('quitRoomClient should not emit if game is not null', () => {
+                const emitStub = stub(socket, 'emit').callsFake(() => {
+                    return true;
+                });
+                room.quitRoomClient();
+                expect(emitStub.called).to.equal(false);
+            });
+
+            it('actionAfterTimeout should call end game if game is ended', () => {
+                stub(room.commandService, 'processSkip' as any).callsFake(() => {
+                    return;
+                });
+                stub(room.commandService, 'postCommand' as any).callsFake(() => {
+                    return;
+                });
+                const endGame = stub(room.commandService, 'endGame' as any);
+                room['actionAfterTimeout']()();
+                expect(endGame.calledOnce).to.equal(true);
+            });
+
+            it('actionAfterTurnWithBot should call move from botService if it is the bot turn', async () => {
+                const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
+                    return '';
+                });
+                const onCommandStub = stub(room.commandService, 'onCommand');
+                const clk = useFakeTimers();
+                await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+                clk.tick(MIN_BOT_PLACEMENT_TIME);
+                clk.restore();
+                expect(onCommandStub.calledOnce).to.equal(true);
+                expect(moveStub.calledOnce).to.equal(true);
+            });
+
+            it('actionAfterTurnWithBot should not call move from botService if it is not the bot turn', async () => {
+                const moveStub = stub(Container.get(BotService), 'move').callsFake(async () => {
+                    return '';
+                });
+                fakeGame.activePlayer = 0;
+                room.game = fakeGame;
+                await room['actionAfterTurnWithBot'](room, BotDifficulty.Easy)();
+                expect(moveStub.called).to.equal(false);
+            });
         });
     });
 

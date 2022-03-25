@@ -24,6 +24,7 @@ export class Game {
     private turnsSkipped: number;
     private placeCounter: number;
     private currentTimer: NodeJS.Timeout;
+    private timerStartTime: number;
 
     constructor(
         public config: GameConfig,
@@ -117,14 +118,14 @@ export class Game {
         this.activePlayer = this.nextPlayer();
     }
 
-    getGameStatus(playerNumber: number, botLevel?: string): unknown {
+    getGameStatus(playerNumber: number, botLevel?: string, withUpdatedTimer: boolean = false): unknown {
         const opponent = { ...this.players[(playerNumber + 1) % 2] };
         opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
             status: {
                 activePlayer: this.players[this.activePlayer].name,
                 letterPotLength: this.bag.letters.length,
-                timer: this.gameOptions.timePerRound,
+                timer: withUpdatedTimer ? this.timeLeft : this.gameOptions.timePerRound,
             },
             players: { player: this.players[playerNumber], opponent, botLevel },
             board: {
@@ -138,6 +139,7 @@ export class Game {
     }
 
     initTimer(): void {
+        this.timerStartTime = Date.now();
         this.currentTimer = setTimeout(this.actionAfterTimeout, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
@@ -148,6 +150,11 @@ export class Game {
 
     stopTimer(): void {
         clearTimeout(this.currentTimer);
+    }
+
+    private get timeLeft(): number {
+        const timeElapsed = Math.round((Date.now() - this.timerStartTime) / MILLISECONDS_PER_SEC);
+        return this.gameOptions.timePerRound - timeElapsed;
     }
 
     private getGameEndStatus(): GameFinishStatus {
