@@ -17,6 +17,8 @@ export class Log2990ObjectivesHandler {
     hostObjectives: Log2990Objective[];
     clientObjectives: Log2990Objective[];
     constructor() {
+        this.hostObjectives = [];
+        this.clientObjectives = [];
         const amountObjectivesToFind = 4;
         const totalAmountObjectives = 8;
         const objectives = new Set<number>();
