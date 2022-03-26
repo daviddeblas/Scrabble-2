@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { restore, stub } from 'sinon';
 import { Game } from './game/game';
 import { Log2990ObjectivesHandler } from './log2990-objectives-handler';
+import { PlacedLetter } from './placed-letter';
 
 describe('Log2990 Objective Handler', () => {
     let log2990ObjectiveHandler: Log2990ObjectivesHandler;
@@ -63,14 +64,46 @@ describe('Log2990 Objective Handler', () => {
         it('verifyObjectives should call verifySeventhObjective if the Objective is the seventh one', () => {
             log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[6]];
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 0);
-            log2990ObjectiveHandler.verifyObjectives(1, [], 0, { board: { getAffectedWords: () => [[]] } } as unknown as Game);
+            log2990ObjectiveHandler.verifyObjectives(1, [], 0, {
+                board: { getAffectedWords: () => [[]] },
+                players: [{}, { score: 2 }],
+            } as unknown as Game);
             expect(objectiveStub.calledOnce).to.equal(true);
+        });
+
+        it('verifyObjectives should call verifySeventhObjective if the Objective is the seventh one and add a bonus when 7 letters placed', () => {
+            log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[6]];
+            const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 0);
+            log2990ObjectiveHandler.verifyObjectives(
+                1,
+                [
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                    { letter: 'A' } as PlacedLetter,
+                ],
+                0,
+                {
+                    board: {
+                        getAffectedWords: () => [[]],
+                    },
+                    players: [{}, { score: 2 }],
+                } as unknown as Game,
+            );
+            const expectedScore = 52;
+            expect(objectiveStub.calledOnceWith(expectedScore)).to.equal(true);
         });
 
         it('verifyObjectives should set is validated to true if score is changed', () => {
             log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[6]];
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 1);
-            log2990ObjectiveHandler.verifyObjectives(1, [], 0, { board: { getAffectedWords: () => [[]] } } as unknown as Game);
+            log2990ObjectiveHandler.verifyObjectives(1, [], 0, {
+                board: { getAffectedWords: () => [[]] },
+                players: [{}, { score: 2 }],
+            } as unknown as Game);
             expect(objectiveStub.calledOnce).to.equal(true);
             expect(log2990ObjectiveHandler['clientObjectives'][0].isValidated).to.equal(true);
         });
@@ -79,7 +112,10 @@ describe('Log2990 Objective Handler', () => {
             log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[0], LOG2990OBJECTIVES[6]];
             log2990ObjectiveHandler['clientObjectives'][1].isValidated = true;
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 0);
-            log2990ObjectiveHandler.verifyObjectives(1, [], 0, { board: { getAffectedWords: () => [[]] } } as unknown as Game);
+            log2990ObjectiveHandler.verifyObjectives(1, [], 0, {
+                board: { getAffectedWords: () => [[]] },
+                players: [{}, { score: 2 }],
+            } as unknown as Game);
             expect(objectiveStub.called).to.equal(false);
         });
     });

@@ -1,4 +1,5 @@
 /* eslint-disable dot-notation */
+import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { expect } from 'chai';
 import { restore } from 'sinon';
@@ -115,6 +116,26 @@ describe('Objectives Verifier Service', () => {
             { letter: 'A', position: { x: 0, y: 3 } } as PlacedLetter,
         ];
         expect(service.verifyThirdObjective(words)).to.equal(expectedResult);
+    });
+
+    it('verifyFourthObjective should return 45 if a 20 point word was written in the first 10 seconds', () => {
+        const expectedResult = 45;
+        const fakeGame = { timerStartTime: Date.now() } as unknown as Game;
+        const letterScore = 30;
+        expect(service.verifyFourthObjective(fakeGame, letterScore)).to.equal(expectedResult);
+    });
+    it('verifyFourthObjective should return 0 if it has been more than 10 second that the turn started', () => {
+        const expectedResult = 0;
+        const elevenSeconds = 11000;
+        const fakeGame = { timerStartTime: Date.now() - elevenSeconds } as unknown as Game;
+        const letterScore = 30;
+        expect(service.verifyFourthObjective(fakeGame, letterScore)).to.equal(expectedResult);
+    });
+    it('verifyFourthObjective should return 0 if the score is less than 20', () => {
+        const expectedResult = 0;
+        const fakeGame = { timerStartTime: Date.now() } as unknown as Game;
+        const letterScore = 19;
+        expect(service.verifyFourthObjective(fakeGame, letterScore)).to.equal(expectedResult);
     });
 
     it('verifySixthObjective should return 50 if one of the word is more than ten letters long', () => {
