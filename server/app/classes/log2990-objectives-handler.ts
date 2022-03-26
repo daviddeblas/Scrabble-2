@@ -2,7 +2,7 @@ import { LOG2990OBJECTIVES } from '@app/constantes';
 import { ObjectivesVerifierService } from '@app/services/objectives-verifier.service';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { Container } from 'typedi';
-import { Game } from './game/game';
+import { BONUS_POINTS_FOR_FULL_EASEL, Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
 
 export enum Objectives {
@@ -30,6 +30,8 @@ export class Log2990ObjectivesHandler {
     verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], score: number, game: Game): number {
         const objectiveList = playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
         const createdWords = game.board.getAffectedWords(placedLetters);
+        const amountLettersForBonus = 7;
+        let bonusAmount = 0;
         for (const objective of objectiveList) {
             const startScore = score;
             if (objective.isValidated) continue;
@@ -53,7 +55,8 @@ export class Log2990ObjectivesHandler {
                     score += this.objectivesVerifier.verifySixthObjective(createdWords);
                     break;
                 case Objectives.OBJECTIVE6:
-                    score += this.objectivesVerifier.verifySeventhObjective(game.players[playerNumber].score + score);
+                    if (placedLetters.length === amountLettersForBonus) bonusAmount = BONUS_POINTS_FOR_FULL_EASEL;
+                    score += this.objectivesVerifier.verifySeventhObjective(game.players[playerNumber].score + score + bonusAmount);
                     break;
                 case Objectives.OBJECTIVE7:
                     score += this.objectivesVerifier.verifyFourthObjective(game, score);
