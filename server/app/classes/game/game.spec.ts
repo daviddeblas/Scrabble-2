@@ -5,6 +5,7 @@
 /* eslint-disable dot-notation */
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { BotDifficulty } from '@app/services/bot.service';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
@@ -352,6 +353,19 @@ describe('game', () => {
         expect(info.players.player).to.deep.eq(game?.players[0]);
     });
 
+    it('getGameStatusWithUpdatedTimer returns specific information given to the player with an real time timer', () => {
+        const expectedTimer = 28;
+        stub(game as any, 'timeLeft').get(() => expectedTimer);
+        const info = game.getGameStatus(0, BotDifficulty.Easy, true) as any;
+        expect(info.status.activePlayer).to.eq(game?.players[game?.activePlayer].name);
+        expect(info.board.board).to.eq(game?.board.board);
+        expect(info.board.multipliers).to.eq(game?.board.multipliers);
+        expect(info.status.letterPotLength).to.eq(game?.bag.letters.length);
+        expect(info.status.timer).to.eq(expectedTimer);
+        expect(info.players.player).to.deep.eq(game?.players[0]);
+        expect(info.players.botLevel).to.eq(BotDifficulty.Easy);
+    });
+
     it('init timer should wait the right amount of ', (done) => {
         const clk = useFakeTimers();
         game['actionAfterTimeout'] = () => {
@@ -372,5 +386,12 @@ describe('game', () => {
         clk.tick(gameOptions.timePerRound * MILLISECONDS_PER_SEC);
         expect(actionAfterTimeout.calledOnce).to.equal(false);
         clk.restore();
+    });
+
+    it('get timeLeft should return the time left, deducing the time since the timeout started', () => {
+        const timeoutStart = Date.now() - 5000;
+        game['timerStartTime'] = timeoutStart;
+        const expectedTime = 55;
+        expect(game['timeLeft']).to.equal(expectedTime);
     });
 });

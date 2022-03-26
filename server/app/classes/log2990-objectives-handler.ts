@@ -1,5 +1,5 @@
 import { LOG2990OBJECTIVES } from '@app/constantes';
-import { ObjectivesVerifier } from '@app/services/objectives-verifier.service';
+import { ObjectivesVerifierService } from '@app/services/objectives-verifier.service';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { Container } from 'typedi';
 import { Game } from './game/game';
@@ -19,11 +19,11 @@ export enum Objectives {
 export class Log2990ObjectivesHandler {
     hostObjectives: Log2990Objective[];
     clientObjectives: Log2990Objective[];
-    objectivesVerifier: ObjectivesVerifier;
+    objectivesVerifier: ObjectivesVerifierService;
     constructor() {
         this.hostObjectives = [];
         this.clientObjectives = [];
-        this.objectivesVerifier = Container.get(ObjectivesVerifier);
+        this.objectivesVerifier = Container.get(ObjectivesVerifierService);
         this.setUpPlayerObjectives();
     }
 
@@ -31,6 +31,7 @@ export class Log2990ObjectivesHandler {
         const objectiveList = playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
         const createdWords = game.board.getAffectedWords(placedLetters);
         for (const objective of objectiveList) {
+            const startScore = score;
             if (objective.isValidated) continue;
             switch (objective.description) {
                 case Objectives.OBJECTIVE0:
@@ -52,12 +53,13 @@ export class Log2990ObjectivesHandler {
                     score += this.objectivesVerifier.verifySixthObjective(createdWords);
                     break;
                 case Objectives.OBJECTIVE6:
-                    score += this.objectivesVerifier.verifySeventhObjective(score);
+                    score += this.objectivesVerifier.verifySeventhObjective(game.players[playerNumber].score + score);
                     break;
                 case Objectives.OBJECTIVE7:
                     score += this.objectivesVerifier.verifyFourthObjective(game, score);
                     break;
             }
+            if (startScore !== score) objective.isValidated = true;
         }
         return score;
     }

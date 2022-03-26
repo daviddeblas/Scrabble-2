@@ -3,14 +3,15 @@ import { PlacedLetter } from '@app/classes/placed-letter';
 import { NO_POINTS, VOWELS } from '@app/constantes';
 import { Service } from 'typedi';
 @Service()
-export class ObjectivesVerifier {
+export class ObjectivesVerifierService {
     readonly objectiveNotCompletedScore = NO_POINTS;
     verifyFirstObjective(createdWords: PlacedLetter[][]): number {
         const objectiveValue = 2;
         const minPalindromeLength = 4;
         for (const word of createdWords) {
             if (word.length < minPalindromeLength) continue;
-            const reverseWord = word.reverse();
+            const currentWord = [...word];
+            const reverseWord = currentWord.reverse();
             if (this.isEqualWord(word, reverseWord)) return objectiveValue;
         }
         const multiplierWithNoPalindrome = 1;
