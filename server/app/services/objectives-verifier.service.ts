@@ -1,7 +1,6 @@
-import { Game } from '@app/classes/game/game';
+import { Game, MILLISECONDS_PER_SEC } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { NO_POINTS, VOWELS } from '@app/constantes';
-import { SECONDS_IN_MINUTE } from 'common/constants';
 import { Service } from 'typedi';
 @Service()
 export class ObjectivesVerifierService {
@@ -46,7 +45,7 @@ export class ObjectivesVerifierService {
         const objectiveValue = 45;
         const maxSecondsForObjective = 10;
         const minScoreForObjective = 20;
-        const timeSpent = (Date.now() - game.timerStartTime) / SECONDS_IN_MINUTE;
+        const timeSpent = (Date.now() - game.timerStartTime) / MILLISECONDS_PER_SEC;
         if (timeSpent > maxSecondsForObjective) return this.objectiveNotCompletedScore;
         return score < minScoreForObjective ? this.objectiveNotCompletedScore : objectiveValue;
     }
@@ -74,6 +73,19 @@ export class ObjectivesVerifierService {
     verifySeventhObjective(score: number): number {
         const objectiveValue = 69;
         return score === objectiveValue ? objectiveValue : this.objectiveNotCompletedScore;
+    }
+
+    verifyEighthObjective(wordsCreated: PlacedLetter[][], objectiveWord: string): number {
+        const objectiveValue = 70;
+        let isWordPlaced = false;
+        wordsCreated.forEach((word) => {
+            const wordInString = word
+                .map((letter) => letter.letter)
+                .join('')
+                .toLowerCase();
+            if (wordInString === objectiveWord) isWordPlaced = true;
+        });
+        return isWordPlaced ? objectiveValue : this.objectiveNotCompletedScore;
     }
 
     private isEqualWord(firstWord: PlacedLetter[], secondWord: PlacedLetter[]): boolean {

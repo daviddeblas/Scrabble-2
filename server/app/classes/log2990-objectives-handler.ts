@@ -6,60 +6,62 @@ import { BONUS_POINTS_FOR_FULL_EASEL, Game } from './game/game';
 import { PlacedLetter } from './placed-letter';
 
 export enum Objectives {
-    OBJECTIVE0 = 'Créer un palindrome de 4 lettres ou plus',
-    OBJECTIVE1 = 'Placer 3 ou plus consonnes seulement',
-    OBJECTIVE2 = "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
-    OBJECTIVE3 = 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
-    OBJECTIVE4 = '?',
-    OBJECTIVE5 = 'Faire un mot de plus de 10 lettres',
-    OBJECTIVE6 = 'Avoir exactement 69 points',
-    OBJECTIVE7 = 'Placer le mot : ',
+    OBJECTIVE1 = 'Créer un palindrome de 4 lettres ou plus',
+    OBJECTIVE2 = 'Placer 3 ou plus consonnes seulement',
+    OBJECTIVE3 = "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
+    OBJECTIVE4 = 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
+    OBJECTIVE5 = '?',
+    OBJECTIVE6 = 'Faire un mot de plus de 10 lettres',
+    OBJECTIVE7 = 'Avoir exactement 69 points',
+    OBJECTIVE8 = 'Placer le mot : ',
 }
 
 export class Log2990ObjectivesHandler {
-    hostObjectives: Log2990Objective[];
-    clientObjectives: Log2990Objective[];
-    objectivesVerifier: ObjectivesVerifierService;
-    constructor() {
+    private hostObjectives: Log2990Objective[];
+    private clientObjectives: Log2990Objective[];
+    private objectivesVerifier: ObjectivesVerifierService;
+    private chosenWordObjective8: string;
+
+    constructor(private game: Game) {
         this.hostObjectives = [];
         this.clientObjectives = [];
         this.objectivesVerifier = Container.get(ObjectivesVerifierService);
         this.setUpPlayerObjectives();
     }
 
-    verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], score: number, game: Game): number {
+    verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], score: number): number {
         const objectiveList = playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
-        const createdWords = game.board.getAffectedWords(placedLetters);
+        const createdWords = this.game.board.getAffectedWords(placedLetters);
         const amountLettersForBonus = 7;
         let bonusAmount = 0;
         for (const objective of objectiveList) {
             const startScore = score;
             if (objective.isValidated) continue;
             switch (objective.description) {
-                case Objectives.OBJECTIVE0:
+                case Objectives.OBJECTIVE1: // Y
                     score *= this.objectivesVerifier.verifyFirstObjective(createdWords);
                     break;
-                case Objectives.OBJECTIVE1:
+                case Objectives.OBJECTIVE2: // Y
                     score += this.objectivesVerifier.verifySecondObjective(placedLetters);
                     break;
-                case Objectives.OBJECTIVE2:
+                case Objectives.OBJECTIVE3: // Y
                     score += this.objectivesVerifier.verifyThirdObjective(placedLetters);
                     break;
-                case Objectives.OBJECTIVE3:
-                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                case Objectives.OBJECTIVE4: // Y
+                    score += this.objectivesVerifier.verifyFourthObjective(this.game, score);
                     break;
-                case Objectives.OBJECTIVE4:
-                    score += this.objectivesVerifier.verifyFifthObjective(placedLetters, game);
-                    break;
-                case Objectives.OBJECTIVE5:
-                    score += this.objectivesVerifier.verifySixthObjective(createdWords);
+                case Objectives.OBJECTIVE5: // Y
+                    score += this.objectivesVerifier.verifyFifthObjective(placedLetters, this.game);
                     break;
                 case Objectives.OBJECTIVE6:
-                    if (placedLetters.length === amountLettersForBonus) bonusAmount = BONUS_POINTS_FOR_FULL_EASEL;
-                    score += this.objectivesVerifier.verifySeventhObjective(game.players[playerNumber].score + score + bonusAmount);
+                    score += this.objectivesVerifier.verifySixthObjective(createdWords);
                     break;
-                case Objectives.OBJECTIVE7:
-                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                case Objectives.OBJECTIVE7: // Y
+                    if (placedLetters.length === amountLettersForBonus) bonusAmount = BONUS_POINTS_FOR_FULL_EASEL;
+                    score += this.objectivesVerifier.verifySeventhObjective(this.game.players[playerNumber].score + score + bonusAmount);
+                    break;
+                case Objectives.OBJECTIVE8:
+                    score += this.objectivesVerifier.verifyEighthObjective(createdWords, this.chosenWordObjective8);
                     break;
             }
             if (startScore !== score) objective.isValidated = true;
@@ -94,8 +96,9 @@ export class Log2990ObjectivesHandler {
 
     private determineObjective(objectiveNumber: number): Log2990Objective {
         const objective = LOG2990OBJECTIVES[objectiveNumber];
-        if (objective.description === Objectives.OBJECTIVE7) {
-            // get a word
+        if (objective.description === Objectives.OBJECTIVE8) {
+            const objectiveWordLength = 8;
+            this.chosenWordObjective8 = this.game.board.getRandomWord(objectiveWordLength);
         }
         return objective;
     }
