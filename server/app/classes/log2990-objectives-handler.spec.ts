@@ -55,6 +55,12 @@ describe('Log2990 Objective Handler', () => {
             log2990ObjectiveHandler.verifyObjectives(1, [], 0, { board: { getAffectedWords: () => [[]] } } as unknown as Game);
             expect(objectiveStub.calledOnce).to.equal(true);
         });
+        it('verifyObjectives should call verifyFifthObjective if the Objective is the fourth one', () => {
+            log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[4]];
+            const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifyFifthObjective').callsFake(() => 0);
+            log2990ObjectiveHandler.verifyObjectives(1, [], 0, { board: { getAffectedWords: () => [[]] } } as unknown as Game);
+            expect(objectiveStub.calledOnce).to.equal(true);
+        });
         it('verifyObjectives should call verifySixthObjective if the Objective is the sixth one', () => {
             log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[5]];
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySixthObjective').callsFake(() => 0);

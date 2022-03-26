@@ -138,6 +138,25 @@ describe('Objectives Verifier Service', () => {
         expect(service.verifyFourthObjective(fakeGame, letterScore)).to.equal(expectedResult);
     });
 
+    it('verifyFifthObjective should return 70 if two or more letters with 8 or more points are placed', () => {
+        const expectedResult = 70;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const fakeGame = { board: { pointsPerLetter: { get: () => 9 } } } as unknown as Game;
+        const placedLetters = [
+            { letter: 'Y', position: { x: 0, y: 0 } } as PlacedLetter,
+            { letter: 'A', position: { x: 0, y: 3 } } as PlacedLetter,
+            { letter: 'K', position: { x: 0, y: 3 } } as PlacedLetter,
+        ];
+        expect(service.verifyFifthObjective(placedLetters, fakeGame)).to.equal(expectedResult);
+    });
+
+    it('verifyFifthObjective should return 0 if not enough letters are worth more than 8 points', () => {
+        const expectedResult = 0;
+        const fakeGame = { board: { pointsPerLetter: { get: () => 2 } } } as unknown as Game;
+        const placedLetters = [{ letter: 'A', position: { x: 0, y: 0 } } as PlacedLetter, { letter: 'A', position: { x: 0, y: 3 } } as PlacedLetter];
+        expect(service.verifyFifthObjective(placedLetters, fakeGame)).to.equal(expectedResult);
+    });
+
     it('verifySixthObjective should return 50 if one of the word is more than ten letters long', () => {
         const expectedResult = 50;
         const words: PlacedLetter[][] = [
