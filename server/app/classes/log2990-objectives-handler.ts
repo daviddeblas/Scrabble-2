@@ -49,7 +49,7 @@ export class Log2990ObjectivesHandler {
                     score += this.objectivesVerifier.verifyFourthObjective(game, score);
                     break;
                 case Objectives.OBJECTIVE4:
-                    score += this.objectivesVerifier.verifyFourthObjective(game, score);
+                    score += this.objectivesVerifier.verifyFifthObjective(placedLetters, game);
                     break;
                 case Objectives.OBJECTIVE5:
                     score += this.objectivesVerifier.verifySixthObjective(createdWords);

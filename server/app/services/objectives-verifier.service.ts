@@ -51,6 +51,18 @@ export class ObjectivesVerifierService {
         return score < minScoreForObjective ? this.objectiveNotCompletedScore : objectiveValue;
     }
 
+    verifyFifthObjective(placedLetters: PlacedLetter[], game: Game): number {
+        const objectiveValue = 70;
+        const minLetterPointForObjective = 8;
+        let amountObjectiveLetters = 0;
+        let pointForLetter: number;
+        placedLetters.forEach((letter) => {
+            pointForLetter = game.board.pointsPerLetter.get(letter.letter) as number;
+            if (pointForLetter >= minLetterPointForObjective) amountObjectiveLetters++;
+        });
+        return amountObjectiveLetters >= 2 ? objectiveValue : this.objectiveNotCompletedScore;
+    }
+
     verifySixthObjective(createdWords: PlacedLetter[][]): number {
         const objectiveValue = 50;
         let isLongEnough = false;
