@@ -168,7 +168,7 @@ describe('game', () => {
     });
 
     it('place should call verifyObjectives if log2990Objectives is not null', () => {
-        game['log2990Objectives'] = new Log2990ObjectivesHandler();
+        game['log2990Objectives'] = new Log2990ObjectivesHandler(game);
         game.players[activePlayer].easel = stringToLetters('abacost');
         const verifyObjectivesStub = stub(game['log2990Objectives'] as Log2990ObjectivesHandler, 'verifyObjectives');
         const positionsOfPlacement = game.players[activePlayer].easel.map((l, i) => new PlacedLetter(l, new Vec2(3 + i, 7)));

@@ -189,4 +189,23 @@ describe('Objectives Verifier Service', () => {
         const playerPoints = 150;
         expect(service.verifySeventhObjective(playerPoints)).to.equal(expectedResult);
     });
+
+    it('verifyEighthObjective should return 0 if the word is not included in the createdWords', () => {
+        const expectedResult = 0;
+        const words: PlacedLetter[][] = [[{ letter: 'C', position: { x: 0, y: 0 } } as PlacedLetter]];
+        const wantedWord = 'abc';
+        expect(service.verifyEighthObjective(words, wantedWord)).to.equal(expectedResult);
+    });
+    it('verifyEighthObjective should return 70 if the word is included in the createdWords', () => {
+        const expectedResult = 70;
+        const words: PlacedLetter[][] = [
+            [
+                { letter: 'A', position: { x: 0, y: 0 } } as PlacedLetter,
+                { letter: 'B', position: { x: 0, y: 1 } } as PlacedLetter,
+                { letter: 'C', position: { x: 0, y: 2 } } as PlacedLetter,
+            ],
+        ];
+        const wantedWord = 'abc';
+        expect(service.verifyEighthObjective(words, wantedWord)).to.equal(expectedResult);
+    });
 });
