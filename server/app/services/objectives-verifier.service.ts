@@ -1,6 +1,7 @@
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { NO_POINTS, VOWELS } from '@app/constantes';
+import { SECONDS_IN_MINUTE } from 'common/constants';
 import { Service } from 'typedi';
 @Service()
 export class ObjectivesVerifierService {
@@ -45,9 +46,9 @@ export class ObjectivesVerifierService {
         const objectiveValue = 45;
         const maxSecondsForObjective = 10;
         const minScoreForObjective = 20;
-        const timeSpent = 10; // TODO: Modifier le timeSpent
+        const timeSpent = (Date.now() - game.timerStartTime) / SECONDS_IN_MINUTE;
         if (timeSpent > maxSecondsForObjective) return this.objectiveNotCompletedScore;
-        return score < minScoreForObjective ? objectiveValue : this.objectiveNotCompletedScore;
+        return score < minScoreForObjective ? this.objectiveNotCompletedScore : objectiveValue;
     }
 
     verifySixthObjective(createdWords: PlacedLetter[][]): number {
