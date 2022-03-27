@@ -28,4 +28,16 @@ describe('GamesObjectivesComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('notClickable should preventDefault event', () => {
+        let preventDefaultCalled = false;
+        const event = {
+            preventDefault: () => {
+                preventDefaultCalled = true;
+                return;
+            },
+        } as MouseEvent;
+        component.notClickable(event);
+        expect(preventDefaultCalled).toBeTrue();
+    });
 });
