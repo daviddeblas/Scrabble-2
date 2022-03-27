@@ -1,4 +1,5 @@
 import { refreshObjectiveState } from '@app/actions/game-objective.actions';
+import { resetAllState } from '@app/actions/game-status.actions';
 import { createReducer, on } from '@ngrx/store';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 
@@ -19,4 +20,5 @@ export const reducer = createReducer(
     on(refreshObjectiveState, (state, { publicObjectives, privateObjectives }) => {
         return { publicObjectives, privateObjectives };
     }),
+    on(resetAllState, () => initialState),
 );

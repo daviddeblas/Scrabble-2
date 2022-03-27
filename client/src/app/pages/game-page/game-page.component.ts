@@ -16,7 +16,10 @@ export class GamePageComponent {
         window.addEventListener('load', (event) => this.catchBrowserLoad(event));
         this.store
             .select('gameObjective')
-            .subscribe((gameObjectives) => (this.isLog2990 = !(gameObjectives.publicObjectives === [] && gameObjectives.privateObjectives === [])));
+            .subscribe(
+                (gameObjectives) =>
+                    (this.isLog2990 = !(gameObjectives.publicObjectives.length === 0 && gameObjectives.privateObjectives.length === 0)),
+            );
     }
 
     catchBrowserLoad(event: Event) {
