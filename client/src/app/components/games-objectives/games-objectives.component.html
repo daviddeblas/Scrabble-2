@@ -9,11 +9,11 @@
     </div> -->
     <!-- Ce qu'il y a en dessous est temporaire c'est pour voir à quoi ça va ressembler-->
     <h2>Objectifs privés</h2>
-    <div class="private-objective-container">
-        <mat-checkbox [checked]="isChecked" (click)="notClickable($event)">Test</mat-checkbox>
+    <div class="private-objective-container" *ngFor="let objective of privateObjectives">
+        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)">{{ objective.description }}</mat-checkbox>
     </div>
     <h2 class="fix-position">Objectifs publics</h2>
-    <div class="public-objective-container" *ngFor="let number of [1, 2]">
-        <mat-checkbox [checked]="isChecked" (click)="notClickable($event)">Test{{ number }}</mat-checkbox>
+    <div class="public-objective-container" *ngFor="let objective of publicObjectives">
+        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)">{{ objective.description }}</mat-checkbox>
     </div>
 </mat-card>

@@ -130,7 +130,7 @@ export class CommandService {
         sockets.forEach((s, index) => {
             if (game.log2990Objectives) {
                 const objectiveList = [...game.log2990Objectives.retrieveLog2990Objective(index)];
-                s.emit('log2990 objectives', { public: objectiveList.splice(0, 2), private: objectiveList });
+                s.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
             }
             s.emit('turn ended');
         });

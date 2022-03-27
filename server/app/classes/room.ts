@@ -74,6 +74,7 @@ export class Room {
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
+        this.sendObjectives();
     }
 
     initGame(): void {
@@ -139,6 +140,7 @@ export class Room {
         this.manager.notifyAvailableRoomsChange();
         this.setupSocket(this.sockets[0], 0);
         this.botLevel = diff;
+        this.sendObjectives();
     }
 
     quitRoomHost(): void {
@@ -164,6 +166,15 @@ export class Room {
         this.removeUnneededListeners(this.sockets[0]);
         this.setupSocket(this.sockets[0], 0);
         if (game.activePlayer === 1) game.actionAfterTurn();
+    }
+
+    private sendObjectives(): void {
+        this.sockets.forEach((socket, index) => {
+            if (this.game?.log2990Objectives) {
+                const objectiveList = [...this.game.log2990Objectives.retrieveLog2990Objective(index)];
+                socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+            }
+        });
     }
 
     private inviteAccepted(client: io.Socket): void {
