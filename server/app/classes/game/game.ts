@@ -23,11 +23,11 @@ export class Game {
     gameFinished: boolean;
     bag: Bag;
     timerStartTime: number;
+    log2990Objectives: Log2990ObjectivesHandler | undefined;
 
     private turnsSkipped: number;
     private placeCounter: number;
     private currentTimer: NodeJS.Timeout;
-    private log2990Objectives: Log2990ObjectivesHandler | undefined;
 
     constructor(
         public config: GameConfig,

@@ -127,7 +127,10 @@ export class CommandService {
 
     private postCommand(game: Game, sockets: io.Socket[]): void {
         game.resetTimer();
-        sockets.forEach((s) => {
+        sockets.forEach((s, index) => {
+            if (game.log2990Objectives) {
+                s.emit('log2990 objectives', game.log2990Objectives.retrieveLog2990Objective(index));
+            }
             s.emit('turn ended');
         });
         game.actionAfterTurn();

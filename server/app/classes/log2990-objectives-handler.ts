@@ -31,12 +31,14 @@ export class Log2990ObjectivesHandler {
 
     verifyObjectives(playerNumber: number, placedLetters: PlacedLetter[], score: number): number {
         const objectiveList = playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
+        const opponentObjectiveList = playerNumber === 0 ? this.clientObjectives : this.hostObjectives;
         const createdWords = this.game.board.getAffectedWords(placedLetters);
         const amountLettersForBonus = 7;
+        const privateObjectiveIndex = 2;
         let bonusAmount = 0;
-        for (const objective of objectiveList) {
+        objectiveList.forEach((objective, index) => {
             const startScore = score;
-            if (objective.isValidated) continue;
+            if (objective.isValidated) return;
             switch (objective.description) {
                 case Objectives.OBJECTIVE1:
                     score *= this.objectivesVerifier.verifyFirstObjective(createdWords);
@@ -64,8 +66,11 @@ export class Log2990ObjectivesHandler {
                     score += this.objectivesVerifier.verifyEighthObjective(createdWords, this.chosenWordObjective8);
                     break;
             }
-            if (startScore !== score) objective.isValidated = true;
-        }
+            if (startScore !== score) {
+                objective.isValidated = true;
+                if (index === privateObjectiveIndex) opponentObjectiveList.push(objective);
+            }
+        });
         return score;
     }
 
@@ -73,6 +78,10 @@ export class Log2990ObjectivesHandler {
         const tempList = this.hostObjectives;
         this.hostObjectives = this.clientObjectives;
         this.clientObjectives = tempList;
+    }
+
+    retrieveLog2990Objective(playerNumber: number): Log2990Objective[] {
+        return playerNumber === 0 ? this.hostObjectives : this.clientObjectives;
     }
 
     private setUpPlayerObjectives(): void {
