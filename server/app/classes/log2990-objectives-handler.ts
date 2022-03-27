@@ -38,25 +38,25 @@ export class Log2990ObjectivesHandler {
             const startScore = score;
             if (objective.isValidated) continue;
             switch (objective.description) {
-                case Objectives.OBJECTIVE1: // Y
+                case Objectives.OBJECTIVE1:
                     score *= this.objectivesVerifier.verifyFirstObjective(createdWords);
                     break;
-                case Objectives.OBJECTIVE2: // Y
+                case Objectives.OBJECTIVE2:
                     score += this.objectivesVerifier.verifySecondObjective(placedLetters);
                     break;
-                case Objectives.OBJECTIVE3: // Y
+                case Objectives.OBJECTIVE3:
                     score += this.objectivesVerifier.verifyThirdObjective(placedLetters);
                     break;
-                case Objectives.OBJECTIVE4: // Y
+                case Objectives.OBJECTIVE4:
                     score += this.objectivesVerifier.verifyFourthObjective(this.game, score);
                     break;
-                case Objectives.OBJECTIVE5: // Y
+                case Objectives.OBJECTIVE5:
                     score += this.objectivesVerifier.verifyFifthObjective(placedLetters, this.game);
                     break;
                 case Objectives.OBJECTIVE6:
                     score += this.objectivesVerifier.verifySixthObjective(createdWords);
                     break;
-                case Objectives.OBJECTIVE7: // Y
+                case Objectives.OBJECTIVE7:
                     if (placedLetters.length === amountLettersForBonus) bonusAmount = BONUS_POINTS_FOR_FULL_EASEL;
                     score += this.objectivesVerifier.verifySeventhObjective(this.game.players[playerNumber].score + score + bonusAmount);
                     break;
