@@ -129,7 +129,8 @@ export class CommandService {
         game.resetTimer();
         sockets.forEach((s, index) => {
             if (game.log2990Objectives) {
-                s.emit('log2990 objectives', game.log2990Objectives.retrieveLog2990Objective(index));
+                const objectiveList = [...game.log2990Objectives.retrieveLog2990Objective(index)];
+                s.emit('log2990 objectives', { public: objectiveList.splice(0, 2), private: objectiveList });
             }
             s.emit('turn ended');
         });

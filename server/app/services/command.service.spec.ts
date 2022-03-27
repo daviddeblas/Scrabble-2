@@ -15,6 +15,7 @@ import { stringToLetter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
 import { GameMode } from 'common/interfaces/game-mode';
+import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
@@ -279,7 +280,11 @@ describe('commands', () => {
     it('post command emits log2990 objectives if gameMode is LOG2990', (done) => {
         room.sockets.pop();
         game.log2990Objectives = new Log2990ObjectivesHandler(game);
-        stub(game.log2990Objectives, 'retrieveLog2990Objective');
+        stub(game.log2990Objectives, 'retrieveLog2990Objective').callsFake(() => [
+            {} as Log2990Objective,
+            {} as Log2990Objective,
+            {} as Log2990Objective,
+        ]);
         room.sockets[0].emit = (namespace: string): boolean => {
             if (namespace === 'log2990 objectives') done();
             return true;
