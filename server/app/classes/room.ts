@@ -157,6 +157,7 @@ export class Room {
         if (looserPlayerNumber === 0) {
             [game.players[0], game.players[1]] = [game.players[1], game.players[0]];
             game.activePlayer = (game.activePlayer + 1) % 2;
+            game.log2990Objectives?.switchingPlayersObjectives();
         }
         game.actionAfterTurn = this.actionAfterTurnWithBot(this, BotDifficulty.Easy);
         const surrenderMessage = game.players[1].name + ' à abandonné, conversion en partie solo débutant';

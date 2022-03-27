@@ -221,6 +221,26 @@ describe('room', () => {
                 }, RESPONSE_DELAY);
             });
 
+            it('convertToSolo should switch client to be host if host surrenders and reset event listeners if Gamemode is Classical', (done) => {
+                const removeEventStub = stub(room, 'removeUnneededListeners');
+                const setupSocketStub = stub(room as any, 'setupSocket');
+                fakeGame.log2990Objectives = {
+                    switchingPlayersObjectives: () => {
+                        return;
+                    },
+                } as Log2990ObjectivesHandler;
+                room.game = fakeGame;
+                const otherSocket = {} as io.Socket;
+                room.sockets = [otherSocket, socket];
+                room['convertToSolo'](0);
+                setTimeout(() => {
+                    expect(removeEventStub.calledOnce).to.equal(true);
+                    expect(setupSocketStub.calledOnce).to.equal(true);
+                    expect(room.game?.players[0].name).to.equal('player2');
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
             it('sendObjectives should emit log2990 objectives and call retrieveLog2990Objective if gameMode is Log2990', (done) => {
                 room.game = fakeGame;
                 room.game.log2990Objectives = new Log2990ObjectivesHandler(fakeGame);
