@@ -3,42 +3,42 @@ import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 export const LOG2990OBJECTIVES: Log2990Objective[] = [
     {
         description: 'Créer un palindrome de 4 lettres ou plus',
-        value: 2,
+        value: 'Double les points de placement',
         isValidated: false,
     },
     {
         description: 'Placer 3 ou plus consonnes seulement',
-        value: 60,
+        value: 'Bonus de 60',
         isValidated: false,
     },
     {
         description: "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
-        value: 30,
+        value: 'Bonus de 30',
         isValidated: false,
     },
     {
         description: 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
-        value: 45,
+        value: 'Bonus de 45',
         isValidated: false,
     },
     {
         description: 'Placer deux lettres qui valent 8 points ou plus en un tour',
-        value: 70,
+        value: 'Bonus de 70',
         isValidated: false,
     },
     {
         description: 'Faire un mot de plus de 10 lettres',
-        value: 50,
+        value: 'Bonus de 50',
         isValidated: false,
     },
     {
         description: 'Avoir exactement 69 points',
-        value: 69,
+        value: 'Bonus de 69',
         isValidated: false,
     },
     {
         description: 'Placer le mot : ',
-        value: 70,
+        value: 'Bonus de 70',
         isValidated: false,
     },
 ];

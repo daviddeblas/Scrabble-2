@@ -1,5 +1,5 @@
 export interface Log2990Objective {
     description: string;
-    value: number;
+    value: string;
     isValidated: boolean;
 }
