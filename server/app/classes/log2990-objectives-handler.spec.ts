@@ -77,6 +77,7 @@ describe('Log2990 Objective Handler', () => {
         });
         it('verifyObjectives should call verifyEighthObjective if the Objective is the eighth one', () => {
             log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[7]];
+            log2990ObjectiveHandler['chosenWordObjective8'] = '';
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifyEighthObjective').callsFake(() => 0);
             log2990ObjectiveHandler.verifyObjectives(1, [], 0);
             expect(objectiveStub.calledOnce).to.equal(true);

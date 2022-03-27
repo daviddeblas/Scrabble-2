@@ -10,7 +10,7 @@ export enum Objectives {
     OBJECTIVE2 = 'Placer 3 ou plus consonnes seulement',
     OBJECTIVE3 = "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
     OBJECTIVE4 = 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
-    OBJECTIVE5 = '?',
+    OBJECTIVE5 = 'Placer deux lettres qui valent 8 points ou plus en un tour',
     OBJECTIVE6 = 'Faire un mot de plus de 10 lettres',
     OBJECTIVE7 = 'Avoir exactement 69 points',
     OBJECTIVE8 = 'Placer le mot : ',
@@ -106,10 +106,11 @@ export class Log2990ObjectivesHandler {
     }
 
     private determineObjective(objectiveNumber: number): Log2990Objective {
-        const objective = LOG2990OBJECTIVES[objectiveNumber];
+        const objective = { ...LOG2990OBJECTIVES[objectiveNumber] };
         if (objective.description === Objectives.OBJECTIVE8) {
             const objectiveWordLength = 8;
             this.chosenWordObjective8 = this.game.board.getRandomWord(objectiveWordLength);
+            objective.description = objective.description + this.chosenWordObjective8;
         }
         return objective;
     }

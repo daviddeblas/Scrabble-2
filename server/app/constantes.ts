@@ -22,8 +22,8 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
         isValidated: false,
     },
     {
-        description: '?',
-        value: 45,
+        description: 'Placer deux lettres qui valent 8 points ou plus en un tour',
+        value: 70,
         isValidated: false,
     },
     {
