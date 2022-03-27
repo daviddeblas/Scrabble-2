@@ -116,6 +116,17 @@ describe('Log2990 Objective Handler', () => {
             const objectiveStub = stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 0);
             log2990ObjectiveHandler.verifyObjectives(1, [], 0);
             expect(objectiveStub.called).to.equal(false);
+            log2990ObjectiveHandler['clientObjectives'][1].isValidated = false;
+        });
+
+        it('verifyObjectives should add the private objective to host if client completes it', () => {
+            log2990ObjectiveHandler['clientObjectives'] = [LOG2990OBJECTIVES[2], LOG2990OBJECTIVES[1], LOG2990OBJECTIVES[6]];
+            log2990ObjectiveHandler['hostObjectives'] = [LOG2990OBJECTIVES[0], LOG2990OBJECTIVES[1], LOG2990OBJECTIVES[2]];
+            stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifyThirdObjective').callsFake(() => 0);
+            stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySecondObjective').callsFake(() => 0);
+            stub(log2990ObjectiveHandler['objectivesVerifier'], 'verifySeventhObjective').callsFake(() => 1);
+            log2990ObjectiveHandler.verifyObjectives(1, [], 0);
+            expect(log2990ObjectiveHandler['hostObjectives'][3]).to.equal(log2990ObjectiveHandler['clientObjectives'][2]);
         });
 
         it('determineObjective should call getRandomWord if the ObjectiveNumber is seven', () => {
@@ -123,6 +134,17 @@ describe('Log2990 Objective Handler', () => {
             const objectiveNumber = 7;
             log2990ObjectiveHandler['determineObjective'](objectiveNumber);
             expect(getRandomWordStub.called).to.equal(true);
+        });
+
+        it('retrieveLog2990Objective with 0 should return hostObjectives', () => {
+            const expectedList = [LOG2990OBJECTIVES[0]];
+            log2990ObjectiveHandler['hostObjectives'] = expectedList;
+            expect(log2990ObjectiveHandler.retrieveLog2990Objective(0)).to.equal(expectedList);
+        });
+        it('retrieveLog2990Objective with 1 should return clientObjectives', () => {
+            const expectedList = [LOG2990OBJECTIVES[0]];
+            log2990ObjectiveHandler['clientObjectives'] = expectedList;
+            expect(log2990ObjectiveHandler.retrieveLog2990Objective(1)).to.equal(expectedList);
         });
     });
 });

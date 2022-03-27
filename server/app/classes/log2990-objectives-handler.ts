@@ -68,7 +68,9 @@ export class Log2990ObjectivesHandler {
             }
             if (startScore !== score) {
                 objective.isValidated = true;
-                if (index === privateObjectiveIndex) opponentObjectiveList.push(objective);
+                if (index === privateObjectiveIndex) {
+                    opponentObjectiveList.push(objective);
+                }
             }
         });
         return score;

@@ -6,6 +6,7 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Board } from '@app/classes/game/board';
 import { Game, MILLISECONDS_PER_SEC } from '@app/classes/game/game';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Room } from '@app/classes/room';
 import { expect } from 'chai';
@@ -270,6 +271,17 @@ describe('commands', () => {
         room.sockets.pop();
         room.sockets[0].emit = (namespace: string): boolean => {
             if (namespace === 'turn ended') done();
+            return true;
+        };
+        commandService['postCommand'](game, room.sockets);
+    });
+
+    it('post command emits log2990 objectives if gameMode is LOG2990', (done) => {
+        room.sockets.pop();
+        game.log2990Objectives = new Log2990ObjectivesHandler(game);
+        stub(game.log2990Objectives, 'retrieveLog2990Objective');
+        room.sockets[0].emit = (namespace: string): boolean => {
+            if (namespace === 'log2990 objectives') done();
             return true;
         };
         commandService['postCommand'](game, room.sockets);
