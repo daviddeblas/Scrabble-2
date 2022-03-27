@@ -11,6 +11,7 @@ import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { MIN_BOT_PLACEMENT_TIME, SECONDS_IN_MINUTE } from 'common/constants';
 import { GameMode } from 'common/interfaces/game-mode';
+import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { createServer, Server } from 'http';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
@@ -18,6 +19,7 @@ import { io as Client, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
+import { Log2990ObjectivesHandler } from './log2990-objectives-handler';
 
 describe('room', () => {
     let roomsManager: SinonStubbedInstance<RoomsManager>;
@@ -168,6 +170,7 @@ describe('room', () => {
             beforeEach(() => {
                 fakeGame = {
                     players: [{ name: 'player1' }, { name: 'player2' }],
+                    board: { getRandomWord: () => 'abc' },
                     bag: { letters: [] },
                     activePlayer: 1,
                     gameFinished: false,
@@ -214,6 +217,22 @@ describe('room', () => {
                     expect(removeEventStub.calledOnce).to.equal(true);
                     expect(setupSocketStub.calledOnce).to.equal(true);
                     expect(room.game?.players[0].name).to.equal('player2');
+                    done();
+                }, RESPONSE_DELAY);
+            });
+
+            it('sendObjectives should emit log2990 objectives and call retrieveLog2990Objective if gameMode is Log2990', (done) => {
+                room.game = fakeGame;
+                room.game.log2990Objectives = new Log2990ObjectivesHandler(fakeGame);
+                const retrieveLog2990ObjectiveStub = stub(room.game.log2990Objectives, 'retrieveLog2990Objective').callsFake(() => [
+                    {} as Log2990Objective,
+                ]);
+                const emitStub = stub(socket, 'emit');
+                room.sockets = [socket];
+                room['sendObjectives']();
+                setTimeout(() => {
+                    expect(emitStub.calledOnce).to.equal(true);
+                    expect(retrieveLog2990ObjectiveStub.calledOnce).to.equal(true);
                     done();
                 }, RESPONSE_DELAY);
             });
