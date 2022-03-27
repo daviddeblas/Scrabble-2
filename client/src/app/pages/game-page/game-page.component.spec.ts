@@ -5,7 +5,6 @@ import { browserReload } from '@app/actions/browser.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { GameMode } from 'common/interfaces/game-mode';
 import { cold } from 'jasmine-marbles';
 import { GamePageComponent } from './game-page.component';
 
@@ -22,14 +21,7 @@ describe('GamePageComponent', () => {
                     provide: Router,
                     useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
                 },
-                provideMockStore({
-                    selectors: [
-                        {
-                            selector: 'gameMode',
-                            value: GameMode.Classical,
-                        },
-                    ],
-                }),
+                provideMockStore(),
                 {
                     provide: EffectsRootModule,
                     useValue: {
@@ -39,10 +31,11 @@ describe('GamePageComponent', () => {
                 provideMockStore(),
             ],
         }).compileComponents();
-        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
+        store = TestBed.inject(MockStore);
+        store.overrideSelector('gameObjective', { publicObjectives: [], privateObjectives: [] });
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
