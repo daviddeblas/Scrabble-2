@@ -1,10 +1,16 @@
 <mat-card>
-    <h2>Objectifs privés</h2>
-    <div class="private-objective-container" *ngFor="let objective of privateObjectives">
-        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)">{{ objective.description }}</mat-checkbox>
+    <h2 class="fix-position">Objectifs privés</h2>
+    <div *ngFor="let objective of privateObjectives">
+        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)"
+            ><strong>{{ objective.description }}</strong
+            ><br />Récompense: <strong>{{ objective.value }}</strong></mat-checkbox
+        >
     </div>
     <h2 class="fix-position">Objectifs publics</h2>
-    <div class="public-objective-container" *ngFor="let objective of publicObjectives">
-        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)">{{ objective.description }}</mat-checkbox>
+    <div *ngFor="let objective of publicObjectives">
+        <mat-checkbox [checked]="objective.isValidated" (click)="notClickable($event)"
+            ><strong>{{ objective.description }}</strong
+            ><br />Récompense: <strong>{{ objective.value }}</strong></mat-checkbox
+        >
     </div>
 </mat-card>

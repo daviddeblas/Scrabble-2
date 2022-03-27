@@ -1,14 +1,11 @@
-.public-objective-container {
-}
-
 .fix-position {
     margin-bottom: -5px;
 }
 
-.private-objective-container {
-    margin-bottom: 10px;
-    margin-top: -20px;
+.objective-container {
+    width: 100%;
 }
+
 // Tiré de https://stackoverflow.com/questions/54168627/mat-checkbox-custom-color-cannot-be-changed
 ::ng-deep .mat-checkbox-checked .mat-checkbox-background,
 .mat-checkbox-indeterminate .mat-checkbox-background {
