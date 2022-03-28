@@ -7,6 +7,7 @@ import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
@@ -112,7 +113,8 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+                const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
+                Container.get(DatabaseService).updateHighScore(highscore, gameMode);
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
