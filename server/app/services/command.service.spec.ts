@@ -6,6 +6,7 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Board } from '@app/classes/game/board';
 import { Game, MILLISECONDS_PER_SEC } from '@app/classes/game/game';
+import { Player } from '@app/classes/game/player';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Room } from '@app/classes/room';
@@ -162,6 +163,34 @@ describe('Individual functions', () => {
         placedLetters[0].forEach((l, index) => {
             expect(l).to.deep.eq(new PlacedLetter(stringToLetter(commandArgs[1][index]), new Vec2(6 + index, 7)));
         });
+    });
+
+    it('endGame should send highScores with Log2990 GameMode', () => {
+        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+            return;
+        });
+        const fakeGame = {
+            log2990Objectives: {},
+            players: [{} as Player],
+            endGame: () => {
+                return {
+                    toEndGameStatus: () => {
+                        return;
+                    },
+                };
+            },
+        } as unknown as Game;
+        const fakeSocket = {
+            emit: () => {
+                return;
+            },
+        } as unknown as io.Socket;
+        sockets = [fakeSocket];
+        const responseTime = 200;
+        commandService['endGame'](fakeGame, sockets);
+        setTimeout(() => {
+            expect(dataStub.calledOnce).to.equal(true);
+        }, responseTime);
     });
 
     it('parse place call returns the right placed characters vertical edition', () => {

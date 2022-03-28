@@ -284,6 +284,35 @@ describe('room', () => {
                 }, RESPONSE_DELAY * 3);
             });
 
+            it('surrenderGame should emit endGame if the game is not null and call dataBase with Log2990 gameMode', (done) => {
+                const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+                    return;
+                });
+                let clientReceived = false;
+                const clientSocket = {
+                    emit: () => {
+                        clientReceived = true;
+                    },
+                } as unknown as io.Socket;
+                let hostReceived = false;
+                const hostSocket = {
+                    emit: () => {
+                        hostReceived = true;
+                    },
+                } as unknown as io.Socket;
+                fakeGame.log2990Objectives = {} as Log2990ObjectivesHandler;
+                room.game = fakeGame;
+                room['botLevel'] = BotDifficulty.Easy;
+                room.sockets = [clientSocket, hostSocket];
+                room.surrenderGame(socket.id);
+                room.surrenderGame('player2');
+                setTimeout(() => {
+                    expect(clientReceived && hostReceived).to.deep.equal(true);
+                    expect(dataStub.called).to.equal(true);
+                    done();
+                }, RESPONSE_DELAY * 3);
+            });
+
             it('surrenderGame should call RoomsManager.removeRoom if no players are left', () => {
                 room['playersLeft'] = 0;
                 room['botLevel'] = BotDifficulty.Easy;
