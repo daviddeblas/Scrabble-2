@@ -51,7 +51,7 @@ export class ObjectivesVerifierService {
     }
 
     verifyFifthObjective(placedLetters: PlacedLetter[], game: Game): number {
-        const objectiveValue = 70;
+        const objectiveValue = 48;
         const minLetterPointForObjective = 8;
         let amountObjectiveLetters = 0;
         let pointForLetter: number;

@@ -139,7 +139,7 @@ describe('Objectives Verifier Service', () => {
     });
 
     it('verifyFifthObjective should return 70 if two or more letters with 8 or more points are placed', () => {
-        const expectedResult = 70;
+        const expectedResult = 48;
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const fakeGame = { board: { pointsPerLetter: { get: () => 9 } } } as unknown as Game;
         const placedLetters = [

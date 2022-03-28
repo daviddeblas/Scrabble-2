@@ -23,7 +23,7 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
     },
     {
         description: 'Placer deux lettres qui valent 8 points ou plus en un tour',
-        value: 'Bonus de 70 points',
+        value: 'Bonus de 48 points',
         isValidated: false,
     },
     {
