@@ -2,7 +2,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { browserReload } from '@app/actions/browser.actions';
+import { BoardComponent } from '@app/components/board/board.component';
+import { CellLetterX2Component } from '@app/components/cells/cell-letter-x2/cell-letter-x2.component';
+import { CellLetterX3Component } from '@app/components/cells/cell-letter-x3/cell-letter-x3.component';
+import { CellStarComponent } from '@app/components/cells/cell-star/cell-star.component';
+import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-word-x2.component';
+import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
+import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
+import { EaselComponent } from '@app/components/easel/easel.component';
+import { GamesObjectivesComponent } from '@app/components/games-objectives/games-objectives.component';
+import { LetterComponent } from '@app/components/letter/letter.component';
+import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
+import { SkipTurnButtonComponent } from '@app/components/skip-turn-button/skip-turn-button.component';
+import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
@@ -15,20 +29,47 @@ describe('GamePageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            declarations: [
+                GamePageComponent,
+                BoardComponent,
+                ChatBoxComponent,
+                SkipTurnButtonComponent,
+                SidebarComponent,
+                SurrenderGameButtonComponent,
+                EaselComponent,
+                BoardToListPipe,
+                GamesObjectivesComponent,
+                LetterComponent,
+                CellStarComponent,
+                CellLetterX2Component,
+                CellLetterX3Component,
+                CellWordX2Component,
+                CellWordX3Component,
+            ],
             imports: [BrowserAnimationsModule, AppMaterialModule],
             providers: [
                 {
                     provide: Router,
                     useValue: jasmine.createSpyObj('router', ['navigateToUrl']),
                 },
-                provideMockStore(),
                 {
                     provide: EffectsRootModule,
                     useValue: {
                         addEffects: jasmine.createSpy('addEffects'),
                     },
                 },
-                provideMockStore(),
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'players',
+                            value: { player: { name: '' } },
+                        },
+                        {
+                            selector: 'gameStatus',
+                            value: { activePlayer: '', gameEnded: false },
+                        },
+                    ],
+                }),
             ],
         }).compileComponents();
     });
@@ -36,6 +77,7 @@ describe('GamePageComponent', () => {
     beforeEach(() => {
         store = TestBed.inject(MockStore);
         store.overrideSelector('gameObjective', { publicObjectives: [], privateObjectives: [] });
+
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
