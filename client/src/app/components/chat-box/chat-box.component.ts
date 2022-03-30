@@ -77,6 +77,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
     }
 
     sendHintMessage(message: string): void {
+        this.keyManager.onEsc();
         if (message.startsWith('!placer') && !this.gameEnded) {
             this.numberOfLastMessages = 0;
             this.store.dispatch(chatActions.messageWritten({ username: this.username, message }));
