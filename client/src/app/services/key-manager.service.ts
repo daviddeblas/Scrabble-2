@@ -143,7 +143,7 @@ export class KeyManagerService {
         if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction) && board[selectedCell.x][selectedCell.y] !== null) return;
 
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (!/^[a-zA-Z*]$/.test(key)) return;
+        if (!/^[a-zA-Z]$/.test(key)) return;
         const letter = stringToLetter(key);
         if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
         this.store.dispatch(placeLetter({ letter: stringToLetter(key.toLowerCase()), isBlank: letter === '*' }));
