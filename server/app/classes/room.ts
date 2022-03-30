@@ -117,6 +117,7 @@ export class Room {
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
+        this.game.gameHistory.createGameHistoryData(this.game.players, true);
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }

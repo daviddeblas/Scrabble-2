@@ -140,6 +140,7 @@ export class CommandService {
             Container.get(DatabaseService).updateHighScore(highscore, 'classical');
             s.emit('end game', endGameStatus);
         });
+        game.gameHistory.createGameHistoryData(game.players, false);
     }
 
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {
