@@ -75,7 +75,7 @@ export class KeyManagerService {
         let modifiedCells: Vec2[] = [];
         let blanks: iVec2[] = [];
         this.board$.subscribe((state) => {
-            modifiedCells = state.selection.modifiedCells;
+            modifiedCells = [...state.selection.modifiedCells];
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
             blanks = state.blanks;
         });

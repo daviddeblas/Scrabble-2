@@ -167,7 +167,7 @@ export const reducer = createReducer(
         const blanks = [...state.blanks];
         [...positions].reverse().forEach((pos) => {
             board[pos.x][pos.y] = null;
-            while (pos === blanks[blanks.length - 1]) blanks.pop();
+            while (blanks.find((position) => pos.equals(position))) blanks.pop();
         });
 
         return { ...state, board, blanks };
