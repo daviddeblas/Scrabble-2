@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BotDifficulty } from '@app/services/bot.service';
 import { DictionaryService } from '@app/services/dictionary.service';
@@ -15,7 +16,6 @@ import { Vec2 } from 'common/classes/vec2';
 import { GameMode } from 'common/interfaces/game-mode';
 import { spy, stub, useFakeTimers } from 'sinon';
 import { Container } from 'typedi';
-import { Log2990ObjectivesHandler } from '../log2990-objectives-handler';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
 
 describe('game', () => {
