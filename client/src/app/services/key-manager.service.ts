@@ -40,7 +40,7 @@ export class KeyManagerService {
 
         if (blanks.length > 0)
             [...modifiedCells].reverse().forEach((cell, index) => {
-                if (cell.equals(blanks[blanks.length - 1])) {
+                if (blanks.find((position) => cell.equals(position))) {
                     letters[letters.length - 1 - index] = BLANK_LETTER;
                 }
             });
