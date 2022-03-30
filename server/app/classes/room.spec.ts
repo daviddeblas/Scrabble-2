@@ -399,6 +399,7 @@ describe('room', () => {
         });
 
         afterEach(() => {
+            restore();
             server.removeAllListeners();
         });
 
@@ -510,7 +511,7 @@ describe('room', () => {
                 hostSocket.emit('create room');
             });
 
-            it('initSurrenderGame should enable the surrender event which calls surrenderGame', (done) => {
+            it('setUpSocket should enable the surrender event which calls surrenderGame', (done) => {
                 let surrenderGameStub: SinonStub;
                 hostSocket.on('player joining', () => {
                     surrenderGameStub = stub(room, 'surrenderGame').callsFake(() => {
