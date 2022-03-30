@@ -130,9 +130,9 @@ export class BotService {
 
     private determineHardBotWord(placements: [Solution, number][]): string {
         const maxValue = placements.sort((previous, current) => {
-            if (previous[0].letters.length === MAX_LETTERS_IN_EASEL) previous[1] += BONUS_POINTS_FOR_FULL_EASEL;
-            if (current[0].letters.length === MAX_LETTERS_IN_EASEL) current[1] += BONUS_POINTS_FOR_FULL_EASEL;
-            return current[1] - previous[1];
+            const scorePrevious = previous[0].letters.length === MAX_LETTERS_IN_EASEL ? previous[1] + BONUS_POINTS_FOR_FULL_EASEL : previous[1];
+            const scoreCurrent = current[0].letters.length === MAX_LETTERS_IN_EASEL ? current[1] + BONUS_POINTS_FOR_FULL_EASEL : current[1];
+            return scoreCurrent - scorePrevious;
         })[0];
         return Solver.solutionToCommandArguments(maxValue[0]);
     }
