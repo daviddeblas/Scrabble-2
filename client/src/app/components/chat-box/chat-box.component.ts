@@ -34,7 +34,10 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
     @HostListener('document:click', ['$event'])
     clickout(event: Event): void {
         this.numberOfLastMessages = 0;
-        if (this.eRef.nativeElement.contains(event.target)) this.keyManager.onEsc();
+        if (this.eRef.nativeElement.contains(event.target)) {
+            this.keyManager.onEsc();
+            this.chatMessage.nativeElement.focus();
+        }
     }
 
     @HostListener('keydown', ['$event'])
