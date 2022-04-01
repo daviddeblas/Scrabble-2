@@ -1,5 +1,5 @@
 import { Dictionary } from '@app/classes/dictionary';
-import { readdirSync, readFileSync, unlink } from 'fs';
+import { readdirSync, readFileSync, unlink, writeFile } from 'fs';
 import path from 'path';
 import io from 'socket.io';
 import { Service } from 'typedi';
@@ -35,8 +35,23 @@ export class DictionaryService {
         this.onDictionaryDeleted(dictionaryName);
     }
 
+    addDictionary(content: string): void | Error {
+        const obj = JSON.parse(content);
+        const dictionaryPath = path.join(dictionariesPath, obj.title);
+        const dictionary = new Dictionary(obj.title, obj.description, obj.word, dictionaryPath);
+        if (this.dictionaries.findIndex((d) => d.title === dictionary.title)) return Error('dictionary with the same title exists');
+        writeFile(dictionaryPath, obj, 'utf8', () => {
+            return;
+        });
+        this.dictionaries.push(dictionary);
+    }
+
     onDictionaryDeleted(dictionaryName: string): void {
         this.sio.emit('dictionary deleted', dictionaryName);
+    }
+
+    getDictionaryFile(name: string): string {
+        return JSON.stringify(this.dictionaries.find((d) => d.title === name));
     }
 
     getDictionary(name: string): Dictionary | undefined {
