@@ -95,6 +95,16 @@ export class ChatService {
                     );
                 }
                 break;
+            case '!aide':
+                if (command.length === 1) {
+                    this.handleSimpleCommand(command);
+                    return true;
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
+                    );
+                }
+                break;
         }
         return false;
     }
