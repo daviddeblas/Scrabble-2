@@ -39,11 +39,33 @@ export class DictionaryService {
         const obj = JSON.parse(content);
         const dictionaryPath = path.join(dictionariesPath, obj.title);
         const dictionary = new Dictionary(obj.title, obj.description, obj.word, dictionaryPath);
-        if (this.dictionaries.findIndex((d) => d.title === dictionary.title)) return Error('dictionary with the same title exists');
+        if (this.dictionaries.findIndex((d) => d.title === dictionary.title) >= 0) return Error('dictionary with the same title already exists');
         writeFile(dictionaryPath, obj, 'utf8', () => {
             return;
         });
         this.dictionaries.push(dictionary);
+    }
+
+    modifyInfo(oldTitle: string, newTitle: string, newDescription: string): void | Error {
+        if (this.getDictionary(newTitle) && oldTitle !== newTitle) return new Error('dictionary with the same title already exists');
+        const dictionary = this.getDictionary(oldTitle);
+        if (!dictionary) return new Error('dictionary not found');
+
+        let err = this.deleteDictionary(dictionary.title);
+        if (err) return err;
+
+        dictionary.description = newDescription;
+        dictionary.title = newTitle;
+
+        err = this.addDictionary(JSON.stringify(dictionary));
+        if (err) return err;
+    }
+
+    reset(): void {
+        this.dictionaries.forEach((d) => {
+            if (d.title === defaultDictionary) return;
+            this.deleteDictionary(d.title);
+        });
     }
 
     onDictionaryDeleted(dictionaryName: string): void {
