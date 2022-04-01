@@ -25,6 +25,11 @@ export class SocketService {
             dictionaryService.setupSocketConnection(socket);
             browserService.setupSocketConnection(socket);
             databaseService.setupSocketConnection(socket);
+
+            socket.onAny((ns, content) => {
+                console.log(ns);
+                console.log(content);
+            });
         });
     }
 

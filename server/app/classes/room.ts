@@ -2,6 +2,7 @@ import { BotNameService } from '@app/services/bot-name.service';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
 import { DatabaseService } from '@app/services/database.service';
+import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
@@ -9,6 +10,7 @@ import { RoomInfo } from 'common/classes/room-info';
 import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
 import io from 'socket.io';
 import { Container } from 'typedi';
+import { Dictionary } from './dictionary';
 import { GameFinishStatus } from './game-finish-status';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
@@ -81,6 +83,7 @@ export class Room {
 
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
+            Container.get(DictionaryService).getDictionary(this.gameOptions.dictionaryType) as Dictionary,
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(),
@@ -130,6 +133,7 @@ export class Room {
         const botName = Container.get(BotNameService).getBotName(diff, this.gameOptions.hostname);
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
+            Container.get(DictionaryService).getDictionary(this.gameOptions.dictionaryType) as Dictionary,
             [this.gameOptions.hostname, botName],
             this.gameOptions,
             this.actionAfterTimeout(),

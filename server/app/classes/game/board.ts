@@ -1,3 +1,4 @@
+import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -23,7 +24,7 @@ export class Board {
     blanks: Vec2[];
     lastPlacedWord: Vec2[];
 
-    constructor(private config: GameConfig) {
+    constructor(private config: GameConfig, private dictionary: Dictionary) {
         this.board = createEmptyMatrix(config.boardSize);
         this.multipliers = createEmptyMatrix(config.boardSize);
         this.pointsPerLetter = new Map();
@@ -49,7 +50,7 @@ export class Board {
 
         let wordValid = true;
         words.forEach((w) => {
-            if (!this.config.dictionary.isWord(w.map((l) => l.letter))) wordValid = false;
+            if (!this.dictionary.isWord(w.map((l) => l.letter))) wordValid = false;
         });
         if (!wordValid) return new GameError(GameErrorType.InvalidWord);
 
@@ -119,7 +120,7 @@ export class Board {
     }
 
     copy(): Board {
-        const returnValue = new Board(this.config);
+        const returnValue = new Board(this.config, this.dictionary);
 
         this.blanks.forEach((b) => returnValue.blanks.push(b.copy()));
 

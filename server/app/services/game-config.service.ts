@@ -1,9 +1,7 @@
-import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import { Service } from 'typedi';
-import { DictionaryService } from './dictionary.service';
 
 const configsPath = 'assets/game-configs';
 
@@ -11,18 +9,17 @@ const configsPath = 'assets/game-configs';
 export class GameConfigService {
     configs: GameConfig[];
 
-    constructor(private dictionaryService: DictionaryService) {
+    constructor() {
         this.configs = [];
     }
 
     async init() {
         this.configs = [];
         const paths = await readdirSync(configsPath);
-        paths.forEach(async (fileName, index) => {
+        paths.forEach(async (fileName) => {
             const json = await readFileSync(path.join(configsPath, fileName), { encoding: 'utf8' });
             const config = JSON.parse(json);
             this.configs.push(config);
-            this.configs[index].dictionary = this.dictionaryService.getDictionary(config.dictionaryName) as Dictionary;
         });
     }
 
