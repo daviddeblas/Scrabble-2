@@ -1,7 +1,7 @@
 import { Letter, lettersToString } from 'common/classes/letter';
 
 export class Dictionary {
-    constructor(public title: string, public description: string, public words: string[]) {}
+    constructor(public title: string, public description: string, public words: string[], public path: string) {}
 
     isWord(word: Letter[]): boolean {
         return this.getMatchingWords(word).length > 0;
