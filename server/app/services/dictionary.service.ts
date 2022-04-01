@@ -36,11 +36,18 @@ export class DictionaryService {
     }
 
     addDictionary(content: string): void | Error {
-        const obj = JSON.parse(content);
-        const dictionaryPath = path.join(dictionariesPath, obj.title);
-        const dictionary = new Dictionary(obj.title, obj.description, obj.word, dictionaryPath);
+        let obj: unknown;
+        try {
+            obj = JSON.parse(content);
+        } catch (e) {
+            return e;
+        }
+
+        const castedObj = obj as Dictionary;
+        const dictionaryPath = path.join(dictionariesPath, castedObj.title.replace(/ /g, '_').concat('.json'));
+        const dictionary = new Dictionary(castedObj.title, castedObj.description, castedObj.words, dictionaryPath);
         if (this.dictionaries.findIndex((d) => d.title === dictionary.title) >= 0) return Error('dictionary with the same title already exists');
-        writeFile(dictionaryPath, obj, 'utf8', () => {
+        writeFile(dictionaryPath, content, 'utf8', () => {
             return;
         });
         this.dictionaries.push(dictionary);
