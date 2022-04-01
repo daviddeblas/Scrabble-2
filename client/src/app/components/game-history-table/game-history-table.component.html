@@ -34,5 +34,9 @@
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr *matNoDataRow class="center">
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">L'historique des parties a bien été réinitialiser</td>
+        </tr>
     </table>
 </div>
