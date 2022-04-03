@@ -27,7 +27,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
         private changeDetector: ChangeDetectorRef,
     ) {
         this.chat$ = store.select('chat');
-        this.playerStore.subscribe((us) => (this.username = us.players.player.name));
+        this.playerStore.select('players').subscribe((players) => (this.username = players.player.name));
         this.numberOfLastMessages = 0;
     }
 

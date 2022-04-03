@@ -76,6 +76,7 @@ export class Room {
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
+        this.sendObjectives();
     }
 
     initGame(): void {
@@ -110,10 +111,11 @@ export class Room {
         const surrenderMessage = looserName + ' à abandonné la partie';
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         const game = this.game as Game;
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                Container.get(HighscoreDatabaseService).updateHighScore(highscore, 'classical');
+                Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
@@ -122,7 +124,7 @@ export class Room {
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
-        const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, GameMode.Classical);
+        const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, gameMode);
         Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
         return;
     }
@@ -143,6 +145,7 @@ export class Room {
         this.manager.notifyAvailableRoomsChange();
         this.setupSocket(this.sockets[0], 0);
         this.botLevel = diff;
+        this.sendObjectives();
     }
 
     quitRoomHost(): void {
@@ -159,6 +162,7 @@ export class Room {
         if (looserPlayerNumber === 0) {
             [game.players[0], game.players[1]] = [game.players[1], game.players[0]];
             game.activePlayer = (game.activePlayer + 1) % 2;
+            game.log2990Objectives?.switchingPlayersObjectives();
         }
         game.actionAfterTurn = this.actionAfterTurnWithBot(this, BotDifficulty.Easy);
         const surrenderMessage = game.players[1].name + ' à abandonné, conversion en partie solo débutant';
@@ -168,6 +172,15 @@ export class Room {
         this.removeUnneededListeners(this.sockets[0]);
         this.setupSocket(this.sockets[0], 0);
         if (game.activePlayer === 1) game.actionAfterTurn();
+    }
+
+    private sendObjectives(): void {
+        this.sockets.forEach((socket, index) => {
+            if (this.game?.log2990Objectives) {
+                const objectiveList = [...this.game.log2990Objectives.retrieveLog2990Objective(index)];
+                socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+            }
+        });
     }
 
     private inviteAccepted(client: io.Socket): void {

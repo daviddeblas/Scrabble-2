@@ -2,10 +2,12 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameHistoryHandler } from '@app/classes/game-history-handler';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
@@ -22,11 +24,12 @@ export class Game {
     gameFinished: boolean;
     bag: Bag;
     gameHistory: GameHistoryHandler;
+    timerStartTime: number;
+    log2990Objectives: Log2990ObjectivesHandler | undefined;
 
     private turnsSkipped: number;
     private placeCounter: number;
     private currentTimer: NodeJS.Timeout;
-    private timerStartTime: number;
 
     constructor(
         public config: GameConfig,
@@ -50,6 +53,8 @@ export class Game {
         setTimeout(() => {
             actionAfterTurn();
         }, creationDelay);
+
+        if (gameOptions.gameMode === GameMode.Log2990) this.log2990Objectives = new Log2990ObjectivesHandler(this);
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): GameError | undefined {
@@ -66,8 +71,9 @@ export class Game {
             if (lettersInCenter.length === 0) return new GameError(GameErrorType.BadStartingMove);
         }
 
-        const scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
+        let scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
         if (scoreToAdd instanceof GameError) return scoreToAdd;
+        if (this.log2990Objectives) scoreToAdd = this.log2990Objectives.verifyObjectives(player, letters, scoreToAdd);
         this.getActivePlayer().score += scoreToAdd;
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);

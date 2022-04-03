@@ -8,6 +8,7 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
+import * as gameModeReducer from '@app/reducers/game-mode.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
@@ -61,6 +62,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
             dictionaries: dictionariesReducer.reducer,
             room: roomReducer.reducer,
             gameStatus: gameReducer.reducer,
+            gameMode: gameModeReducer.reducer,
         }),
         EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects, GameHistoryEffects]),
         StoreDevtoolsModule.instrument({}),

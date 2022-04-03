@@ -3,7 +3,7 @@
         <button routerLink="/home" mat-icon-button class="home-button">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <span>Mode classique</span>
+        <span>Mode {{ gameMode$ | async }}</span>
     </mat-toolbar>
 
     <main>

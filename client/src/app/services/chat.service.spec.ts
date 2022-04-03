@@ -3,6 +3,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { refreshObjectiveState } from '@app/actions/game-objective.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -48,6 +49,17 @@ describe('ChatService', () => {
         service.broadcastMsg(expectedMessage.username, expectedMessage.message);
         setTimeout(() => {
             expect(sendSpy).toHaveBeenCalledOnceWith('send message', expectedMessage);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive log2990 objectives and dispatch "[Game Objective] Refresh Objective State"', (done) => {
+        const expectedObjectives = { publicObjectives: [], privateObjectives: [] };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('log2990 objectives', expectedObjectives);
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: refreshObjectiveState(expectedObjectives) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
             done();
         }, RESPONSE_TIME);
     });
