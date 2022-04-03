@@ -17,8 +17,8 @@ import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { CommandService } from './command.service';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Individual functions', () => {
@@ -98,7 +98,7 @@ describe('Individual functions', () => {
     });
 
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
-        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
             return;
         });
         sockets[0] = {

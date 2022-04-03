@@ -5,7 +5,7 @@
 import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
-import { DatabaseService } from '@app/services/database.service';
+import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
@@ -218,7 +218,7 @@ describe('room', () => {
             });
 
             it('surrenderGame should emit endGame if the game is not null', (done) => {
-                const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+                const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
                     return;
                 });
                 let clientReceived = false;

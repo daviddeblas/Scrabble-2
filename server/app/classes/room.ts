@@ -1,12 +1,14 @@
 import { BotNameService } from '@app/services/bot-name.service';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
-import { DatabaseService } from '@app/services/database.service';
 import { GameConfigService } from '@app/services/game-config.service';
+import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
+import { HistoryDatabaseService } from '@app/services/history-database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
@@ -111,16 +113,17 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+                Container.get(HighscoreDatabaseService).updateHighScore(highscore, 'classical');
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
             socket.emit('end game', gameFinishStatus.toEndGameStatus(index));
         });
-        this.game.gameHistory.createGameHistoryData(this.game.players, true);
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
+        const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, GameMode.Classical);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
         return;
     }
 

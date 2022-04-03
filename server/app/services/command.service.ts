@@ -8,10 +8,12 @@ import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container, Service } from 'typedi';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 
 @Service()
 export class CommandService {
@@ -137,10 +139,11 @@ export class CommandService {
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             const highscore = { name: game.players[i].name, score: game.players[i].score };
-            Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+            Container.get(HighscoreDatabaseService).updateHighScore(highscore, 'classical');
             s.emit('end game', endGameStatus);
         });
-        game.gameHistory.createGameHistoryData(game.players, false);
+        const gameHistory = game.gameHistory.createGameHistoryData(game.players, false, GameMode.Classical);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
     }
 
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {

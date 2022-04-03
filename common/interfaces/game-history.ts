@@ -1,6 +1,6 @@
 export interface GameHistory {
     date: string;
-    gameDuration: number;
+    gameDuration: string;
     namePlayer1: string;
     scorePlayer1: number;
     namePlayer2: string;
