@@ -22,8 +22,8 @@ export const DEFAULT_HIGHSCORE = {
     ] as HighScore[],
 };
 
-export const DATABASE = {
-    uri: 'mongodb+srv://log2990-101:log2990-101@cluster0.qzik0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+export const HIGHSCORE_DATABASE = {
+    uri: 'mongodb+srv://LOG2990equipe101:Polytechnique2022@cluster0.kuvzt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
     highScore: {
         name: 'Scores_DB',
         collections: {
