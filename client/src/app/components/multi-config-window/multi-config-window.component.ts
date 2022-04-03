@@ -7,6 +7,7 @@ import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
 import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Observable } from 'rxjs';
 
 export const MAX_TIME = 300;
@@ -23,6 +24,7 @@ export class MultiConfigWindowComponent implements OnInit {
     @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
     settingsForm: FormGroup;
     dictionaries$: Observable<string[]>;
+    gameMode$: Observable<GameMode>;
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
@@ -31,11 +33,17 @@ export class MultiConfigWindowComponent implements OnInit {
     readonly defaultTimer: number = DEFAULT_TIMER;
     readonly timerIncrement: number = TIMER_INCREMENT;
 
-    constructor(private fb: FormBuilder, public roomService: RoomService, dictionariesStore: Store<{ dictionaries: string[] }>, store: Store) {
+    constructor(
+        private fb: FormBuilder,
+        public roomService: RoomService,
+        dictionariesStore: Store<{ dictionaries: string[] }>,
+        store: Store<{ gameMode: GameMode }>,
+    ) {
         store.dispatch(resetAllState());
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');
         store.dispatch(loadDictionaries());
+        this.gameMode$ = store.select('gameMode');
     }
 
     ngOnInit(): void {
@@ -55,7 +63,14 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     onSubmit(): void {
-        const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
+        let decidedGameMode = GameMode.Classical;
+        this.gameMode$.subscribe((gameMode) => (decidedGameMode = gameMode));
+        const gameOptions = new GameOptions(
+            this.settingsForm.controls.name.value,
+            this.settingsForm.controls.selectedDictionary.value,
+            decidedGameMode,
+            this.timer,
+        );
         if (this.isSoloGame) this.gameOptionsSubmitted.emit({ gameOptions, botLevel: this.settingsForm.controls.botLevel.value });
         else this.gameOptionsSubmitted.emit({ gameOptions });
     }

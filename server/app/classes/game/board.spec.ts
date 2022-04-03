@@ -8,7 +8,7 @@ import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
-import { stub } from 'sinon';
+import { restore, stub } from 'sinon';
 import { Container } from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
@@ -68,6 +68,14 @@ describe('board', async () => {
     it('getAffectedWords should be correct', () => {
         const words = board.getAffectedWords(correctLettersToPlace);
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
+    });
+
+    it('getRandomWord should call config.dictionnary getRandomWord', () => {
+        const randomWordSize = 2;
+        const getRandomWordStub = stub(board['config'].dictionary, 'getRandomWord');
+        board.getRandomWord(randomWordSize);
+        expect(getRandomWordStub.calledOnceWith(randomWordSize));
+        restore();
     });
 
     it('scorePositions should score accordingly on correct placement without any multiplier', () => {

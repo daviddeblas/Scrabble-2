@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { refreshObjectiveState } from '@app/actions/game-objective.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
 import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, EASEL_CAPACITY, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
+import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -22,6 +24,11 @@ export class ChatService {
     }
 
     acceptNewAction(): void {
+        this.socketService.on('log2990 objectives', (objectives: { publicObjectives: Log2990Objective[]; privateObjectives: Log2990Objective[] }) => {
+            this.store.dispatch(
+                refreshObjectiveState({ publicObjectives: objectives.publicObjectives, privateObjectives: objectives.privateObjectives }),
+            );
+        });
         this.socketService.on('receive message', (chatMessage: ChatMessage) => {
             this.store.dispatch(receivedMessage(chatMessage));
         });

@@ -3,6 +3,7 @@ import { Server } from 'app/server';
 import { assert, expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import * as sinon from 'sinon';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -30,7 +31,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle create room event and emit game settings event', (done) => {
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
+        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', gameMode: GameMode.Classical, timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.on('create room success', (info: RoomInfo) => {
             expect(defaultOptions).to.deep.equal(info.gameOptions);
@@ -60,7 +61,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and emit get list event with the hostnames of the accessible rooms', (done) => {
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
+        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', gameMode: GameMode.Classical, timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms: RoomInfo[]) => {

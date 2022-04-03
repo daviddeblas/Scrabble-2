@@ -5,7 +5,8 @@
         <app-skip-turn-button></app-skip-turn-button>
         <app-surrender-game-button></app-surrender-game-button>
     </mat-toolbar>
-    <app-chat-box class="game-chatbox"></app-chat-box>
+    <app-games-objectives *ngIf="isLog2990" class="game-objective"></app-games-objectives>
+    <app-chat-box [ngClass]="isLog2990 ? 'game-chatbox-log2990' : 'game-chatbox-classic'"></app-chat-box>
     <app-board class="game-board"></app-board>
     <app-easel class="game-rack"></app-easel>
     <app-sidebar class="game-sidebar"></app-sidebar>

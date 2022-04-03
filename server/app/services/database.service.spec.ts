@@ -8,6 +8,7 @@ import { PORT } from '@app/environnement';
 import { DatabaseService } from '@app/services/database.service';
 import { fail } from 'assert';
 import { expect } from 'chai';
+import { GameMode } from 'common/interfaces/game-mode';
 import { createServer, Server } from 'http';
 import { describe } from 'mocha';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -76,8 +77,8 @@ describe('Database service', () => {
     it('should insert default scores in the database', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        const scoreClassic = await databaseService.getHighscores('classical');
-        const scoreLog2990 = await databaseService.getHighscores('log2990');
+        const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
+        const scoreLog2990 = await databaseService.getHighscores(GameMode.Log2990);
         expect(scoreClassic.length).to.equal(5);
         expect(scoreLog2990.length).to.equal(5);
     });
@@ -85,7 +86,7 @@ describe('Database service', () => {
     it('should return the right highscore list when connecting to the database', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        const scoreClassical = await databaseService.getHighscores('classical');
+        const scoreClassical = await databaseService.getHighscores(GameMode.Classical);
         expect(scoreClassical[0].name).to.equal('name5');
         expect(scoreClassical[1].name).to.equal('name4');
         expect(scoreClassical[2].name).to.equal('name3');
@@ -96,8 +97,8 @@ describe('Database service', () => {
     it('should updateHighScore when a higher score has been reached in Classical', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        await databaseService.updateHighScore(player1, 'classical');
-        const scoreClassic = await databaseService.getHighscores('classical');
+        await databaseService.updateHighScore(player1, GameMode.Classical);
+        const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
         expect(scoreClassic[0].name).to.equal('fakePlayer1');
         expect(scoreClassic[0].score).to.equal(10);
     });
@@ -105,8 +106,8 @@ describe('Database service', () => {
     it('should updateHighScore when a higher score has been reached in Log2990', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        await databaseService.updateHighScore(player1, 'log2990');
-        const scoreLog2990 = await databaseService.getHighscores('log2990');
+        await databaseService.updateHighScore(player1, GameMode.Log2990);
+        const scoreLog2990 = await databaseService.getHighscores(GameMode.Log2990);
         expect(scoreLog2990[0].name).to.equal('fakePlayer1');
         expect(scoreLog2990[0].score).to.equal(10);
     });
@@ -114,26 +115,26 @@ describe('Database service', () => {
     it('should present both names when more than a player have the same score in Log2990 highscores', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        await databaseService.updateHighScore(player3, 'log2290');
-        await databaseService.updateHighScore(player1, 'log2990');
-        const scoreClassic = await databaseService.getHighscores('log2990');
+        await databaseService.updateHighScore(player3, GameMode.Log2990);
+        await databaseService.updateHighScore(player1, GameMode.Log2990);
+        const scoreClassic = await databaseService.getHighscores(GameMode.Log2990);
         expect(scoreClassic[0].name).to.equal('fakePlayer3 - fakePlayer1');
     });
 
     it('should present both names when more than a player have the same score in Classical highscores', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        await databaseService.updateHighScore(player3, 'classical');
-        await databaseService.updateHighScore(player3, 'classical');
-        const scoreClassic = await databaseService.getHighscores('classical');
+        await databaseService.updateHighScore(player3, GameMode.Classical);
+        await databaseService.updateHighScore(player3, GameMode.Classical);
+        const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
         expect(scoreClassic[0].name).to.equal('fakePlayer3');
     });
 
     it('should not updateHighScore when a new score is lower than all of the current highscores in Classical', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        await databaseService.updateHighScore(player2, 'classical');
-        const scoreClassic = await databaseService.getHighscores('classical');
+        await databaseService.updateHighScore(player2, GameMode.Classical);
+        const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
         for (const score of scoreClassic) {
             expect(score.name).to.not.equal('fakePlayer2');
         }
@@ -143,7 +144,7 @@ describe('Database service', () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.resetDB();
-        const scoreClassic = await databaseService.getHighscores('classical');
+        const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
         expect(scoreClassic).to.be.empty;
     });
 
