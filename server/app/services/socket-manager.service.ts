@@ -34,4 +34,8 @@ export class SocketService {
     isOpen(): boolean {
         return this.sio.getMaxListeners() > 0;
     }
+
+    broadcastMessage(socketValue: string, message: unknown): void {
+        this.sio.sockets.emit(socketValue, message);
+    }
 }

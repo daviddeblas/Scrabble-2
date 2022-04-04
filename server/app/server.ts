@@ -18,8 +18,10 @@ import { SocketService } from './services/socket-manager.service';
 @Service()
 export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
+
+    socketService: SocketService;
+
     private server: http.Server;
-    private socketService: SocketService;
 
     constructor(private readonly application: Application) {}
 

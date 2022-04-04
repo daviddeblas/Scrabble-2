@@ -1,8 +1,9 @@
 import { HISTORY_DATABASE } from '@app/classes/game-history-handler';
+import { Server } from '@app/server';
 import { GameHistory } from 'common/interfaces/game-history';
 import { Db, MongoClient, WithId } from 'mongodb';
 import io from 'socket.io';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 
 @Service()
 export class HistoryDatabaseService {
@@ -39,6 +40,9 @@ export class HistoryDatabaseService {
     async addGameHistory(gameHistory: GameHistory): Promise<void> {
         const collection = HISTORY_DATABASE.gameHistory.collections.data;
         this.gameHistoryDB.collection(collection).insertOne(gameHistory);
+        this.getGameHistory().then((value) => {
+            Container.get(Server).socketService.broadcastMessage('receive gameHistory', value);
+        });
     }
 
     get database(): Db {
