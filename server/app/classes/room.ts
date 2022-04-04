@@ -7,6 +7,7 @@ import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
@@ -74,6 +75,7 @@ export class Room {
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
+        this.sendObjectives();
     }
 
     initGame(): void {
@@ -97,7 +99,10 @@ export class Room {
 
     surrenderGame(looserId: string): GameError | undefined {
         if (!this.game?.players) return new GameError(GameErrorType.GameNotExists);
-
+        if (!this.botLevel) {
+            this.convertToSolo(looserId === this.host.id ? 0 : 1);
+            return;
+        }
         const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
         this.game.stopTimer();
         this.game.endGame();
@@ -108,7 +113,8 @@ export class Room {
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+                const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
+                Container.get(DatabaseService).updateHighScore(highscore, gameMode);
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
@@ -136,12 +142,42 @@ export class Room {
         this.manager.notifyAvailableRoomsChange();
         this.setupSocket(this.sockets[0], 0);
         this.botLevel = diff;
+        this.sendObjectives();
     }
 
     quitRoomHost(): void {
         if (this.clients[0]) this.inviteRefused(this.clients[0]);
         this.manager.removeRoom(this);
         this.manager.notifyAvailableRoomsChange();
+    }
+
+    private convertToSolo(looserPlayerNumber: number): void {
+        this.playersLeft--;
+        this.sockets.splice(looserPlayerNumber, 1);
+        this.botLevel = BotDifficulty.Easy;
+        const game = this.game as Game;
+        if (looserPlayerNumber === 0) {
+            [game.players[0], game.players[1]] = [game.players[1], game.players[0]];
+            game.activePlayer = (game.activePlayer + 1) % 2;
+            game.log2990Objectives?.switchingPlayersObjectives();
+        }
+        game.actionAfterTurn = this.actionAfterTurnWithBot(this, BotDifficulty.Easy);
+        const surrenderMessage = game.players[1].name + ' à abandonné, conversion en partie solo débutant';
+        this.sockets[0].emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
+        game.players[1].name = Container.get(BotNameService).getBotName(BotDifficulty.Easy, game.players[0].name);
+        this.sockets[0].emit('game status', game.getGameStatus(0, this.botLevel, true));
+        this.removeUnneededListeners(this.sockets[0]);
+        this.setupSocket(this.sockets[0], 0);
+        if (game.activePlayer === 1) game.actionAfterTurn();
+    }
+
+    private sendObjectives(): void {
+        this.sockets.forEach((socket, index) => {
+            if (this.game?.log2990Objectives) {
+                const objectiveList = [...this.game.log2990Objectives.retrieveLog2990Objective(index)];
+                socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+            }
+        });
     }
 
     private inviteAccepted(client: io.Socket): void {

@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
+import { GameMode } from 'common/interfaces/game-mode';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 
 describe('MultiConfigWindowComponent', () => {
@@ -24,7 +25,14 @@ describe('MultiConfigWindowComponent', () => {
                     provide: MatDialogRef,
                     useValue: {},
                 },
-                provideMockStore(),
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameMode',
+                            value: GameMode.Classical,
+                        },
+                    ],
+                }),
             ],
         }).compileComponents();
     });
@@ -139,7 +147,7 @@ describe('MultiConfigWindowComponent', () => {
         fixture.detectChanges();
         const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
         component.onSubmit();
-        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', GameMode.Classical, component.timer);
         expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions });
     });
 
@@ -150,7 +158,7 @@ describe('MultiConfigWindowComponent', () => {
         fixture.detectChanges();
         const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
         component.onSubmit();
-        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', GameMode.Classical, component.timer);
         const expectedLevel = 'Débutant';
         expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions, botLevel: expectedLevel });
     });

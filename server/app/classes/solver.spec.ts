@@ -420,11 +420,12 @@ describe('solver', () => {
 
         const solutions: Solution[] = [...new Array(2)].map((v, i) => {
             return {
-                letters: [],
+                letters: [new PlacedLetter('A', new Vec2(0, i))],
                 blanks: [],
                 direction: new Vec2(0, i),
             };
         });
+        solutions[0].blanks = [new Vec2(0, 0)];
 
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);

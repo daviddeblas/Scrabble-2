@@ -1,10 +1,12 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Bag } from './bag';
 import { Board } from './board';
 import { Player } from './player';
@@ -20,6 +22,8 @@ export class Game {
     activePlayer: number;
     gameFinished: boolean;
     bag: Bag;
+    timerStartTime: number;
+    log2990Objectives: Log2990ObjectivesHandler | undefined;
 
     private turnsSkipped: number;
     private placeCounter: number;
@@ -46,6 +50,8 @@ export class Game {
         setTimeout(() => {
             actionAfterTurn();
         }, creationDelay);
+
+        if (gameOptions.gameMode === GameMode.Log2990) this.log2990Objectives = new Log2990ObjectivesHandler(this);
     }
 
     place(letters: PlacedLetter[], blanks: number[], player: number): GameError | undefined {
@@ -62,8 +68,9 @@ export class Game {
             if (lettersInCenter.length === 0) return new GameError(GameErrorType.BadStartingMove);
         }
 
-        const scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
+        let scoreToAdd = this.board.place(letters, blanks, this.placeCounter === 0);
         if (scoreToAdd instanceof GameError) return scoreToAdd;
+        if (this.log2990Objectives) scoreToAdd = this.log2990Objectives.verifyObjectives(player, letters, scoreToAdd);
         this.getActivePlayer().score += scoreToAdd;
         if (letters.length === MAX_LETTERS_IN_EASEL) this.getActivePlayer().score += BONUS_POINTS_FOR_FULL_EASEL;
         this.getActivePlayer().removeLetters(easelLettersForMove);
@@ -117,14 +124,14 @@ export class Game {
         this.activePlayer = this.nextPlayer();
     }
 
-    getGameStatus(playerNumber: number, botLevel?: string): unknown {
+    getGameStatus(playerNumber: number, botLevel?: string, withUpdatedTimer: boolean = false): unknown {
         const opponent = { ...this.players[(playerNumber + 1) % 2] };
         opponent.easel = opponent.easel.map(() => BLANK_LETTER);
         return {
             status: {
                 activePlayer: this.players[this.activePlayer].name,
                 letterPotLength: this.bag.letters.length,
-                timer: this.gameOptions.timePerRound,
+                timer: withUpdatedTimer ? this.timeLeft : this.gameOptions.timePerRound,
             },
             players: { player: this.players[playerNumber], opponent, botLevel },
             board: {
@@ -138,6 +145,7 @@ export class Game {
     }
 
     initTimer(): void {
+        this.timerStartTime = Date.now();
         this.currentTimer = setTimeout(this.actionAfterTimeout, this.gameOptions.timePerRound * MILLISECONDS_PER_SEC);
     }
 
@@ -148,6 +156,11 @@ export class Game {
 
     stopTimer(): void {
         clearTimeout(this.currentTimer);
+    }
+
+    private get timeLeft(): number {
+        const timeElapsed = Math.round((Date.now() - this.timerStartTime) / MILLISECONDS_PER_SEC);
+        return this.gameOptions.timePerRound - timeElapsed;
     }
 
     private getGameEndStatus(): GameFinishStatus {

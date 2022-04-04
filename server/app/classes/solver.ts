@@ -45,7 +45,11 @@ export class Solver {
         const allSolutions: Solution[] = await this.findAllSolutions();
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
-            const wordsCreated = this.board.getAffectedWords(solution.letters);
+            const solutionWithBlanks = solution.letters.map((letter) => {
+                if (solution.blanks.find((v) => v.equals(letter.position))) return new PlacedLetter('*', letter.position);
+                return letter;
+            });
+            const wordsCreated = this.board.getAffectedWords(solutionWithBlanks);
             let score = 0;
             let error: GameError | undefined;
             wordsCreated.forEach((word) => {
