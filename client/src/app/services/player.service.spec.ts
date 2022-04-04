@@ -66,6 +66,7 @@ describe('PlayerService', () => {
         }).compileComponents();
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
         store = TestBed.inject(MockStore);
+        store.overrideSelector('gameStatus', { letterPotLength: 9 });
         service = TestBed.inject(PlayerService);
         store.refreshState();
     });
@@ -184,6 +185,19 @@ describe('PlayerService', () => {
         const sendSpy = spyOn(service['socketService'], 'send');
         service.exchangeLetters(letters);
         expect(sendSpy).not.toHaveBeenCalled();
+    });
+
+    it('exchangeLetters should emit an error message if not enough letters are in pot', () => {
+        const letters = 'aerev';
+        store.overrideSelector('gameStatus', { letterPotLength: 0 });
+        spyOn(service, 'lettersInEasel').and.callFake(() => {
+            return true;
+        });
+        service.exchangeLetters(letters);
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: 'Commande mal formée - Pas assez de lettres dans la réserve', messageType: 'Error' }),
+        });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('lettersInEasel should return true if all letters are in easel', () => {
