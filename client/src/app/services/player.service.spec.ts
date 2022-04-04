@@ -138,7 +138,7 @@ describe('PlayerService', () => {
         position = 'o13h';
         service.placeWord(position, word);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: "Commande impossible à réaliser - Lettre à l'extérieur du plateau", messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -150,7 +150,7 @@ describe('PlayerService', () => {
         position = 'm15v';
         service.placeWord(position, word);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: "Commande impossible à réaliser - Lettre à l'extérieur du plateau", messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });

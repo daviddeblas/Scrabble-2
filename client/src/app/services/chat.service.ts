@@ -83,7 +83,9 @@ export class ChatService {
             if (this.handleNonTurnSpecificCommands(command)) return;
 
             if (username !== activePlayer) {
-                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
+                this.store.dispatch(
+                    receivedMessage({ username: '', message: "Commande impossible à réaliser - Ce n'est pas votre tour", messageType: 'Error' }),
+                );
                 return;
             }
             this.handleTurnSpecificCommands(command);
@@ -128,7 +130,7 @@ export class ChatService {
                 this.handleSimpleCommand(command);
                 break;
             default:
-                this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
+                this.store.dispatch(receivedMessage({ username: '', message: 'Entrée invalide', messageType: 'Error' }));
                 return;
         }
     }

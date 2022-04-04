@@ -194,7 +194,7 @@ describe('ChatService', () => {
         const exampleMessage = ['!Bonjour'];
         service['handleTurnSpecificCommands'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Entrée invalide', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -212,7 +212,9 @@ describe('ChatService', () => {
         const exampleMessage = '!passer';
         const otherPlayer = 'Other Player';
         service.messageWritten(otherPlayer, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: "Commande impossible à réaliser - Ce n'est pas votre tour", messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 

@@ -40,7 +40,7 @@ export class PlayerService {
         const lettersToPlace = this.findLettersToPlace(position, letters);
         if (lettersToPlace === '') {
             this.playerStore.dispatch(
-                receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+                receivedMessage({ username: '', message: "Commande impossible à réaliser - Lettre à l'extérieur du plateau", messageType: 'Error' }),
             );
             return;
         }
