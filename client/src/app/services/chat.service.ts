@@ -97,11 +97,11 @@ export class ChatService {
                 break;
             case '!aide':
                 if (command.length === 1) {
-                    this.handleSimpleCommand(command);
+                    this.processHelp();
                     return true;
                 } else {
                     this.store.dispatch(
-                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande aide mal formée', messageType: 'Error' }),
                     );
                 }
                 break;
@@ -192,5 +192,18 @@ export class ChatService {
         isValid &&= /^[a-z/*]*$/.test(command[1]);
         isValid &&= command.length === 2;
         return isValid;
+    }
+
+    private processHelp(): void {
+        const helpMessage = 'Commandes: \n'
+            .concat('!placer : cette commande permet de placer une à plusieurs lettres\n')
+            .concat('ex : !placer h8h vue --> h8 : case sur le plateau, h : direction horizontale, vue : lettres\n')
+            .concat('!échanger : cette commande échange une à plusieurs lettres sur votre chevalet\n')
+            .concat('ex : !échanger mwb --> remplace les lettres m, w, b sur votre chevalet\n')
+            .concat('!passer : cette commande permet de passer son tour\n')
+            .concat('!réserve : cette commande permet de voir les lettres dans la réserve et de votre adversaire\n')
+            .concat('!indice : cette commande donne des suggestions de lettres à placer\n');
+
+        this.store.dispatch(receivedMessage({ username: '', message: helpMessage, messageType: 'System' }));
     }
 }
