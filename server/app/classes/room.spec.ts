@@ -6,6 +6,7 @@ import { Room } from '@app/classes/room';
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
+import { HistoryDatabaseService } from '@app/services/history-database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
@@ -172,6 +173,11 @@ describe('room', () => {
                     players: [{ name: 'player1' }, { name: 'player2' }],
                     board: { getRandomWord: () => 'abc' },
                     bag: { letters: [] },
+                    gameHistory: {
+                        createGameHistoryData: () => {
+                            return;
+                        },
+                    },
                     activePlayer: 1,
                     gameFinished: false,
                     stopTimer: () => {
@@ -261,6 +267,9 @@ describe('room', () => {
                 const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
                     return;
                 });
+                const gameHistoryStub = stub(Container.get(HistoryDatabaseService), 'addGameHistory').callsFake(async () => {
+                    return;
+                });
                 let clientReceived = false;
                 const clientSocket = {
                     emit: () => {
@@ -280,12 +289,16 @@ describe('room', () => {
                 setTimeout(() => {
                     expect(clientReceived && hostReceived).to.deep.equal(true);
                     expect(dataStub.called).to.equal(true);
+                    expect(gameHistoryStub.called).to.equal(true);
                     done();
                 }, RESPONSE_DELAY * 3);
             });
 
             it('surrenderGame should emit endGame if the game is not null and call dataBase with Log2990 gameMode', (done) => {
                 const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
+                    return;
+                });
+                const gameHistoryStub = stub(Container.get(HistoryDatabaseService), 'addGameHistory').callsFake(async () => {
                     return;
                 });
                 let clientReceived = false;
@@ -309,16 +322,21 @@ describe('room', () => {
                 setTimeout(() => {
                     expect(clientReceived && hostReceived).to.deep.equal(true);
                     expect(dataStub.called).to.equal(true);
+                    expect(gameHistoryStub.called).to.equal(true);
                     done();
                 }, RESPONSE_DELAY * 3);
             });
 
             it('surrenderGame should call RoomsManager.removeRoom if no players are left', () => {
+                const gameHistoryStub = stub(Container.get(HistoryDatabaseService), 'addGameHistory').callsFake(async () => {
+                    return;
+                });
                 room['playersLeft'] = 0;
                 room['botLevel'] = BotDifficulty.Easy;
                 room.sockets = [];
                 room.surrenderGame('socket id');
                 expect(roomsManager.removeRoom.calledOnce).to.equal(true);
+                expect(gameHistoryStub.called).to.equal(true);
             });
 
             it('surrenderGame should call convertToSolo if botLevel undefined with 0 if host surrenders', () => {
