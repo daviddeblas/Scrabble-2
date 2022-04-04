@@ -327,15 +327,6 @@ describe('commands', () => {
             expect(processHintStub.calledOnce);
             expect(postCommandStub.notCalled);
         });
-
-        it('string with help calls processHelp', async () => {
-            const processHelpStub = stub(commandService, 'processHelp' as any);
-            const postCommandStub = stub(commandService, 'postCommand' as any);
-            const fullCommand = 'aide';
-            await commandService['processCommand'](game, room.sockets, fullCommand, game.activePlayer);
-            expect(processHelpStub.calledOnce);
-            expect(postCommandStub.notCalled);
-        });
     });
 
     it('process place calls game place on correctly formed arguments', (done) => {
@@ -490,13 +481,5 @@ describe('commands', () => {
             return true;
         };
         commandService['processBag'](game, room.sockets, [], 0);
-    });
-
-    it('process help calls game emits on correctly formed arguments', (done) => {
-        room.sockets[0].emit = (): boolean => {
-            done();
-            return true;
-        };
-        commandService['processHelp'](game, room.sockets, [], 0);
     });
 });

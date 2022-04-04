@@ -54,9 +54,6 @@ export class CommandService {
             case 'indice':
                 error = await this.processHint(game, sockets, args, playerNumber);
                 break;
-            case 'aide':
-                this.processHelp(game, sockets, args, playerNumber);
-                break;
         }
         return error;
     }
@@ -126,19 +123,6 @@ export class CommandService {
         const hints = await solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
         return;
-    }
-
-    private processHelp(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): void {
-        const message = 'Commandes: \n'
-            .concat('!placer : cette commande permet de placer une à plusieurs lettres\n')
-            .concat('ex : !placer h8h vue --> h8 : case sur le plateau, h : direction horizontale, vue : lettres\n\n')
-            .concat('!échanger : cette commande échange une à plusieurs lettres sur votre chevalet\n')
-            .concat('ex : !échanger mwb --> remplace les lettres m, w, b sur votre chevalet\n\n')
-            .concat('!passer : cette commande permet de passer son tour\n\n')
-            .concat('!réserve : cette commande permet de voir les lettres dans la réserve et de votre adversaire\n\n')
-            .concat('!indice : cette commande donne des suggestions de lettres à placer\n\n');
-
-        sockets[playerNumber].emit('receive message', { username: '', message, messageType: 'System' });
     }
 
     private postCommand(game: Game, sockets: io.Socket[]): void {
