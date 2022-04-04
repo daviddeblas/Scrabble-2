@@ -16,7 +16,7 @@ import { stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 
-describe('Database service', () => {
+describe('Highscore-database service', () => {
     let databaseService: HighscoreDatabaseService;
     let mongoServer: MongoMemoryServer;
     const player1 = { name: 'fakePlayer1', score: 10 };

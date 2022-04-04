@@ -45,10 +45,6 @@ export class HistoryDatabaseService {
         });
     }
 
-    get database(): Db {
-        return this.gameHistoryDB;
-    }
-
     async resetDB() {
         await this.gameHistoryDB.dropCollection(HISTORY_DATABASE.gameHistory.collections.data);
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable prefer-const */
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable no-invalid-this */
@@ -31,5 +32,15 @@ describe('GameHistoryHandler', () => {
         const historyData = gameHistory.createGameHistoryData([player1, player2], true, GameMode.Log2990);
         expect(historyData.gameMode).to.eq('Log2990');
         expect(historyData.isSurrender).to.eq(true);
+    });
+
+    it('should return time in second if it is less than 1 min', () => {
+        const gameHistory = new GameHistoryHandler();
+        expect(gameHistory.timerToString(0)).to.equal('0 sec');
+    });
+
+    it('should return time in minutes and seconds if it is more than 1 min', () => {
+        const gameHistory = new GameHistoryHandler();
+        expect(gameHistory.timerToString(90)).to.equal('1 min 30 sec');
     });
 });
