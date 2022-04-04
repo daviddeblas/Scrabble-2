@@ -18,7 +18,7 @@ import { PlacedLetter } from './placed-letter';
 import { Solver } from './solver';
 
 describe('solver', () => {
-    const dictionary: Dictionary = new Dictionary('', '', []);
+    const dictionary: Dictionary = new Dictionary('', '', [], '');
     let board: Board;
     beforeEach(() => {
         board = {

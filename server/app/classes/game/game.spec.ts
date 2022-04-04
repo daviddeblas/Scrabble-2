@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
+import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BotDifficulty } from '@app/services/bot.service';
@@ -20,20 +21,26 @@ describe('game', () => {
     let game: Game;
     let activePlayer: number;
     const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
-    const timerCallbackMock = () => {
+    const timerCallbackMock: () => GameError | undefined = () => {
         return undefined;
     };
-    const afterTurnCallbackMock: () => Promise<undefined> = async () => {
+    const afterTurnCallbackMock: () => Promise<undefined | GameError> = async () => {
         return undefined;
     };
-
-    before(() => {
-        Container.get(DictionaryService).init();
-        Container.get(GameConfigService).init();
-    });
+    const dicService = Container.get(DictionaryService);
+    dicService.init();
+    const dictionary = dicService.getDictionary('Francais') as Dictionary;
+    Container.get(GameConfigService).init();
 
     beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, afterTurnCallbackMock);
+        game = new Game(
+            Container.get(GameConfigService).configs[0],
+            dictionary,
+            ['player 1', 'player 2'],
+            gameOptions,
+            timerCallbackMock,
+            afterTurnCallbackMock,
+        );
         activePlayer = game.activePlayer;
     });
 
