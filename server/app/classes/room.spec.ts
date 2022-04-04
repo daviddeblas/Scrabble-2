@@ -285,7 +285,7 @@ describe('room', () => {
             });
 
             it('surrenderGame should emit endGame if the game is not null and call dataBase with Log2990 gameMode', (done) => {
-                const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+                const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
                     return;
                 });
                 let clientReceived = false;

@@ -166,7 +166,7 @@ describe('Individual functions', () => {
     });
 
     it('endGame should send highScores with Log2990 GameMode', () => {
-        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
             return;
         });
         const fakeGame = {
