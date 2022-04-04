@@ -70,16 +70,6 @@ describe('SocketManager service tests', () => {
         });
     });
 
-    it('should handle get dictionaries event and emit receive dictionaries event with the dictionaries names', (done) => {
-        const expectedList = ['Mon dictionnaire'];
-        clientSocket.emit('get dictionaries');
-        clientSocket.on('receive dictionaries', (listOfDictionary) => {
-            expect(listOfDictionary).to.deep.equal(expectedList);
-            expect(listOfDictionary).to.be.length(1);
-            done();
-        });
-    });
-
     it('isOpen should return true when set to default value', (done) => {
         const isOpen: boolean = service.isOpen();
         assert(isOpen === true);

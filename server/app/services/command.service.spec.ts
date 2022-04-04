@@ -2,6 +2,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
+import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Board } from '@app/classes/game/board';
@@ -26,6 +27,9 @@ describe('Individual functions', () => {
     let commandService: CommandService;
     const gameConfig: GameConfig = new GameConfig('gameConfig', [], new Vec2(BOARD_SIZE, BOARD_SIZE));
     const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const dicService = Container.get(DictionaryService);
+    dicService.init();
+    const dictionary = dicService.getDictionary('Francais') as Dictionary;
 
     const createFakeSocket = (index: number) => {
         return {
@@ -153,7 +157,7 @@ describe('Individual functions', () => {
     });
 
     it('parse place call returns the right placed characters', () => {
-        const game = { board: new Board(gameConfig) } as unknown as Game;
+        const game = { board: new Board(gameConfig, dictionary) } as unknown as Game;
         const commandArgs = ['h7h', 'con'];
         const placedLetters = commandService['parsePlaceCall'](game, commandArgs);
         placedLetters[0].forEach((l, index) => {
@@ -162,7 +166,7 @@ describe('Individual functions', () => {
     });
 
     it('parse place call returns the right placed characters vertical edition', () => {
-        const game = { board: new Board(gameConfig) } as unknown as Game;
+        const game = { board: new Board(gameConfig, dictionary) } as unknown as Game;
         const commandArgs = ['g8v', 'con'];
         const placedLetters = commandService['parsePlaceCall'](game, commandArgs);
         placedLetters[0].forEach((l, index) => {

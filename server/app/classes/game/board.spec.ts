@@ -10,12 +10,14 @@ import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
 import { stub } from 'sinon';
 import { Container } from 'typedi';
+import { Dictionary } from '../dictionary';
 import { Board, createEmptyMatrix } from './board';
 
 describe('board', async () => {
     let board: Board;
     await Container.get(DictionaryService).init();
     await Container.get(GameConfigService).init();
+    const dic = Container.get(DictionaryService).getDictionary('Francais') as Dictionary;
     const gameConfig = Container.get(GameConfigService).configs[0];
     const correctLettersToPlace = [
         new PlacedLetter('C', new Vec2(6, 7)),
@@ -24,7 +26,7 @@ describe('board', async () => {
     ];
 
     beforeEach(() => {
-        board = new Board(gameConfig);
+        board = new Board(gameConfig, dic);
     });
 
     it('CreateEmptyMatrix should initialize a double array filled with null', () => {
