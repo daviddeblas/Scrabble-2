@@ -86,6 +86,14 @@ describe('KeyManagerService', () => {
             expect(dispatchSpy).not.toHaveBeenCalled();
         });
 
+        it("onKey shouldn't do anything if receiving a key that is a number or star", () => {
+            const dispatchSpy = spyOn(store, 'dispatch');
+
+            service.onKey('2');
+            service.onKey('*');
+            expect(dispatchSpy).not.toHaveBeenCalled();
+        });
+
         it("onKey shouldn't do anything the focus is on something else than the body", () => {
             const testButton = document.createElement('button');
             document.body.appendChild(testButton);
