@@ -9,6 +9,7 @@ import { CellWordX2Component } from '@app/components/cells/cell-word-x2/cell-wor
 import { CellWordX3Component } from '@app/components/cells/cell-word-x3/cell-word-x3.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { EaselComponent } from '@app/components/easel/easel.component';
+import { GamesObjectivesComponent } from '@app/components/games-objectives/games-objectives.component';
 import { LetterComponent } from '@app/components/letter/letter.component';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SkipTurnButtonComponent } from '@app/components/skip-turn-button/skip-turn-button.component';
@@ -21,6 +22,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import * as boardReducer from '@app/reducers/board.reducer';
 import * as chatReducer from '@app/reducers/chat.reducer';
+import * as objectiveReducer from '@app/reducers/game-objective.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as leaderboardReducer from '@app/reducers/leaderboard.reducer';
 import * as localSettingsReducer from '@app/reducers/local-settings.reducer';
@@ -47,6 +49,7 @@ import { StoreModule } from '@ngrx/store';
         ChatBoxComponent,
         SurrenderGameButtonComponent,
         SkipTurnButtonComponent,
+        GamesObjectivesComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -57,6 +60,7 @@ import { StoreModule } from '@ngrx/store';
         StoreModule.forFeature(chatReducer.chatFeatureKey, chatReducer.reducer),
         StoreModule.forFeature(leaderboardReducer.leaderboardFeatureKey, leaderboardReducer.reducer),
         StoreModule.forFeature(localSettingsReducer.localSettingsFeatureKey, localSettingsReducer.reducer),
+        StoreModule.forFeature(objectiveReducer.gameObjectiveFeatureKey, objectiveReducer.reducer),
         EffectsModule.forFeature([ChatEffects, PlayerEffects, BrowserEffects]),
     ],
 })

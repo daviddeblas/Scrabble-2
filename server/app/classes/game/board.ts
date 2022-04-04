@@ -161,6 +161,10 @@ export class Board {
         return words;
     }
 
+    getRandomWord(wordLength: number): string {
+        return this.config.dictionary.getRandomWord(wordLength);
+    }
+
     private getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {
         let checkingPosition = new Vec2(pos.x, pos.y);
         const word: PlacedLetter[] = [];

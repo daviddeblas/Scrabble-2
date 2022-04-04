@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { GameError, GameErrorType } from '@app/classes/game.exception';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { BotDifficulty } from '@app/services/bot.service';
 import { DictionaryService } from '@app/services/dictionary.service';
@@ -12,6 +13,7 @@ import { expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
+import { GameMode } from 'common/interfaces/game-mode';
 import { spy, stub, useFakeTimers } from 'sinon';
 import { Container } from 'typedi';
 import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_PER_SEC } from './game';
@@ -19,7 +21,7 @@ import { BONUS_POINTS_FOR_FULL_EASEL, Game, MAX_LETTERS_IN_EASEL, MILLISECONDS_P
 describe('game', () => {
     let game: Game;
     let activePlayer: number;
-    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', GameMode.Classical, 60);
     const timerCallbackMock = () => {
         return undefined;
     };
@@ -46,6 +48,21 @@ describe('game', () => {
         const totalAmountOfPlayers = 2;
         expect(game.bag.letters.length).to.eq(totalLetters - totalLettersInEachPlayerEasel * totalAmountOfPlayers);
         expect(game['turnsSkipped']).to.eq(0);
+        expect(game['log2990Objectives']).to.equal(undefined);
+    });
+
+    it('constructor with GameMode Log2990 should instantiate a Log2990ObjectivesHandler', () => {
+        const options = new GameOptions('host', 'dict', GameMode.Log2990, 60);
+        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], options, timerCallbackMock, afterTurnCallbackMock);
+        expect(game.players.length).to.eq(2);
+        expect(game.activePlayer === 0 || game.activePlayer === 1).to.eq(true);
+        const amountOfEachLetters = game.config.letters.map((l) => l.amount);
+        const totalLetters = amountOfEachLetters.reduce((sum, amount) => sum + amount);
+        const totalLettersInEachPlayerEasel = MAX_LETTERS_IN_EASEL;
+        const totalAmountOfPlayers = 2;
+        expect(game.bag.letters.length).to.eq(totalLetters - totalLettersInEachPlayerEasel * totalAmountOfPlayers);
+        expect(game['turnsSkipped']).to.eq(0);
+        expect(game['log2990Objectives']).not.to.equal(undefined);
     });
 
     it('place should score according to scorePosition on correct placement', () => {
@@ -148,6 +165,15 @@ describe('game', () => {
         const thisPlayerScore = game.players[activePlayer].score;
         const expectedPoints = game.board['scorePosition'](positionsOfPlacement) as number;
         expect(thisPlayerScore).to.eq((expectedPoints + multiplierBonusOnBoard) * wordMultiplier + BONUS_POINTS_FOR_FULL_EASEL);
+    });
+
+    it('place should call verifyObjectives if log2990Objectives is not null', () => {
+        game['log2990Objectives'] = new Log2990ObjectivesHandler(game);
+        game.players[activePlayer].easel = stringToLetters('abacost');
+        const verifyObjectivesStub = stub(game['log2990Objectives'] as Log2990ObjectivesHandler, 'verifyObjectives');
+        const positionsOfPlacement = game.players[activePlayer].easel.map((l, i) => new PlacedLetter(l, new Vec2(3 + i, 7)));
+        game.place(positionsOfPlacement, [], game.activePlayer);
+        expect(verifyObjectivesStub.calledOnce).to.equal(true);
     });
 
     it('place should score according to scorePosition added from the sum of opponent easel points per letter on correct placement on endgame situation', () => {

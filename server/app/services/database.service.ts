@@ -1,5 +1,5 @@
-import { GameMode } from '@app/classes/game-configs';
 import { DATABASE, DEFAULT_HIGHSCORE, HighScore, NUMBER_OF_SCORES } from '@app/classes/highscore';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Db, MongoClient, WithId } from 'mongodb';
 import io from 'socket.io';
 import { Service } from 'typedi';
@@ -33,7 +33,7 @@ export class DatabaseService {
         return this.client.close();
     }
 
-    async getHighscores(gameMode: string): Promise<HighScore[]> {
+    async getHighscores(gameMode: GameMode): Promise<HighScore[]> {
         return this.highScoreDB
             .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
             .find({})
@@ -45,7 +45,7 @@ export class DatabaseService {
             });
     }
 
-    async updateHighScore(highScore: HighScore, gameMode: string): Promise<void> {
+    async updateHighScore(highScore: HighScore, gameMode: GameMode): Promise<void> {
         const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
         const equalScore = await this.highScoreDB.collection(collection).findOne({ score: highScore.score });
         if (equalScore) {
@@ -68,10 +68,10 @@ export class DatabaseService {
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('get highScores', () => {
-            this.getHighscores('classical').then((value) => {
+            this.getHighscores(GameMode.Classical).then((value) => {
                 socket.emit('receive classic highscores', value);
             });
-            this.getHighscores('log2990').then((value) => {
+            this.getHighscores(GameMode.Log2990).then((value) => {
                 socket.emit('receive log2990 highscores', value);
             });
         });

@@ -10,4 +10,10 @@ export class Dictionary {
     getMatchingWords(word: Letter[]): string[] {
         return this.words.filter((w) => new RegExp('^'.concat(lettersToString(word).toLowerCase().replace('*', '.').concat('$'))).test(w));
     }
+
+    getRandomWord(wordLength: number): string {
+        const correspondingWords = this.words.filter((word) => word.length === wordLength);
+        const index = Math.floor(Math.random() * correspondingWords.length);
+        return correspondingWords[index];
+    }
 }
