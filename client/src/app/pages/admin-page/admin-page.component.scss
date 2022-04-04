@@ -7,8 +7,21 @@
     grid-template-columns: repeat(3, 1fr);
     column-gap: 10px;
     margin: 10px;
+    height: 92%;
 }
 
 .menu {
     height: 100%;
+}
+
+.dictionaries {
+    display: contents;
+}
+
+.dictionary {
+    display: contents;
+}
+
+.dictionary-title {
+    font-size: medium;
 }
