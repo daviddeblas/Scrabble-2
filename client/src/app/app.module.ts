@@ -28,6 +28,7 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
 import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
+import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -48,6 +49,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
         GameJoinPageComponent,
         LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
+        AdminPageComponent,
     ],
     imports: [
         AppMaterialModule,
