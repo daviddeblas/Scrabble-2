@@ -1,5 +1,6 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
+import { GameHistoryHandler } from '@app/classes/game-history-handler';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -22,6 +23,7 @@ export class Game {
     activePlayer: number;
     gameFinished: boolean;
     bag: Bag;
+    gameHistory: GameHistoryHandler;
     timerStartTime: number;
     log2990Objectives: Log2990ObjectivesHandler | undefined;
 
@@ -40,6 +42,7 @@ export class Game {
         this.board = new Board(config);
         this.activePlayer = Math.floor(Math.random() * playerNames.length);
         this.players = [];
+        this.gameHistory = new GameHistoryHandler();
         playerNames.forEach((name) => this.players.push(new Player(name)));
         this.turnsSkipped = 0;
         this.players.forEach((p) => p.addLetters(this.bag.getLetters(MAX_LETTERS_IN_EASEL)));

@@ -21,8 +21,9 @@ import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { CommandService } from './command.service';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Individual functions', () => {
@@ -102,7 +103,7 @@ describe('Individual functions', () => {
     });
 
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
-        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
             return;
         });
         sockets[0] = {
@@ -166,12 +167,20 @@ describe('Individual functions', () => {
     });
 
     it('endGame should send highScores with Log2990 GameMode', () => {
-        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
+            return;
+        });
+        const gameHistoryStub = stub(Container.get(HistoryDatabaseService), 'addGameHistory').callsFake(async () => {
             return;
         });
         const fakeGame = {
             log2990Objectives: {},
             players: [{} as Player],
+            gameHistory: {
+                createGameHistoryData: () => {
+                    return;
+                },
+            },
             endGame: () => {
                 return {
                     toEndGameStatus: () => {
@@ -190,6 +199,7 @@ describe('Individual functions', () => {
         commandService['endGame'](fakeGame, sockets);
         setTimeout(() => {
             expect(dataStub.calledOnce).to.equal(true);
+            expect(gameHistoryStub.called).to.equal(true);
         }, responseTime);
     });
 
