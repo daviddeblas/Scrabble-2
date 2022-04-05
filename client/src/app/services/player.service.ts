@@ -30,10 +30,12 @@ export class PlayerService {
     exchangeLetters(letters: string): void {
         let enoughLetters = false;
         this.statusStore.select('gameStatus').subscribe((status) => (enoughLetters = status.letterPotLength > EASEL_CAPACITY));
-        if (!enoughLetters)
+        if (!enoughLetters) {
             this.playerStore.dispatch(
                 receivedMessage({ username: '', message: 'Commande mal formée - Pas assez de lettres dans la réserve', messageType: 'Error' }),
             );
+            return;
+        }
         if (this.lettersInEasel(letters)) {
             const commandLine = 'échanger ' + letters;
             this.socketService.send('command', commandLine);
