@@ -15,20 +15,22 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
+import { GameHistoryTableComponent } from './components/game-history-table/game-history-table.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
+import { GameHistoryEffects } from './effects/game-history.effects';
 import { GameEffects } from './effects/game.effects';
 import { LeaderboardEffects } from './effects/leaderboard.effects';
 import { RoomEffects } from './effects/room.effects';
 import { GamePageModule } from './modules/game-page.module';
+import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
-import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -50,6 +52,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
         AdminPageComponent,
+        GameHistoryTableComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -64,7 +67,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
             gameStatus: gameReducer.reducer,
             gameMode: gameModeReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects, GameHistoryEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,

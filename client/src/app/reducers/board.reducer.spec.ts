@@ -269,10 +269,7 @@ describe('[Board] Reducer', () => {
     describe('[Board] Letters Removed', () => {
         it('should set the given position cells to null in the board', () => {
             const action = removeLetters({
-                positions: [
-                    { x: 5, y: 5 },
-                    { x: 5, y: 6 },
-                ],
+                positions: [new Vec2(5, 5), new Vec2(5, 6)],
             });
             const result = reducer(boardStub, action);
 
