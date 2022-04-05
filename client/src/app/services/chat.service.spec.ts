@@ -413,4 +413,19 @@ describe('ChatService', () => {
     it('handleNonTurnSpecificCommand should return false on correct call', () => {
         expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeFalsy();
     });
+
+    it('handleNonTurnSpecificCommand should return true on correct call', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!aide'])).toBeTruthy();
+    });
+
+    it('handleNonTurnSpecificCommand should return false on correct call', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!aide', 'a'])).toBeFalsy();
+    });
+
+    it('should call helpProcess with the command !aide', () => {
+        const helpCommandSpy = spyOn(service as any, 'processHelp');
+        const exampleMessage = ['!aide'];
+        service['handleNonTurnSpecificCommands'](exampleMessage);
+        expect(helpCommandSpy).toHaveBeenCalledWith();
+    });
 });

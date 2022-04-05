@@ -5,19 +5,23 @@ import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
 import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
-import { DATABASE } from './classes/highscore';
+import { HISTORY_DATABASE } from './classes/game-history-handler';
+import { HIGHSCORE_DATABASE } from './classes/highscore';
 import { BrowserService } from './services/browser.service';
-import { DatabaseService } from './services/database.service';
 import { DictionaryService } from './services/dictionary.service';
 import { GameConfigService } from './services/game-config.service';
+import { HighscoreDatabaseService } from './services/highscore-database.service';
+import { HistoryDatabaseService } from './services/history-database.service';
 import { RoomsManager } from './services/rooms-manager.service';
 import { SocketService } from './services/socket-manager.service';
 
 @Service()
 export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
+
+    socketService: SocketService;
+
     private server: http.Server;
-    private socketService: SocketService;
 
     constructor(private readonly application: Application) {}
 
@@ -41,10 +45,12 @@ export class Server {
             Container.get(RoomsManager),
             Container.get(DictionaryService),
             Container.get(BrowserService),
-            Container.get(DatabaseService),
+            Container.get(HighscoreDatabaseService),
             Container.get(GameConfigService),
+            Container.get(HistoryDatabaseService),
         );
-        Container.get(DatabaseService).start(DATABASE.uri);
+        Container.get(HighscoreDatabaseService).start(HIGHSCORE_DATABASE.uri);
+        Container.get(HistoryDatabaseService).start(HISTORY_DATABASE.uri);
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

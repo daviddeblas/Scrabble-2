@@ -1,8 +1,9 @@
 import { BotNameService } from '@app/services/bot-name.service';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
-import { DatabaseService } from '@app/services/database.service';
 import { GameConfigService } from '@app/services/game-config.service';
+import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
+import { HistoryDatabaseService } from '@app/services/history-database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
@@ -110,11 +111,11 @@ export class Room {
         const surrenderMessage = looserName + ' à abandonné la partie';
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         const game = this.game as Game;
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
-                Container.get(DatabaseService).updateHighScore(highscore, gameMode);
+                Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
@@ -123,6 +124,8 @@ export class Room {
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
+        const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, gameMode);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
         return;
     }
 

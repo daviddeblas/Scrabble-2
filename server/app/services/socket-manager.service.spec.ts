@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
@@ -92,5 +93,24 @@ describe('SocketManager service tests', () => {
         const isOpen: boolean = service.isOpen();
         assert(isOpen === false);
         done();
+    });
+
+    it('broadcastMessage should call sockets.emit with the given parameters', (done) => {
+        const expectedValue = 'abc';
+        const expectedMessage = 'message';
+        service['sio'] = {
+            sockets: {
+                emit: (value: string, message: unknown) => {
+                    expect(value).to.equal(expectedValue);
+                    expect(message).to.equal(expectedMessage);
+                    done();
+                    return false;
+                },
+            } as any,
+            close: () => {
+                return;
+            },
+        } as any;
+        service.broadcastMessage(expectedValue, expectedMessage);
     });
 });

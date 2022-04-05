@@ -11,8 +11,9 @@ import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
 import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container, Service } from 'typedi';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 
 @Service()
 export class CommandService {
@@ -139,13 +140,15 @@ export class CommandService {
     }
 
     private endGame(game: Game, sockets: io.Socket[]): void {
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             const highscore = { name: game.players[i].name, score: game.players[i].score };
-            const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
-            Container.get(DatabaseService).updateHighScore(highscore, gameMode);
+            Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             s.emit('end game', endGameStatus);
         });
+        const gameHistory = game.gameHistory.createGameHistoryData(game.players, false, gameMode);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
     }
 
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {

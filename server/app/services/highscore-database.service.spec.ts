@@ -3,9 +3,9 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
-import { DATABASE } from '@app/classes/highscore';
+import { HIGHSCORE_DATABASE } from '@app/classes/highscore';
 import { PORT } from '@app/environnement';
-import { DatabaseService } from '@app/services/database.service';
+import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { GameMode } from 'common/interfaces/game-mode';
@@ -16,15 +16,15 @@ import { stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 
-describe('Database service', () => {
-    let databaseService: DatabaseService;
+describe('Highscore-database service', () => {
+    let databaseService: HighscoreDatabaseService;
     let mongoServer: MongoMemoryServer;
     const player1 = { name: 'fakePlayer1', score: 10 };
     const player2 = { name: 'fakePlayer2', score: -1 };
     const player3 = { name: 'fakePlayer3', score: 10 };
 
     beforeEach(async () => {
-        databaseService = new DatabaseService();
+        databaseService = new HighscoreDatabaseService();
         mongoServer = await MongoMemoryServer.create();
     });
 
@@ -59,18 +59,18 @@ describe('Database service', () => {
     it('should populate the database when start is called', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        const scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        const scores = await databaseService.database.collection(HIGHSCORE_DATABASE.highScore.collections.classical).find({}).toArray();
         expect(scores.length).to.equal(5);
     });
 
     it('should not populate the database with start function if it is already populated', async () => {
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
-        let scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        let scores = await databaseService.database.collection(HIGHSCORE_DATABASE.highScore.collections.classical).find({}).toArray();
         expect(scores.length).to.equal(5);
         await databaseService.closeConnection();
         await databaseService.start(mongoUri);
-        scores = await databaseService.database.collection(DATABASE.highScore.collections.classical).find({}).toArray();
+        scores = await databaseService.database.collection(HIGHSCORE_DATABASE.highScore.collections.classical).find({}).toArray();
         expect(scores.length).to.equal(5);
     });
 

@@ -22,6 +22,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
 import * as boardReducer from '@app/reducers/board.reducer';
 import * as chatReducer from '@app/reducers/chat.reducer';
+import * as gameHistoryReducer from '@app/reducers/game-history.reducer';
 import * as objectiveReducer from '@app/reducers/game-objective.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as leaderboardReducer from '@app/reducers/leaderboard.reducer';
@@ -60,6 +61,7 @@ import { StoreModule } from '@ngrx/store';
         StoreModule.forFeature(chatReducer.chatFeatureKey, chatReducer.reducer),
         StoreModule.forFeature(leaderboardReducer.leaderboardFeatureKey, leaderboardReducer.reducer),
         StoreModule.forFeature(localSettingsReducer.localSettingsFeatureKey, localSettingsReducer.reducer),
+        StoreModule.forFeature(gameHistoryReducer.gameHistoryFeatureKey, gameHistoryReducer.reducer),
         StoreModule.forFeature(objectiveReducer.gameObjectiveFeatureKey, objectiveReducer.reducer),
         EffectsModule.forFeature([ChatEffects, PlayerEffects, BrowserEffects]),
     ],
