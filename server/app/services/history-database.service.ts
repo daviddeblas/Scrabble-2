@@ -1,4 +1,4 @@
-import { HISTORY_DATABASE } from '@app/classes/game-history-handler';
+import { HISTORY_DATABASE } from '@app/constantes';
 import { Server } from '@app/server';
 import { GameHistory } from 'common/interfaces/game-history';
 import { Db, MongoClient, WithId } from 'mongodb';

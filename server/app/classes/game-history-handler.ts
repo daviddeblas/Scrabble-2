@@ -33,12 +33,3 @@ export class GameHistoryHandler {
         }
     }
 }
-export const HISTORY_DATABASE = {
-    uri: 'mongodb+srv://LOG2990equipe101:Polytechnique2022@cluster0.kuvzt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
-    gameHistory: {
-        name: 'Historique_DB',
-        collections: {
-            data: 'PartiesJouées',
-        },
-    },
-};

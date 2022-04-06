@@ -46,3 +46,24 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
 export const VOWELS = ['a', 'e', 'i', 'o', 'u', 'y'];
 
 export const NO_POINTS = 0;
+
+export const HISTORY_DATABASE = {
+    uri: 'mongodb+srv://LOG2990equipe101:Polytechnique2022@cluster0.kuvzt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    gameHistory: {
+        name: 'Historique_DB',
+        collections: {
+            data: 'PartiesJouées',
+        },
+    },
+};
+
+export const BOT_NAME_DATABASE = {
+    uri: 'mongodb+srv://LOG2990equipe101:Polytechnique2022@cluster0.kuvzt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    botNames: {
+        name: 'Bot_Names_DB',
+        collections: {
+            easyBot: 'Nom bots débutant',
+            hardBot: 'Nom bot expert',
+        },
+    },
+};
