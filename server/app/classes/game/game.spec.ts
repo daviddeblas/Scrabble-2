@@ -27,12 +27,12 @@ describe('game', () => {
     const afterTurnCallbackMock: () => Promise<undefined | GameError> = async () => {
         return undefined;
     };
-    const dicService = Container.get(DictionaryService);
-    dicService.init();
-    const dictionary = dicService.getDictionary('Francais') as Dictionary;
     Container.get(GameConfigService).init();
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        const dicService = Container.get(DictionaryService);
+        await dicService.init();
+        const dictionary = dicService.getDictionary('Francais') as Dictionary;
         game = new Game(
             Container.get(GameConfigService).configs[0],
             dictionary,

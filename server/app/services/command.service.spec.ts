@@ -267,6 +267,7 @@ describe('commands', () => {
         room.join(sockets[1], 'player 2');
         room['inviteAccepted'](sockets[1]);
         game = room.game as Game;
+        game.dictionary = Container.get(DictionaryService).getDictionary('Francais') as Dictionary;
     });
 
     it('post command emits turn ended', (done) => {
