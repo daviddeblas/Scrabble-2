@@ -3,7 +3,7 @@ import { Server } from '@app/server';
 import { GameHistory } from 'common/interfaces/game-history';
 import { Db, MongoClient, WithId } from 'mongodb';
 import io from 'socket.io';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
 
 @Service()
 export class HistoryDatabaseService {

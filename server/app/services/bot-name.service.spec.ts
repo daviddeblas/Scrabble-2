@@ -4,9 +4,11 @@ import { PORT, RESPONSE_DELAY } from '@app/environnement';
 import { expect } from 'chai';
 import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
 import { createServer, Server } from 'http';
-import { restore, stub } from 'sinon';
+import { mock, restore, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
+import { Container } from 'typedi';
+import { BotNameDatabaseService } from './bot-name-database.service';
 import { BotNameService } from './bot-name.service';
 import { BotDifficulty } from './bot.service';
 
@@ -15,6 +17,7 @@ describe('Bot Name service tests', () => {
 
     beforeEach(async () => {
         service = new BotNameService();
+        mock(Container.get(BotNameDatabaseService));
     });
 
     afterEach(() => {
@@ -116,6 +119,12 @@ describe('Bot Name service tests', () => {
         expect(service['addedHardNames'].includes('Name')).to.equal(false);
     });
 
+    it('setBotNames should set the addedBotNames', () => {
+        service.setBotNames(['BOB'], ['Hello']);
+        expect(service['addedHardNames'].includes('Hello')).to.equal(true);
+        expect(service['addedEasyNames'].includes('BOB')).to.equal(true);
+    });
+
     it('modifyBotName should not modify the name when in the initialNames', () => {
         service['modifyBotName']('BOB', 'Hello');
         expect(service['easyBotInitialName'].includes('Hello')).to.equal(false);
@@ -177,7 +186,7 @@ describe('Bot Name service tests', () => {
         it('setUpBotNameSocket on add bot name should call addBotName and sendAllBotNames', (done) => {
             const addBotNameStub = stub(service as any, 'addBotName');
             const sendAllBotNamesStub = stub(service as any, 'sendAllBotNames');
-            hostSocket.emit('add bot name');
+            hostSocket.emit('add bot name', { difficulty: BotDifficulty.Easy, name: 'Jackie' });
             setTimeout(() => {
                 expect(addBotNameStub.calledOnce).to.equal(true);
                 expect(sendAllBotNamesStub.calledOnce).to.equal(true);
@@ -189,7 +198,7 @@ describe('Bot Name service tests', () => {
             const removeBotNameStub = stub(service as any, 'removeBotName');
             const sendAllBotNamesStub = stub(service as any, 'sendAllBotNames');
 
-            hostSocket.emit('delete bot name');
+            hostSocket.emit('delete bot name', { difficulty: BotDifficulty.Easy, name: 'Jackie' });
             setTimeout(() => {
                 expect(removeBotNameStub.calledOnce).to.equal(true);
                 expect(sendAllBotNamesStub.calledOnce).to.equal(true);
@@ -200,7 +209,7 @@ describe('Bot Name service tests', () => {
         it('setUpBotNameSocket on modify bot name should call modifyBotName and sendAllBotNames', (done) => {
             const modifyBotNameStub = stub(service as any, 'modifyBotName');
             const sendAllBotNamesStub = stub(service as any, 'sendAllBotNames');
-            hostSocket.emit('modify bot name');
+            hostSocket.emit('modify bot name', { previousName: 'Jackie', modifiedName: 'Francis' });
             setTimeout(() => {
                 expect(modifyBotNameStub.calledOnce).to.equal(true);
                 expect(sendAllBotNamesStub.calledOnce).to.equal(true);

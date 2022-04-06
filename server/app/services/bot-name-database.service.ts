@@ -16,22 +16,8 @@ export class BotNameDatabaseService {
 
             await this.client.connect();
 
-            let easyBotNames: string[] = [];
-            this.botNameDB
-                .collection(BOT_NAME_DATABASE.botNames.collections.easyBot)
-                .find({})
-                .toArray()
-                .then((botName: WithId<Document>[]) => {
-                    easyBotNames = botName.map((name) => name as unknown as string);
-                });
-            let hardBotNames: string[] = [];
-            this.botNameDB
-                .collection(BOT_NAME_DATABASE.botNames.collections.hardBot)
-                .find({})
-                .toArray()
-                .then((botName: WithId<Document>[]) => {
-                    hardBotNames = botName.map((name) => name as unknown as string);
-                });
+            const easyBotNames: string[] = await this.getBotNames(BotDifficulty.Easy);
+            const hardBotNames: string[] = await this.getBotNames(BotDifficulty.Hard);
 
             Container.get(BotNameService).setBotNames(easyBotNames, hardBotNames);
         } catch {
@@ -42,6 +28,17 @@ export class BotNameDatabaseService {
 
     async closeConnection(): Promise<void> {
         return this.client.close();
+    }
+
+    async getBotNames(difficulty: BotDifficulty): Promise<string[]> {
+        const botType = difficulty === BotDifficulty.Easy ? 'easyBot' : 'hardBot';
+        return this.botNameDB
+            .collection(BOT_NAME_DATABASE.botNames.collections[botType])
+            .find({})
+            .toArray()
+            .then((botName: WithId<Document>[]) => {
+                return botName.map((name) => (name as unknown as { name: string }).name);
+            });
     }
 
     async addBotName(botDifficulty: BotDifficulty, name: string): Promise<void> {
@@ -60,7 +57,7 @@ export class BotNameDatabaseService {
     }
 
     async resetDB(): Promise<void> {
-        await this.botNameDB.dropCollection(BOT_NAME_DATABASE.botNames.collections.easyBot);
-        await this.botNameDB.dropCollection(BOT_NAME_DATABASE.botNames.collections.hardBot);
+        await this.botNameDB.collection(BOT_NAME_DATABASE.botNames.collections.easyBot).deleteMany({});
+        await this.botNameDB.collection(BOT_NAME_DATABASE.botNames.collections.hardBot).deleteMany({});
     }
 }

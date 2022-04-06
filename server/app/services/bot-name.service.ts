@@ -1,7 +1,7 @@
 import { BotDifficulty } from '@app/services/bot.service';
 import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
 import io from 'socket.io';
-import Container, { Service } from 'typedi';
+import { Container, Service } from 'typedi';
 import { BotNameDatabaseService } from './bot-name-database.service';
 
 @Service()

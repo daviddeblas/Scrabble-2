@@ -62,7 +62,7 @@ export const BOT_NAME_DATABASE = {
     botNames: {
         name: 'Bot_Names_DB',
         collections: {
-            easyBot: 'Nom bots débutant',
+            easyBot: 'Nom bot débutant',
             hardBot: 'Nom bot expert',
         },
     },
