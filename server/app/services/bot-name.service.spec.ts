@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { PORT, RESPONSE_DELAY } from '@app/environnement';
+import { Server } from '@app/server';
 import { expect } from 'chai';
 import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
-import { createServer, Server } from 'http';
+import { createServer, Server as httpServer } from 'http';
 import { mock, restore, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
@@ -11,6 +12,7 @@ import { Container } from 'typedi';
 import { BotNameDatabaseService } from './bot-name-database.service';
 import { BotNameService } from './bot-name.service';
 import { BotDifficulty } from './bot.service';
+import { SocketService } from './socket-manager.service';
 
 describe('Bot Name service tests', () => {
     let service: BotNameService;
@@ -134,7 +136,8 @@ describe('Bot Name service tests', () => {
     describe('socket connections', () => {
         let hostSocket: Socket;
         let server: io.Server;
-        let httpServer: Server;
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        let httpServer: httpServer;
 
         before((done) => {
             httpServer = createServer();
@@ -164,14 +167,20 @@ describe('Bot Name service tests', () => {
             const expectedEasyNames = ['ROB', 'BOT', 'BOB'];
             const expectedHardNames = ['OLA', 'DYNO', 'MIKE', 'Name'];
             service['addedHardNames'] = ['Name'];
-            hostSocket.on('receive bot name', (names) => {
-                expectedEasyNames.forEach((name, index) => expect(names.easyBotName[index]).to.equal(name));
-                expectedHardNames.forEach((name, index) => expect(names.hardBotNames[index]).to.equal(name));
-                done();
-            });
-            server.on('connection', (socket) => {
-                service['sendAllBotNames'](socket);
-            });
+            Container.get(Server).socketService = {
+                broadcastMessage: () => {
+                    return;
+                },
+            } as unknown as SocketService;
+            stub(Container.get(Server).socketService, 'broadcastMessage').callsFake(
+                (socketValue, names: { easyBotName: string[]; hardBotNames: string[] }) => {
+                    expect(socketValue).to.equal('receive bot name');
+                    expectedEasyNames.forEach((name, index) => expect(names.easyBotName[index]).to.equal(name));
+                    expectedHardNames.forEach((name, index) => expect(names.hardBotNames[index]).to.equal(name));
+                    done();
+                },
+            );
+            service['sendAllBotNames']();
         });
 
         it('setUpBotNameSocket on get bot names should call sendAllBotNames', (done) => {

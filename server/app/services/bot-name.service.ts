@@ -1,3 +1,4 @@
+import { Server } from '@app/server';
 import { BotDifficulty } from '@app/services/bot.service';
 import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
 import io from 'socket.io';
@@ -34,23 +35,23 @@ export class BotNameService {
 
     setUpBotNameSocket(socket: io.Socket): void {
         socket.on('get bot names', () => {
-            this.sendAllBotNames(socket);
+            this.sendAllBotNames();
         });
         socket.on('add bot name', (nameParameters) => {
             this.addBotName(nameParameters.difficulty, nameParameters.name);
-            this.sendAllBotNames(socket);
+            this.sendAllBotNames();
         });
         socket.on('delete bot name', (nameParameters) => {
             this.removeBotName(nameParameters.difficulty, nameParameters.name);
-            this.sendAllBotNames(socket);
+            this.sendAllBotNames();
         });
         socket.on('modify bot name', (nameParameters) => {
             this.modifyBotName(nameParameters.previousName, nameParameters.modifiedName);
-            this.sendAllBotNames(socket);
+            this.sendAllBotNames();
         });
         socket.on('reset all names', () => {
             this.resetAllNames();
-            this.sendAllBotNames(socket);
+            this.sendAllBotNames();
         });
     }
 
@@ -108,9 +109,10 @@ export class BotNameService {
         }
     }
 
-    private sendAllBotNames(socket: io.Socket): void {
+    private sendAllBotNames(): void {
         const easyBotName = [...this.easyBotInitialName, ...this.addedEasyNames];
         const hardBotNames = [...this.hardBotInitialName, ...this.addedHardNames];
-        socket.emit('receive bot name', { easyBotName, hardBotNames });
+        const value = { easyBotName, hardBotNames };
+        Container.get(Server).socketService.broadcastMessage('receive bot name', value);
     }
 }
