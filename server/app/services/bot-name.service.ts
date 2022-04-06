@@ -30,16 +30,16 @@ export class BotNameService {
         socket.on('get bot names', () => {
             this.sendAllBotNames(socket);
         });
-        socket.on('add bot name', (difficulty: BotDifficulty, name: string) => {
-            this.addBotName(difficulty, name);
+        socket.on('add bot name', (nameParameters) => {
+            this.addBotName(nameParameters.difficulty, nameParameters.name);
             this.sendAllBotNames(socket);
         });
-        socket.on('delete bot name', (difficulty: BotDifficulty, name: string) => {
-            this.removeBotName(difficulty, name);
+        socket.on('delete bot name', (nameParameters) => {
+            this.removeBotName(nameParameters.difficulty, nameParameters.name);
             this.sendAllBotNames(socket);
         });
-        socket.on('modify bot name', (previousName: string, modifiedName: string) => {
-            this.modifyBotName(previousName, modifiedName);
+        socket.on('modify bot name', (nameParameters) => {
+            this.modifyBotName(nameParameters.previousName, nameParameters.modifiedName);
             this.sendAllBotNames(socket);
         });
         socket.on('reset all names', () => {

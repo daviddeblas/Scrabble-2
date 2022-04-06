@@ -7,6 +7,7 @@ import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
 import { HISTORY_DATABASE } from './classes/game-history-handler';
 import { HIGHSCORE_DATABASE } from './classes/highscore';
+import { BotNameService } from './services/bot-name.service';
 import { BrowserService } from './services/browser.service';
 import { DictionaryService } from './services/dictionary.service';
 import { GameConfigService } from './services/game-config.service';
@@ -48,6 +49,7 @@ export class Server {
             Container.get(HighscoreDatabaseService),
             Container.get(GameConfigService),
             Container.get(HistoryDatabaseService),
+            Container.get(BotNameService),
         );
         Container.get(HighscoreDatabaseService).start(HIGHSCORE_DATABASE.uri);
         Container.get(HistoryDatabaseService).start(HISTORY_DATABASE.uri);
