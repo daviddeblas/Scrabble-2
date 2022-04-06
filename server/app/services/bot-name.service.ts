@@ -1,5 +1,6 @@
 import { BotDifficulty } from '@app/services/bot.service';
 import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
+import io from 'socket.io';
 import { Service } from 'typedi';
 
 @Service()
@@ -25,7 +26,30 @@ export class BotNameService {
         return botName;
     }
 
-    addBotName(difficulty: BotDifficulty, name: string): void {
+    setUpBotNameSocket(socket: io.Socket): void {
+        socket.on('get bot names', () => {
+            this.sendAllBotNames(socket);
+        });
+        socket.on('add bot name', (difficulty: BotDifficulty, name: string) => {
+            this.addBotName(difficulty, name);
+            this.sendAllBotNames(socket);
+        });
+        socket.on('delete bot name', (difficulty: BotDifficulty, name: string) => {
+            this.removeBotName(difficulty, name);
+            this.sendAllBotNames(socket);
+        });
+        socket.on('modify bot name', (previousName: string, modifiedName: string) => {
+            this.modifyBotName(previousName, modifiedName);
+            this.sendAllBotNames(socket);
+        });
+        socket.on('reset all names', () => {
+            this.resetAllNames();
+            this.sendAllBotNames(socket);
+        });
+    }
+
+    private addBotName(difficulty: BotDifficulty, name: string): void {
+        if (this.botNameExists(name)) return;
         switch (difficulty) {
             case BotDifficulty.Easy:
                 this.addedEasyNames.push(name);
@@ -36,7 +60,7 @@ export class BotNameService {
         }
     }
 
-    removeBotName(difficulty: BotDifficulty, name: string): void {
+    private removeBotName(difficulty: BotDifficulty, name: string): void {
         let index: number;
         switch (difficulty) {
             case BotDifficulty.Easy:
@@ -52,8 +76,30 @@ export class BotNameService {
         }
     }
 
-    resetAllNames(): void {
+    private resetAllNames(): void {
         this.addedEasyNames = [];
         this.addedHardNames = [];
+    }
+
+    private botNameExists(name: string): boolean {
+        let exists = false;
+        exists ||= [...this.easyBotInitialName, ...this.addedEasyNames].includes(name);
+        exists ||= [...this.hardBotInitialName, ...this.addedHardNames].includes(name);
+        return exists;
+    }
+
+    private modifyBotName(previousName: string, modifiedName: string): void {
+        let nameIndex: number;
+        if ((nameIndex = this.addedEasyNames.indexOf(previousName)) >= 0) {
+            this.addedEasyNames[nameIndex] = modifiedName;
+        } else if ((nameIndex = this.addedHardNames.indexOf(previousName)) >= 0) {
+            this.addedHardNames[nameIndex] = modifiedName;
+        }
+    }
+
+    private sendAllBotNames(socket: io.Socket): void {
+        const easyBotName = [...this.easyBotInitialName, ...this.addedEasyNames];
+        const hardBotNames = [...this.hardBotInitialName, ...this.addedHardNames];
+        socket.emit('receive bot name', { easyBotName, hardBotNames });
     }
 }
