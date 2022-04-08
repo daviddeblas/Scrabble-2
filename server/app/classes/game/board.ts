@@ -163,7 +163,7 @@ export class Board {
     }
 
     getRandomWord(wordLength: number): string {
-        return this.config.dictionary.getRandomWord(wordLength);
+        return this.dictionary.getRandomWord(wordLength);
     }
 
     private getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {

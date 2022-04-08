@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
+import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
@@ -10,7 +11,6 @@ import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
 import { restore, stub } from 'sinon';
 import { Container } from 'typedi';
-import { Dictionary } from '../dictionary';
 import { Board, createEmptyMatrix } from './board';
 
 describe('board', async () => {
@@ -72,9 +72,9 @@ describe('board', async () => {
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
     });
 
-    it('getRandomWord should call config.dictionnary getRandomWord', () => {
+    it('getRandomWord should call config.dictionary getRandomWord', () => {
         const randomWordSize = 2;
-        const getRandomWordStub = stub(board['config'].dictionary, 'getRandomWord');
+        const getRandomWordStub = stub(board['dictionary'], 'getRandomWord');
         board.getRandomWord(randomWordSize);
         expect(getRandomWordStub.calledOnceWith(randomWordSize));
         restore();

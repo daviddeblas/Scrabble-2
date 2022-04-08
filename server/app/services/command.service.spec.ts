@@ -302,14 +302,13 @@ describe('commands', () => {
         sockets.push(createFakeSocket(0));
         sockets.push(createFakeSocket(1));
 
-        gameOptions = new GameOptions('a', 'b', GameMode.Classical);
+        gameOptions = new GameOptions('a', 'Francais', GameMode.Classical);
         commandService = new CommandService(Container.get(DictionaryService));
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
         room.join(sockets[1], 'player 2');
         room['inviteAccepted'](sockets[1]);
         game = room.game as Game;
-        game.dictionary = Container.get(DictionaryService).getDictionary('Francais') as Dictionary;
     });
 
     it('post command emits turn ended', (done) => {
