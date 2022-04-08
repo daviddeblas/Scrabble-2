@@ -10,6 +10,7 @@ import { PORT } from '@app/environnement';
 import { assert, expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import { createServer, Server } from 'http';
 import { restore, spy, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
@@ -28,7 +29,7 @@ describe('Rooms Manager Service', () => {
 
     beforeEach(async () => {
         roomsManager = Container.get(RoomsManager);
-        options = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
+        options = { hostname: 'My Name', dictionaryType: 'My Dictionary', gameMode: GameMode.Classical, timePerRound: 60 };
         socket = {
             once: () => {
                 return;
@@ -76,7 +77,7 @@ describe('Rooms Manager Service', () => {
         roomsManager['createRoom'](socket, options);
         const expectedResult = [new RoomInfo(socket.id, options)];
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', gameMode: GameMode.Classical, timePerRound: 90 };
         roomsManager['createRoom'](socket, otherOption);
         expectedResult.push(new RoomInfo(socket.id, otherOption));
         expect(roomsManager.getRooms()).to.deep.equal(expectedResult);
@@ -94,7 +95,7 @@ describe('Rooms Manager Service', () => {
         roomsManager.sendAvailableRooms(socket);
         assert(spyOnSocket.calledWith('get list', expectedResult));
 
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', gameMode: GameMode.Classical, timePerRound: 90 };
         roomsManager['createRoom'](socket, otherOption);
         const room = roomsManager['rooms'][1];
         // eslint-disable-next-line dot-notation
@@ -187,14 +188,14 @@ describe('Rooms Manager Service', () => {
     });
 
     it('getRoom should return undefined if there is no socket Id corresponding to the playerId passed as a parameter', () => {
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', gameMode: GameMode.Classical, timePerRound: 90 };
         roomsManager['rooms'].push(new Room(socket, roomsManager, otherOption));
         const undefinedID = '3';
         expect(roomsManager.getRoom(undefinedID)).to.deep.equal(undefined);
     });
 
     it('getRoom should return the room if the host socket Id is passed as a parameter', () => {
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', gameMode: GameMode.Classical, timePerRound: 90 };
         const expectedRoom = new Room(socket, roomsManager, otherOption);
         roomsManager['rooms'].push(expectedRoom);
         expect(roomsManager.getRoom(socket.id)).to.equal(expectedRoom);
@@ -202,7 +203,7 @@ describe('Rooms Manager Service', () => {
 
     it('getRoom should return the room if the opponent socket Id is passed as a parameter', () => {
         const opponentSocket = { id: 'Opponent' } as unknown as Socket;
-        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', timePerRound: 90 };
+        const otherOption = { hostname: 'Second Name', dictionaryType: 'Dictionary', gameMode: GameMode.Classical, timePerRound: 90 };
         const expectedRoom = new Room(socket, roomsManager, otherOption);
         expectedRoom.clients[0] = opponentSocket;
         roomsManager['rooms'].push(expectedRoom);

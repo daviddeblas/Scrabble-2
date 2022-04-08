@@ -27,14 +27,17 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
         private changeDetector: ChangeDetectorRef,
     ) {
         this.chat$ = store.select('chat');
-        this.playerStore.subscribe((us) => (this.username = us.players.player.name));
+        this.playerStore.select('players').subscribe((players) => (this.username = players.player.name));
         this.numberOfLastMessages = 0;
     }
 
     @HostListener('document:click', ['$event'])
     clickout(event: Event): void {
         this.numberOfLastMessages = 0;
-        if (this.eRef.nativeElement.contains(event.target)) this.keyManager.onEsc();
+        if (this.eRef.nativeElement.contains(event.target)) {
+            this.keyManager.onEsc();
+            this.chatMessage.nativeElement.focus();
+        }
     }
 
     @HostListener('keydown', ['$event'])
@@ -77,6 +80,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
     }
 
     sendHintMessage(message: string): void {
+        this.keyManager.onEsc();
         if (message.startsWith('!placer') && !this.gameEnded) {
             this.numberOfLastMessages = 0;
             this.store.dispatch(chatActions.messageWritten({ username: this.username, message }));

@@ -8,10 +8,12 @@ import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container, Service } from 'typedi';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 
 @Service()
 export class CommandService {
@@ -127,19 +129,26 @@ export class CommandService {
 
     private postCommand(game: Game, sockets: io.Socket[]): void {
         game.resetTimer();
-        sockets.forEach((s) => {
+        sockets.forEach((s, index) => {
+            if (game.log2990Objectives) {
+                const objectiveList = [...game.log2990Objectives.retrieveLog2990Objective(index)];
+                s.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+            }
             s.emit('turn ended');
         });
         game.actionAfterTurn();
     }
 
     private endGame(game: Game, sockets: io.Socket[]): void {
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             const highscore = { name: game.players[i].name, score: game.players[i].score };
-            Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+            Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             s.emit('end game', endGameStatus);
         });
+        const gameHistory = game.gameHistory.createGameHistoryData(game.players, false, gameMode);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
     }
 
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {

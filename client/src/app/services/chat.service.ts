@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { refreshObjectiveState } from '@app/actions/game-objective.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, EASEL_CAPACITY, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
+import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -22,6 +24,11 @@ export class ChatService {
     }
 
     acceptNewAction(): void {
+        this.socketService.on('log2990 objectives', (objectives: { publicObjectives: Log2990Objective[]; privateObjectives: Log2990Objective[] }) => {
+            this.store.dispatch(
+                refreshObjectiveState({ publicObjectives: objectives.publicObjectives, privateObjectives: objectives.privateObjectives }),
+            );
+        });
         this.socketService.on('receive message', (chatMessage: ChatMessage) => {
             this.store.dispatch(receivedMessage(chatMessage));
         });
@@ -76,7 +83,9 @@ export class ChatService {
             if (this.handleNonTurnSpecificCommands(command)) return;
 
             if (username !== activePlayer) {
-                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
+                this.store.dispatch(
+                    receivedMessage({ username: '', message: "Commande impossible à réaliser - Ce n'est pas votre tour", messageType: 'Error' }),
+                );
                 return;
             }
             this.handleTurnSpecificCommands(command);
@@ -92,6 +101,16 @@ export class ChatService {
                 } else {
                     this.store.dispatch(
                         receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
+                    );
+                }
+                break;
+            case '!aide':
+                if (command.length === 1) {
+                    this.processHelp();
+                    return true;
+                } else {
+                    this.store.dispatch(
+                        receivedMessage({ username: '', message: 'Erreur de syntaxe - commande aide mal formée', messageType: 'Error' }),
                     );
                 }
                 break;
@@ -121,7 +140,7 @@ export class ChatService {
                 this.handleSimpleCommand(command);
                 break;
             default:
-                this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
+                this.store.dispatch(receivedMessage({ username: '', message: 'Entrée invalide', messageType: 'Error' }));
                 return;
         }
     }
@@ -178,9 +197,21 @@ export class ChatService {
 
     private validateExchangeCommand(command: string[]): boolean {
         let isValid = true;
-        this.store.select('gameStatus').subscribe((status) => (isValid &&= status.letterPotLength > EASEL_CAPACITY));
         isValid &&= /^[a-z/*]*$/.test(command[1]);
         isValid &&= command.length === 2;
         return isValid;
+    }
+
+    private processHelp(): void {
+        const helpMessage = 'Commandes: \n'
+            .concat('!placer : cette commande permet de placer une à plusieurs lettres\n')
+            .concat('ex : !placer h8h vue --> h8 : case sur le plateau, h : direction horizontale, vue : lettres\n')
+            .concat('!échanger : cette commande échange une à plusieurs lettres sur votre chevalet\n')
+            .concat('ex : !échanger mwb --> remplace les lettres m, w, b sur votre chevalet\n')
+            .concat('!passer : cette commande permet de passer son tour\n')
+            .concat('!réserve : cette commande permet de voir les lettres dans la réserve et de votre adversaire\n')
+            .concat('!indice : cette commande donne des suggestions de lettres à placer\n');
+
+        this.store.dispatch(receivedMessage({ username: '', message: helpMessage, messageType: 'System' }));
     }
 }

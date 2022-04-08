@@ -8,15 +8,18 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import * as dictionariesReducer from '@app/reducers/dictionaries.reducer';
+import * as gameModeReducer from '@app/reducers/game-mode.reducer';
 import * as gameReducer from '@app/reducers/game-status.reducer';
 import * as roomReducer from '@app/reducers/room.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
+import { GameHistoryTableComponent } from './components/game-history-table/game-history-table.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { DictionariesEffects } from './effects/dictionaries.effects';
+import { GameHistoryEffects } from './effects/game-history.effects';
 import { GameEffects } from './effects/game.effects';
 import { LeaderboardEffects } from './effects/leaderboard.effects';
 import { RoomEffects } from './effects/room.effects';
@@ -27,7 +30,6 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
 import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -47,6 +49,7 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
         GameJoinPageComponent,
         LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
+        GameHistoryTableComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -59,8 +62,9 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
             dictionaries: dictionariesReducer.reducer,
             room: roomReducer.reducer,
             gameStatus: gameReducer.reducer,
+            gameMode: gameModeReducer.reducer,
         }),
-        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects]),
+        EffectsModule.forRoot([DictionariesEffects, RoomEffects, GameEffects, LeaderboardEffects, GameHistoryEffects]),
         StoreDevtoolsModule.instrument({}),
         GamePageModule,
         ReactiveFormsModule,

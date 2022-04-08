@@ -1,26 +1,26 @@
-import { GameMode } from '@app/classes/game-configs';
-import { DATABASE, DEFAULT_HIGHSCORE, HighScore, NUMBER_OF_SCORES } from '@app/classes/highscore';
+import { DEFAULT_HIGHSCORE, HighScore, HIGHSCORE_DATABASE, NUMBER_OF_SCORES } from '@app/classes/highscore';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Db, MongoClient, WithId } from 'mongodb';
 import io from 'socket.io';
 import { Service } from 'typedi';
 
 @Service()
-export class DatabaseService {
+export class HighscoreDatabaseService {
     private highScoreDB: Db;
     private client: MongoClient;
     async start(url: string) {
         try {
             const client = new MongoClient(url);
             this.client = client;
-            this.highScoreDB = client.db(DATABASE.highScore.name);
+            this.highScoreDB = client.db(HIGHSCORE_DATABASE.highScore.name);
 
             await this.client.connect();
 
-            if ((await this.highScoreDB.collection(DATABASE.highScore.collections.classical).countDocuments()) === 0) {
+            if ((await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.classical).countDocuments()) === 0) {
                 await this.populateDBClassical();
             }
 
-            if ((await this.highScoreDB.collection(DATABASE.highScore.collections.log2990).countDocuments()) === 0) {
+            if ((await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.log2990).countDocuments()) === 0) {
                 await this.populateDBlog2990();
             }
         } catch {
@@ -33,9 +33,9 @@ export class DatabaseService {
         return this.client.close();
     }
 
-    async getHighscores(gameMode: string): Promise<HighScore[]> {
+    async getHighscores(gameMode: GameMode): Promise<HighScore[]> {
         return this.highScoreDB
-            .collection(DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
+            .collection(HIGHSCORE_DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'])
             .find({})
             .sort({ score: -1 })
             .limit(NUMBER_OF_SCORES)
@@ -46,7 +46,7 @@ export class DatabaseService {
     }
 
     async updateHighScore(highScore: HighScore, gameMode: string): Promise<void> {
-        const collection = DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
+        const collection = HIGHSCORE_DATABASE.highScore.collections[gameMode === GameMode.Classical ? 'classical' : 'log2990'];
         const equalScore = await this.highScoreDB.collection(collection).findOne({ score: highScore.score });
         if (equalScore) {
             if (equalScore.name.includes(highScore.name)) return;
@@ -62,16 +62,16 @@ export class DatabaseService {
     }
 
     async resetDB() {
-        await this.highScoreDB.dropCollection(DATABASE.highScore.collections.classical);
-        await this.highScoreDB.dropCollection(DATABASE.highScore.collections.log2990);
+        await this.highScoreDB.dropCollection(HIGHSCORE_DATABASE.highScore.collections.classical);
+        await this.highScoreDB.dropCollection(HIGHSCORE_DATABASE.highScore.collections.log2990);
     }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('get highScores', () => {
-            this.getHighscores('classical').then((value) => {
+            this.getHighscores(GameMode.Classical).then((value) => {
                 socket.emit('receive classic highscores', value);
             });
-            this.getHighscores('log2990').then((value) => {
+            this.getHighscores(GameMode.Log2990).then((value) => {
                 socket.emit('receive log2990 highscores', value);
             });
         });
@@ -81,7 +81,7 @@ export class DatabaseService {
         const scores: HighScore[] = DEFAULT_HIGHSCORE.classical;
 
         for (const score of scores) {
-            await this.highScoreDB.collection(DATABASE.highScore.collections.classical).insertOne(score);
+            await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.classical).insertOne(score);
         }
     }
 
@@ -89,7 +89,7 @@ export class DatabaseService {
         const scores: HighScore[] = DEFAULT_HIGHSCORE.log2990;
 
         for (const score of scores) {
-            await this.highScoreDB.collection(DATABASE.highScore.collections.log2990).insertOne(score);
+            await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.log2990).insertOne(score);
         }
     }
 }

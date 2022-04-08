@@ -12,6 +12,7 @@ import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { RoomService } from './room.service';
@@ -20,7 +21,7 @@ import { SocketClientService } from './socket-client.service';
 describe('RoomService', () => {
     const timer = 60;
     const botLevel = 'Debutant';
-    const gameOptions = new GameOptions('host', 'dict', timer);
+    const gameOptions = new GameOptions('host', 'dict', GameMode.Classical, timer);
     let service: RoomService;
     let socketService: SocketTestHelper;
     let store: MockStore;

@@ -3,6 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { provideMockStore } from '@ngrx/store/testing';
 import { GameSelectionPageComponent } from './game-selection-page.component';
 
 describe('GameSelectionPageComponent', () => {
@@ -22,6 +23,7 @@ describe('GameSelectionPageComponent', () => {
                     useValue: mockDialogSpy,
                 },
                 FormBuilder,
+                provideMockStore(),
             ],
         }).compileComponents();
     });

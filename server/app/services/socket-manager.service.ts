@@ -1,10 +1,12 @@
 import http from 'http';
 import io from 'socket.io';
 import { Service } from 'typedi';
+import { BotNameService } from './bot-name.service';
 import { BrowserService } from './browser.service';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
 import { GameConfigService } from './game-config.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 import { RoomsManager } from './rooms-manager.service';
 
 @Service()
@@ -16,8 +18,10 @@ export class SocketService {
         public roomManager: RoomsManager,
         public dictionaryService: DictionaryService,
         public browserService: BrowserService,
-        public databaseService: DatabaseService,
+        public databaseService: HighscoreDatabaseService,
         public configService: GameConfigService,
+        public historyDatabaseService: HistoryDatabaseService,
+        public botNameService: BotNameService,
     ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         dictionaryService.sio = this.sio;
@@ -26,15 +30,16 @@ export class SocketService {
             dictionaryService.setupSocketConnection(socket);
             browserService.setupSocketConnection(socket);
             databaseService.setupSocketConnection(socket);
-
-            socket.onAny((ns, content) => {
-                console.log(ns);
-                console.log(content);
-            });
+            historyDatabaseService.setupSocketConnection(socket);
+            botNameService.setUpBotNameSocket(socket);
         });
     }
 
     isOpen(): boolean {
         return this.sio.getMaxListeners() > 0;
+    }
+
+    broadcastMessage(socketValue: string, message: unknown): void {
+        this.sio.sockets.emit(socketValue, message);
     }
 }
