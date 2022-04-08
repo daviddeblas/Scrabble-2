@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+    closeRoom,
     createRoomSuccess,
     joinInviteCanceled,
     joinInviteReceived,
@@ -24,6 +25,12 @@ export class RoomService {
         this.socketService.on('create room success', (roomInfo: RoomInfo) => {
             this.store.dispatch(createRoomSuccess({ roomInfo }));
             this.waitForInvitations();
+        });
+
+        this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
+            if (gameOptions.dictionaryType === deletedDictionaryName) {
+                this.store.dispatch(closeRoom());
+            }
         });
     }
 
@@ -77,6 +84,11 @@ export class RoomService {
         });
         this.socketService.on('refused', () => {
             this.store.dispatch(joinRoomDeclined({ roomInfo, playerName }));
+        });
+        this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
+            if (roomInfo.gameOptions.dictionaryType === deletedDictionaryName) {
+                this.store.dispatch(joinInviteCanceled());
+            }
         });
     }
 

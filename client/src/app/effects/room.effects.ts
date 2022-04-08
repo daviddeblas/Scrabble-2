@@ -5,6 +5,7 @@
 
 import { Injectable } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatStepper } from '@angular/material/stepper';
 import { Router } from '@angular/router';
 import {
     acceptInvite,
@@ -63,6 +64,7 @@ export class RoomEffects {
                 ofType(closeRoom),
                 tap(() => {
                     this.roomService.closeRoom();
+                    this.roomCreationStepper.reset();
                 }),
             ),
         { dispatch: false },
@@ -136,6 +138,7 @@ export class RoomEffects {
     );
 
     dialogRef: MatDialogRef<GameJoinPageComponent>;
+    roomCreationStepper: MatStepper;
 
     constructor(private actions$: Actions, private roomService: RoomService, private router: Router) {}
 }

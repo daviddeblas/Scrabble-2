@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable import/no-deprecated */
+import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
@@ -15,12 +16,16 @@ import { restore, spy, stub } from 'sinon';
 import { Server as MainServer, Socket } from 'socket.io';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import { Container } from 'typedi';
+import { DictionaryService } from './dictionary.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Rooms Manager Service', () => {
     let roomsManager: RoomsManager;
     let options: GameOptions;
     let socket: Socket;
+    const dicService = Container.get(DictionaryService);
+    dicService.init();
+    const dictionary = dicService.getDictionary('Francais') as Dictionary;
 
     beforeEach(async () => {
         roomsManager = Container.get(RoomsManager);
@@ -94,7 +99,7 @@ describe('Rooms Manager Service', () => {
         roomsManager['createRoom'](socket, otherOption);
         const room = roomsManager['rooms'][1];
         // eslint-disable-next-line dot-notation
-        room.game = new Game(new GameConfig(), [''], room['gameOptions'], room['actionAfterTimeout'](), async () => {
+        room.game = new Game(new GameConfig(), dictionary, [''], room['gameOptions'], room['actionAfterTimeout'](), async () => {
             return undefined;
         });
         assert(spyOnSocket.calledWith('get list', expectedResult));

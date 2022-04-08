@@ -24,6 +24,7 @@ export class SocketService {
         public botNameService: BotNameService,
     ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
+        dictionaryService.sio = this.sio;
         this.sio.on('connection', (socket) => {
             roomManager.setupSocketConnection(socket);
             dictionaryService.setupSocketConnection(socket);

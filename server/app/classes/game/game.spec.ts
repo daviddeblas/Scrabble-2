@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
+import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -25,17 +26,23 @@ describe('game', () => {
     const timerCallbackMock = () => {
         return undefined;
     };
-    const afterTurnCallbackMock: () => Promise<undefined> = async () => {
+    const afterTurnCallbackMock: () => Promise<undefined | GameError> = async () => {
         return undefined;
     };
+    Container.get(GameConfigService).init();
 
-    before(() => {
-        Container.get(DictionaryService).init();
-        Container.get(GameConfigService).init();
-    });
-
-    beforeEach(() => {
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], gameOptions, timerCallbackMock, afterTurnCallbackMock);
+    beforeEach(async () => {
+        const dicService = Container.get(DictionaryService);
+        await dicService.init();
+        const dictionary = dicService.getDictionary('Francais') as Dictionary;
+        game = new Game(
+            Container.get(GameConfigService).configs[0],
+            dictionary,
+            ['player 1', 'player 2'],
+            gameOptions,
+            timerCallbackMock,
+            afterTurnCallbackMock,
+        );
         activePlayer = game.activePlayer;
     });
 
@@ -53,7 +60,14 @@ describe('game', () => {
 
     it('constructor with GameMode Log2990 should instantiate a Log2990ObjectivesHandler', () => {
         const options = new GameOptions('host', 'dict', GameMode.Log2990, 60);
-        game = new Game(Container.get(GameConfigService).configs[0], ['player 1', 'player 2'], options, timerCallbackMock, afterTurnCallbackMock);
+        game = new Game(
+            Container.get(GameConfigService).configs[0],
+            Container.get(DictionaryService).getDictionary('Francais') as Dictionary,
+            ['player 1', 'player 2'],
+            options,
+            timerCallbackMock,
+            afterTurnCallbackMock,
+        );
         expect(game.players.length).to.eq(2);
         expect(game.activePlayer === 0 || game.activePlayer === 1).to.eq(true);
         const amountOfEachLetters = game.config.letters.map((l) => l.amount);
