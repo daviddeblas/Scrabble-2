@@ -1,6 +1,7 @@
 import http from 'http';
 import io from 'socket.io';
 import { Service } from 'typedi';
+import { BotNameService } from './bot-name.service';
 import { BrowserService } from './browser.service';
 import { DictionaryService } from './dictionary.service';
 import { GameConfigService } from './game-config.service';
@@ -20,6 +21,7 @@ export class SocketService {
         public databaseService: HighscoreDatabaseService,
         public configService: GameConfigService,
         public historyDatabaseService: HistoryDatabaseService,
+        public botNameService: BotNameService,
     ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.sio.on('connection', (socket) => {
@@ -28,6 +30,7 @@ export class SocketService {
             browserService.setupSocketConnection(socket);
             databaseService.setupSocketConnection(socket);
             historyDatabaseService.setupSocketConnection(socket);
+            botNameService.setUpBotNameSocket(socket);
         });
     }
 
