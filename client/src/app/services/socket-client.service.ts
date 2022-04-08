@@ -30,11 +30,6 @@ export class SocketClientService implements OnDestroy {
 
     connect() {
         if (!this.isSocketAlive()) this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false, closeOnBeforeunload: false });
-
-        this.socket.onAny((ns, content) => {
-            console.log(ns);
-            console.log(content);
-        });
     }
 
     disconnect() {
