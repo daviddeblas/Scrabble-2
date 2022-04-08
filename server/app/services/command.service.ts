@@ -121,7 +121,7 @@ export class CommandService {
 
     private async processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): Promise<GameError | undefined> {
         if (args.length > 0) return new GameError(GameErrorType.WrongHintArgument);
-        const solver = new Solver(game.config.dictionary, game.board, game.players[playerNumber].easel);
+        const solver = new Solver(game.dictionary, game.board, game.players[playerNumber].easel);
         const hints = await solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
         return;

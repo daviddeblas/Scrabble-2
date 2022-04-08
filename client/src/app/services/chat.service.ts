@@ -6,7 +6,7 @@ import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Store } from '@ngrx/store';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, EASEL_CAPACITY, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, HINT_COUNT, POSITION_LAST_CHAR } from 'common/constants';
 import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { SocketClientService } from './socket-client.service';
 
@@ -83,7 +83,9 @@ export class ChatService {
             if (this.handleNonTurnSpecificCommands(command)) return;
 
             if (username !== activePlayer) {
-                this.store.dispatch(receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }));
+                this.store.dispatch(
+                    receivedMessage({ username: '', message: "Commande impossible à réaliser - Ce n'est pas votre tour", messageType: 'Error' }),
+                );
                 return;
             }
             this.handleTurnSpecificCommands(command);
@@ -138,7 +140,7 @@ export class ChatService {
                 this.handleSimpleCommand(command);
                 break;
             default:
-                this.store.dispatch(receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }));
+                this.store.dispatch(receivedMessage({ username: '', message: 'Entrée invalide', messageType: 'Error' }));
                 return;
         }
     }
@@ -195,7 +197,6 @@ export class ChatService {
 
     private validateExchangeCommand(command: string[]): boolean {
         let isValid = true;
-        this.store.select('gameStatus').subscribe((status) => (isValid &&= status.letterPotLength > EASEL_CAPACITY));
         isValid &&= /^[a-z/*]*$/.test(command[1]);
         isValid &&= command.length === 2;
         return isValid;
