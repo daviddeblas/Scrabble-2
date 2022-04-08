@@ -1,5 +1,5 @@
 import { Dictionary } from '@app/classes/dictionary';
-import { readdirSync, readFileSync, unlink, writeFile } from 'fs';
+import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
 import path from 'path';
 import io from 'socket.io';
 import { Service } from 'typedi';
@@ -47,9 +47,7 @@ export class DictionaryService {
         const dictionaryPath = path.join(dictionariesPath, castedObj.title.replace(/ /g, '_').concat('.json'));
         const dictionary = new Dictionary(castedObj.title, castedObj.description, castedObj.words, dictionaryPath);
         if (this.dictionaries.findIndex((d) => d.title === dictionary.title) >= 0) return Error('dictionary with the same title already exists');
-        writeFile(dictionaryPath, content, 'utf8', () => {
-            return;
-        });
+        writeFileSync(dictionaryPath, content, 'utf8');
         this.dictionaries.push(dictionary);
     }
 
@@ -58,14 +56,18 @@ export class DictionaryService {
         const dictionary = this.getDictionary(oldTitle);
         if (!dictionary) return new Error('dictionary not found');
 
-        let err = this.deleteDictionary(dictionary.title);
-        if (err) return err;
+        this.deleteDictionary(dictionary.title);
 
         dictionary.description = newDescription;
         dictionary.title = newTitle;
 
-        err = this.addDictionary(JSON.stringify(dictionary));
-        if (err) return err;
+        const content = {
+            title: dictionary.title,
+            description: dictionary.description,
+            words: dictionary.words,
+        };
+
+        this.addDictionary(JSON.stringify(content));
     }
 
     reset(): void {
