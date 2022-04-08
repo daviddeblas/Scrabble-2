@@ -24,7 +24,7 @@ export class DictionaryService {
         });
     }
 
-    deleteDictionary(dictionaryName: string): void | Error {
+    deleteDictionary(dictionaryName: string): undefined | Error {
         if (dictionaryName === defaultDictionary) return new Error('deleted dictionary is the default');
         const selectedDictionaryIndex = this.dictionaries.findIndex((d) => d.title === dictionaryName);
         if (selectedDictionaryIndex < 0) return new Error('dictionary not found');
@@ -33,9 +33,10 @@ export class DictionaryService {
         });
         this.dictionaries.splice(selectedDictionaryIndex, 1);
         this.onDictionaryDeleted(dictionaryName);
+        return;
     }
 
-    addDictionary(content: string): void | Error {
+    addDictionary(content: string): undefined | Error {
         let obj: unknown;
         try {
             obj = JSON.parse(content);
@@ -49,9 +50,10 @@ export class DictionaryService {
         if (this.dictionaries.findIndex((d) => d.title === dictionary.title) >= 0) return Error('dictionary with the same title already exists');
         writeFileSync(dictionaryPath, content, 'utf8');
         this.dictionaries.push(dictionary);
+        return;
     }
 
-    modifyInfo(oldTitle: string, newTitle: string, newDescription: string): void | Error {
+    modifyInfo(oldTitle: string, newTitle: string, newDescription: string): undefined | Error {
         if (this.getDictionary(newTitle) && oldTitle !== newTitle) return new Error('dictionary with the same title already exists');
         const dictionary = this.getDictionary(oldTitle);
         if (!dictionary) return new Error('dictionary not found');
@@ -68,6 +70,7 @@ export class DictionaryService {
         };
 
         this.addDictionary(JSON.stringify(content));
+        return;
     }
 
     reset(): void {
