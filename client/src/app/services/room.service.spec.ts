@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
     closeRoom,
     createRoomSuccess,
@@ -29,7 +30,17 @@ describe('RoomService', () => {
     beforeEach(() => {
         socketService = new SocketTestHelper();
         TestBed.configureTestingModule({
-            providers: [provideMockStore()],
+            providers: [
+                provideMockStore(),
+                {
+                    provide: MatSnackBar,
+                    useValue: {
+                        open: () => {
+                            return;
+                        },
+                    },
+                },
+            ],
         });
         service = TestBed.inject(RoomService);
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
