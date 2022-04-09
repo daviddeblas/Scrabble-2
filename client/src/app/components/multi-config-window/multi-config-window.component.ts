@@ -7,6 +7,7 @@ import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
 import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
+import { iDictionary } from 'common/interfaces/dictionary';
 import { GameMode } from 'common/interfaces/game-mode';
 import { Observable } from 'rxjs';
 
@@ -23,7 +24,7 @@ export class MultiConfigWindowComponent implements OnInit {
     @Input() isSoloGame: boolean = false;
     @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
     settingsForm: FormGroup;
-    dictionaries$: Observable<string[]>;
+    dictionaries$: Observable<iDictionary[]>;
     gameMode$: Observable<GameMode>;
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
@@ -36,7 +37,7 @@ export class MultiConfigWindowComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         public roomService: RoomService,
-        dictionariesStore: Store<{ dictionaries: string[] }>,
+        dictionariesStore: Store<{ dictionaries: iDictionary[] }>,
         store: Store<{ gameMode: GameMode }>,
     ) {
         store.dispatch(resetAllState());

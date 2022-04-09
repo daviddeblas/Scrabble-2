@@ -33,7 +33,6 @@ export class GameJoinPageComponent implements OnDestroy {
     formGroup: FormGroup;
     selectedRoom: RoomInfo | undefined;
     isFormDisabled: boolean;
-    refused: boolean;
 
     roomList$: Observable<RoomInfo[]>;
     pendingRoom$: Observable<RoomInfo | undefined>;
@@ -48,7 +47,6 @@ export class GameJoinPageComponent implements OnDestroy {
         this.store.dispatch(resetAllState());
         this.formGroup = formBuilder.group({ name: new FormControl({ value: '', disabled: this.isFormDisabled }) });
         this.isFormDisabled = false;
-        this.refused = false;
 
         this.roomList$ = roomStore.select('room', 'roomList');
         this.pendingRoom$ = roomStore.select('room', 'pendingRoom');
@@ -97,7 +95,6 @@ export class GameJoinPageComponent implements OnDestroy {
         this.pendingRoom$.subscribe((newPendingRoom) => {
             if (newPendingRoom) return;
             this.formGroup.controls.name.enable();
-            this.refused = true;
             this.stepper.reset();
         });
     }
