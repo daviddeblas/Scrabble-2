@@ -664,4 +664,27 @@ describe('solver', () => {
         assert(perpendicularSolutionRegexSpy.notCalled);
         expect(solutions).deep.equal([]);
     });
+
+    it('should stop perpendicular search if time expired', async () => {
+        const inputSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('K', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexSpy = spy(solver as any, 'perpendicularSolutionRegex');
+
+        const dateNowStub = stub(Date, 'now').callsFake(() => {
+            return MAX_BOT_PLACEMENT_TIME * 2;
+        });
+
+        const solutions = await solver['findPerpendicularSolutions'](MAX_BOT_PLACEMENT_TIME, inputSolution);
+        assert(perpendicularSolutionRegexSpy.notCalled);
+        expect(solutions).deep.equal([]);
+
+        dateNowStub.restore();
+    });
 });
