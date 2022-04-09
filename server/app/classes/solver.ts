@@ -53,6 +53,9 @@ export class Solver {
         const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
         const allSolutions: Solution[] = await this.findAllSolutions(expiration);
         if (allSolutions.length < 1) return result;
+        if (extendSearch) {
+            allSolutions.push(...(await this.findPerpendicularSolutions(expiration, allSolutions)));
+        }
         for (const solution of allSolutions) {
             const solutionWithBlanks = solution.letters.map((letter) => {
                 if (solution.blanks.find((v) => v.equals(letter.position))) return new PlacedLetter('*', letter.position);
@@ -152,6 +155,38 @@ export class Solver {
         });
 
         return solutions;
+    }
+
+    private async findPerpendicularSolutions(expiration: number, solutions: Solution[]): Promise<Solution[]> {
+        const extraSolutions: Solution[] = [];
+
+        for (const solution of solutions) {
+            // ne pas faire la recherche sur les mots de plus d'une lettre
+            if (solution.letters.length !== 1) continue;
+
+            const direction = solution.direction.flip();
+
+            if (Date.now() > expiration) return extraSolutions;
+            await immediatePromise();
+
+            const regex = this.perpendicularSolutionRegex(solution);
+            if (regex === null) continue;
+
+            const words: Word[] = [];
+            const index: number = solution.letters[0].position.dot(direction);
+
+            this.dictionary.words.forEach((v) => {
+                const match = regex.exec(v);
+                if (match === null) return;
+                words.push({ word: match[0], index: index - match[1].length });
+            });
+
+            const lines = this.filterDuplicateLetters(new Array(BOARD_SIZE).fill(null), words);
+
+            const lineStart = solution.direction.mul(solution.letters[0].position.dot(solution.direction));
+            extraSolutions.push(...this.filterInvalidAffectedWords(lines, direction, lineStart));
+        }
+        return extraSolutions;
     }
 
     private perpendicularSolutionRegex(solution: Solution): RegExp | null {
