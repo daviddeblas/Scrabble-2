@@ -13,8 +13,8 @@ import { GameOptions } from 'common/classes/game-options';
     styleUrls: ['./game-preparation-page.component.scss'],
 })
 export class GamePreparationPageComponent implements OnInit {
-    @ViewChild('MultiConfigWindowComponent') multiConfigWindowComponent: MultiConfigWindowComponent;
-    @ViewChild('stepper') stepper: MatStepper;
+    @ViewChild('stepper') private stepper: MatStepper;
+    @ViewChild('MultiConfigWindowComponent') private multiConfigWindowComponent: MultiConfigWindowComponent;
     firstFormGroup: FormGroup;
     isEditable = false;
     constructor(private formBuilder: FormBuilder, private store: Store, private effects: RoomEffects) {}
