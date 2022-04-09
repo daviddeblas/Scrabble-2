@@ -1,3 +1,10 @@
+/* eslint-disable max-lines */
+/* 
+Justification : 
+Cette classe a un usage précis et contient un algorithme complexe.
+Les fonctions sont très couplés pour des raisons de performance.
+*/
+
 import { Line } from '@app/interfaces/line';
 import { Segment } from '@app/interfaces/segment';
 import { Solution } from '@app/interfaces/solution';
@@ -33,16 +40,18 @@ export class Solver {
     }
 
     async getHints(): Promise<string[]> {
-        const solutions: Solution[] = await this.findAllSolutions();
+        const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
+        const solutions: Solution[] = await this.findAllSolutions(expiration);
         if (solutions.length < 1) return [];
 
         const randomSolutions = this.pickRandomSolutions(solutions);
         return this.solutionsToHints(randomSolutions);
     }
 
-    async getBotSolutions(): Promise<[Solution, number][] | GameError> {
+    async getBotSolutions(extendSearch: boolean): Promise<[Solution, number][] | GameError> {
         const result: [Solution, number][] = [];
-        const allSolutions: Solution[] = await this.findAllSolutions();
+        const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
+        const allSolutions: Solution[] = await this.findAllSolutions(expiration);
         if (allSolutions.length < 1) return result;
         for (const solution of allSolutions) {
             const solutionWithBlanks = solution.letters.map((letter) => {
@@ -66,11 +75,10 @@ export class Solver {
         return result;
     }
 
-    private async findAllSolutions(): Promise<Solution[]> {
+    private async findAllSolutions(expiration: number): Promise<Solution[]> {
         await immediatePromise();
         if (this.isBoardEmpty()) return this.findFirstSolutions();
         const solutions: Solution[] = [];
-        const expiration = Date.now() + MAX_BOT_PLACEMENT_TIME;
         for (let i = 0; i < BOARD_SIZE; i++) {
             solutions.push(...this.findLineSolutions(this.board.board[i], i, new Vec2(0, 1)));
             if (Date.now() > expiration) return [];
@@ -294,7 +302,7 @@ export class Solver {
     private filterDuplicateLetters(line: (Letter | null)[], words: Word[]): Line[] {
         const matches: Line[] = [];
         words.forEach((w) => {
-            const insertedLine: Line = { letters: new Array(line.length).fill(null), blanks: [] };
+            const insertedLine: Line = { letters: new Array(BOARD_SIZE).fill(null), blanks: [] };
             insertedLine.letters.splice(w.index, w.word.length, ...(Array.from(w.word.toUpperCase()) as Letter[]));
             const easelTmp = [...this.easel];
 
