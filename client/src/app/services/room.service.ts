@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import {
     closeRoom,
     createRoomSuccess,
@@ -105,6 +105,7 @@ export class RoomService {
 
     private sendErrorMessage(message: string): void {
         const durationMilliseconds = 3000;
-        this.snackBar.open(message, undefined, { duration: durationMilliseconds });
+        const configuration: MatSnackBarConfig = { duration: durationMilliseconds };
+        this.snackBar.open(message, 'Compris', configuration);
     }
 }
