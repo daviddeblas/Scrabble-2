@@ -6,11 +6,10 @@ import { Dictionary } from '@app/classes/dictionary';
 import { Line } from '@app/interfaces/line';
 import { Solution } from '@app/interfaces/solution';
 import { Word } from '@app/interfaces/word';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
-import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { GameError, GameErrorType } from './game.exception';
 import { Board } from './game/board';
@@ -259,7 +258,7 @@ describe('solver', () => {
             return [sol];
         });
 
-        const solutions = await solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME);
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
@@ -271,7 +270,7 @@ describe('solver', () => {
         stub(solver as any, 'isBoardEmpty').returns(true);
         const findFirstSolutionsStub = stub(solver as any, 'findFirstSolutions').returns([]);
 
-        const solutions = await solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions'](0);
         expect(solutions).to.deep.equal([]);
         assert(findFirstSolutionsStub.calledOnce);
     });
@@ -300,12 +299,12 @@ describe('solver', () => {
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 2;
-        let result = await solver['findAllSolutions']();
+        let result = await solver['findAllSolutions'](MAX_BOT_PLACEMENT_TIME);
         expect(result).to.deep.equal([]);
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 0.75;
-        result = await solver['findAllSolutions']();
+        result = await solver['findAllSolutions'](MAX_BOT_PLACEMENT_TIME);
         expect(result).to.deep.equal([]);
 
         dateNowStub.restore();
@@ -430,7 +429,7 @@ describe('solver', () => {
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);
 
-        const results = await solver.getBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
 
         assert(scorePositionStub.calledTwice);
@@ -440,7 +439,7 @@ describe('solver', () => {
     it('should return no easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([]);
-        const results = await solver.getBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
     });
@@ -458,7 +457,7 @@ describe('solver', () => {
         stub(solver['board'], 'scorePosition').callsFake(() => {
             return new GameError(GameErrorType.LetterIsNull);
         });
-        const results = await solver.getBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results instanceof GameError).to.equals(true);
     });
 
