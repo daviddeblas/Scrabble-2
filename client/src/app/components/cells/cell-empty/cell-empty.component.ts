@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./cell-empty.component.scss'],
 })
 export class CellEmptyComponent {
-    @Input() pos: iVec2 = { x: 0, y: 0 };
+    @Input() pos: iVec2;
 
     selection$: Observable<BoardSelection>;
 
@@ -29,6 +29,7 @@ export class CellEmptyComponent {
         }>,
     ) {
         this.selection$ = store.select('board', 'selection');
+        this.pos = { x: 0, y: 0 };
     }
 
     click(): void {
