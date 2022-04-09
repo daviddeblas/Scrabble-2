@@ -74,7 +74,7 @@ export class DictionaryService {
     }
 
     reset(): void {
-        this.dictionaries.forEach((d) => {
+        [...this.dictionaries].forEach((d) => {
             if (d.title === defaultDictionary) return;
             this.deleteDictionary(d.title);
         });
