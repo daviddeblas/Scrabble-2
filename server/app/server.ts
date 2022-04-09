@@ -59,7 +59,6 @@ export class Server {
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
         this.server.on('listening', () => this.onListening());
-        Container.get(DictionaryService).setupRoutes(this.application.app);
     }
 
     private onError(error: NodeJS.ErrnoException): void {

@@ -1,5 +1,5 @@
 import { Dictionary } from '@app/classes/dictionary';
-import { Application } from 'express';
+import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
 import path from 'path';
@@ -17,6 +17,11 @@ const badRequest = 400;
 export class DictionaryService {
     dictionaries: Dictionary[] = [];
     sio: io.Server;
+    router: Router;
+
+    constructor() {
+        this.configureRouter();
+    }
 
     async init() {
         this.dictionaries = [];
@@ -97,17 +102,18 @@ export class DictionaryService {
         return this.dictionaries.find((d) => d.title === name);
     }
 
-    setupRoutes(app: Application) {
-        app.get('/admin/dictionary/:id', (req, res) => {
+    configureRouter() {
+        this.router = Router();
+        this.router.get('/:id', (req, res) => {
             const dic = this.getDictionary(req.params.id);
             if (!dic) {
                 res.status(resourceNotFound).send();
                 return;
             }
-            res.sendFile(dic.path);
+            res.sendFile(dic.path, { root: path.join(__dirname, '../..') });
         });
-        app.post('/admin/dictionary', (req, res) => {
-            const response = this.addDictionary(JSON.stringify((req.files?.dictionary as fileUpload.UploadedFile).data.toString('utf8')));
+        this.router.post('/', (req, res) => {
+            const response = this.addDictionary((req.files?.dictionary as fileUpload.UploadedFile).data.toString('utf8'));
             if (response) {
                 res.status(badRequest).send();
                 return;
@@ -117,7 +123,7 @@ export class DictionaryService {
     }
 
     setupSocketConnection(socket: io.Socket) {
-        socket.on('reset dictionary', () => {
+        socket.on('reset dictionaries', () => {
             this.reset();
         });
         socket.on('delete dictionary', (name) => {
@@ -127,7 +133,7 @@ export class DictionaryService {
             }
             socket.emit('delete dictionary success', name);
         });
-        socket.on('modify dictionary', ({ oldName, newName, newDescription }) => {
+        socket.on('modify dictionary', (oldName, newName, newDescription) => {
             if (this.modifyInfo(oldName, newName, newDescription)) {
                 socket.emit('modify dictionary failed', oldName);
                 return;
