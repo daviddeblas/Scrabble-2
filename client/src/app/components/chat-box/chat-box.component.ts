@@ -34,10 +34,9 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
     @HostListener('document:click', ['$event'])
     clickout(event: Event): void {
         this.numberOfLastMessages = 0;
-        if (this.eRef.nativeElement.contains(event.target)) {
-            this.keyManager.onEsc();
-            this.chatMessage.nativeElement.focus();
-        }
+        if (!this.eRef.nativeElement.contains(event.target)) return;
+        this.keyManager.onEsc();
+        this.chatMessage.nativeElement.focus();
     }
 
     @HostListener('keydown', ['$event'])
@@ -81,9 +80,8 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
 
     sendHintMessage(message: string): void {
         this.keyManager.onEsc();
-        if (message.startsWith('!placer') && !this.gameEnded) {
-            this.numberOfLastMessages = 0;
-            this.store.dispatch(chatActions.messageWritten({ username: this.username, message }));
-        }
+        if (!(message.startsWith('!placer') && !this.gameEnded)) return;
+        this.numberOfLastMessages = 0;
+        this.store.dispatch(chatActions.messageWritten({ username: this.username, message }));
     }
 }

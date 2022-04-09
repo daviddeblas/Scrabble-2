@@ -107,11 +107,10 @@ export class Log2990ObjectivesHandler {
 
     private determineObjective(objectiveNumber: number): Log2990Objective {
         const objective = { ...LOG2990OBJECTIVES[objectiveNumber] };
-        if (objective.description === Objectives.OBJECTIVE8) {
-            const objectiveWordLength = 6;
-            this.chosenWordObjective8 = this.game.board.getRandomWord(objectiveWordLength);
-            objective.description = objective.description + this.chosenWordObjective8;
-        }
+        if (objective.description !== Objectives.OBJECTIVE8) return objective;
+        const objectiveWordLength = 6;
+        this.chosenWordObjective8 = this.game.board.getRandomWord(objectiveWordLength);
+        objective.description = objective.description + this.chosenWordObjective8;
         return objective;
     }
 }

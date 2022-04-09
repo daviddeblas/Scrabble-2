@@ -16,6 +16,7 @@ import { Dictionary } from './dictionary';
 import { GameFinishStatus } from './game-finish-status';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
+import { Log2990ObjectivesHandler } from './log2990-objectives-handler';
 
 export class Room {
     started: boolean;
@@ -179,11 +180,11 @@ export class Room {
     }
 
     private sendObjectives(): void {
+        if (!this.game?.log2990Objectives) return;
+        const log2990Objectives = this.game.log2990Objectives as Log2990ObjectivesHandler;
         this.sockets.forEach((socket, index) => {
-            if (this.game?.log2990Objectives) {
-                const objectiveList = [...this.game.log2990Objectives.retrieveLog2990Objective(index)];
-                socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
-            }
+            const objectiveList = [...log2990Objectives.retrieveLog2990Objective(index)];
+            socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
         });
     }
 
@@ -211,11 +212,9 @@ export class Room {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
-            if (message.includes(' a quitté le jeu') && messageType === 'System') {
-                if (--this.playersLeft <= 0) {
-                    this.manager.removeRoom(this);
-                }
-            }
+            if (!(message.includes(' a quitté le jeu') && messageType === 'System')) return;
+            if (--this.playersLeft > 0) return;
+            this.manager.removeRoom(this);
         });
 
         // Initialise l'abbandon de la partie
