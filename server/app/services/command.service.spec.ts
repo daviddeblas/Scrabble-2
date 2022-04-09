@@ -232,8 +232,39 @@ describe('Individual functions', () => {
             gameOptions,
         } as unknown as Game;
         const clk = useFakeTimers();
+        const playerNumber = 0;
+        sockets = [fakeSocket];
+        commandService['postCommand'] = () => done();
+        commandService['errorOnCommand'](game, sockets, new GameError(GameErrorType.InvalidWord), playerNumber);
+        clk.tick(game['gameOptions'].timePerRound * MILLISECONDS_PER_SEC);
+        clk.restore();
+    });
+
+    it('errorCommand should start a timer and call emit from opponent', (done) => {
+        const fakeSocket = {
+            emit: (event: string) => {
+                expect(event).to.equal('error');
+            },
+        } as unknown as io.Socket;
+        const fakeOpponent = {
+            emit: (event: string, message: { username: string; message: string; messageType: string }) => {
+                expect(message.message).to.equal("L'adversaire à placer un mot non valide");
+                expect(event).to.equal('receive message');
+            },
+        } as unknown as io.Socket;
+        const game = {
+            stopTimer: () => {
+                return;
+            },
+            nextTurn: () => {
+                return;
+            },
+            gameOptions,
+        } as unknown as Game;
+        const clk = useFakeTimers();
         const playerNumber = 1;
         sockets[playerNumber] = fakeSocket;
+        sockets[(playerNumber + 1) % 2] = fakeOpponent;
         commandService['postCommand'] = () => done();
         commandService['errorOnCommand'](game, sockets, new GameError(GameErrorType.InvalidWord), playerNumber);
         clk.tick(game['gameOptions'].timePerRound * MILLISECONDS_PER_SEC);
