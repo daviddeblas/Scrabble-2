@@ -49,35 +49,4 @@ export class Application {
         this.app.use(fileUpload());
         this.app.use(cors());
     }
-
-    /* (private errorHandling(): void {
-        // When previous handlers have not served a request: path wasn't found
-        this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-            const err: HttpException = new HttpException('Not Found');
-            next(err);
-        });
-
-        // development error handler
-        // will print stacktrace
-        if (this.app.get('env') === 'development') {
-            this.app.use((err: HttpException, req: express.Request, res: express.Response) => {
-                res.status(err.status || this.internalError);
-                res.send({
-                    message: err.message,
-                    error: err,
-                });
-            });
-        }
-
-        // production error handler
-        // no stacktraces leaked to user (in production env only)
-        this.app.use((err: HttpException, req: express.Request, res: express.Response) => {
-            res.status(err.status || this.internalError);
-            res.send({
-                message: err.message,
-                error: {},
-            });
-        });
-    }
-    */
 }
