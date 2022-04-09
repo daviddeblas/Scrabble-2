@@ -1,7 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatStepper } from '@angular/material/stepper';
 import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { RoomState } from '@app/reducers/room.reducer';
@@ -16,7 +15,6 @@ import { Observable } from 'rxjs';
     styleUrls: ['./waiting-room.component.scss'],
 })
 export class WaitingRoomComponent implements OnDestroy, OnInit {
-    @Input() stepper: MatStepper;
     roomInfo$: Observable<RoomInfo | undefined>;
     player2$: Observable<string | undefined>;
     gameStarted: boolean;
