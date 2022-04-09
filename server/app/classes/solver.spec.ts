@@ -444,6 +444,37 @@ describe('solver', () => {
         assert(findAllSolutionsStub.calledOnce);
     });
 
+    it('should return hard bot solution', async () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const allSolutions: Solution[] = [
+            {
+                letters: [new PlacedLetter('A', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+        ];
+
+        const extraSolutions: Solution[] = [...new Array(2)].map((v, i) => {
+            return {
+                letters: [new PlacedLetter('B', new Vec2(2, i))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            };
+        });
+
+        const scorePositionStub = stub(board, 'scorePosition').returns(5);
+        const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([...allSolutions]);
+        const findPerpendicularSolutionsStub = stub(solver as any, 'findPerpendicularSolutions').returns(extraSolutions);
+
+        const results = await solver.getBotSolutions(true);
+        expect(results).to.deep.equals([...allSolutions, ...extraSolutions].map((s) => [s, 5]));
+
+        expect(scorePositionStub.callCount).equals(3);
+        assert(findAllSolutionsStub.calledOnce);
+        assert(findPerpendicularSolutionsStub.calledOnce);
+    });
+
     it('should return an error if scorePosition returns an error', async () => {
         const solutions: Solution[] = [...new Array(2)].map((v, i) => {
             return {
