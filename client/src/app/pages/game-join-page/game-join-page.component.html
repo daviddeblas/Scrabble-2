@@ -1,6 +1,5 @@
 <mat-stepper linear #stepper (selectionChange)="onStepChange()">
     <mat-step [completed]="selectedRoom !== undefined" [editable]="true">
-        <p *ngIf="refused" class="error">Invitation refusée</p>
         <ng-template matStepLabel>Rejoindre une partie</ng-template>
         <button
             *ngIf="roomListLength() !== 0"
