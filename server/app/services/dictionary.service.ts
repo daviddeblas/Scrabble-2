@@ -1,9 +1,9 @@
 import { Dictionary } from '@app/classes/dictionary';
+import { Server } from '@app/server';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
 import path from 'path';
 import io from 'socket.io';
-import { Service } from 'typedi';
-// TODO pouvoir changer de dictionnaire
+import { Container, Service } from 'typedi';
 
 export const defaultDictionary = 'Francais';
 const dictionariesPath = 'assets/dictionaries';
@@ -11,7 +11,6 @@ const dictionariesPath = 'assets/dictionaries';
 @Service()
 export class DictionaryService {
     dictionaries: Dictionary[] = [];
-    sio: io.Server;
 
     async init() {
         this.dictionaries = [];
@@ -81,7 +80,7 @@ export class DictionaryService {
     }
 
     onDictionaryDeleted(dictionaryName: string): void {
-        this.sio.emit('dictionary deleted', dictionaryName);
+        Container.get(Server).socketService.broadcastMessage('dictionary deleted', dictionaryName);
     }
 
     getDictionaryFile(name: string): string {
