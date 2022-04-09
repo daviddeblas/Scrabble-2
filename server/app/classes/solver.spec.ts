@@ -687,4 +687,23 @@ describe('solver', () => {
 
         dateNowStub.restore();
     });
+
+    it('should stop perpendicular search if regex is null', async () => {
+        const inputSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('K', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexStub = stub(solver as any, 'perpendicularSolutionRegex').returns(null);
+        const filterDuplicateLettersSpy = spy(solver as any, 'filterDuplicateLetters');
+
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, inputSolution);
+        assert(filterDuplicateLettersSpy.notCalled);
+        assert(perpendicularSolutionRegexStub.calledOnce);
+        expect(solutions).deep.equal([]);
+    });
 });
