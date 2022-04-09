@@ -2,6 +2,7 @@ import { HttpException } from '@app/classes/http.exception';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import fileUpload from 'express-fileupload';
 import { StatusCodes } from 'http-status-codes';
 import logger from 'morgan';
 import swaggerJSDoc from 'swagger-jsdoc';
@@ -44,6 +45,7 @@ export class Application {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(cookieParser());
+        this.app.use(fileUpload());
         this.app.use(cors());
     }
 
