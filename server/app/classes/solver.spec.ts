@@ -560,4 +560,30 @@ describe('solver', () => {
 
         expect(regex?.source).to.equal('(?=^.{2,4}$)^([ABC]{0,6})A[ABC]{0,8}$');
     });
+
+    it('should regex for perpendicular be null if letter before', () => {
+        board.board[2] = [null, null, null, null, null, 'X', null, null, null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex).to.equal(null);
+    });
+
+    it('should regex for perpendicular be null if letter after', () => {
+        board.board[2] = [null, null, null, null, null, null, null, 'X', null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex).to.equal(null);
+    });
 });
