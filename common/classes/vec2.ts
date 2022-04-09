@@ -24,6 +24,10 @@ export class Vec2 implements iVec2 {
         return new Vec2(this.x * n, this.y * n);
     }
 
+    dot(v: iVec2): number {
+        return this.x * v.x + this.y * v.y;
+    }
+
     flip() {
         return new Vec2(this.y, this.x);
     }
