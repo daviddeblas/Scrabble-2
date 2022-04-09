@@ -20,8 +20,8 @@ export const TIMER_INCREMENT = 30;
     styleUrls: ['./multi-config-window.component.scss'],
 })
 export class MultiConfigWindowComponent implements OnInit {
-    @Input() isSoloGame: boolean = false;
-    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
+    @Input() isSoloGame: boolean;
+    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }>;
     settingsForm: FormGroup;
     dictionaries$: Observable<string[]>;
     gameMode$: Observable<GameMode>;
@@ -39,6 +39,7 @@ export class MultiConfigWindowComponent implements OnInit {
         dictionariesStore: Store<{ dictionaries: string[] }>,
         store: Store<{ gameMode: GameMode }>,
     ) {
+        this.gameOptionsSubmitted = new EventEmitter();
         store.dispatch(resetAllState());
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');

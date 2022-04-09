@@ -4,6 +4,7 @@
         <app-multi-config-window
             #MultiConfigWindowComponent
             (gameOptionsSubmitted)="onGameOptionsSubmit($event.gameOptions)"
+            [isSoloGame]="false"
         ></app-multi-config-window>
     </mat-step>
     <mat-step [stepControl]="formSettings" [editable]="isEditable">

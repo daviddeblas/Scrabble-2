@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { loadLeaderboard } from '@app/actions/leaderboard.actions';
 import { HighScore } from '@app/classes/highscore';
@@ -11,7 +11,6 @@ import { Store } from '@ngrx/store';
     styleUrls: ['./leaderboard-page.component.scss'],
 })
 export class LeaderboardPageComponent {
-    @Output() readonly buttonClick = new EventEmitter<string>();
     dataClassicLeaderBoard: MatTableDataSource<HighScore>;
     dataLog2990LeaderBoard: MatTableDataSource<HighScore>;
     displayedColumns: string[] = ['rank', 'name', 'score'];
