@@ -647,4 +647,21 @@ describe('solver', () => {
 
         expect(solutions).to.deep.equal(expected);
     });
+
+    it('should not search perpendicular solution on multi-letters word', async () => {
+        const multiLetterSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('B', new Vec2(8, 9)), new PlacedLetter('C', new Vec2(8, 10))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexSpy = spy(solver as any, 'perpendicularSolutionRegex');
+
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, multiLetterSolution);
+        assert(perpendicularSolutionRegexSpy.notCalled);
+        expect(solutions).deep.equal([]);
+    });
 });
