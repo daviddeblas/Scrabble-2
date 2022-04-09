@@ -53,6 +53,7 @@ export class WaitingRoomComponent implements OnDestroy, OnInit {
 
     convertToSolo(): void {
         this.store.dispatch(switchToSoloRoom({ botLevel: this.settingsForm.controls.botLevel.value }));
+        this.gameStarted = true;
         this.dialogRef.close();
     }
 
