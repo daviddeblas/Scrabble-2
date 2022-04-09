@@ -155,6 +155,7 @@ export class Room {
 
     quitRoomHost(): void {
         if (this.clients[0]) this.inviteRefused(this.clients[0]);
+        this.host.removeAllListeners('switch to solo room');
         this.manager.removeRoom(this);
         this.manager.notifyAvailableRoomsChange();
     }
