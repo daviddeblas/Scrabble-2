@@ -534,4 +534,30 @@ describe('solver', () => {
         const results = solver['firstSolutionTransform'](words);
         expect(results).to.deep.equal(expected);
     });
+
+    it('should regex for perpendicular solution', () => {
+        board.board[5] = [null, 'A', null, null, null, null, null, null, null, 'C', null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C', '*']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(5, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex?.source).to.equal('(?=^.{2,5}$)^([a-z]{0,3})A[a-z]{0,1}$');
+    });
+
+    it('should regex for perpendicular solution until board limit', () => {
+        board.board[2] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex?.source).to.equal('(?=^.{2,4}$)^([ABC]{0,6})A[ABC]{0,8}$');
+    });
 });
