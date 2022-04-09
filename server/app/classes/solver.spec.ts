@@ -617,4 +617,34 @@ describe('solver', () => {
 
         expect(regex).to.equal(null);
     });
+
+    it('should search perpendicular solution', async () => {
+        const dictionarySample = { words: ['ab', 'beta', 'delta'] } as Dictionary;
+        board.board[7] = [null, null, null, null, null, 'A', 'L', 'P', 'H', 'A', null, null, null, null, null];
+        const oneLetterSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('B', new Vec2(8, 9))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionarySample, board, ['B', 'E', 'T', 'A']);
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, oneLetterSolution);
+
+        const expected: Solution[] = [
+            {
+                letters: [
+                    new PlacedLetter('B', new Vec2(8, 9)),
+                    new PlacedLetter('E', new Vec2(8, 10)),
+                    new PlacedLetter('T', new Vec2(8, 11)),
+                    new PlacedLetter('A', new Vec2(8, 12)),
+                ],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+        ];
+
+        expect(solutions).to.deep.equal(expected);
+    });
 });
