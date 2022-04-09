@@ -153,6 +153,49 @@ export class Solver {
 
         return solutions;
     }
+
+    private perpendicularSolutionRegex(solution: Solution): RegExp | null {
+        // direction perpendiculaire
+        const direction = solution.direction.flip();
+
+        let k = solution.letters[0].position.sub(direction);
+        let backwardSpacing = 0;
+        while (k.x >= 0 && k.y >= 0) {
+            if (this.board.board[k.x][k.y] !== null) {
+                // les mots collés à d'autres sont prit en compte dans les recherche précédentes
+                backwardSpacing--;
+                break;
+            }
+            backwardSpacing++;
+            k = k.sub(direction);
+        }
+        // le mot était déjà collé, ignorer
+        if (backwardSpacing < 0) return null;
+
+        k = solution.letters[0].position.add(direction);
+        let forwardSpacing = 0;
+        while (k.x < BOARD_SIZE && k.y < BOARD_SIZE) {
+            if (this.board.board[k.x][k.y] !== null) {
+                // les mots collés à d'autres sont prit en compte dans les recherche précédentes
+                forwardSpacing--;
+                break;
+            }
+            forwardSpacing++;
+            k = k.add(direction);
+        }
+        // le mot était déjà collé, ignorer
+        if (forwardSpacing < 0) return null;
+
+        const easelText = this.easel.includes('*') ? 'a-z' : this.easel.join('');
+
+        return new RegExp(
+            `(?=^.{2,${this.easel.length + 1}}$)^([${easelText}]{0,${backwardSpacing}})${
+                solution.letters[0].letter
+            }[${easelText}]{0,${forwardSpacing}}$`,
+            'i',
+        );
+    }
+
     private pickRandomSolutions(solutions: Solution[]): Solution[] {
         if (solutions.length <= HINT_COUNT) {
             return solutions;
