@@ -96,7 +96,9 @@ export class DictionaryService {
         socket.on('get dictionaries', () => {
             socket.emit(
                 'receive dictionaries',
-                this.dictionaries.map((d) => d.title),
+                this.dictionaries.map((d) => {
+                    return { title: d.title, description: d.description };
+                }),
             );
         });
     }

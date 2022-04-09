@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { loadDictionariesSuccess } from '@app/actions/dictionaries.actions';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { iDictionary } from 'common/interfaces/dictionary';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { DictionaryService } from './dictionary.service';
@@ -35,7 +36,7 @@ describe('DictionaryService', () => {
     it('getDictionaries should wait for "receive dictionaries" from socket and dispatch "loadDictionariesSuccess"', () => {
         service.getDictionaries();
 
-        const dictionaries = ['dict'];
+        const dictionaries: iDictionary[] = [{ title: 'dict', description: 'desc' }];
         const expectedAction = cold('a', { a: loadDictionariesSuccess({ dictionaries }) });
 
         socketService.peerSideEmit('receive dictionaries', dictionaries);
