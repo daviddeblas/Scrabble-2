@@ -1,12 +1,16 @@
+import { Application } from '@app/app';
 import { Server } from '@app/server';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { expect } from 'chai';
 import { readdirSync, readFileSync } from 'fs';
-import mock from 'mock-fs';
+import mockFs from 'mock-fs';
 import { restore, stub } from 'sinon';
 import { Server as SocketServer } from 'socket.io';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import request from 'supertest';
 import { Container } from 'typedi';
+
+const portNo = 3000;
 
 describe('Dictionary Service', () => {
     let service: DictionaryService;
@@ -16,7 +20,7 @@ describe('Dictionary Service', () => {
     });
 
     it('init should hold the dictionaries in the dictionariesPath', async () => {
-        mock({
+        mockFs({
             'assets/dictionaries/test.json': `{
 	                "title": "test",
 	                "description": "test",
@@ -26,27 +30,11 @@ describe('Dictionary Service', () => {
         await service.init();
         expect(service.dictionaries).to.be.of.length(1);
         expect(service.dictionaries[0].title).to.eq('test');
-        mock.restore();
+        mockFs.restore();
     });
-
-    it('setupSocketConnection emits receive dictionaries on get dictionaries', (done) => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const server = new SocketServer(3000);
-        server.on('connection', (socket) => {
-            service.setupSocketConnection(socket);
-        });
-        const clientSocket = io('ws://localhost:3000');
-        clientSocket.on('receive dictionaries', () => {
-            server.close();
-            done();
-        });
-
-        clientSocket.emit('get dictionaries');
-    });
-
     describe('filesystem interactions', () => {
         beforeEach(async () => {
-            mock({
+            mockFs({
                 'assets/dictionaries/test.json': `{
 	                "title": "test",
 	                "description": "test",
@@ -146,7 +134,105 @@ describe('Dictionary Service', () => {
         });
 
         afterEach(() => {
-            mock.restore();
+            mockFs.restore();
+        });
+    });
+
+    describe('communication with sockets and http', () => {
+        let server: SocketServer;
+        let clientSocket: Socket;
+        beforeEach(async () => {
+            server = new SocketServer(portNo);
+            mockFs({
+                'test/testDic.json': '{"title": "testDic", "description": "testDic","words": ["testDic"] }',
+                'assets/dictionaries/test.json': `{
+	                "title": "test",
+	                "description": "test",
+	                "words": ["test"]
+                }`,
+            });
+
+            await service.init();
+            server.on('connection', (socket) => {
+                service.setupSocketConnection(socket);
+            });
+
+            clientSocket = io('ws://localhost:3000');
+        });
+        it('setupSocketConnection emits receive dictionaries on get dictionaries', (done) => {
+            clientSocket.on('receive dictionaries', () => {
+                done();
+            });
+
+            clientSocket.emit('get dictionaries');
+        });
+
+        it('setupSocketConnection calls reset on reset dictionaries', (done) => {
+            service.reset = () => {
+                done();
+            };
+            clientSocket.emit('reset dictionaries');
+        });
+
+        it('setupSocketConnection emits delete dictionary failed on wrong delete dictionary', (done) => {
+            clientSocket.on('delete dictionary failed', () => {
+                done();
+            });
+
+            clientSocket.emit('delete dictionary');
+        });
+
+        it('setupSocketConnection emits delete dictionary success on right delete dictionary', (done) => {
+            clientSocket.on('delete dictionary success', () => {
+                done();
+            });
+
+            clientSocket.emit('delete dictionary', 'test');
+        });
+
+        it('setupSocketConnection emits modify dictionary failed on wrong right dictionary', (done) => {
+            clientSocket.on('modify dictionary failed', () => {
+                done();
+            });
+
+            clientSocket.emit('modify dictionary', 'test2', 'test2', 'test2');
+        });
+
+        it('setupSocketConnection emits modify dictionary success on right modify dictionary', (done) => {
+            clientSocket.on('modify dictionary success', () => {
+                done();
+            });
+
+            clientSocket.emit('modify dictionary', 'test', 'test2', 'test2');
+        });
+
+        it('get dictionaries from api should return the right dictionary', async () => {
+            const res = await request(Container.get(Application).app).get('/admin/dictionary/test');
+            expect(res.body.title).to.eq('test');
+        });
+
+        it('get dictionaries from api should send 404 when wrong name', async () => {
+            const res = await request(Container.get(Application).app).get('/admin/dictionary/2test');
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(res.statusCode).to.eq(404);
+        });
+
+        it('send dictionaries from api should send the dictionary', async () => {
+            const res = await request(Container.get(Application).app).post('/admin/dictionary').attach('dictionary', 'test/testDic.json');
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(res.statusCode).to.eq(200);
+            expect(service.dictionaries).to.be.of.length(2);
+        });
+        it('send dictionaries from api should send the dictionary but return 400 if dictionary already exists', async () => {
+            const res = await request(Container.get(Application).app).post('/admin/dictionary').attach('dictionary', 'assets/dictionaries/test.json');
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(res.statusCode).to.eq(400);
+            expect(service.dictionaries).to.be.of.length(1);
+        });
+
+        afterEach(() => {
+            server.close();
+            mockFs.restore();
         });
     });
 });
