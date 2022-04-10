@@ -7,7 +7,7 @@ import {
     joinInviteReceived,
     joinRoomAccepted,
     joinRoomDeclined,
-    loadRoomsSuccess
+    loadRoomsSuccess,
 } from '@app/actions/room.actions';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
@@ -29,16 +29,10 @@ export class RoomService {
         });
 
         this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
-<<<<<<< HEAD
             if (gameOptions.dictionaryType !== deletedDictionaryName) return;
             this.store.dispatch(closeRoom());
-=======
-            if (gameOptions.dictionaryType === deletedDictionaryName) {
-                this.store.dispatch(closeRoom());
-                const error = 'Dictionnaire utilisé supprimé';
-                this.sendErrorMessage(error);
-            }
->>>>>>> origin/dev
+            const error = 'Dictionnaire utilisé supprimé';
+            this.sendErrorMessage(error);
         });
     }
 
