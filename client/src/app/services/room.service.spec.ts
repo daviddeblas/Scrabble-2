@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
+    closeRoom,
     createRoomSuccess,
     joinInviteCanceled,
     joinInviteReceived,
@@ -28,7 +30,17 @@ describe('RoomService', () => {
     beforeEach(() => {
         socketService = new SocketTestHelper();
         TestBed.configureTestingModule({
-            providers: [provideMockStore()],
+            providers: [
+                provideMockStore(),
+                {
+                    provide: MatSnackBar,
+                    useValue: {
+                        open: () => {
+                            return;
+                        },
+                    },
+                },
+            ],
         });
         service = TestBed.inject(RoomService);
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
@@ -61,6 +73,25 @@ describe('RoomService', () => {
         expect(store.scannedActions$).toBeObservable(expectedAction);
 
         expect(waitForInvitationsSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch "[Room] Close Room" if deleted dictionary is the one used', () => {
+        service.createRoom(gameOptions);
+
+        socketService.peerSideEmit('dictionary deleted', 'dict');
+
+        const expectedAction = cold('a', { a: closeRoom() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should not dispatch "[Room] Close Room" if deleted dictionary is not the one used', () => {
+        const dispatchSpy = spyOn(store, 'dispatch');
+
+        service.createRoom(gameOptions);
+
+        socketService.peerSideEmit('dictionary deleted', 'other dict');
+
+        expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
     it('should wait invitations from the server', () => {
@@ -182,7 +213,7 @@ describe('RoomService', () => {
             service.joinRoom(roomList[0], playerName);
 
             expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
-            expect(onSpy).toHaveBeenCalledTimes(2);
+            expect(onSpy).toHaveBeenCalledTimes(3);
         });
 
         it('should send a request to join a room and wait for an answer', () => {
@@ -192,7 +223,7 @@ describe('RoomService', () => {
             service.joinRoom(roomList[0], playerName);
 
             expect(sendSpy).toHaveBeenCalledWith('join room', { roomId: roomList[0].roomId, playerName });
-            expect(onSpy).toHaveBeenCalledTimes(2);
+            expect(onSpy).toHaveBeenCalledTimes(3);
         });
 
         it('should dispatch "[Room] Join Room Accepted" when receiving accept', () => {
@@ -211,6 +242,24 @@ describe('RoomService', () => {
 
             const expectedAction = cold('a', { a: joinRoomDeclined({ roomInfo: roomList[0], playerName }) });
             expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('should dispatch "[Room] Join Invite Canceled" when the dictionaryName is the one used', () => {
+            service.joinRoom(roomList[0], playerName);
+
+            socketService.peerSideEmit('dictionary deleted', 'dict');
+
+            const expectedAction = cold('a', { a: joinInviteCanceled() });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
+        });
+
+        it('should not dispatch "[Room] Join Invite Canceled" when the dictionaryName is not the one used', () => {
+            const dispatchSpy = spyOn(store, 'dispatch');
+            service.joinRoom(roomList[0], playerName);
+
+            socketService.peerSideEmit('dictionary deleted', 'other dict');
+
+            expect(dispatchSpy).not.toHaveBeenCalled();
         });
     });
 });

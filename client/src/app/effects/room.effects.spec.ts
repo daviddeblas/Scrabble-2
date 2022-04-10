@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
+import { MatStepper } from '@angular/material/stepper';
 import { Router } from '@angular/router';
 import {
     acceptInvite,
@@ -97,9 +98,17 @@ describe('RoomEffects', () => {
     });
 
     it('closeRoomEffect$ should call the closeRoom from room service', () => {
+        let resetCalled = false;
+        effects.roomCreationStepper = {
+            reset: () => {
+                resetCalled = true;
+                return;
+            },
+        } as unknown as MatStepper;
         actions$ = of(closeRoom());
         effects.closeRoomEffect$.subscribe();
         expect(roomService.closeRoom).toHaveBeenCalled();
+        expect(resetCalled).toBeTrue();
     });
 
     it('refuseInviteEffect$ should call the refuseInvite from room service', () => {

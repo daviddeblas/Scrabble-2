@@ -1,3 +1,4 @@
+import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameHistoryHandler } from '@app/classes/game-history-handler';
@@ -33,13 +34,14 @@ export class Game {
 
     constructor(
         public config: GameConfig,
+        public dictionary: Dictionary,
         playerNames: string[],
         private gameOptions: GameOptions,
         private actionAfterTimeout: () => undefined | GameError,
         public actionAfterTurn: () => Promise<undefined | GameError>,
     ) {
         this.bag = new Bag(config);
-        this.board = new Board(config);
+        this.board = new Board(config, dictionary);
         this.activePlayer = Math.floor(Math.random() * playerNames.length);
         this.players = [];
         this.gameHistory = new GameHistoryHandler();

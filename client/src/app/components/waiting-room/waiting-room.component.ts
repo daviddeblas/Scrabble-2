@@ -51,7 +51,6 @@ export class WaitingRoomComponent implements OnDestroy, OnInit {
 
     quitWaitingRoom(): void {
         this.store.dispatch(closeRoom());
-        this.stepper.reset();
     }
 
     convertToSolo(): void {

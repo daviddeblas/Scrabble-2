@@ -2,10 +2,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatStepper } from '@angular/material/stepper';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { createRoom } from '@app/actions/room.actions';
 import { MultiConfigWindowComponent } from '@app/components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from '@app/components/waiting-room/waiting-room.component';
+import { RoomEffects } from '@app/effects/room.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
@@ -26,6 +28,10 @@ describe('GamePreparationPageComponent', () => {
                 {
                     provide: MatDialogRef,
                     useValue: {},
+                },
+                {
+                    provide: RoomEffects,
+                    useValue: { roomCreationStepper: MatStepper },
                 },
                 provideMockStore(),
             ],

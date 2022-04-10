@@ -10,6 +10,5 @@ export class GameConfig {
         public letters: LetterConfigItem[] = [],
         public boardSize: Vec2 = new Vec2(0, 0),
         public multipliers: PositionedMultipliers[] = [],
-        public dictionaryName: string = 'Mon Dictionnaire',
     ) {}
 }

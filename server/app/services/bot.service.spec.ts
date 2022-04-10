@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
+import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -52,6 +53,7 @@ describe('Bot service tests', () => {
             bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
             board: { board: fakeBoard, scorePosition: () => 2, getAffectedWords: (letters: PlacedLetter[]) => [letters] },
             config: Container.get(GameConfigService).configs[0],
+            dictionary: Container.get(DictionaryService).getDictionary('Francais') as Dictionary,
         } as unknown as Game;
     });
 

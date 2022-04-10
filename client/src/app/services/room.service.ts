@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import {
+    closeRoom,
     createRoomSuccess,
     joinInviteCanceled,
     joinInviteReceived,
@@ -16,7 +18,7 @@ import { SocketClientService } from './socket-client.service';
     providedIn: 'root',
 })
 export class RoomService {
-    constructor(private socketService: SocketClientService, private store: Store) {}
+    constructor(private socketService: SocketClientService, private store: Store, private snackBar: MatSnackBar) {}
 
     createRoom(gameOptions: GameOptions): void {
         this.socketService.send('create room', gameOptions);
@@ -24,6 +26,14 @@ export class RoomService {
         this.socketService.on('create room success', (roomInfo: RoomInfo) => {
             this.store.dispatch(createRoomSuccess({ roomInfo }));
             this.waitForInvitations();
+        });
+
+        this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
+            if (gameOptions.dictionaryType === deletedDictionaryName) {
+                this.store.dispatch(closeRoom());
+                const error = 'Dictionnaire utilisé supprimé';
+                this.sendErrorMessage(error);
+            }
         });
     }
 
@@ -77,10 +87,25 @@ export class RoomService {
         });
         this.socketService.on('refused', () => {
             this.store.dispatch(joinRoomDeclined({ roomInfo, playerName }));
+            const error = "Refusée par l'hôte";
+            this.sendErrorMessage(error);
+        });
+        this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
+            if (roomInfo.gameOptions.dictionaryType === deletedDictionaryName) {
+                this.store.dispatch(joinInviteCanceled());
+                const error = 'Dictionnaire utilisé supprimé';
+                this.sendErrorMessage(error);
+            }
         });
     }
 
     cancelJoinRoom() {
         this.socketService.send('cancel join room');
+    }
+
+    private sendErrorMessage(message: string): void {
+        const durationMilliseconds = 3000;
+        const configuration: MatSnackBarConfig = { duration: durationMilliseconds };
+        this.snackBar.open(message, 'Compris', configuration);
     }
 }

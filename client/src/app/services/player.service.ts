@@ -4,11 +4,12 @@ import { placeWordSuccess } from '@app/actions/player.actions';
 import { Word } from '@app/classes/word';
 import { Direction } from '@app/enums/direction';
 import { BoardState } from '@app/reducers/board.reducer';
+import { GameStatus } from '@app/reducers/game-status.reducer';
 import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Letter } from 'common/classes/letter';
 import { boardPositionToVec2 } from 'common/classes/vec2';
-import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
+import { ASCII_ALPHABET_POSITION, BOARD_SIZE, DECIMAL_BASE, EASEL_CAPACITY, POSITION_LAST_CHAR } from 'common/constants';
 import { SocketClientService } from './socket-client.service';
 
 @Injectable({
@@ -19,6 +20,7 @@ export class PlayerService {
         private socketService: SocketClientService,
         private playerStore: Store<{ players: Players }>,
         private boardStore: Store<{ board: BoardState }>,
+        private statusStore: Store<{ gameStatus: GameStatus }>,
     ) {}
 
     surrenderGame(): void {
@@ -26,6 +28,14 @@ export class PlayerService {
     }
 
     exchangeLetters(letters: string): void {
+        let enoughLetters = false;
+        this.statusStore.select('gameStatus').subscribe((status) => (enoughLetters = status.letterPotLength > EASEL_CAPACITY));
+        if (!enoughLetters) {
+            this.playerStore.dispatch(
+                receivedMessage({ username: '', message: 'Commande mal formée - Pas assez de lettres dans la réserve', messageType: 'Error' }),
+            );
+            return;
+        }
         if (this.lettersInEasel(letters)) {
             const commandLine = 'échanger ' + letters;
             this.socketService.send('command', commandLine);
@@ -40,7 +50,7 @@ export class PlayerService {
         const lettersToPlace = this.findLettersToPlace(position, letters);
         if (lettersToPlace === '') {
             this.playerStore.dispatch(
-                receivedMessage({ username: '', message: "Erreur de syntaxe - Lettre à l'extérieur du plateau", messageType: 'Error' }),
+                receivedMessage({ username: '', message: "Commande impossible à réaliser - Lettre à l'extérieur du plateau", messageType: 'Error' }),
             );
             return;
         }

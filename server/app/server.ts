@@ -5,8 +5,10 @@ import { DECIMAL_BASE } from 'common/constants';
 import http from 'http';
 import { AddressInfo } from 'net';
 import { Container, Service } from 'typedi';
-import { HISTORY_DATABASE } from './classes/game-history-handler';
 import { HIGHSCORE_DATABASE } from './classes/highscore';
+import { BOT_NAME_DATABASE, HISTORY_DATABASE } from './constantes';
+import { BotNameDatabaseService } from './services/bot-name-database.service';
+import { BotNameService } from './services/bot-name.service';
 import { BrowserService } from './services/browser.service';
 import { DictionaryService } from './services/dictionary.service';
 import { GameConfigService } from './services/game-config.service';
@@ -48,9 +50,11 @@ export class Server {
             Container.get(HighscoreDatabaseService),
             Container.get(GameConfigService),
             Container.get(HistoryDatabaseService),
+            Container.get(BotNameService),
         );
         Container.get(HighscoreDatabaseService).start(HIGHSCORE_DATABASE.uri);
         Container.get(HistoryDatabaseService).start(HISTORY_DATABASE.uri);
+        Container.get(BotNameDatabaseService).start(BOT_NAME_DATABASE.uri);
         console.log(this.socketService.isOpen() ? 'Socket server is open' : 'Socket server is closed');
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
