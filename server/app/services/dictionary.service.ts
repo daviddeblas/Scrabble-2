@@ -1,11 +1,11 @@
 import { Dictionary } from '@app/classes/dictionary';
+import { Server } from '@app/server';
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
 import path from 'path';
 import io from 'socket.io';
-import { Service } from 'typedi';
-// TODO pouvoir changer de dictionnaire
+import { Container, Service } from 'typedi';
 
 export const defaultDictionary = 'Francais';
 const dictionariesPath = 'assets/dictionaries';
@@ -16,7 +16,6 @@ const badRequest = 400;
 @Service()
 export class DictionaryService {
     dictionaries: Dictionary[] = [];
-    sio: io.Server;
     router: Router;
 
     constructor() {
@@ -84,14 +83,14 @@ export class DictionaryService {
     }
 
     reset(): void {
-        this.dictionaries.forEach((d) => {
+        [...this.dictionaries].forEach((d) => {
             if (d.title === defaultDictionary) return;
             this.deleteDictionary(d.title);
         });
     }
 
     onDictionaryDeleted(dictionaryName: string): void {
-        this.sio.emit('dictionary deleted', dictionaryName);
+        Container.get(Server).socketService.broadcastMessage('dictionary deleted', dictionaryName);
     }
 
     getDictionaryFile(name: string): string {

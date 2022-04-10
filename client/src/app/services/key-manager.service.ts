@@ -140,12 +140,15 @@ export class KeyManagerService {
             board = state.board;
             orientation = state.selection.orientation;
         });
-        if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction) && board[selectedCell.x][selectedCell.y] !== null) return;
+        const isAtBoardLimit = isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction);
+        const isCellAlreadyUsed = board[selectedCell.x][selectedCell.y] !== null;
+        if (isAtBoardLimit && isCellAlreadyUsed) return;
 
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         if (!/^[a-zA-Z]$/.test(key)) return;
         const letter = stringToLetter(key);
-        if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
+        const keyInEasel = this.playerService.getEasel().findIndex((l) => l === letter);
+        if (keyInEasel < 0) return;
         this.store.dispatch(placeLetter({ letter: stringToLetter(key.toLowerCase()), isBlank: letter === '*' }));
         this.store.dispatch(removeLetterFromEasel({ letter }));
     }

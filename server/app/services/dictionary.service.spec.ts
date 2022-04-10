@@ -1,9 +1,11 @@
 import { Application } from '@app/app';
+import { Server } from '@app/server';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { expect } from 'chai';
 import { readdirSync, readFileSync } from 'fs';
 import mockFs from 'mock-fs';
-import { Server } from 'socket.io';
+import { restore, stub } from 'sinon';
+import { Server as SocketServer } from 'socket.io';
 import { io, Socket } from 'socket.io-client';
 import request from 'supertest';
 import { Container } from 'typedi';
@@ -15,12 +17,6 @@ describe('Dictionary Service', () => {
 
     beforeEach(async () => {
         service = Container.get(DictionaryService);
-        const sioMock = {
-            emit: () => {
-                return;
-            },
-        };
-        service.sio = sioMock as unknown as Server;
     });
 
     it('init should hold the dictionaries in the dictionariesPath', async () => {
@@ -80,17 +76,23 @@ describe('Dictionary Service', () => {
         });
 
         it('deleteDictionary should delete files and the dictionary on valid input', () => {
+            stub(Container.get(Server).socketService, 'broadcastMessage');
             service.deleteDictionary('test');
             expect(service.dictionaries).to.be.of.length(0);
             expect(readdirSync('assets/dictionaries')).to.be.of.length(0);
+            restore();
         });
 
         it("deleteDictionary shouldn't delete on defaultDictionary name", () => {
+            stub(Container.get(Server).socketService, 'broadcastMessage');
             expect(service.deleteDictionary('Francais')).to.be.a('Error');
+            restore();
         });
 
         it("deleteDictionary shouldn't delete not found dictionary", () => {
+            stub(Container.get(Server).socketService, 'broadcastMessage');
             expect(service.deleteDictionary('Francaisaaaa')).to.be.a('Error');
+            restore();
         });
 
         it('modifyInfo should modify the info in fs and in array', () => {
@@ -137,10 +139,10 @@ describe('Dictionary Service', () => {
     });
 
     describe('communication with sockets and http', () => {
-        let server: Server;
+        let server: SocketServer;
         let clientSocket: Socket;
         beforeEach(async () => {
-            server = new Server(portNo);
+            server = new SocketServer(portNo);
             mockFs({
                 'test/testDic.json': '{"title": "testDic", "description": "testDic","words": ["testDic"] }',
                 'assets/dictionaries/test.json': `{

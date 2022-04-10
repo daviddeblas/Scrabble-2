@@ -18,12 +18,12 @@ describe('KeyManagerService', () => {
     let boardStub: Letter[][];
     let selectionStub: BoardSelection;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         boardStub = createEmptyMatrix({ x: BOARD_SIZE, y: BOARD_SIZE });
         boardStub[0][0] = 'L';
         boardStub[1][0] = 'E';
         selectionStub = new BoardSelection(new Vec2(2, 0), Direction.HORIZONTAL, [new Vec2(0, 0), new Vec2(1, 0)]);
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
                     selectors: [
@@ -46,7 +46,7 @@ describe('KeyManagerService', () => {
                     },
                 },
             ],
-        });
+        }).compileComponents();
         service = TestBed.inject(KeyManagerService);
         store = TestBed.inject(MockStore);
     });
