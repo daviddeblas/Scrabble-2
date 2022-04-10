@@ -29,11 +29,10 @@ export class RoomService {
         });
 
         this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
-            if (gameOptions.dictionaryType === deletedDictionaryName) {
-                this.store.dispatch(closeRoom());
-                const error = 'Dictionnaire utilisé supprimé';
-                this.sendErrorMessage(error);
-            }
+            if (gameOptions.dictionaryType !== deletedDictionaryName) return;
+            this.store.dispatch(closeRoom());
+            const error = 'Dictionnaire utilisé supprimé';
+            this.sendErrorMessage(error);
         });
     }
 
@@ -91,11 +90,10 @@ export class RoomService {
             this.sendErrorMessage(error);
         });
         this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
-            if (roomInfo.gameOptions.dictionaryType === deletedDictionaryName) {
-                this.store.dispatch(joinInviteCanceled());
-                const error = 'Dictionnaire utilisé supprimé';
-                this.sendErrorMessage(error);
-            }
+            if (roomInfo.gameOptions.dictionaryType !== deletedDictionaryName) return;
+            this.store.dispatch(joinInviteCanceled());
+            const error = 'Dictionnaire utilisé supprimé';
+            this.sendErrorMessage(error);
         });
     }
 

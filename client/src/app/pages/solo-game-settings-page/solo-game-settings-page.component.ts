@@ -13,10 +13,9 @@ export class SoloGameSettingsPageComponent {
     constructor(private store: Store, private router: Router, private dialogRef: MatDialogRef<SoloGameSettingsPageComponent>) {}
 
     onGameOptionsSubmit(gameOptions: GameOptions, botLevel?: string) {
-        if (botLevel !== undefined) {
-            this.store.dispatch(createSoloRoom({ gameOptions, botLevel }));
-            this.router.navigate(['game']);
-            this.dialogRef.close();
-        }
+        if (botLevel === undefined) return;
+        this.store.dispatch(createSoloRoom({ gameOptions, botLevel }));
+        this.router.navigate(['game']);
+        this.dialogRef.close();
     }
 }

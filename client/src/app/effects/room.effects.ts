@@ -64,7 +64,7 @@ export class RoomEffects {
                 ofType(closeRoom),
                 tap(() => {
                     this.roomService.closeRoom();
-                    this.roomCreationStepper.reset();
+                    if (this.roomCreationStepper) this.roomCreationStepper.reset();
                 }),
             ),
         { dispatch: false },
