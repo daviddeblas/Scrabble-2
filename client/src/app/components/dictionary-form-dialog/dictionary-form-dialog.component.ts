@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
+import { Store } from '@ngrx/store';
+import { iDictionary } from 'common/interfaces/dictionary';
 
 @Component({
     selector: 'app-dictionary-form-dialog',
@@ -8,19 +11,32 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class DictionaryFormDialogComponent implements OnInit {
     settingsForm: FormGroup;
-    title: string;
-    description: string;
-    fileRequired: boolean;
+    dictionaryIndex: number | null = null;
+    currentDictionary: iDictionary | null = null;
+    fileRequired: boolean = false;
 
-    constructor(private fb: FormBuilder) {}
+    constructor(private fb: FormBuilder, private store: Store) {}
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
-            title: [this.title, [Validators.required]],
-            description: [this.description, Validators.required],
+            title: [this.currentDictionary?.title, [Validators.required]],
+            description: [this.currentDictionary?.description, Validators.required],
             file: ['', this.fileRequired ? Validators.required : Validators.nullValidator],
         });
     }
 
-    onSubmit() {}
+    onSubmit() {
+        if (this.dictionaryIndex !== null) {
+            this.store.dispatch(
+                modifyDictionary({
+                    index: this.dictionaryIndex,
+                    dictionary: this.getFormDictionary(),
+                }),
+            );
+        } else this.store.dispatch(addDictionary({ dictionary: this.getFormDictionary() }));
+    }
+
+    private getFormDictionary(): iDictionary {
+        return { title: this.settingsForm.controls.title.value, description: this.settingsForm.controls.description.value };
+    }
 }

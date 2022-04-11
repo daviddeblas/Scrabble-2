@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { deleteDictionary, loadDictionaries } from '@app/actions/dictionaries.actions';
+import { deleteDictionary, downloadDictionary, loadDictionaries, resetDictionaries } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
 import { iDictionary } from 'common/interfaces/dictionary';
 import { Observable } from 'rxjs';
@@ -25,20 +25,24 @@ export class DictionariesAdministratorComponent implements OnInit {
         dialogComponent.fileRequired = true;
     }
 
-    resetDictionaries() {}
+    resetDictionaries() {
+        this.store.dispatch(resetDictionaries());
+    }
 
     modifyDictionary(index: number, currentDictionary: iDictionary): void {
         const dialogRef = this.dialog.open(DictionaryFormDialogComponent);
         const dialogComponent = dialogRef.componentInstance;
-        dialogComponent.title = currentDictionary.title;
-        dialogComponent.description = currentDictionary.description;
+        dialogComponent.dictionaryIndex = index;
+        dialogComponent.currentDictionary = currentDictionary;
     }
 
     deleteDictionary(index: number) {
         this.store.dispatch(deleteDictionary({ index }));
     }
 
-    downloadDictionary(index: number) {}
+    downloadDictionary(dictionary: iDictionary) {
+        this.store.dispatch(downloadDictionary({ dictionary }));
+    }
 
     ngOnInit(): void {}
 }
