@@ -24,12 +24,16 @@ import { GameEffects } from './effects/game.effects';
 import { LeaderboardEffects } from './effects/leaderboard.effects';
 import { RoomEffects } from './effects/room.effects';
 import { GamePageModule } from './modules/game-page.module';
+import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
 import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
+import { DictionaryFormDialogComponent } from './components/dictionary-form-dialog/dictionary-form-dialog.component';
+import { DictionariesAdministratorComponent } from './components/dictionaries-administrator/dictionaries-administrator.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -49,7 +53,10 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
         GameJoinPageComponent,
         LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
+        AdminPageComponent,
         GameHistoryTableComponent,
+        DictionaryFormDialogComponent,
+        DictionariesAdministratorComponent,
     ],
     imports: [
         AppMaterialModule,

@@ -2,7 +2,6 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Board } from '@app/classes/game/board';
@@ -12,6 +11,7 @@ import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handle
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Room } from '@app/classes/room';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { stringToLetter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';

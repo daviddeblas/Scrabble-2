@@ -1,6 +1,6 @@
 import { LetterConfigItem } from '@app/classes/letter-config-item';
+import { Dictionary } from 'common/classes/dictionary';
 import { Vec2 } from 'common/classes/vec2';
-import { Dictionary } from './dictionary';
 import { PositionedMultipliers } from './positioned-multipliers';
 
 export class GameConfig {

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { loadDictionariesSuccess } from '@app/actions/dictionaries.actions';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -16,7 +17,22 @@ describe('DictionaryService', () => {
     beforeEach(() => {
         socketService = new SocketTestHelper();
 
-        TestBed.configureTestingModule({ providers: [provideMockStore()] });
+        TestBed.configureTestingModule({
+            providers: [
+                provideMockStore(),
+                {
+                    provide: HttpClient,
+                    useValue: {
+                        get: () => {
+                            return;
+                        },
+                        post: () => {
+                            return;
+                        },
+                    },
+                },
+            ],
+        });
         service = TestBed.inject(DictionaryService);
         TestBed.inject(SocketClientService).socket = TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
         store = TestBed.inject(MockStore);

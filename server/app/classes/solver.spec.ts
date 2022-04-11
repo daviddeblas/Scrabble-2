@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
-import { Dictionary } from '@app/classes/dictionary';
 import { Line } from '@app/interfaces/line';
 import { Solution } from '@app/interfaces/solution';
 import { Word } from '@app/interfaces/word';
 import { assert, expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';

@@ -3,7 +3,6 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -11,6 +10,7 @@ import { BotDifficulty } from '@app/services/bot.service';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';

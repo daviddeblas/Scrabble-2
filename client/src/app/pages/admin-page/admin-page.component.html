@@ -1,0 +1,21 @@
+<div class="container">
+    <mat-toolbar color="primary">
+        <button routerLink="/home" mat-icon-button class="home-button">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <span>Admin</span>
+    </mat-toolbar>
+    <div class="liste-menus">
+        <app-dictionaries-administrator class="menu-dict"></app-dictionaries-administrator>
+        <mat-card class="menu-bot">
+            <mat-card-title>Joueurs virtuels</mat-card-title>
+            <mat-card-subtitle>Modifier le nom des joueurs virtuels</mat-card-subtitle>
+        </mat-card>
+        <mat-card class="menu-hist">
+            <mat-card-title>Historique des parties</mat-card-title>
+            <mat-card-content>
+                <app-game-history-table></app-game-history-table>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

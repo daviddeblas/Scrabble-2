@@ -1,0 +1,34 @@
+<mat-card class="dictionaries">
+    <mat-card-title>Dictionaires</mat-card-title>
+    <mat-card-subtitle>Ajout/Retrait des dictionaires disponibles</mat-card-subtitle>
+    <mat-card-actions>
+        <button mat-icon-button (click)="addDictionary()">
+            <mat-icon>add</mat-icon>
+        </button>
+        <button mat-icon-button (click)="resetDictionaries()">
+            <mat-icon>restore</mat-icon>
+        </button>
+    </mat-card-actions>
+    <mat-card-content>
+        <ul>
+            <li class="dictionary" *ngFor="let dictionary of dictionaries$ | async; let i = index">
+                <mat-card>
+                    <mat-card-title class="dictionary-title">{{ dictionary.title }}</mat-card-title>
+                    <mat-card-subtitle class="dictionary-description">{{ dictionary.description }}
+                    </mat-card-subtitle>
+                    <mat-card-actions>
+                        <button mat-icon-button (click)="modifyDictionary(i, dictionary)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="deleteDictionary(dictionary)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="downloadDictionary(dictionary)">
+                            <mat-icon>get_app</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </li>
+        </ul>
+    </mat-card-content>
+</mat-card>

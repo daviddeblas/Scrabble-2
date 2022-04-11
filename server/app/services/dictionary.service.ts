@@ -1,5 +1,5 @@
-import { Dictionary } from '@app/classes/dictionary';
 import { Server } from '@app/server';
+import { Dictionary } from 'common/classes/dictionary';
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
@@ -82,6 +82,15 @@ export class DictionaryService {
         return;
     }
 
+    sendDictionaries(socket: io.Socket) {
+        socket.emit(
+            'receive dictionaries',
+            this.dictionaries.map((d) => {
+                return { title: d.title, description: d.description };
+            }),
+        );
+    }
+
     reset(): void {
         [...this.dictionaries].forEach((d) => {
             if (d.title === defaultDictionary) return;
@@ -109,7 +118,7 @@ export class DictionaryService {
                 res.status(resourceNotFound).send();
                 return;
             }
-            res.sendFile(dic.path, { root: path.join(__dirname, '../..') });
+            res.sendFile(dic.path, { root: path.join('./') });
         });
         this.router.post('/', (req, res) => {
             const response = this.addDictionary((req.files?.dictionary as fileUpload.UploadedFile).data.toString('utf8'));
@@ -124,6 +133,7 @@ export class DictionaryService {
     setupSocketConnection(socket: io.Socket) {
         socket.on('reset dictionaries', () => {
             this.reset();
+            this.sendDictionaries(socket);
         });
         socket.on('delete dictionary', (name) => {
             if (this.deleteDictionary(name)) {
@@ -132,20 +142,15 @@ export class DictionaryService {
             }
             socket.emit('delete dictionary success', name);
         });
-        socket.on('modify dictionary', (oldName, newName, newDescription) => {
+        socket.on('modify dictionary', ({ oldName, newName, newDescription }) => {
             if (this.modifyInfo(oldName, newName, newDescription)) {
                 socket.emit('modify dictionary failed', oldName);
                 return;
             }
-            socket.emit('modify dictionary success', oldName, newName, newDescription);
+            socket.emit('modify dictionary success', { oldName, newName, newDescription });
         });
         socket.on('get dictionaries', () => {
-            socket.emit(
-                'receive dictionaries',
-                this.dictionaries.map((d) => {
-                    return { title: d.title, description: d.description };
-                }),
-            );
+            this.sendDictionaries(socket);
         });
     }
 }

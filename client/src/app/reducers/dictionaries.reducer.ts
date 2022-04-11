@@ -10,5 +10,12 @@ export const initialState: iDictionary[] = [];
 export const reducer = createReducer(
     initialState,
     on(dictionariesActions.loadDictionariesSuccess, (state, { dictionaries }) => dictionaries),
+    on(dictionariesActions.addDictionary, (state, { dictionary }) => [...state, dictionary]),
+    on(dictionariesActions.modifyDictionary, (state, { oldDictionary, newDictionary }) => {
+        const newState = [...state];
+        newState[newState.findIndex((e) => e.title === oldDictionary.title)] = newDictionary;
+        return newState;
+    }),
+    on(dictionariesActions.deleteDictionary, (state, { dictionary }) => state.filter((e) => e.title !== dictionary.title)),
     on(resetAllState, () => initialState),
 );
