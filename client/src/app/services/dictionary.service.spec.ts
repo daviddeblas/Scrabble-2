@@ -22,7 +22,14 @@ describe('DictionaryService', () => {
                 provideMockStore(),
                 {
                     provide: HttpClient,
-                    useValue: { get: () => {}, post: () => {} },
+                    useValue: {
+                        get: () => {
+                            return;
+                        },
+                        post: () => {
+                            return;
+                        },
+                    },
                 },
             ],
         });

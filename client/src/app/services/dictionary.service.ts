@@ -49,6 +49,7 @@ export class DictionaryService {
     downloadDictionary(dictionary: iDictionary) {
         this.http
             .get(environment.serverUrl.concat('/admin/dictionary/', dictionary.title), { responseType: 'blob' as 'json' })
+            // la reponse de la requete http n'a pas de type
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .subscribe((response: any) => {
                 const dataType = response.type;
