@@ -39,20 +39,26 @@ export class HistoryDatabaseService {
 
     async addGameHistory(gameHistory: GameHistory): Promise<void> {
         const collection = HISTORY_DATABASE.gameHistory.collections.data;
-        this.gameHistoryDB.collection(collection).insertOne(gameHistory);
+        await this.gameHistoryDB.collection(collection).insertOne(gameHistory);
         this.getGameHistory().then((value) => {
             Container.get(Server).socketService.broadcastMessage('receive gameHistory', value);
         });
     }
 
     async resetDB() {
-        await this.gameHistoryDB.dropCollection(HISTORY_DATABASE.gameHistory.collections.data);
+        await this.gameHistoryDB.collection(HISTORY_DATABASE.gameHistory.collections.data).deleteMany({});
     }
 
     setupSocketConnection(socket: io.Socket) {
         socket.on('get gameHistory', () => {
             this.getGameHistory().then((value) => {
                 socket.emit('receive gameHistory', value);
+            });
+        });
+        socket.on('reset gameHistory', async () => {
+            await this.resetDB();
+            this.getGameHistory().then((value) => {
+                Container.get(Server).socketService.broadcastMessage('receive gameHistory', value);
             });
         });
     }

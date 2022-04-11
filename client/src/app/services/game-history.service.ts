@@ -16,4 +16,8 @@ export class GameHistoryService {
         });
         this.socketService.send('get gameHistory');
     }
+
+    resetGameHistory(): void {
+        this.socketService.send('reset gameHistory');
+    }
 }
