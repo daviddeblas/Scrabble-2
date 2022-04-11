@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
 import { iDictionary } from 'common/interfaces/dictionary';
@@ -15,7 +16,7 @@ export class DictionaryFormDialogComponent implements OnInit {
     currentDictionary: iDictionary | null = null;
     fileRequired: boolean = false;
 
-    constructor(private fb: FormBuilder, private store: Store) {}
+    constructor(private fb: FormBuilder, private store: Store, private dialogRef: MatDialogRef<DictionaryFormDialogComponent>) {}
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
@@ -34,6 +35,8 @@ export class DictionaryFormDialogComponent implements OnInit {
                 }),
             );
         } else this.store.dispatch(addDictionary({ dictionary: this.getFormDictionary() }));
+
+        this.dialogRef.close();
     }
 
     private getFormDictionary(): iDictionary {
