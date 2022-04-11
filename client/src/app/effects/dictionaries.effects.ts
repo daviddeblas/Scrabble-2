@@ -27,7 +27,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     addDictionaries$ = createEffect(
@@ -39,7 +38,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     resetDictionaries$ = createEffect(
@@ -51,7 +49,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     modifyDictionary$ = createEffect(
@@ -63,7 +60,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     deleteDictionary$ = createEffect(
@@ -75,7 +71,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     downloadDictionaries$ = createEffect(
@@ -87,7 +82,6 @@ export class DictionariesEffects {
                 }),
             ),
         { dispatch: false },
-        // FeatureActions.actionOne is not dispatched
     );
 
     constructor(private actions$: Actions, private dictionaryService: DictionaryService) {}
