@@ -111,6 +111,13 @@ describe('RoomEffects', () => {
         expect(resetCalled).toBeTrue();
     });
 
+    it('closeRoomEffect$ should call the closeRoom from room service even if the stepper is undefined', () => {
+        effects.roomCreationStepper = undefined as unknown as MatStepper;
+        actions$ = of(closeRoom());
+        effects.closeRoomEffect$.subscribe();
+        expect(roomService.closeRoom).toHaveBeenCalled();
+    });
+
     it('refuseInviteEffect$ should call the refuseInvite from room service', () => {
         actions$ = of(refuseInvite());
         effects.refuseInviteEffect$.subscribe();

@@ -9,5 +9,8 @@ import { iVec2 } from 'common/classes/vec2';
     styleUrls: ['./cell-letter-x3.component.scss'],
 })
 export class CellLetterX3Component {
-    @Input() pos: iVec2 = { x: 0, y: 0 };
+    @Input() pos: iVec2;
+    constructor() {
+        this.pos = { x: 0, y: 0 };
+    }
 }

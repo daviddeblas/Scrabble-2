@@ -7,6 +7,7 @@ import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
 import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
+import { iDictionary } from 'common/interfaces/dictionary';
 import { GameMode } from 'common/interfaces/game-mode';
 import { Observable } from 'rxjs';
 
@@ -20,10 +21,10 @@ export const TIMER_INCREMENT = 30;
     styleUrls: ['./multi-config-window.component.scss'],
 })
 export class MultiConfigWindowComponent implements OnInit {
-    @Input() isSoloGame: boolean = false;
-    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
+    @Input() isSoloGame: boolean;
+    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }>;
     settingsForm: FormGroup;
-    dictionaries$: Observable<string[]>;
+    dictionaries$: Observable<iDictionary[]>;
     gameMode$: Observable<GameMode>;
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
@@ -36,9 +37,10 @@ export class MultiConfigWindowComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         public roomService: RoomService,
-        dictionariesStore: Store<{ dictionaries: string[] }>,
+        dictionariesStore: Store<{ dictionaries: iDictionary[] }>,
         store: Store<{ gameMode: GameMode }>,
     ) {
+        this.gameOptionsSubmitted = new EventEmitter();
         store.dispatch(resetAllState());
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');

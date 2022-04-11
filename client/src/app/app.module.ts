@@ -31,6 +31,8 @@ import { GameSelectionPageComponent } from './pages/game-selection-page/game-sel
 import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
+import { DictionaryFormDialogComponent } from './components/dictionary-form-dialog/dictionary-form-dialog.component';
+import { DictionariesAdministratorComponent } from './components/dictionaries-administrator/dictionaries-administrator.component';
 
 /**
  * Main module that is used in main.ts.
@@ -53,6 +55,8 @@ import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/s
         SoloGameSettingsPageComponent,
         AdminPageComponent,
         GameHistoryTableComponent,
+        DictionaryFormDialogComponent,
+        DictionariesAdministratorComponent,
     ],
     imports: [
         AppMaterialModule,

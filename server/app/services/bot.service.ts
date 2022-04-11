@@ -82,7 +82,7 @@ export class BotService {
 
     private async placeCommand(game: Game, difficulty: BotDifficulty): Promise<string | GameError> {
         const solver = new Solver(game.dictionary, game.board, game.players[1].easel);
-        const foundPlacements: [Solution, number][] | GameError = await solver.getBotSolutions();
+        const foundPlacements: [Solution, number][] | GameError = await solver.getBotSolutions(difficulty === BotDifficulty.Hard);
         if (foundPlacements instanceof GameError) return foundPlacements;
         if (foundPlacements.length === 0) return 'passer';
         const command = this.determineWord(foundPlacements, difficulty);

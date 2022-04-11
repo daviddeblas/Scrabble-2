@@ -10,9 +10,15 @@ import { iVec2 } from 'common/classes/vec2';
     styleUrls: ['./letter.component.scss'],
 })
 export class LetterComponent {
-    @Input() pos: iVec2 = { x: 0, y: 0 };
-    @Input() letter: Letter = 'A';
+    @Input() pos: iVec2;
+    @Input() letter: Letter;
     @Input() value: number | undefined;
-    @Input() blank: boolean = false;
-    @Input() color?: string = '#fffcec';
+    @Input() blank: boolean;
+    @Input() color?: string;
+
+    constructor() {
+        this.pos = { x: 0, y: 0 };
+        this.blank = false;
+        this.color = '#fffcec';
+    }
 }

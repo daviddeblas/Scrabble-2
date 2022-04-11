@@ -1,17 +1,26 @@
 import { Dictionary } from '@app/classes/dictionary';
+import { Server } from '@app/server';
+import { Router } from 'express';
+import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
 import path from 'path';
 import io from 'socket.io';
-import { Service } from 'typedi';
-// TODO pouvoir changer de dictionnaire
+import { Container, Service } from 'typedi';
 
 export const defaultDictionary = 'Francais';
 const dictionariesPath = 'assets/dictionaries';
 
+const resourceNotFound = 404;
+const badRequest = 400;
+
 @Service()
 export class DictionaryService {
     dictionaries: Dictionary[] = [];
-    sio: io.Server;
+    router: Router;
+
+    constructor() {
+        this.configureRouter();
+    }
 
     async init() {
         this.dictionaries = [];
@@ -73,15 +82,24 @@ export class DictionaryService {
         return;
     }
 
+    sendDictionaries(socket: io.Socket) {
+        socket.emit(
+            'receive dictionaries',
+            this.dictionaries.map((d) => {
+                return { title: d.title, description: d.description };
+            }),
+        );
+    }
+
     reset(): void {
-        this.dictionaries.forEach((d) => {
+        [...this.dictionaries].forEach((d) => {
             if (d.title === defaultDictionary) return;
             this.deleteDictionary(d.title);
         });
     }
 
     onDictionaryDeleted(dictionaryName: string): void {
-        this.sio.emit('dictionary deleted', dictionaryName);
+        Container.get(Server).socketService.broadcastMessage('dictionary deleted', dictionaryName);
     }
 
     getDictionaryFile(name: string): string {
@@ -92,12 +110,47 @@ export class DictionaryService {
         return this.dictionaries.find((d) => d.title === name);
     }
 
+    configureRouter() {
+        this.router = Router();
+        this.router.get('/:id', (req, res) => {
+            const dic = this.getDictionary(req.params.id);
+            if (!dic) {
+                res.status(resourceNotFound).send();
+                return;
+            }
+            res.sendFile(dic.path, { root: path.join(__dirname, '../..') });
+        });
+        this.router.post('/', (req, res) => {
+            const response = this.addDictionary((req.files?.dictionary as fileUpload.UploadedFile).data.toString('utf8'));
+            if (response) {
+                res.status(badRequest).send();
+                return;
+            }
+            res.send('OK');
+        });
+    }
+
     setupSocketConnection(socket: io.Socket) {
+        socket.on('reset dictionaries', () => {
+            this.reset();
+            this.sendDictionaries(socket);
+        });
+        socket.on('delete dictionary', (name) => {
+            if (this.deleteDictionary(name)) {
+                socket.emit('delete dictionary failed', name);
+                return;
+            }
+            socket.emit('delete dictionary success', name);
+        });
+        socket.on('modify dictionary', (oldName, newName, newDescription) => {
+            if (this.modifyInfo(oldName, newName, newDescription)) {
+                socket.emit('modify dictionary failed', oldName);
+                return;
+            }
+            socket.emit('modify dictionary success', oldName, newName, newDescription);
+        });
         socket.on('get dictionaries', () => {
-            socket.emit(
-                'receive dictionaries',
-                this.dictionaries.map((d) => d.title),
-            );
+            this.sendDictionaries(socket);
         });
     }
 }

@@ -144,7 +144,7 @@ describe('board', async () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
-        const wordMultiplier = 3;
+        const wordMultiplier = 6;
         expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
     });
 
