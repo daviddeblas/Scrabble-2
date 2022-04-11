@@ -1,5 +1,5 @@
-import { Dictionary } from '@app/classes/dictionary';
 import { Server } from '@app/server';
+import { Dictionary } from 'common/classes/dictionary';
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
