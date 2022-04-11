@@ -41,7 +41,23 @@ describe('GameManagerService', () => {
     beforeEach(() => {
         socketService = new SocketTestHelper();
         TestBed.configureTestingModule({
-            providers: [provideMockStore()],
+            providers: [
+                provideMockStore(),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketService,
+                        send: (value: string) => {
+                            socketService.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketService.on(event, callback);
+                            return;
+                        },
+                    },
+                },
+            ],
         });
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
         TestBed.compileComponents();

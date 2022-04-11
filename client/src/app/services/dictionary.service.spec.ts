@@ -5,7 +5,6 @@ import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { iDictionary } from 'common/interfaces/dictionary';
 import { cold } from 'jasmine-marbles';
-import { Socket } from 'socket.io-client';
 import { DictionaryService } from './dictionary.service';
 import { SocketClientService } from './socket-client.service';
 
@@ -31,10 +30,23 @@ describe('DictionaryService', () => {
                         },
                     },
                 },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketService,
+                        send: (value: string) => {
+                            socketService.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketService.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         });
         service = TestBed.inject(DictionaryService);
-        TestBed.inject(SocketClientService).socket = TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
         store = TestBed.inject(MockStore);
     });
 

@@ -1,5 +1,8 @@
+/* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { PlayerService } from '@app/services/player.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of } from 'rxjs';
 import { PlayerEffects } from './player.effects';
@@ -10,6 +13,7 @@ describe('PlayerEffects', () => {
     let service: jasmine.SpyObj<PlayerService>;
 
     beforeEach(() => {
+        const socketHelper = new SocketTestHelper();
         service = jasmine.createSpyObj('PlayerService', ['surrenderGame', 'placeWord', 'exchangeLetters']);
         TestBed.configureTestingModule({
             providers: [
@@ -18,6 +22,23 @@ describe('PlayerEffects', () => {
                 {
                     provide: PlayerService,
                     useValue: service,
+                },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                        resetConnection: () => {
+                            return;
+                        },
+                    },
                 },
             ],
         });
