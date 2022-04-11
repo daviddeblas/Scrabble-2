@@ -52,7 +52,7 @@ export class MultiConfigWindowComponent implements OnInit {
         this.settingsForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(this.minNameLength), Validators.maxLength(this.maxNameLength)]],
             botLevel: ['Débutant'],
-            selectedDictionary: ['', Validators.required],
+            selectedDictionary: ['Francais', Validators.required],
         });
     }
 
