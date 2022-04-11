@@ -16,6 +16,8 @@ export class DictionaryFormDialogComponent implements OnInit {
     currentDictionary: iDictionary | null = null;
     fileRequired: boolean = false;
 
+    file: File;
+
     constructor(private fb: FormBuilder, private store: Store, private dialogRef: MatDialogRef<DictionaryFormDialogComponent>) {}
 
     ngOnInit(): void {
@@ -27,14 +29,14 @@ export class DictionaryFormDialogComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.dictionaryIndex !== null) {
+        if (this.dictionaryIndex !== null && this.currentDictionary != null) {
             this.store.dispatch(
                 modifyDictionary({
-                    index: this.dictionaryIndex,
-                    dictionary: this.getFormDictionary(),
+                    oldDictionary: this.currentDictionary,
+                    newDictionary: this.getFormDictionary(),
                 }),
             );
-        } else this.store.dispatch(addDictionary({ dictionary: this.getFormDictionary() }));
+        } else this.store.dispatch(addDictionary({ dictionary: this.getFormDictionary(), file: this.file }));
 
         this.dialogRef.close();
     }

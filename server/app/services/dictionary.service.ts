@@ -82,6 +82,15 @@ export class DictionaryService {
         return;
     }
 
+    sendDictionaries(socket: io.Socket) {
+        socket.emit(
+            'receive dictionaries',
+            this.dictionaries.map((d) => {
+                return { title: d.title, description: d.description };
+            }),
+        );
+    }
+
     reset(): void {
         [...this.dictionaries].forEach((d) => {
             if (d.title === defaultDictionary) return;
@@ -124,6 +133,7 @@ export class DictionaryService {
     setupSocketConnection(socket: io.Socket) {
         socket.on('reset dictionaries', () => {
             this.reset();
+            this.sendDictionaries(socket);
         });
         socket.on('delete dictionary', (name) => {
             if (this.deleteDictionary(name)) {
@@ -140,12 +150,7 @@ export class DictionaryService {
             socket.emit('modify dictionary success', oldName, newName, newDescription);
         });
         socket.on('get dictionaries', () => {
-            socket.emit(
-                'receive dictionaries',
-                this.dictionaries.map((d) => {
-                    return { title: d.title, description: d.description };
-                }),
-            );
+            this.sendDictionaries(socket);
         });
     }
 }
