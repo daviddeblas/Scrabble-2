@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { cellClick } from '@app/actions/board.actions';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -52,21 +53,23 @@ describe('CellEmptyComponent', () => {
     });
 
     it('should not dispatch cellClick if the current player is not the active player', () => {
-        store.overrideSelector('gameStatus', { activePlayer: 'player2', gameEnded: false });
+        component['activePlayer'] = 'player2';
+        component['gameEnded'] = false;
         const dispatchSpy = spyOn(store, 'dispatch');
         component.click();
         expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
     it('should not dispatch cellClick if the game ended', () => {
-        store.overrideSelector('gameStatus', { activePlayer: 'player1', gameEnded: true });
+        component['activePlayer'] = 'player1';
+        component['gameEnded'] = true;
         const dispatchSpy = spyOn(store, 'dispatch');
         component.click();
         expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
     it('should not dispatch cellClick if the board already contains a letter at cell position', () => {
-        store.overrideSelector('board', { board: [['A']] });
+        component['letter'] = 'A';
         const dispatchSpy = spyOn(store, 'dispatch');
         component.click();
         expect(dispatchSpy).not.toHaveBeenCalled();

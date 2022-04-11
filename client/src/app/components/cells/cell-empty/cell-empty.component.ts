@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { cellClick } from '@app/actions/board.actions';
 import { BoardSelection } from '@app/classes/board-selection';
 import { BoardState } from '@app/reducers/board.reducer';
@@ -7,7 +7,7 @@ import { Players } from '@app/reducers/player.reducer';
 import { Store } from '@ngrx/store';
 import { Letter } from 'common/classes/letter';
 import { iVec2 } from 'common/classes/vec2';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     /* Nécessaire pour les composantes SVG */
@@ -16,10 +16,19 @@ import { Observable } from 'rxjs';
     templateUrl: './cell-empty.component.html',
     styleUrls: ['./cell-empty.component.scss'],
 })
-export class CellEmptyComponent {
+export class CellEmptyComponent implements OnInit, OnDestroy {
     @Input() pos: iVec2;
 
     selection$: Observable<BoardSelection>;
+
+    private playersSubscription: Subscription;
+    private gameStatusSubscription: Subscription;
+    private boardSubscription: Subscription;
+
+    private currentPlayer: String;
+    private activePlayer: String;
+    private gameEnded: boolean;
+    private letter: Letter | null = null;
 
     constructor(
         public store: Store<{
@@ -32,26 +41,31 @@ export class CellEmptyComponent {
         this.pos = { x: 0, y: 0 };
     }
 
+    ngOnInit(): void {
+        this.playersSubscription = this.store.select('players').subscribe((state) => {
+            this.currentPlayer = state.player.name;
+        });
+        this.gameStatusSubscription = this.store.select('gameStatus').subscribe((state) => {
+            this.activePlayer = state.activePlayer;
+            this.gameEnded = state.gameEnded;
+        });
+        this.boardSubscription = this.store.select('board').subscribe((state) => {
+            this.letter = state.board[this.pos.x][this.pos.y];
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.playersSubscription.unsubscribe();
+        this.gameStatusSubscription.unsubscribe();
+        this.boardSubscription.unsubscribe();
+    }
+
     click(): void {
         // Premier contrôle de validation pour la sélection d'une cellule (Active player + Game Ended)
-        let currentPlayer = '';
-        let activePlayer = '';
-        let gameEnded = false;
-        this.store.select('players').subscribe((state) => {
-            currentPlayer = state.player.name;
-        });
-        this.store.select('gameStatus').subscribe((state) => {
-            activePlayer = state.activePlayer;
-            gameEnded = state.gameEnded;
-        });
-        if (gameEnded || currentPlayer !== activePlayer) return;
+        if (this.gameEnded || this.currentPlayer !== this.activePlayer) return;
 
         // Deuxième validation pour la sélection d'une cellule (Is cell empty)
-        let letter: Letter | null = null;
-        this.store.select('board').subscribe((state) => {
-            letter = state.board[this.pos.x][this.pos.y];
-        });
-        if (letter) return;
+        if (this.letter) return;
 
         this.store.dispatch(cellClick({ pos: this.pos }));
     }
