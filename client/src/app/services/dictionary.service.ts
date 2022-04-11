@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { loadDictionariesSuccess } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
+import { Dictionary } from 'common/classes/dictionary';
 import { iDictionary } from 'common/interfaces/dictionary';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -21,8 +22,8 @@ export class DictionaryService {
         });
     }
 
-    addDictionary(formData: FormData): Observable<FormData> {
-        return this.http.post<FormData>(environment.serverUrl, formData);
+    addDictionary(dictionary: Dictionary): Observable<Dictionary> {
+        return this.http.post<Dictionary>(environment.serverUrl, dictionary);
     }
 
     resetDictionaries() {
@@ -46,12 +47,18 @@ export class DictionaryService {
     }
 
     downloadDictionary(dictionary: iDictionary) {
-        const link = document.createElement('a');
-        link.setAttribute('target', '_blank');
-        link.setAttribute('href', environment.serverUrl.concat(dictionary.title));
-        link.setAttribute('download', `${dictionary.title}.json`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.http.get(environment.serverUrl.concat('/', dictionary.title), { responseType: 'blob' as 'json' }).subscribe((response: any) => {
+            const dataType = response.type;
+            const binaryData = [];
+            binaryData.push(response);
+            const link = document.createElement('a');
+            link.setAttribute('target', '_blank');
+            link.setAttribute('href', window.URL.createObjectURL(new Blob(binaryData as BlobPart[], { type: dataType })));
+            link.setAttribute('download', `${dictionary.title}.json`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        });
     }
 }

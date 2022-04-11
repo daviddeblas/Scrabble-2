@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
+import { Dictionary } from 'common/classes/dictionary';
 import { iDictionary } from 'common/interfaces/dictionary';
 
 @Component({
@@ -16,15 +17,30 @@ export class DictionaryFormDialogComponent implements OnInit {
     currentDictionary: iDictionary | null = null;
     fileRequired: boolean = false;
 
-    file: File;
+    loadedDictionary: Dictionary | undefined;
 
     constructor(private fb: FormBuilder, private store: Store, private dialogRef: MatDialogRef<DictionaryFormDialogComponent>) {}
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
-            title: [this.currentDictionary?.title, [Validators.required]],
-            description: [this.currentDictionary?.description, Validators.required],
+            title: new FormControl({ value: this.currentDictionary?.title, disabled: this.fileRequired }, [Validators.required]),
+            description: new FormControl({ value: this.currentDictionary?.description, disabled: this.fileRequired }, [Validators.required]),
             file: ['', this.fileRequired ? Validators.required : Validators.nullValidator],
+        });
+    }
+
+    onFileSelected(event: Event) {
+        // Ca au moins ca compile
+        const file: File = (event as unknown as { target: { files: File[] } }).target.files[0];
+
+        file.text().then((text) => {
+            this.loadedDictionary = JSON.parse(text);
+            if (this.loadedDictionary) {
+                this.settingsForm.controls.title.setValue(this.loadedDictionary.title);
+                this.settingsForm.controls.description.setValue(this.loadedDictionary.description);
+            }
+            this.settingsForm.controls.title.enable();
+            this.settingsForm.controls.description.enable();
         });
     }
 
@@ -36,7 +52,12 @@ export class DictionaryFormDialogComponent implements OnInit {
                     newDictionary: this.getFormDictionary(),
                 }),
             );
-        } else this.store.dispatch(addDictionary({ dictionary: this.getFormDictionary(), file: this.file }));
+        } else if (this.loadedDictionary) {
+            const formDictionary = this.getFormDictionary();
+            this.loadedDictionary.title = formDictionary.title;
+            this.loadedDictionary.description = formDictionary.description;
+            this.store.dispatch(addDictionary({ dictionary: this.loadedDictionary }));
+        }
 
         this.dialogRef.close();
     }
