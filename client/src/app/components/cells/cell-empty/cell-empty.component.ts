@@ -25,8 +25,8 @@ export class CellEmptyComponent implements OnInit, OnDestroy {
     private gameStatusSubscription: Subscription;
     private boardSubscription: Subscription;
 
-    private currentPlayer: String;
-    private activePlayer: String;
+    private currentPlayer: string;
+    private activePlayer: string;
     private gameEnded: boolean;
     private letter: Letter | null = null;
 
