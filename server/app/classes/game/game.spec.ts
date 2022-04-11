@@ -234,12 +234,7 @@ describe('game', () => {
         expect(game.activePlayer).to.not.eq(ogActivePlayer);
     });
 
-    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
-        game.bag.letters = ['A'];
-        expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
-    });
-
-    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
+    it('draw should return an error if checkMove returns an error', () => {
         stub(game, 'checkMove' as any).callsFake(() => new GameError(GameErrorType.LettersAreNotInEasel));
         expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
     });
