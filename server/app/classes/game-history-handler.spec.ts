@@ -15,6 +15,8 @@ describe('GameHistoryHandler', () => {
         let mockDate = new Date();
         let mockDateToString = mockDate.toLocaleString('fr-CA');
         const gameHistory = new GameHistoryHandler();
+        // eslint-disable-next-line dot-notation
+        gameHistory['startDate'] = mockDate;
         const historyData = gameHistory.createGameHistoryData([player1, player2], false, GameMode.Classical);
         expect(historyData.date).to.eq(mockDateToString);
         expect(historyData.gameDuration).to.eq('0 sec');

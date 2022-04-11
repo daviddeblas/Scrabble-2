@@ -157,6 +157,9 @@ export class CommandService {
         if (error.message !== GameErrorType.InvalidWord) return;
         game.stopTimer();
         setTimeout(() => {
+            const opponentSocket = sockets[(playerNumber + 1) % 2];
+            const wrongWordMessage = "L'adversaire à placer un mot non valide";
+            if (opponentSocket) opponentSocket.emit('receive message', { username: '', message: wrongWordMessage, messageType: 'System' });
             game.nextTurn();
             this.postCommand(game, sockets);
         }, delayForInvalidWord);

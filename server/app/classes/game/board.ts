@@ -106,7 +106,7 @@ export class Board {
                     break;
                 case MultiplierType.Word:
                     score += letterPoints;
-                    multiplier = multiplier < multi.amount ? multi.amount : multiplier;
+                    multiplier *= multi.amount;
                     break;
             }
         });

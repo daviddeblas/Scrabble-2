@@ -30,6 +30,7 @@ import * as localSettingsReducer from '@app/reducers/local-settings.reducer';
 import * as playerReducer from '@app/reducers/player.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
+import { BackButtonDisableModule } from 'angular-disable-browser-back-button';
 
 @NgModule({
     declarations: [
@@ -55,6 +56,7 @@ import { StoreModule } from '@ngrx/store';
     imports: [
         AppMaterialModule,
         CommonModule,
+        BackButtonDisableModule.forRoot(),
         StoreModule.forFeature(gameReducer.gameStatusFeatureKey, gameReducer.reducer),
         StoreModule.forFeature(boardReducer.boardFeatureKey, boardReducer.reducer),
         StoreModule.forFeature(playerReducer.playerFeatureKey, playerReducer.reducer),

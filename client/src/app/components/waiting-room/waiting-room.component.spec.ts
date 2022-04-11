@@ -1,4 +1,3 @@
-import { CdkStepper } from '@angular/cdk/stepper';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -27,9 +26,6 @@ describe('WaitingRoomComponent', () => {
             imports: [AppMaterialModule, BrowserAnimationsModule, FormsModule],
             providers: [
                 FormBuilder,
-                {
-                    provide: CdkStepper,
-                },
                 {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
