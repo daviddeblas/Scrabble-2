@@ -147,7 +147,7 @@ export class DictionaryService {
                 socket.emit('modify dictionary failed', oldName);
                 return;
             }
-            socket.emit('modify dictionary success', oldName, newName, newDescription);
+            socket.emit('modify dictionary success', { oldName, newName, newDescription });
         });
         socket.on('get dictionaries', () => {
             this.sendDictionaries(socket);
