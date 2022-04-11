@@ -114,7 +114,6 @@ describe('MultiConfigWindowComponent', () => {
         };
         const spy = spyOn(component, 'onSubmit').and.callFake(fakeSubmit);
         expect(component.settingsForm.controls.name.valid).toBeFalse();
-        expect(component.settingsForm.controls.selectedDictionary.valid).toBeFalse();
         expect(component.settingsForm.valid).toBeFalse();
         fixture.detectChanges();
         // Verification que le bouton ne peut pas être pressé
