@@ -27,28 +27,3 @@
     grid-column-start: 2;
     grid-column-end: 3;
 }
-
-.dictionaries {
-    display: contents;
-}
-
-.dictionary {
-    display: contents;
-}
-
-.dictionary > * {
-    margin-bottom: 5px;
-}
-
-.dictionary-title {
-    font-size: medium;
-}
-
-.dictionary-description {
-    margin-bottom: 0;
-}
-
-.mat-card-actions,
-.mat-card-subtitle {
-    margin-bottom: 0;
-}
