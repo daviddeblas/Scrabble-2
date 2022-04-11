@@ -142,7 +142,7 @@ export class DictionaryService {
             }
             socket.emit('delete dictionary success', name);
         });
-        socket.on('modify dictionary', (oldName, newName, newDescription) => {
+        socket.on('modify dictionary', ({ oldName, newName, newDescription }) => {
             if (this.modifyInfo(oldName, newName, newDescription)) {
                 socket.emit('modify dictionary failed', oldName);
                 return;

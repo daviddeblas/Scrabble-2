@@ -36,8 +36,8 @@ export class DictionariesAdministratorComponent implements OnInit {
         dialogComponent.currentDictionary = currentDictionary;
     }
 
-    deleteDictionary(index: number) {
-        this.store.dispatch(deleteDictionary({ index }));
+    deleteDictionary(dictionary: iDictionary) {
+        this.store.dispatch(deleteDictionary({ dictionary }));
     }
 
     downloadDictionary(dictionary: iDictionary) {

@@ -16,6 +16,6 @@ export const reducer = createReducer(
         newState[newState.findIndex((e) => e.title === oldDictionary.title)] = newDictionary;
         return newState;
     }),
-    on(dictionariesActions.deleteDictionary, (state, { index }) => state.filter((e, i) => i !== index)),
+    on(dictionariesActions.deleteDictionary, (state, { dictionary }) => state.filter((e) => e.title !== dictionary.title)),
     on(resetAllState, () => initialState),
 );

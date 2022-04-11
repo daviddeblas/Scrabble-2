@@ -23,7 +23,7 @@ export class DictionaryService {
     }
 
     addDictionary(dictionary: Dictionary): Observable<Dictionary> {
-        return this.http.post<Dictionary>(environment.serverUrl, dictionary);
+        return this.http.post<Dictionary>(environment.serverUrl.concat('/admin/dictionary/'), dictionary);
     }
 
     resetDictionaries() {
@@ -35,7 +35,7 @@ export class DictionaryService {
     }
 
     deleteDictionary(title: string) {
-        this.socketService.send('delete dictionary', { name: title });
+        this.socketService.send('delete dictionary', title);
     }
 
     modifyDictionary(oldDictionary: iDictionary, newDictionary: iDictionary) {
@@ -47,18 +47,20 @@ export class DictionaryService {
     }
 
     downloadDictionary(dictionary: iDictionary) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.http.get(environment.serverUrl.concat('/', dictionary.title), { responseType: 'blob' as 'json' }).subscribe((response: any) => {
-            const dataType = response.type;
-            const binaryData = [];
-            binaryData.push(response);
-            const link = document.createElement('a');
-            link.setAttribute('target', '_blank');
-            link.setAttribute('href', window.URL.createObjectURL(new Blob(binaryData as BlobPart[], { type: dataType })));
-            link.setAttribute('download', `${dictionary.title}.json`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        });
+        this.http
+            .get(environment.serverUrl.concat('/admin/dictionary/', dictionary.title), { responseType: 'blob' as 'json' })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .subscribe((response: any) => {
+                const dataType = response.type;
+                const binaryData = [];
+                binaryData.push(response);
+                const link = document.createElement('a');
+                link.setAttribute('target', '_blank');
+                link.setAttribute('href', window.URL.createObjectURL(new Blob(binaryData as BlobPart[], { type: dataType })));
+                link.setAttribute('download', `${dictionary.title}.json`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            });
     }
 }

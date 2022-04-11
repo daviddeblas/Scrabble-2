@@ -12,7 +12,7 @@ export const addDictionary = createAction('[Dictionaries] Add Dictionary', props
 
 export const resetDictionaries = createAction('[Dictionaries] Reset Dictionaries');
 
-export const deleteDictionary = createAction('[Dictionaries] Delete Dictionary', props<{ index: number }>());
+export const deleteDictionary = createAction('[Dictionaries] Delete Dictionary', props<{ dictionary: iDictionary }>());
 
 export const modifyDictionary = createAction('[Dictionaries] Modify Dictionary', props<{ oldDictionary: iDictionary; newDictionary: iDictionary }>());
 
