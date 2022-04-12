@@ -228,6 +228,12 @@ describe('Dictionary Service', () => {
             expect(res.statusCode).to.eq(400);
             expect(service.dictionaries).to.be.of.length(1);
         });
+        it('send dictionaries from api should send the dictionary but return 400 if nothing is attached', async () => {
+            const res = await request(Container.get(Application).app).post('/admin/dictionary');
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(res.statusCode).to.eq(400);
+            expect(service.dictionaries).to.be.of.length(1);
+        });
 
         afterEach(() => {
             server.close();
