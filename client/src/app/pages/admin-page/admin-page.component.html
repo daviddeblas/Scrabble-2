@@ -12,7 +12,13 @@
             <mat-card-subtitle>Modifier le nom des joueurs virtuels</mat-card-subtitle>
         </mat-card>
         <mat-card class="menu-hist">
-            <mat-card-title>Historique des parties</mat-card-title>
+            <mat-card-title
+                >Historique des parties
+                <button mat-icon-button (click)="resetGameHistory()">
+                    <mat-icon matTooltip="Réinitialiser">restore</mat-icon>
+                </button>
+            </mat-card-title>
+
             <mat-card-content>
                 <app-game-history-table></app-game-history-table>
             </mat-card-content>

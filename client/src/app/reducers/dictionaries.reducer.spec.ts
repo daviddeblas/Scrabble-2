@@ -1,19 +1,19 @@
 import { addDictionary, deleteDictionary, loadDictionariesSuccess, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { Dictionary } from 'common/classes/dictionary';
+import { DEFAULT_DICTIONARY } from 'common/constants';
 import { iDictionary } from 'common/interfaces/dictionary';
 import { initialState, reducer } from './dictionaries.reducer';
 
 describe('Dictionaries Reducer', () => {
-    describe('an unknown action', () => {
-        it('should return the previous state', () => {
-            const dictionaries: iDictionary[] = [{ title: 'dict', description: 'desc' }];
-            const action = loadDictionariesSuccess({ dictionaries });
+    it('should put the default dictionary first', () => {
+        const firstDictionary = { title: DEFAULT_DICTIONARY, description: 'Default dict' } as iDictionary;
+        const dictionaries: iDictionary[] = [{ title: 'dict', description: 'desc' }];
+        const action = loadDictionariesSuccess({ dictionaries: [...dictionaries, firstDictionary] });
 
-            const result = reducer(initialState, action);
+        const result = reducer(initialState, action);
 
-            expect(result).toBe(dictionaries);
-        });
+        expect(result).toEqual([firstDictionary, ...dictionaries]);
     });
 
     it('should reset to initial state', () => {
@@ -26,7 +26,8 @@ describe('Dictionaries Reducer', () => {
 
     it('should reset to addDictionary dictionnary to the list', () => {
         const dictionary: Dictionary = { title: 'dict', description: 'desc' } as Dictionary;
-        const action = addDictionary({ dictionary });
+        const file = {} as File;
+        const action = addDictionary({ file, dictionary });
         const result = reducer(initialState, action);
 
         expect(result).toEqual([dictionary]);

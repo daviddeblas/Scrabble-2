@@ -72,4 +72,12 @@ describe('GameHistoryService', () => {
             done();
         }, RESPONSE_TIME);
     });
+
+    it('resetGameHistory should send reset gameHistory', (done) => {
+        spyOn(socketService, 'emit').and.callFake((value: string) => {
+            expect(value).toEqual('reset gameHistory');
+            done();
+        });
+        service.resetGameHistory();
+    });
 });

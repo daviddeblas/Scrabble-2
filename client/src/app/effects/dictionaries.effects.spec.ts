@@ -1,12 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import {
-    addDictionary,
-    deleteDictionary,
-    downloadDictionary,
-    loadDictionaries,
-    modifyDictionary,
-    resetDictionaries,
-} from '@app/actions/dictionaries.actions';
+import { deleteDictionary, downloadDictionary, loadDictionaries, modifyDictionary, resetDictionaries } from '@app/actions/dictionaries.actions';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { provideMockStore } from '@ngrx/store/testing';
@@ -50,12 +43,6 @@ describe('DictionariesEffects', () => {
         actions$ = of(loadDictionaries);
         effects.loadDictionaries$.subscribe();
         expect(dictionaryService.getDictionaries).toHaveBeenCalled();
-    });
-
-    it('addDictionaries$ should call addDictionary from dictionary service', () => {
-        actions$ = of(addDictionary);
-        effects.addDictionaries$.subscribe();
-        expect(dictionaryService.addDictionary).toHaveBeenCalled();
     });
 
     it('resetDictionaries$ should call resetDictionaries from dictionary service', () => {
