@@ -1,6 +1,6 @@
 import { Server } from '@app/server';
 import { Dictionary } from 'common/classes/dictionary';
-import { defaultDictionary as DEFAULT_DICTIONARY } from 'common/constants';
+import { DEFAULT_DICTIONARY } from 'common/constants';
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
