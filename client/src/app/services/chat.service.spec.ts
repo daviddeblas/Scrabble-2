@@ -405,6 +405,20 @@ describe('ChatService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(ChatService);
