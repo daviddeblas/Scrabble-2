@@ -14,6 +14,7 @@ import {
 } from '@app/actions/dictionaries.actions';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { iDictionary } from 'common/interfaces/dictionary';
 import { tap } from 'rxjs/operators';
 
 @Injectable()
@@ -33,8 +34,13 @@ export class DictionariesEffects {
         () =>
             this.actions$.pipe(
                 ofType(addDictionary),
-                tap(({ dictionary }) => {
-                    this.dictionaryService.addDictionary(dictionary);
+                tap(({ file, dictionary }) => {
+                    this.dictionaryService.addDictionary(file).subscribe(() => {
+                        file.text().then((content) => {
+                            const oldDictionary: iDictionary = JSON.parse(content);
+                            this.dictionaryService.modifyDictionary(oldDictionary, dictionary);
+                        });
+                    });
                 }),
             ),
         { dispatch: false },

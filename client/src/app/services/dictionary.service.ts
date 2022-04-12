@@ -22,8 +22,10 @@ export class DictionaryService {
         });
     }
 
-    addDictionary(dictionary: Dictionary): Observable<Dictionary> {
-        return this.http.post<Dictionary>(environment.serverUrl.concat('/admin/dictionary/'), dictionary);
+    addDictionary(file: File): Observable<Dictionary> {
+        const formData = new FormData();
+        formData.append('dictionary', file);
+        return this.http.post<Dictionary>(environment.serverUrl.concat('/admin/dictionary/'), formData);
     }
 
     resetDictionaries() {

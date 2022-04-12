@@ -3,7 +3,6 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatDialogRef } from '@angular/material/dialog';
 import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
-import { Dictionary } from 'common/classes/dictionary';
 import { iDictionary } from 'common/interfaces/dictionary';
 
 @Component({
@@ -17,7 +16,8 @@ export class DictionaryFormDialogComponent implements OnInit {
     currentDictionary: iDictionary | null = null;
     fileRequired: boolean = false;
 
-    loadedDictionary: Dictionary | undefined;
+    loadedDictionary: iDictionary | undefined;
+    loadedFile: File;
 
     constructor(private fb: FormBuilder, private store: Store, private dialogRef: MatDialogRef<DictionaryFormDialogComponent>) {}
 
@@ -31,9 +31,9 @@ export class DictionaryFormDialogComponent implements OnInit {
 
     onFileSelected(event: Event) {
         // Ca au moins ca compile
-        const file: File = (event as unknown as { target: { files: File[] } }).target.files[0];
+        this.loadedFile = (event as unknown as { target: { files: File[] } }).target.files[0];
 
-        file.text().then((text) => {
+        this.loadedFile.text().then((text) => {
             this.loadedDictionary = JSON.parse(text);
             if (this.loadedDictionary) {
                 this.settingsForm.controls.title.setValue(this.loadedDictionary.title);
@@ -56,7 +56,7 @@ export class DictionaryFormDialogComponent implements OnInit {
             const formDictionary = this.getFormDictionary();
             this.loadedDictionary.title = formDictionary.title;
             this.loadedDictionary.description = formDictionary.description;
-            this.store.dispatch(addDictionary({ dictionary: this.loadedDictionary }));
+            this.store.dispatch(addDictionary({ file: this.loadedFile, dictionary: this.loadedDictionary }));
         }
 
         this.dialogRef.close();
