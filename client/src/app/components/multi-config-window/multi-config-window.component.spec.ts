@@ -3,7 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
 import { GameMode } from 'common/interfaces/game-mode';
@@ -15,6 +17,7 @@ describe('MultiConfigWindowComponent', () => {
     const iterationAmount = 10;
 
     beforeEach(async () => {
+        const socketHelper = new SocketTestHelper();
         await TestBed.configureTestingModule({
             declarations: [MultiConfigWindowComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule],
@@ -24,6 +27,20 @@ describe('MultiConfigWindowComponent', () => {
                 {
                     provide: MatDialogRef,
                     useValue: {},
+                },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
                 },
                 provideMockStore({
                     selectors: [

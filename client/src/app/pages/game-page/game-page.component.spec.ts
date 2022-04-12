@@ -15,8 +15,10 @@ import { LetterComponent } from '@app/components/letter/letter.component';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SkipTurnButtonComponent } from '@app/components/skip-turn-button/skip-turn-button.component';
 import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardToListPipe } from '@app/pipes/board-to-list.pipe';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { EffectsRootModule } from '@ngrx/effects';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
@@ -28,6 +30,7 @@ describe('GamePageComponent', () => {
     let store: MockStore;
 
     beforeEach(async () => {
+        const socketHelper = new SocketTestHelper();
         await TestBed.configureTestingModule({
             declarations: [
                 GamePageComponent,
@@ -56,6 +59,20 @@ describe('GamePageComponent', () => {
                     provide: EffectsRootModule,
                     useValue: {
                         addEffects: jasmine.createSpy('addEffects'),
+                    },
+                },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
                     },
                 },
                 provideMockStore({

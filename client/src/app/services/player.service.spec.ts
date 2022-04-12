@@ -62,6 +62,20 @@ describe('PlayerService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketService,
+                        send: (value: string) => {
+                            socketService.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketService.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;

@@ -12,6 +12,7 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { ChatService } from './chat.service';
+import { SocketClientService } from './socket-client.service';
 
 describe('ChatService', () => {
     let service: ChatService;
@@ -32,11 +33,24 @@ describe('ChatService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(ChatService);
         store = TestBed.inject(MockStore);
-        service['socketService'].socket = socketHelper as unknown as Socket;
     });
 
     it('should be created', () => {
@@ -391,6 +405,20 @@ describe('ChatService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(ChatService);

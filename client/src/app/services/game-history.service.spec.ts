@@ -29,7 +29,25 @@ describe('GameHistoryService', () => {
     beforeEach(() => {
         socketService = new SocketTestHelper();
 
-        TestBed.configureTestingModule({ providers: [provideMockStore()] });
+        TestBed.configureTestingModule({
+            providers: [
+                provideMockStore(),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketService,
+                        send: (value: string) => {
+                            socketService.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketService.on(event, callback);
+                            return;
+                        },
+                    },
+                },
+            ],
+        });
         service = TestBed.inject(GameHistoryService);
         TestBed.inject(SocketClientService).socket = TestBed.inject(SocketClientService).socket = socketService as unknown as Socket;
         store = TestBed.inject(MockStore);
