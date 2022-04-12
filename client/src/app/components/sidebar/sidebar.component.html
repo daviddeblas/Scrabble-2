@@ -39,24 +39,26 @@
         </div>
         <button
             mat-raised-button
-            class="commandButton"
             color="primary"
             (click)="placeWord()"
             [disabled]="(modifiedCells$ | async)?.length === 0"
             aria-label="Placer le mot"
         >
+            <mat-icon>play_arrow</mat-icon>
             Jouer
         </button>
         <button
             mat-raised-button
-            class="commandButton"
             color="primary"
             (click)="getHint()"
             [disabled]="!isActivePlayer((players$ | async)?.player) || (gameStatus$ | async)?.gameEnded"
             aria-label="Prendre un indice"
         >
+            <mat-icon>lightbulb</mat-icon>
             Indice
         </button>
+        <app-skip-turn-button></app-skip-turn-button>
+        <app-surrender-game-button></app-surrender-game-button>
     </div>
 
     <mat-card class="player-card" [class.active]="isActivePlayer((players$ | async)?.player) && !(gameStatus$ | async)?.gameEnded">
