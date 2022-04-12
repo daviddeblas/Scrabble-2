@@ -1,14 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { provideMockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { iDictionary } from 'common/interfaces/dictionary';
+import { cold } from 'jasmine-marbles';
 import { DictionaryFormDialogComponent } from './dictionary-form-dialog.component';
 
 describe('DictionaryFormDialogComponent', () => {
+    const mockDialogSpy: { close: jasmine.Spy } = {
+        close: jasmine.createSpy('close'),
+    };
     let component: DictionaryFormDialogComponent;
     let fixture: ComponentFixture<DictionaryFormDialogComponent>;
+    let store: MockStore;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -18,10 +25,11 @@ describe('DictionaryFormDialogComponent', () => {
                 provideMockStore(),
                 {
                     provide: MatDialogRef,
-                    useValue: {},
+                    useValue: mockDialogSpy,
                 },
             ],
         }).compileComponents();
+        store = TestBed.inject(MockStore);
     });
 
     beforeEach(() => {
@@ -32,5 +40,72 @@ describe('DictionaryFormDialogComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('ngOnInit should change validator if fileRequired is true and currentDictionary is defined', () => {
+        const dictionary = { title: 'Title', description: 'This dict' };
+        component.currentDictionary = dictionary;
+        component.fileRequired = true;
+        component.ngOnInit();
+        expect(component.settingsForm.controls.file.validator).toEqual(Validators.required);
+        expect(component.settingsForm.controls.title.value).toEqual(dictionary.title);
+        expect(component.settingsForm.controls.description.value).toEqual(dictionary.description);
+    });
+
+    it('onFileSelected should enable the settingsForm inputs', async () => {
+        const dictionary = { title: 'Title', description: 'This dict' };
+        const file = {
+            text: async () => {
+                return new Promise<string>((resolve) => {
+                    resolve(JSON.stringify(dictionary));
+                });
+            },
+        };
+        const event = { target: { files: [file] } };
+        component.onFileSelected(event as unknown as Event);
+        fixture.detectChanges();
+        expect(component.settingsForm.controls.title.enabled).toBeTruthy();
+        expect(component.settingsForm.controls.description.enabled).toBeTruthy();
+    });
+
+    it('onSubmit should dispatch modifyDictionary if dictionaryIndex and currentDictionary are not null', () => {
+        const oldDictionary = { title: 'Title', description: 'This dict' };
+        const newDictionary = { title: 'NEW Title', description: 'This new dict' };
+        component.dictionaryIndex = 1;
+        component.currentDictionary = oldDictionary;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(component as any, 'getFormDictionary').and.callFake(() => newDictionary);
+        const expectedAction = cold('a', { a: modifyDictionary({ oldDictionary, newDictionary }) });
+        component.onSubmit();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+        expect(mockDialogSpy.close).toHaveBeenCalled();
+    });
+
+    it('onSubmit should dispatch addDictionary if loadedDictionary is not null', () => {
+        const dictionary = { title: 'Title', description: 'This dict' };
+        const expectedFile = {} as File;
+        component.loadedDictionary = {} as iDictionary;
+        component.loadedFile = expectedFile;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(component as any, 'getFormDictionary').and.callFake(() => dictionary);
+        const expectedAction = cold('a', { a: addDictionary({ file: expectedFile, dictionary }) });
+        component.onSubmit();
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+        expect(mockDialogSpy.close).toHaveBeenCalled();
+    });
+
+    it('onSubmit should close dialog if all attributes are null', () => {
+        component.onSubmit();
+        expect(mockDialogSpy.close).toHaveBeenCalled();
+    });
+
+    it('getFormDictionary should return a dictionary with given values', () => {
+        const title = 'Title';
+        const description = 'This dict';
+        const dictionary = { title, description };
+        component.settingsForm.controls.title.setValue(title);
+        component.settingsForm.controls.description.setValue(description);
+        // eslint-disable-next-line dot-notation
+        expect(component['getFormDictionary']()).toEqual(dictionary);
     });
 });

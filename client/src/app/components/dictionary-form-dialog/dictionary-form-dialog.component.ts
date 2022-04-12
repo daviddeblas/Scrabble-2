@@ -30,7 +30,6 @@ export class DictionaryFormDialogComponent implements OnInit {
     }
 
     onFileSelected(event: Event) {
-        // Ca au moins ca compile
         this.loadedFile = (event as unknown as { target: { files: File[] } }).target.files[0];
 
         this.loadedFile.text().then((text) => {
