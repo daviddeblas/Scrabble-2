@@ -1,5 +1,6 @@
 import { Server } from '@app/server';
 import { Dictionary } from 'common/classes/dictionary';
+import { defaultDictionary as DEFAULT_DICTIONARY } from 'common/constants';
 import { Router } from 'express';
 import fileUpload from 'express-fileupload';
 import { readdirSync, readFileSync, unlink, writeFileSync } from 'fs';
@@ -7,7 +8,6 @@ import path from 'path';
 import io from 'socket.io';
 import { Container, Service } from 'typedi';
 
-export const defaultDictionary = 'Francais';
 const dictionariesPath = 'assets/dictionaries';
 
 const resourceNotFound = 404;
@@ -34,7 +34,7 @@ export class DictionaryService {
     }
 
     deleteDictionary(dictionaryName: string): undefined | Error {
-        if (dictionaryName === defaultDictionary) return new Error('deleted dictionary is the default');
+        if (dictionaryName === DEFAULT_DICTIONARY) return new Error('deleted dictionary is the default');
         const selectedDictionaryIndex = this.dictionaries.findIndex((d) => d.title === dictionaryName);
         if (selectedDictionaryIndex < 0) return new Error('dictionary not found');
         unlink(this.dictionaries[selectedDictionaryIndex].path, () => {
@@ -93,7 +93,7 @@ export class DictionaryService {
 
     reset(): void {
         [...this.dictionaries].forEach((d) => {
-            if (d.title === defaultDictionary) return;
+            if (d.title === DEFAULT_DICTIONARY) return;
             this.deleteDictionary(d.title);
         });
     }
