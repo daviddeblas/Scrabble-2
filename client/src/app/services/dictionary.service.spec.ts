@@ -77,6 +77,18 @@ describe('DictionaryService', () => {
 
     it('downloadDictionary should call http.get and ', async () => {
         const dictionary = { title: 'Title', description: 'dict description' } as iDictionary;
+        spyOn(document, 'createElement').and.returnValue({
+            setAttribute: () => {
+                return;
+            },
+            click: () => {
+                return;
+            },
+            remove: () => {
+                return;
+            },
+        } as unknown as HTMLElement);
+        spyOn(document.body, 'appendChild');
         httpClientMock.get.and.returnValue(
             new Observable<{ type: 'string' }>((observer) => {
                 observer.next({ type: 'string' });
