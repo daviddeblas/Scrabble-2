@@ -13,10 +13,10 @@ export const reducer = createReducer(
     on(botNamesActions.addBotName, (state, { name, difficulty }) => {
         const newState = { easy: [...state.easy], hard: [...state.hard] };
         switch (difficulty) {
-            case 'easy':
+            case 'Débutant':
                 newState.easy.push(name);
                 break;
-            case 'hard':
+            case 'Expert':
                 newState.hard.push(name);
                 break;
         }
@@ -25,10 +25,10 @@ export const reducer = createReducer(
     on(botNamesActions.modifyBotName, (state, { oldName, newName, difficulty }) => {
         const newState = { easy: [...state.easy], hard: [...state.hard] };
         switch (difficulty) {
-            case 'easy':
+            case 'Débutant':
                 newState.easy[newState.easy.findIndex((e) => e === oldName)] = newName;
                 break;
-            case 'hard':
+            case 'Expert':
                 newState.hard[newState.hard.findIndex((e) => e === oldName)] = newName;
                 break;
         }
@@ -38,10 +38,10 @@ export const reducer = createReducer(
     on(botNamesActions.deleteBotName, (state, { name, difficulty }) => {
         const newState = { easy: [...state.easy], hard: [...state.hard] };
         switch (difficulty) {
-            case 'easy':
+            case 'Débutant':
                 newState.easy = newState.easy.filter((n) => name !== n);
                 break;
-            case 'hard':
+            case 'Expert':
                 newState.hard = newState.hard.filter((n) => name !== n);
                 break;
         }

@@ -14,14 +14,14 @@
             <mat-card-title> Debutant </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
-                    <li class="bots" *ngFor="let name of (botNames$ | async)?.easy; let i = index">
+                    <li class="bots" *ngFor="let name of (botNames$ | async)?.easy">
                         <mat-card>
                             <mat-card-title class="bot-title">
                                 {{ name }}
-                                <button mat-icon-button (click)="edit(name, 'Débutant')">
+                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="edit(name, 'Débutant')">
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button (click)="delete(name, 'Débutant')">
+                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="delete(name, 'Débutant')">
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </mat-card-title>
@@ -34,14 +34,14 @@
             <mat-card-title> Expert </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
-                    <li class="bots" *ngFor="let name of (botNames$ | async)?.hard; let i = index">
+                    <li class="bots" *ngFor="let name of (botNames$ | async)?.hard">
                         <mat-card>
                             <mat-card-title class="bot-title"
                                 >{{ name }}
-                                <button mat-icon-button (click)="edit(name, 'Expert')">
+                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="edit(name, 'Expert')">
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button (click)="delete(name, 'Expert')">
+                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="delete(name, 'Expert')">
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </mat-card-title>

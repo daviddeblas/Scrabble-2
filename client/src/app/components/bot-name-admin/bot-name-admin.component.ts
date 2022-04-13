@@ -4,6 +4,7 @@ import { deleteBotName, loadBotNames, resetBotNames } from '@app/actions/bot-nam
 import { BotNameFormDialogComponent } from '@app/components/bot-name-form-dialog/bot-name-form-dialog.component';
 import { BotNames } from '@app/interfaces/bot-names';
 import { Store } from '@ngrx/store';
+import { EASY_BOT_NAMES, HARD_BOT_NAMES } from 'common/constants';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -37,5 +38,11 @@ export class BotAdminComponent {
 
     delete(name: string, difficulty: string) {
         this.store.dispatch(deleteBotName({ name, difficulty }));
+    }
+
+    botNameNotChangeable(name: string): boolean {
+        let isNotChangeable = EASY_BOT_NAMES.includes(name);
+        isNotChangeable ||= HARD_BOT_NAMES.includes(name);
+        return isNotChangeable;
     }
 }
