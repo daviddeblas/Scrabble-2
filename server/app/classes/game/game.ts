@@ -111,7 +111,9 @@ export class Game {
             this.stopTimer();
             return true;
         }
-        if (this.players.filter((p) => p.easel.length === 0).length > 0 && this.bag.letters.length === 0) {
+        const lettersInPlayerEasel = this.players.filter((p) => p.easel.length === 0).length > 0;
+        const lettersInBagLeft = this.bag.letters.length;
+        if (lettersInPlayerEasel && lettersInBagLeft === 0) {
             this.stopTimer();
             return true;
         }
@@ -186,7 +188,8 @@ export class Game {
     }
 
     private determineWinner(): string | null {
-        if (this.players.filter((p) => p.score === this.players[0].score).length === this.players.length) return null;
+        const playersWithSameScore = this.players.filter((p) => p.score === this.players[0].score);
+        if (playersWithSameScore.length === this.players.length) return null;
         const winningPlayer = this.players.reduce((playerWithMostPoints, currentPlayer) =>
             currentPlayer.score > playerWithMostPoints.score ? currentPlayer : playerWithMostPoints,
         );
