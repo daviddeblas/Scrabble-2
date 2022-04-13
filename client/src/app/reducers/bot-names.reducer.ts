@@ -5,7 +5,7 @@ import { createReducer, on } from '@ngrx/store';
 
 export const botNamesFeatureKey = 'botNames';
 
-export const initialState: BotNames = { easy: ['aaa'], hard: [] };
+export const initialState: BotNames = { easy: ['aaa', 'aaa', 'aaa'], hard: ['bbbb'] };
 
 export const reducer = createReducer(
     initialState,
