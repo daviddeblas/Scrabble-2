@@ -42,8 +42,8 @@ export class Board {
 
     place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number | GameError {
         this.lastPlacedWord = [];
-        if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
-            return new GameError(GameErrorType.WrongPosition);
+        const letterOutOfBoard = letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y);
+        if (letterOutOfBoard.length > 0) return new GameError(GameErrorType.WrongPosition);
         const words = this.getAffectedWords(letters);
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
         if (!firstMove && allPlacedLetters.length === letters.length) return new GameError(GameErrorType.WordNotConnected);
