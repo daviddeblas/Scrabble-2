@@ -14,9 +14,9 @@
             <mat-card-title> Debutant </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
-                    <li class="dictionary" *ngFor="let name of (botNames$ | async)?.easy; let i = index">
+                    <li class="bots" *ngFor="let name of (botNames$ | async)?.easy; let i = index">
                         <mat-card>
-                            <mat-card-title class="dictionary-title">
+                            <mat-card-title class="bot-title">
                                 {{ name }}
                                 <button mat-icon-button (click)="edit(name, 'Débutant')">
                                     <mat-icon>edit</mat-icon>
@@ -34,9 +34,9 @@
             <mat-card-title> Expert </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
-                    <li class="dictionary" *ngFor="let name of (botNames$ | async)?.hard; let i = index">
+                    <li class="bots" *ngFor="let name of (botNames$ | async)?.hard; let i = index">
                         <mat-card>
-                            <mat-card-title class="dictionary-title"
+                            <mat-card-title class="bot-title"
                                 >{{ name }}
                                 <button mat-icon-button (click)="edit(name, 'Expert')">
                                     <mat-icon>edit</mat-icon>

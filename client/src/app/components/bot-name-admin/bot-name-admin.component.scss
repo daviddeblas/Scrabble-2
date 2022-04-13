@@ -15,20 +15,16 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
-.dictionary {
+.bots {
     display: contents;
 }
 
-.dictionary > * {
+.bots > * {
     margin-bottom: 5px;
 }
 
-.dictionary-title {
+.bot-title {
     font-size: medium;
-}
-
-.dictionary-description {
-    margin-bottom: 0;
 }
 
 .mat-card-actions,
