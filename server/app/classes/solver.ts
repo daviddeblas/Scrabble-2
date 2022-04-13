@@ -21,6 +21,8 @@ import { PlacedLetter } from './placed-letter';
 // éviter de bloquer la event loop pendant trop longtemps dans les calculs
 const immediatePromise: () => Promise<void> = promisify(setImmediate);
 
+const LETTER_X2_DIST = 4;
+
 export class Solver {
     constructor(private dictionary: Dictionary, private board: Board, private easel: Letter[]) {}
 
@@ -138,7 +140,8 @@ export class Solver {
             const easelTmp = [...this.easel];
             const wordArray: Letter[] = Array.from(word.toUpperCase()) as Letter[];
             const solution: Solution = { letters: [], blanks: [], direction };
-            let position: Vec2 = startingPosition.copy();
+
+            let position: Vec2 = this.firstSolutionShift(direction, startingPosition, wordArray);
 
             for (const letter of wordArray) {
                 let index = easelTmp.indexOf(letter);
@@ -155,6 +158,28 @@ export class Solver {
         });
 
         return solutions;
+    }
+
+    private firstSolutionShift(direction: Vec2, startingPosition: Vec2, wordArray: Letter[]): Vec2 {
+        let position = startingPosition.copy();
+        if (wordArray.length > LETTER_X2_DIST) {
+            let bestLetterScore = 0;
+            for (let i = 0; i < wordArray.length - LETTER_X2_DIST; i++) {
+                const letterScore = this.board.pointsPerLetter.get(wordArray[i]) as number;
+                if (bestLetterScore < letterScore) {
+                    bestLetterScore = letterScore;
+                    position = startingPosition.add(direction.mul(-LETTER_X2_DIST - i));
+                }
+            }
+            for (let i = LETTER_X2_DIST; i < wordArray.length; i++) {
+                const letterScore = this.board.pointsPerLetter.get(wordArray[i]) as number;
+                if (bestLetterScore < letterScore) {
+                    bestLetterScore = letterScore;
+                    position = startingPosition.add(direction.mul(LETTER_X2_DIST - i));
+                }
+            }
+        }
+        return position;
     }
 
     private async findPerpendicularSolutions(expiration: number, solutions: Solution[]): Promise<Solution[]> {
