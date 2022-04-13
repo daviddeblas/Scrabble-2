@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { loadBotNames, resetBotNames } from '@app/actions/bot-names.actions';
+import { deleteBotName, loadBotNames, resetBotNames } from '@app/actions/bot-names.actions';
+import { BotNameFormDialogComponent } from '@app/components/bot-name-form-dialog/bot-name-form-dialog.component';
 import { BotNames } from '@app/interfaces/bot-names';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -23,16 +24,18 @@ export class BotAdminComponent {
     }
 
     add() {
-        return;
+        this.dialog.open(BotNameFormDialogComponent);
     }
 
-    // eslint-disable-next-line no-unused-vars
-    edit(_index: number, _difficulty: string) {
-        return;
+    edit(_name: string, _difficulty: string) {
+        const dialogRef = this.dialog.open(BotNameFormDialogComponent);
+        const dialogComponent = dialogRef.componentInstance;
+        dialogComponent.oldName = _name;
+        dialogComponent.currentBotName = _name;
+        dialogComponent.currentDifficulty = _difficulty;
     }
 
-    // eslint-disable-next-line no-unused-vars
-    delete(_index: number, _difficulty: string) {
-        return;
+    delete(name: string, difficulty: string) {
+        this.store.dispatch(deleteBotName({ name, difficulty }));
     }
 }

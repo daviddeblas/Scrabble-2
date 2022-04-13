@@ -1,19 +1,27 @@
 <mat-card class="bot-name-admin">
-    <mat-card-title>Nom des adversaires</mat-card-title>
+    <mat-card-title>
+        Nom des adversaires
+        <button mat-icon-button (click)="add()">
+            <mat-icon>add</mat-icon>
+        </button>
+        <button mat-icon-button (click)="reset()">
+            <mat-icon>restore</mat-icon>
+        </button>
+    </mat-card-title>
     <mat-card-subtitle>Ajout/Retrait des noms des adversaires</mat-card-subtitle>
     <div class="difficulty-grid">
         <mat-card>
-            <mat-card-title>Debutant</mat-card-title>
+            <mat-card-title> Debutant </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
                     <li class="dictionary" *ngFor="let name of (botNames$ | async)?.easy; let i = index">
                         <mat-card>
                             <mat-card-title class="dictionary-title">
                                 {{ name }}
-                                <button mat-icon-button (click)="edit(i, 'easy')">
+                                <button mat-icon-button (click)="edit(name, 'Débutant')">
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button (click)="delete(i, 'easy')">
+                                <button mat-icon-button (click)="delete(name, 'Débutant')">
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </mat-card-title>
@@ -23,20 +31,20 @@
             </mat-card-content>
         </mat-card>
         <mat-card>
-            <mat-card-title>Expert</mat-card-title>
+            <mat-card-title> Expert </mat-card-title>
             <mat-card-content>
                 <ul class="name-list">
                     <li class="dictionary" *ngFor="let name of (botNames$ | async)?.hard; let i = index">
                         <mat-card>
-                            <mat-card-title class="dictionary-title">{{ name }}</mat-card-title>
-                            <mat-card-actions>
-                                <button mat-icon-button (click)="edit(i, 'hard')">
+                            <mat-card-title class="dictionary-title"
+                                >{{ name }}
+                                <button mat-icon-button (click)="edit(name, 'Expert')">
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button (click)="delete(i, 'hard')">
+                                <button mat-icon-button (click)="delete(name, 'Expert')">
                                     <mat-icon>delete</mat-icon>
                                 </button>
-                            </mat-card-actions>
+                            </mat-card-title>
                         </mat-card>
                     </li>
                 </ul>
