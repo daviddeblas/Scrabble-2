@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 
 export const loadBotNames = createAction('[BotNames] Load BotNames');
 
-export const loadBotNamesSuccess = createAction('[BotNames] Load BotNames Success', props<{ names: { hardBots: string[]; easyBots: string[] } }>());
+export const loadBotNamesSuccess = createAction('[BotNames] Load BotNames Success', props<{ names: { hard: string[]; easy: string[] } }>());
 
 export const addBotName = createAction('[BotNames] Add BotName', props<{ name: string; difficulty: string }>());
 

@@ -11,7 +11,7 @@ export class BotNamesService {
 
     getBotNames() {
         this.socketService.send('get bot names');
-        this.socketService.on('receive bot name', (arr: { easyBots: string[]; hardBots: string[] }) => {
+        this.socketService.on('receive bot name', (arr: { easy: string[]; hard: string[] }) => {
             this.store.dispatch(loadBotNamesSuccess({ names: arr }));
         });
     }

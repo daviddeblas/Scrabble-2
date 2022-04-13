@@ -1,30 +1,42 @@
-<mat-card class="dictionaries">
-    <mat-card-title>Dictionaires</mat-card-title>
-    <mat-card-subtitle>Ajout/Retrait des dictionaires disponibles</mat-card-subtitle>
+<mat-card class="app-bot-name-admin">
+    <mat-card-title>Nom des adversaires</mat-card-title>
+    <mat-card-subtitle>Ajout/Retrait des noms des adversaires</mat-card-subtitle>
     <mat-card-actions>
-        <button mat-icon-button (click)="addDictionary()">
+        <button mat-icon-button (click)="add()">
             <mat-icon>add</mat-icon>
         </button>
-        <button mat-icon-button (click)="resetDictionaries()">
+        <button mat-icon-button (click)="reset()">
             <mat-icon>restore</mat-icon>
         </button>
     </mat-card-actions>
     <mat-card-content>
         <ul>
-            <li class="dictionary" *ngFor="let dictionary of dictionaries$ | async; let i = index">
+            <li class="dictionary" *ngFor="let name of (botNames$ | async)?.easy; let i = index">
                 <mat-card>
-                    <mat-card-title class="dictionary-title">{{ dictionary.title }}</mat-card-title>
-                    <mat-card-subtitle class="dictionary-description">{{ dictionary.description }}
-                    </mat-card-subtitle>
+                    <mat-card-title class="dictionary-title">{{ name }}</mat-card-title>
                     <mat-card-actions>
-                        <button mat-icon-button (click)="modifyDictionary(i, dictionary)">
+                        <button mat-icon-button (click)="edit(i, 'easy')">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="deleteDictionary(i)">
+                        <button mat-icon-button (click)="delete(i, 'easy')">
                             <mat-icon>delete</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="downloadDictionary(dictionary)">
-                            <mat-icon>get_app</mat-icon>
+                    </mat-card-actions>
+                </mat-card>
+            </li>
+        </ul>
+    </mat-card-content>
+    <mat-card-content>
+        <ul>
+            <li class="dictionary" *ngFor="let name of (botNames$ | async)?.hard; let i = index">
+                <mat-card>
+                    <mat-card-title class="dictionary-title">{{ name }}</mat-card-title>
+                    <mat-card-actions>
+                        <button mat-icon-button (click)="edit(i, 'hard')">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="delete(i, 'hard')">
+                            <mat-icon>delete</mat-icon>
                         </button>
                     </mat-card-actions>
                 </mat-card>

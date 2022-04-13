@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { loadBotNames } from '@app/actions/bot-names.actions';
+import { loadBotNames, resetBotNames } from '@app/actions/bot-names.actions';
+import { BotNames } from '@app/interfaces/bot-names';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -10,10 +11,28 @@ import { Observable } from 'rxjs';
     styleUrls: ['./bot-name-admin.component.scss'],
 })
 export class BotAdminComponent {
-    botNames$: Observable<string[]>;
+    botNames$: Observable<BotNames>;
 
-    constructor(private store: Store<{ botNames: string[] }>, public dialog: MatDialog) {
+    constructor(private store: Store<{ botNames: BotNames }>, public dialog: MatDialog) {
         this.botNames$ = store.select('botNames');
         store.dispatch(loadBotNames());
+    }
+
+    reset() {
+        this.store.dispatch(resetBotNames());
+    }
+
+    add() {
+        return;
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    edit(_index: number, _difficulty: string) {
+        return;
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    delete(_index: number, _difficulty: string) {
+        return;
     }
 }
