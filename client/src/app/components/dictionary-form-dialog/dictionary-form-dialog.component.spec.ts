@@ -28,7 +28,14 @@ describe('DictionaryFormDialogComponent', () => {
             imports: [ReactiveFormsModule, FormsModule, AppMaterialModule, BrowserAnimationsModule],
             declarations: [DictionaryFormDialogComponent],
             providers: [
-                provideMockStore(),
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'dictionaries',
+                            value: [{ title: 'My Dict', description: 'description' }],
+                        },
+                    ],
+                }),
                 {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
@@ -155,6 +162,7 @@ describe('DictionaryFormDialogComponent', () => {
     it('onSubmit should dispatch modifyDictionary if dictionaryIndex and currentDictionary are not null', () => {
         const oldDictionary = { title: 'Title', description: 'This dict' };
         const newDictionary = { title: 'NEW Title', description: 'This new dict' };
+        component.settingsForm.controls.title.setValue('title');
         component.dictionaryIndex = 1;
         component.currentDictionary = oldDictionary;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,6 +175,7 @@ describe('DictionaryFormDialogComponent', () => {
 
     it('onSubmit should dispatch addDictionary if loadedDictionary is not null', () => {
         const dictionary = { title: 'Title', description: 'This dict' };
+        component.settingsForm.controls.title.setValue('title');
         const expectedFile = {} as File;
         component.loadedDictionary = {} as iDictionary;
         component.loadedFile = expectedFile;
@@ -179,8 +188,18 @@ describe('DictionaryFormDialogComponent', () => {
     });
 
     it('onSubmit should close dialog if all attributes are null', () => {
+        component.settingsForm.controls.title.setValue('title');
         component.onSubmit();
         expect(mockDialogSpy.close).toHaveBeenCalled();
+    });
+
+    it('onSubmit should call dispatchFileError if dictionary title chosen is the same as another one', () => {
+        component.settingsForm.controls.title.setValue('My Dict');
+        component.dictionaryIndex = 5;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dispatchErrorSpy = spyOn(component as any, 'dispatchFileError');
+        component.onSubmit();
+        expect(dispatchErrorSpy).toHaveBeenCalledOnceWith('Titre de dictionnaire déjà existant');
     });
 
     it('getFormDictionary should return a dictionary with given values', () => {

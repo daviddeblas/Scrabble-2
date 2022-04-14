@@ -22,7 +22,7 @@ export class DictionaryFormDialogComponent implements OnInit {
 
     constructor(
         private fb: FormBuilder,
-        private store: Store,
+        private store: Store<{ dictionaries: iDictionary[] }>,
         private dialogRef: MatDialogRef<DictionaryFormDialogComponent>,
         private snackBar: MatSnackBar,
     ) {}
@@ -57,6 +57,10 @@ export class DictionaryFormDialogComponent implements OnInit {
     }
 
     onSubmit() {
+        if (this.dictionaryTitleExists()) {
+            this.dispatchFileError('Titre de dictionnaire déjà existant');
+            return;
+        }
         if (this.dictionaryIndex !== null && this.currentDictionary != null) {
             this.store.dispatch(
                 modifyDictionary({
@@ -76,6 +80,19 @@ export class DictionaryFormDialogComponent implements OnInit {
 
     private getFormDictionary(): iDictionary {
         return { title: this.settingsForm.controls.title.value, description: this.settingsForm.controls.description.value };
+    }
+
+    private dictionaryTitleExists(): boolean {
+        let titleExists: iDictionary | undefined;
+        const dictionaryTitleSelected = this.settingsForm.controls.title.value.toLowerCase();
+        this.store.select('dictionaries').subscribe((dictionaries) => {
+            titleExists = dictionaries.find((dictionary, index) => {
+                const sameTitle = dictionary.title.toLowerCase() === dictionaryTitleSelected;
+                const sameIndex = index === this.dictionaryIndex;
+                return sameTitle && !sameIndex;
+            });
+        });
+        return titleExists !== undefined;
     }
 
     private dispatchFileError(message: string): void {
