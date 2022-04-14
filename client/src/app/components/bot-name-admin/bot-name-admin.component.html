@@ -2,10 +2,10 @@
     <mat-card-title>
         Nom des adversaires
         <button mat-icon-button (click)="add()">
-            <mat-icon>add</mat-icon>
+            <mat-icon matTooltip="Ajouter">add</mat-icon>
         </button>
         <button mat-icon-button (click)="reset()">
-            <mat-icon>restore</mat-icon>
+            <mat-icon matTooltip="Réinitialiser">restore</mat-icon>
         </button>
     </mat-card-title>
     <mat-card-subtitle>Ajout/Retrait des noms des adversaires</mat-card-subtitle>
@@ -18,10 +18,20 @@
                         <mat-card>
                             <mat-card-title class="bot-title">
                                 {{ name }}
-                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="edit(name, 'Débutant')">
+                                <button
+                                    mat-icon-button
+                                    [disabled]="botNameNotChangeable(name)"
+                                    matTooltip="Modifier"
+                                    (click)="edit(name, 'Débutant')"
+                                >
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="delete(name, 'Débutant')">
+                                <button
+                                    mat-icon-button
+                                    [disabled]="botNameNotChangeable(name)"
+                                    matTooltip="Supprimer"
+                                    (click)="delete(name, 'Débutant')"
+                                >
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </mat-card-title>
@@ -38,10 +48,15 @@
                         <mat-card>
                             <mat-card-title class="bot-title"
                                 >{{ name }}
-                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="edit(name, 'Expert')">
+                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" matTooltip="Modifier" (click)="edit(name, 'Expert')">
                                     <mat-icon>edit</mat-icon>
                                 </button>
-                                <button mat-icon-button [disabled]="botNameNotChangeable(name)" (click)="delete(name, 'Expert')">
+                                <button
+                                    mat-icon-button
+                                    [disabled]="botNameNotChangeable(name)"
+                                    matTooltip="Supprimer"
+                                    (click)="delete(name, 'Expert')"
+                                >
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </mat-card-title>
