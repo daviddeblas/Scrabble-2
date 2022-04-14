@@ -28,7 +28,7 @@ export class DictionaryService {
         return this.http.post<Dictionary>(environment.serverUrl.concat('/admin/dictionary/'), formData);
     }
 
-    resetDictionaries() {
+    resetDictionaries(): void {
         this.socketService.send('reset dictionaries');
 
         this.socketService.on('receive dictionaries', (dictionaries: iDictionary[]) => {
@@ -40,7 +40,7 @@ export class DictionaryService {
         this.socketService.send('delete dictionary', title);
     }
 
-    modifyDictionary(oldDictionary: iDictionary, newDictionary: iDictionary) {
+    modifyDictionary(oldDictionary: iDictionary, newDictionary: iDictionary): void {
         this.socketService.send('modify dictionary', {
             oldName: oldDictionary.title,
             newName: newDictionary.title,
@@ -48,7 +48,7 @@ export class DictionaryService {
         });
     }
 
-    downloadDictionary(dictionary: iDictionary) {
+    downloadDictionary(dictionary: iDictionary): void {
         this.http
             .get(environment.serverUrl.concat('/admin/dictionary/', dictionary.title), { responseType: 'blob' as 'json' })
             // la reponse de la requete http n'a pas de type

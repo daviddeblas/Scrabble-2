@@ -88,7 +88,6 @@ export class Game {
     }
 
     draw(letters: Letter[], player: number): GameError | undefined {
-        if (this.bag.letters.length < MAX_LETTERS_IN_EASEL) return new GameError(GameErrorType.NotEnoughLetters);
         const error = this.checkMove(letters, player);
         if (error) return error;
         this.getActivePlayer().removeLetters(letters);

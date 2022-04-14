@@ -5,7 +5,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { createSoloRoom } from '@app/actions/room.actions';
 import { MultiConfigWindowComponent } from '@app/components/multi-config-window/multi-config-window.component';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
 import { cold } from 'jasmine-marbles';
@@ -20,6 +22,7 @@ describe('SoloGameSettingsPageComponent', () => {
     };
 
     beforeEach(async () => {
+        const socketHelper = new SocketTestHelper();
         await TestBed.configureTestingModule({
             declarations: [SoloGameSettingsPageComponent, MultiConfigWindowComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule],
@@ -32,6 +35,20 @@ describe('SoloGameSettingsPageComponent', () => {
                     provide: Router,
                     useValue: {
                         navigate: () => {
+                            return;
+                        },
+                    },
+                },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
                             return;
                         },
                     },

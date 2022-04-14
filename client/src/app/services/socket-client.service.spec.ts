@@ -3,16 +3,18 @@
 
 import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
-import { Socket } from 'socket.io-client';
+import * as SocketClient from 'socket.io-client';
 import { SocketClientService } from './socket-client.service';
 
 describe('SocketClientService', () => {
     let service: SocketClientService;
-
+    let socketHelper: SocketTestHelper;
     beforeEach(() => {
+        socketHelper = new SocketTestHelper();
         TestBed.configureTestingModule({});
         service = TestBed.inject(SocketClientService);
-        service.socket = new SocketTestHelper() as unknown as Socket;
+        service.disconnect();
+        service.socket = socketHelper as unknown as SocketClient.Socket;
     });
 
     it('should be created', () => {
@@ -44,16 +46,6 @@ describe('SocketClientService', () => {
         service.resetConnection();
         expect(disconnectSpy).toHaveBeenCalled();
         expect(connectSpy).toHaveBeenCalled();
-    });
-
-    it('should return if socket is alive', () => {
-        service.socket.connected = false;
-        expect(service.isSocketAlive()).toBeFalse();
-        service.socket.connected = true;
-        expect(service.isSocketAlive()).toBeTrue();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).socket = undefined;
-        expect(service.isSocketAlive()).toBeFalse();
     });
 
     it('isSocketAlive should return true if the socket is still connected', () => {

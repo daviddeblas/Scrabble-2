@@ -1,5 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { resetGameHistory } from '@app/actions/game-history.actions';
+import { DictionariesAdministratorComponent } from '@app/components/dictionaries-administrator/dictionaries-administrator.component';
+import { GameHistoryTableComponent } from '@app/components/game-history-table/game-history-table.component';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { AdminPageComponent } from './admin-page.component';
@@ -11,8 +15,18 @@ describe('AdminPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [AdminPageComponent],
-            providers: [provideMockStore()],
+            imports: [AppMaterialModule, BrowserAnimationsModule],
+            declarations: [AdminPageComponent, GameHistoryTableComponent, DictionariesAdministratorComponent],
+            providers: [
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameHistory',
+                            value: { gameHistory: {} },
+                        },
+                    ],
+                }),
+            ],
         }).compileComponents();
         store = TestBed.inject(MockStore);
     });

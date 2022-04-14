@@ -31,7 +31,7 @@ describe('DictionaryFormDialogComponent', () => {
                 provideMockStore(),
                 {
                     provide: MatDialogRef,
-                    useValue: {},
+                    useValue: mockDialogSpy,
                 },
                 {
                     provide: MatSnackBar,
