@@ -75,6 +75,9 @@ export class HighscoreDatabaseService {
                 socket.emit('receive log2990 highscores', value);
             });
         });
+        socket.on('reset highScores', () => {
+            this.resetDB();
+        });
     }
 
     private async populateDBClassical() {

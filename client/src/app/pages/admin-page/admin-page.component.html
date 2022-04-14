@@ -9,8 +9,7 @@
         <app-dictionaries-administrator class="menu-dict"></app-dictionaries-administrator>
         <app-bot-name-admin class="menu-bot"></app-bot-name-admin>
         <mat-card class="menu-hist">
-            <mat-card-title
-                >Historique des parties
+            <mat-card-title>Historique des parties
                 <button mat-icon-button (click)="resetGameHistory()">
                     <mat-icon matTooltip="Réinitialiser">restore</mat-icon>
                 </button>
@@ -19,6 +18,13 @@
             <mat-card-content>
                 <app-game-history-table></app-game-history-table>
             </mat-card-content>
+        </mat-card>
+        <mat-card class="menu-lead">
+            <mat-card-title>Leaderboard:
+                <button mat-icon-button (click)="resetLeaderBoard()">
+                    <mat-icon matTooltip="Réinitialiser">restore</mat-icon>
+                </button>
+            </mat-card-title>
         </mat-card>
     </div>
 </div>

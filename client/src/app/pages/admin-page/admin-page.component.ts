@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { resetGameHistory } from '@app/actions/game-history.actions';
+import { resetLeaderboard } from '@app/actions/leaderboard.actions';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -12,5 +13,9 @@ export class AdminPageComponent {
 
     resetGameHistory(): void {
         this.store.dispatch(resetGameHistory());
+    }
+
+    resetLeaderBoard(): void {
+        this.store.dispatch(resetLeaderboard());
     }
 }
