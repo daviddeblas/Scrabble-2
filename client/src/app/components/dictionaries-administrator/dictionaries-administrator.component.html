@@ -16,14 +16,16 @@
                     <mat-card-title class="dictionary-title">{{ dictionary.title }}</mat-card-title>
                     <mat-card-subtitle class="dictionary-description">{{ dictionary.description }} </mat-card-subtitle>
                     <mat-card-actions>
-                        <button mat-icon-button (click)="modifyDictionary(i, dictionary)" [disabled]="dictionary.title === defaultDictionary">
-                            <mat-icon matTooltip="Editer">edit</mat-icon>
+                        <button mat-icon-button (click)="modifyDictionary(i, dictionary)"
+                            [disabled]="dictionary.title === defaultDictionary" matTooltip="Editer">
+                            <mat-icon>edit</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="deleteDictionary(dictionary)" [disabled]="dictionary.title === defaultDictionary">
-                            <mat-icon matTooltip="Supprimer">delete</mat-icon>
+                        <button mat-icon-button (click)="deleteDictionary(dictionary)"
+                            [disabled]="dictionary.title === defaultDictionary" matTooltip="Supprimer">
+                            <mat-icon>delete</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="downloadDictionary(dictionary)">
-                            <mat-icon matTooltip="Télécharger">get_app</mat-icon>
+                        <button mat-icon-button (click)="downloadDictionary(dictionary)" matTooltip="Télécharger">
+                            <mat-icon>get_app</mat-icon>
                         </button>
                     </mat-card-actions>
                 </mat-card>

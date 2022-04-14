@@ -172,14 +172,12 @@ describe('Bot Name service tests', () => {
                     return;
                 },
             } as unknown as SocketService;
-            stub(Container.get(Server).socketService, 'broadcastMessage').callsFake(
-                (socketValue, names: { easyBotName: string[]; hardBotNames: string[] }) => {
-                    expect(socketValue).to.equal('receive bot name');
-                    expectedEasyNames.forEach((name, index) => expect(names.easyBotName[index]).to.equal(name));
-                    expectedHardNames.forEach((name, index) => expect(names.hardBotNames[index]).to.equal(name));
-                    done();
-                },
-            );
+            stub(Container.get(Server).socketService, 'broadcastMessage').callsFake((socketValue, names: { easy: string[]; hard: string[] }) => {
+                expect(socketValue).to.equal('receive bot name');
+                expectedEasyNames.forEach((name, index) => expect(names.easy[index]).to.equal(name));
+                expectedHardNames.forEach((name, index) => expect(names.hard[index]).to.equal(name));
+                done();
+            });
             service['sendAllBotNames']();
         });
 

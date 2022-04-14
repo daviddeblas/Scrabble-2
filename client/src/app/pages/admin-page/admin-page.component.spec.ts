@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { resetGameHistory } from '@app/actions/game-history.actions';
+import { BotAdminComponent } from '@app/components/bot-name-admin/bot-name-admin.component';
 import { DictionariesAdministratorComponent } from '@app/components/dictionaries-administrator/dictionaries-administrator.component';
 import { GameHistoryTableComponent } from '@app/components/game-history-table/game-history-table.component';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -16,7 +17,7 @@ describe('AdminPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [AppMaterialModule, BrowserAnimationsModule],
-            declarations: [AdminPageComponent, GameHistoryTableComponent, DictionariesAdministratorComponent],
+            declarations: [AdminPageComponent, GameHistoryTableComponent, DictionariesAdministratorComponent, BotAdminComponent],
             providers: [
                 provideMockStore({
                     selectors: [

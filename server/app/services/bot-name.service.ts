@@ -110,9 +110,9 @@ export class BotNameService {
     }
 
     private sendAllBotNames(): void {
-        const easyBotName = [...this.easyBotInitialName, ...this.addedEasyNames];
-        const hardBotNames = [...this.hardBotInitialName, ...this.addedHardNames];
-        const value = { easyBotName, hardBotNames };
+        const easy = [...this.easyBotInitialName, ...this.addedEasyNames];
+        const hard = [...this.hardBotInitialName, ...this.addedHardNames];
+        const value = { easy, hard };
         Container.get(Server).socketService.broadcastMessage('receive bot name', value);
     }
 }
