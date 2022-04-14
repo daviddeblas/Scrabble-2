@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -12,7 +12,7 @@ describe('BotNameFormDialogComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [AppMaterialModule, BrowserAnimationsModule],
+            imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule],
             declarations: [BotNameFormDialogComponent],
             providers: [
                 FormBuilder,

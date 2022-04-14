@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { addDictionary, modifyDictionary } from '@app/actions/dictionaries.actions';
@@ -22,6 +22,7 @@ describe('DictionaryFormDialogComponent', () => {
             imports: [ReactiveFormsModule, FormsModule, AppMaterialModule, BrowserAnimationsModule],
             declarations: [DictionaryFormDialogComponent],
             providers: [
+                FormBuilder,
                 provideMockStore(),
                 {
                     provide: MatDialogRef,
