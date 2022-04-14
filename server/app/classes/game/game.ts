@@ -1,10 +1,10 @@
-import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameFinishStatus } from '@app/classes/game-finish-status';
 import { GameHistoryHandler } from '@app/classes/game-history-handler';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
@@ -88,7 +88,6 @@ export class Game {
     }
 
     draw(letters: Letter[], player: number): GameError | undefined {
-        if (this.bag.letters.length < MAX_LETTERS_IN_EASEL) return new GameError(GameErrorType.NotEnoughLetters);
         const error = this.checkMove(letters, player);
         if (error) return error;
         this.getActivePlayer().removeLetters(letters);

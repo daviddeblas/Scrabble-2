@@ -96,10 +96,11 @@ export class CommandService {
         if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) return new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
-        // Même si on remplace le eslint par la structure for-of, il y a quand même un eslint car on utilise
-        // jamais directement l'index, donc on a décidé de juste ignorer le problème de la structure du for
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < args[0].length; i++) lettersToSendEveryone.push('#');
+        let i = 0;
+        while (i < args[0].length) {
+            lettersToSendEveryone.push('#');
+            i++;
+        }
 
         sockets.forEach((s, index) => {
             if (index === playerNumber) s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });

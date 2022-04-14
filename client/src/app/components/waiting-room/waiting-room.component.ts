@@ -4,7 +4,6 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
 import { GamePreparationPageComponent } from '@app/pages/game-preparation-page/game-preparation-page.component';
 import { RoomState } from '@app/reducers/room.reducer';
-import { SocketClientService } from '@app/services/socket-client.service';
 import { Store } from '@ngrx/store';
 import { RoomInfo } from 'common/classes/room-info';
 import { Observable } from 'rxjs';
@@ -23,7 +22,6 @@ export class WaitingRoomComponent implements OnDestroy, OnInit {
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<GamePreparationPageComponent>,
-        public socketService: SocketClientService,
         private store: Store,
         roomStore: Store<{ room: RoomState }>,
     ) {

@@ -3,7 +3,6 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { Dictionary } from '@app/classes/dictionary';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
@@ -11,6 +10,7 @@ import { BotDifficulty } from '@app/services/bot.service';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { BLANK_LETTER, Letter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
@@ -234,12 +234,7 @@ describe('game', () => {
         expect(game.activePlayer).to.not.eq(ogActivePlayer);
     });
 
-    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
-        game.bag.letters = ['A'];
-        expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
-    });
-
-    it('draw should return an error if the length of game bag is lower than MAX_LETTERS_IN_EASEL', () => {
+    it('draw should return an error if checkMove returns an error', () => {
         stub(game, 'checkMove' as any).callsFake(() => new GameError(GameErrorType.LettersAreNotInEasel));
         expect(game.draw([game.players[game.activePlayer].easel[0]], game.activePlayer) instanceof GameError).to.equal(true);
     });

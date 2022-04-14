@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { loadDictionariesSuccess } from '@app/actions/dictionaries.actions';
 import { Store } from '@ngrx/store';
+import { Dictionary } from 'common/classes/dictionary';
 import { iDictionary } from 'common/interfaces/dictionary';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -21,11 +22,13 @@ export class DictionaryService {
         });
     }
 
-    addDictionary(formData: FormData): Observable<FormData> {
-        return this.http.post<FormData>(environment.serverUrl, formData);
+    addDictionary(file: File): Observable<Dictionary> {
+        const formData = new FormData();
+        formData.append('dictionary', file);
+        return this.http.post<Dictionary>(environment.serverUrl.concat('/admin/dictionary/'), formData);
     }
 
-    resetDictionaries() {
+    resetDictionaries(): void {
         this.socketService.send('reset dictionaries');
 
         this.socketService.on('receive dictionaries', (dictionaries: iDictionary[]) => {
@@ -34,10 +37,10 @@ export class DictionaryService {
     }
 
     deleteDictionary(title: string) {
-        this.socketService.send('delete dictionary', { name: title });
+        this.socketService.send('delete dictionary', title);
     }
 
-    modifyDictionary(oldDictionary: iDictionary, newDictionary: iDictionary) {
+    modifyDictionary(oldDictionary: iDictionary, newDictionary: iDictionary): void {
         this.socketService.send('modify dictionary', {
             oldName: oldDictionary.title,
             newName: newDictionary.title,
@@ -45,13 +48,22 @@ export class DictionaryService {
         });
     }
 
-    downloadDictionary(dictionary: iDictionary) {
-        const link = document.createElement('a');
-        link.setAttribute('target', '_blank');
-        link.setAttribute('href', environment.serverUrl.concat(dictionary.title));
-        link.setAttribute('download', `${dictionary.title}.json`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    downloadDictionary(dictionary: iDictionary): void {
+        this.http
+            .get(environment.serverUrl.concat('/admin/dictionary/', dictionary.title), { responseType: 'blob' as 'json' })
+            // la reponse de la requete http n'a pas de type
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .subscribe((response: any) => {
+                const dataType = response.type;
+                const binaryData = [];
+                binaryData.push(response);
+                const link = document.createElement('a');
+                link.setAttribute('target', '_blank');
+                link.setAttribute('href', window.URL.createObjectURL(new Blob(binaryData as BlobPart[], { type: dataType })));
+                link.setAttribute('download', `${dictionary.title}.json`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            });
     }
 }

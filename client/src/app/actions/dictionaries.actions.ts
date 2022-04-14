@@ -7,11 +7,11 @@ export const loadDictionariesSuccess = createAction('[Dictionaries] Load Diction
 
 export const loadDictionariesFailure = createAction('[Dictionaries] Load Dictionaries Failure', props<{ error: Error }>());
 
-export const addDictionary = createAction('[Dictionaries] Add Dictionary', props<{ dictionary: iDictionary; file: File }>());
+export const addDictionary = createAction('[Dictionaries] Add Dictionary', props<{ file: File; dictionary: iDictionary }>());
 
 export const resetDictionaries = createAction('[Dictionaries] Reset Dictionaries');
 
-export const deleteDictionary = createAction('[Dictionaries] Delete Dictionary', props<{ index: number }>());
+export const deleteDictionary = createAction('[Dictionaries] Delete Dictionary', props<{ dictionary: iDictionary }>());
 
 export const modifyDictionary = createAction('[Dictionaries] Modify Dictionary', props<{ oldDictionary: iDictionary; newDictionary: iDictionary }>());
 

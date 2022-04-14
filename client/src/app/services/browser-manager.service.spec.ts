@@ -2,6 +2,7 @@
 import { TestBed } from '@angular/core/testing';
 import { restoreMessages } from '@app/actions/chat.actions';
 import { refreshTimer } from '@app/actions/game-status.actions';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { DEFAULT_TIMER } from 'common/constants';
 import { cold } from 'jasmine-marbles';
@@ -10,12 +11,12 @@ import { SocketClientService } from './socket-client.service';
 
 describe('BrowserManagerService', () => {
     let service: BrowserManagerService;
-    let socketService: SocketClientService;
+    let socketHelperService: SocketTestHelper;
     let store: MockStore;
     const waitingTime = 250;
 
     beforeEach(async () => {
-        socketService = new SocketClientService();
+        socketHelperService = new SocketTestHelper();
         await TestBed.configureTestingModule({
             providers: [
                 provideMockStore({
@@ -24,16 +25,31 @@ describe('BrowserManagerService', () => {
                         { selector: 'gameStatus', value: { timer: DEFAULT_TIMER } },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelperService,
+                        send: (value: string) => {
+                            socketHelperService.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelperService.on(event, callback);
+                            return;
+                        },
+                        isSocketAlive: () => true,
+                        connect: () => {
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(BrowserManagerService);
         store = TestBed.inject(MockStore);
-        service.socketService = socketService;
-        socketService.connect();
     });
     afterEach(() => {
         document.cookie = 'socket= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; // Permet de supprimer les cookies crée pour le test
-        socketService.disconnect();
     });
 
     it('should create', () => {
@@ -41,32 +57,32 @@ describe('BrowserManagerService', () => {
     });
 
     it('beforeUnloadHandler should call socketService.send', () => {
-        const socketSendSpy = spyOn(socketService, 'send').and.callThrough();
+        const socketSendSpy = spyOn(socketHelperService, 'emit').and.callThrough();
         service.onBrowserClosed();
         expect(socketSendSpy).toHaveBeenCalled();
     });
 
     it('beforeUnloadHandler should add a cookie', () => {
         const testSocketId = 'theSocketId';
-        socketService.socket.id = testSocketId;
+        socketHelperService.id = testSocketId;
         const expectedCookie = 'socket=' + testSocketId;
         service.onBrowserClosed();
         expect(document.cookie.includes(expectedCookie)).toBeTrue();
     });
 
     it('onloadHandler should call socketService.isSocketAlive and not .connect if a socket is still alive', () => {
-        const socketAliveSpy = spyOn(socketService, 'isSocketAlive').and.callFake(() => {
+        const socketAliveSpy = spyOn(service.socketService, 'isSocketAlive').and.callFake(() => {
             return true;
         });
-        const connectSpy = spyOn(socketService, 'connect').and.callThrough();
+        const connectSpy = spyOn(service.socketService, 'connect').and.callThrough();
         service.onBrowserLoad();
         expect(socketAliveSpy).toHaveBeenCalled();
         expect(connectSpy).not.toHaveBeenCalled();
     });
 
     it("onloadHandler should call socketService.connect if a socket isn't connected", () => {
-        const connectSpy = spyOn(socketService, 'connect').and.callThrough();
-        socketService.disconnect();
+        const connectSpy = spyOn(service.socketService, 'connect').and.callThrough();
+        spyOn(service.socketService, 'isSocketAlive').and.callFake(() => false);
         service.onBrowserLoad();
         expect(connectSpy).toHaveBeenCalled();
     });
@@ -76,8 +92,7 @@ describe('BrowserManagerService', () => {
         const fakeSend = () => {
             return;
         };
-        const sendSpy = spyOn(socketService, 'send').and.callFake(fakeSend);
-        socketService.disconnect();
+        const sendSpy = spyOn(service.socketService, 'send').and.callFake(fakeSend);
         const expectedOldId = 'MyOldSocketId';
         document.cookie = 'socket=' + expectedOldId + '; path=/';
         service.onBrowserLoad();

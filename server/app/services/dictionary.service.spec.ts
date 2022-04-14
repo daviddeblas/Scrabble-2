@@ -195,15 +195,14 @@ describe('Dictionary Service', () => {
                 done();
             });
 
-            clientSocket.emit('modify dictionary', 'test2', 'test2', 'test2');
+            clientSocket.emit('modify dictionary', { oldName: 'test2', newName: 'test2', newDescription: 'test2' });
         });
 
         it('setupSocketConnection emits modify dictionary success on right modify dictionary', (done) => {
             clientSocket.on('modify dictionary success', () => {
                 done();
             });
-
-            clientSocket.emit('modify dictionary', 'test', 'test2', 'test2');
+            clientSocket.emit('modify dictionary', { oldName: 'test', newName: 'test2', newDescription: 'test2' });
         });
 
         it('get dictionaries from api should return the right dictionary', async () => {

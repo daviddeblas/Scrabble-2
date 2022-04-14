@@ -1,7 +1,7 @@
-import { Dictionary } from '@app/classes/dictionary';
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Dictionary } from 'common/classes/dictionary';
 import { Letter } from 'common/classes/letter';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';

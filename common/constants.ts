@@ -14,3 +14,5 @@ export const MIN_BOT_PLACEMENT_TIME = 3000;
 export const MAX_BOT_PLACEMENT_TIME = 20000;
 
 export const SECONDS_IN_MINUTE = 60;
+
+export const DEFAULT_DICTIONARY = 'Francais';

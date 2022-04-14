@@ -40,6 +40,21 @@ describe('RoomService', () => {
                         },
                     },
                 },
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketService,
+                        send: (value: string, data?: unknown) => {
+                            if (!data) socketService.emit(value);
+                            if (data) socketService.emit(value, data);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketService.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         });
         service = TestBed.inject(RoomService);
