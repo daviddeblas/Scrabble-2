@@ -195,7 +195,7 @@ describe('DictionaryFormDialogComponent', () => {
     });
 
     it('onSubmit should call dispatchFileError if dictionary title chosen is the same as another one', () => {
-        component.settingsForm.controls.title.setValue('My Dict');
+        component.loadedDictionary = { title: 'My Dict', description: '' };
         component.dictionaryIndex = 5;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dispatchErrorSpy = spyOn(component as any, 'dispatchFileError');
