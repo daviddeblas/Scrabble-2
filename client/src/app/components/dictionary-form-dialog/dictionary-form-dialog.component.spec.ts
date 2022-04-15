@@ -70,7 +70,7 @@ describe('DictionaryFormDialogComponent', () => {
         expect(component.settingsForm.controls.description.value).toEqual(dictionary.description);
     });
 
-    it('onFileSelected should enable the settingsForm inputs', (done) => {
+    it('onFileSelected should disable the settingsForm inputs', (done) => {
         const dictionary = { title: 'Title', description: 'This dict', words: ['aa'] };
         const file = {
             name: 'something.json',
@@ -83,8 +83,8 @@ describe('DictionaryFormDialogComponent', () => {
         const event = { target: { files: [file] } };
         component.onFileSelected(event as unknown as Event);
         setTimeout(() => {
-            expect(component.settingsForm.controls.title.enabled).toBeTruthy();
-            expect(component.settingsForm.controls.description.enabled).toBeTruthy();
+            expect(component.settingsForm.controls.title.disabled).toBeTruthy();
+            expect(component.settingsForm.controls.description.disabled).toBeTruthy();
             done();
         }, waitingAsyncTime);
     });

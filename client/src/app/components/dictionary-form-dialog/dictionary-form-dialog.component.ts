@@ -51,8 +51,8 @@ export class DictionaryFormDialogComponent implements OnInit {
             this.loadedDictionary = jsonFile;
             this.settingsForm.controls.title.setValue(jsonFile.title);
             this.settingsForm.controls.description.setValue(jsonFile.description);
-            this.settingsForm.controls.title.enable();
-            this.settingsForm.controls.description.enable();
+            this.settingsForm.controls.title.disable();
+            this.settingsForm.controls.description.disable();
         });
     }
 
