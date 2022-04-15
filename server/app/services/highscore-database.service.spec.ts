@@ -140,12 +140,18 @@ describe('Highscore-database service', () => {
         }
     });
 
-    it('should reset the database when calling resetDB', async () => {
+    it('should reset the database when calling resetDB and call populateDB for both gameModes', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const populateClassicalStub = stub(databaseService as any, 'populateDBClassical');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const populateLog2990Stub = stub(databaseService as any, 'populateDBlog2990');
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.resetDB();
         const scoreClassic = await databaseService.getHighscores(GameMode.Classical);
         expect(scoreClassic).to.be.empty;
+        expect(populateClassicalStub.called).to.equal(true);
+        expect(populateLog2990Stub.called).to.equal(true);
     });
 
     describe('socket connections', () => {
