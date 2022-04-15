@@ -200,5 +200,19 @@ describe('Highscore-database service', () => {
                 done();
             }, responseDelay);
         });
+
+        it('should call resetDB when reset highScores received', (done) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const resetStub = stub(databaseService as any, 'resetDB');
+            server.on('connection', (socket) => {
+                databaseService.setupSocketConnection(socket);
+                hostSocket.emit('reset highScores');
+            });
+            const responseDelay = 200;
+            setTimeout(() => {
+                expect(resetStub.called).to.equal(true);
+                done();
+            }, responseDelay);
+        });
     });
 });
