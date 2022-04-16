@@ -3,9 +3,12 @@
 // Necessaire pour utiliser les actions dans les fichiers .effects, si on enleve la ligne esLint: unexpected this
 // Si on enleve le esLint : erreur de TypeScript
 
+import { HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
     addDictionary,
+    addDictionaryFailed,
+    addDictionarySuccess,
     deleteDictionary,
     downloadDictionary,
     loadDictionaries,
@@ -14,8 +17,9 @@ import {
 } from '@app/actions/dictionaries.actions';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { iDictionary } from 'common/interfaces/dictionary';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class DictionariesEffects {
@@ -35,12 +39,21 @@ export class DictionariesEffects {
             this.actions$.pipe(
                 ofType(addDictionary),
                 tap(({ file, dictionary }) => {
-                    this.dictionaryService.addDictionary(file).subscribe(() => {
-                        file.text().then((content) => {
-                            const oldDictionary: iDictionary = JSON.parse(content);
-                            this.dictionaryService.modifyDictionary(oldDictionary, dictionary);
-                        });
-                    });
+                    this.dictionaryService
+                        .addDictionary(file)
+                        .pipe(
+                            catchError(async (response: Response) => {
+                                if (response.status === HttpStatusCode.Ok) {
+                                    file.text().then((content) => {
+                                        const fileDictionary: iDictionary = JSON.parse(content);
+                                        this.store.dispatch(addDictionarySuccess({ dictionary: fileDictionary }));
+                                        this.dictionaryService.modifyDictionary(fileDictionary, dictionary);
+                                    });
+                                } else
+                                    this.store.dispatch(addDictionaryFailed({ error: Error(`${response.status} - ${response.statusText || ''}`) }));
+                            }),
+                        )
+                        .subscribe();
                 }),
             ),
         { dispatch: false },
@@ -90,5 +103,5 @@ export class DictionariesEffects {
         { dispatch: false },
     );
 
-    constructor(private actions$: Actions, private dictionaryService: DictionaryService) {}
+    constructor(private actions$: Actions, private dictionaryService: DictionaryService, private store: Store) {}
 }

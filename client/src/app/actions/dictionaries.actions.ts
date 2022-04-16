@@ -9,6 +9,10 @@ export const loadDictionariesFailure = createAction('[Dictionaries] Load Diction
 
 export const addDictionary = createAction('[Dictionaries] Add Dictionary', props<{ file: File; dictionary: iDictionary }>());
 
+export const addDictionarySuccess = createAction('[Dictionaries] Add Dictionary Success', props<{ dictionary: iDictionary }>());
+
+export const addDictionaryFailed = createAction('[Dictionaries] Add Dictionary Failed', props<{ error: Error }>());
+
 export const resetDictionaries = createAction('[Dictionaries] Reset Dictionaries');
 
 export const deleteDictionary = createAction('[Dictionaries] Delete Dictionary', props<{ dictionary: iDictionary }>());

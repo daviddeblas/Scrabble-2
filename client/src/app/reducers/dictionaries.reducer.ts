@@ -18,7 +18,7 @@ export const reducer = createReducer(
         const newState = [dictionaries[index], ...dictionariesCopy];
         return newState;
     }),
-    on(dictionariesActions.addDictionary, (state, { dictionary }) => [...state, dictionary]),
+    on(dictionariesActions.addDictionarySuccess, (state, { dictionary }) => [...state, dictionary]),
     on(dictionariesActions.modifyDictionary, (state, { oldDictionary, newDictionary }) => {
         const newState = [...state];
         newState[newState.findIndex((e) => e.title === oldDictionary.title)] = newDictionary;
