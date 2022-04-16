@@ -88,7 +88,7 @@ export class DictionaryFormDialogComponent implements OnInit {
 
     private dictionaryTitleExists(): boolean {
         let titleExists: iDictionary | undefined;
-        const dictionaryTitleSelected = this.fileRequired ? this.loadedDictionary?.title : this.settingsForm.controls.title.value.toLowerCase();
+        const dictionaryTitleSelected = this.settingsForm.controls.title.value.toLowerCase();
         this.store.select('dictionaries').subscribe((dictionaries) => {
             titleExists = dictionaries.find((dictionary, index) => {
                 const sameTitle = dictionary.title.toLowerCase() === dictionaryTitleSelected;
