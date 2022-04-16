@@ -1,9 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { messageWritten } from '@app/actions/chat.actions';
 import { zoomIn, zoomOut } from '@app/actions/local-settings.actions';
 import { Player } from '@app/classes/player';
+import { SkipTurnButtonComponent } from '@app/components/skip-turn-button/skip-turn-button.component';
+import { SurrenderGameButtonComponent } from '@app/components/surrender-game-button/surrender-game-button.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { KeyManagerService } from '@app/services/key-manager.service';
 import { StoreModule } from '@ngrx/store';
@@ -23,17 +26,25 @@ describe('SidebarComponent', () => {
         keyManagerMock = jasmine.createSpyObj('keyManager', ['onEnter']);
         await TestBed.configureTestingModule({
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, StoreModule.forRoot({})],
-            declarations: [SidebarComponent],
+            declarations: [SidebarComponent, SkipTurnButtonComponent, SurrenderGameButtonComponent],
             providers: [
                 provideMockStore({
                     selectors: [
                         {
                             selector: 'gameStatus',
-                            value: { activePlayer: 'moi', timer: DEFAULT_TIMER },
+                            value: { activePlayer: 'moi', timer: DEFAULT_TIMER, gameEnded: false },
+                        },
+                        {
+                            selector: 'players',
+                            value: { player: { name: 'VanDamne' } },
                         },
                     ],
                 }),
                 { provide: KeyManagerService, useValue: keyManagerMock },
+                {
+                    provide: Router,
+                    useValue: {},
+                },
             ],
         }).compileComponents();
         eventStub = {
