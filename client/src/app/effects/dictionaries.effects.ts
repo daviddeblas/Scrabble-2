@@ -41,18 +41,7 @@ export class DictionariesEffects {
                 tap(({ file, dictionary }) => {
                     this.dictionaryService
                         .addDictionary(file)
-                        .pipe(
-                            catchError(async (response: Response) => {
-                                if (response.status === HttpStatusCode.Ok) {
-                                    file.text().then((content) => {
-                                        const fileDictionary: iDictionary = JSON.parse(content);
-                                        this.store.dispatch(addDictionarySuccess({ dictionary: fileDictionary }));
-                                        this.dictionaryService.modifyDictionary(fileDictionary, dictionary);
-                                    });
-                                } else
-                                    this.store.dispatch(addDictionaryFailed({ error: Error(`${response.status} - ${response.statusText || ''}`) }));
-                            }),
-                        )
+                        .pipe(catchError(async (error) => this.handleAddDictionaryResponse(error, file, dictionary)))
                         .subscribe();
                 }),
             ),
@@ -104,4 +93,14 @@ export class DictionariesEffects {
     );
 
     constructor(private actions$: Actions, private dictionaryService: DictionaryService, private store: Store) {}
+
+    handleAddDictionaryResponse = async (response: Response, file: File, dictionary: iDictionary) => {
+        if (response.status === HttpStatusCode.Ok) {
+            await file.text().then((content) => {
+                const fileDictionary: iDictionary = JSON.parse(content);
+                this.store.dispatch(addDictionarySuccess({ dictionary: fileDictionary }));
+                this.dictionaryService.modifyDictionary(fileDictionary, dictionary);
+            });
+        } else this.store.dispatch(addDictionaryFailed({ error: Error(`${response.status} - ${response.statusText || ''}`) }));
+    };
 }

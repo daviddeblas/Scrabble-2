@@ -1,4 +1,4 @@
-import { addDictionary, deleteDictionary, loadDictionariesSuccess, modifyDictionary } from '@app/actions/dictionaries.actions';
+import { addDictionarySuccess, deleteDictionary, loadDictionariesSuccess, modifyDictionary } from '@app/actions/dictionaries.actions';
 import { resetAllState } from '@app/actions/game-status.actions';
 import { Dictionary } from 'common/classes/dictionary';
 import { DEFAULT_DICTIONARY } from 'common/constants';
@@ -26,8 +26,7 @@ describe('Dictionaries Reducer', () => {
 
     it('should reset to addDictionary dictionnary to the list', () => {
         const dictionary: Dictionary = { title: 'dict', description: 'desc' } as Dictionary;
-        const file = {} as File;
-        const action = addDictionary({ file, dictionary });
+        const action = addDictionarySuccess({ dictionary });
         const result = reducer(initialState, action);
 
         expect(result).toEqual([dictionary]);
