@@ -13,9 +13,9 @@ import { iDictionary } from 'common/interfaces/dictionary';
 })
 export class DictionaryFormDialogComponent implements OnInit {
     settingsForm: FormGroup;
-    dictionaryIndex: number | null = null;
-    currentDictionary: iDictionary | null = null;
-    fileRequired: boolean = false;
+    dictionaryIndex: number | null;
+    currentDictionary: iDictionary | null;
+    fileRequired: boolean;
 
     loadedDictionary: iDictionary | undefined;
     loadedFile: File;
@@ -25,7 +25,11 @@ export class DictionaryFormDialogComponent implements OnInit {
         private store: Store<{ dictionaries: iDictionary[] }>,
         private dialogRef: MatDialogRef<DictionaryFormDialogComponent>,
         private snackBar: MatSnackBar,
-    ) {}
+    ) {
+        this.dictionaryIndex = null;
+        this.currentDictionary = null;
+        this.fileRequired = false;
+    }
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
