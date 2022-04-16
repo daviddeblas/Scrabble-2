@@ -22,3 +22,12 @@
 .mat-card-subtitle {
     margin-bottom: 0;
 }
+
+::ng-deep .mat-tooltip {
+    font-size: 14px;
+}
+
+.dict-list {
+    max-height: 65vh;
+    overflow-y: scroll;
+}

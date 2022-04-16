@@ -1,5 +1,4 @@
 import { createAction, props } from '@ngrx/store';
-import { Dictionary } from 'common/classes/dictionary';
 import { iDictionary } from 'common/interfaces/dictionary';
 
 export const loadDictionaries = createAction('[Dictionaries] Load Dictionaries');
@@ -8,7 +7,11 @@ export const loadDictionariesSuccess = createAction('[Dictionaries] Load Diction
 
 export const loadDictionariesFailure = createAction('[Dictionaries] Load Dictionaries Failure', props<{ error: Error }>());
 
-export const addDictionary = createAction('[Dictionaries] Add Dictionary', props<{ dictionary: Dictionary }>());
+export const addDictionary = createAction('[Dictionaries] Add Dictionary', props<{ file: File; dictionary: iDictionary }>());
+
+export const addDictionarySuccess = createAction('[Dictionaries] Add Dictionary Success', props<{ dictionary: iDictionary }>());
+
+export const addDictionaryFailed = createAction('[Dictionaries] Add Dictionary Failed', props<{ error: Error }>());
 
 export const resetDictionaries = createAction('[Dictionaries] Reset Dictionaries');
 

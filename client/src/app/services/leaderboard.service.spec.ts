@@ -71,4 +71,10 @@ describe('LeaderBoardService', () => {
             done();
         }, RESPONSE_TIME);
     });
+
+    it('resetLeaderboard should send "reset highScores" to socket', () => {
+        const emitSpy = spyOn(socketService, 'emit');
+        service.resetLeaderboard();
+        expect(emitSpy).toHaveBeenCalledWith('reset highScores');
+    });
 });

@@ -62,8 +62,10 @@ export class HighscoreDatabaseService {
     }
 
     async resetDB() {
-        await this.highScoreDB.dropCollection(HIGHSCORE_DATABASE.highScore.collections.classical);
-        await this.highScoreDB.dropCollection(HIGHSCORE_DATABASE.highScore.collections.log2990);
+        await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.classical).deleteMany({});
+        await this.highScoreDB.collection(HIGHSCORE_DATABASE.highScore.collections.log2990).deleteMany({});
+        await this.populateDBClassical();
+        await this.populateDBlog2990();
     }
 
     setupSocketConnection(socket: io.Socket) {
@@ -74,6 +76,9 @@ export class HighscoreDatabaseService {
             this.getHighscores(GameMode.Log2990).then((value) => {
                 socket.emit('receive log2990 highscores', value);
             });
+        });
+        socket.on('reset highScores', () => {
+            this.resetDB();
         });
     }
 

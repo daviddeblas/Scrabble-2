@@ -3,9 +3,12 @@
 // Necessaire pour utiliser les actions dans les fichiers .effects, si on enleve la ligne esLint: unexpected this
 // Si on enleve le esLint : erreur de TypeScript
 
+import { HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
     addDictionary,
+    addDictionaryFailed,
+    addDictionarySuccess,
     deleteDictionary,
     downloadDictionary,
     loadDictionaries,
@@ -14,7 +17,9 @@ import {
 } from '@app/actions/dictionaries.actions';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { tap } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { iDictionary } from 'common/interfaces/dictionary';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class DictionariesEffects {
@@ -33,8 +38,11 @@ export class DictionariesEffects {
         () =>
             this.actions$.pipe(
                 ofType(addDictionary),
-                tap(({ dictionary }) => {
-                    this.dictionaryService.addDictionary(dictionary);
+                tap(({ file, dictionary }) => {
+                    this.dictionaryService
+                        .addDictionary(file)
+                        .pipe(catchError(async (error) => this.handleAddDictionaryResponse(error, file, dictionary)))
+                        .subscribe();
                 }),
             ),
         { dispatch: false },
@@ -84,5 +92,15 @@ export class DictionariesEffects {
         { dispatch: false },
     );
 
-    constructor(private actions$: Actions, private dictionaryService: DictionaryService) {}
+    constructor(private actions$: Actions, private dictionaryService: DictionaryService, private store: Store) {}
+
+    handleAddDictionaryResponse = async (response: Response, file: File, dictionary: iDictionary) => {
+        if (response.status === HttpStatusCode.Ok) {
+            await file.text().then((content) => {
+                const fileDictionary: iDictionary = JSON.parse(content);
+                this.store.dispatch(addDictionarySuccess({ dictionary: fileDictionary }));
+                this.dictionaryService.modifyDictionary(fileDictionary, dictionary);
+            });
+        } else this.store.dispatch(addDictionaryFailed({ error: Error(`${response.status} - ${response.statusText || ''}`) }));
+    };
 }

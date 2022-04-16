@@ -12,7 +12,7 @@ import { GameMode } from 'common/interfaces/game-mode';
 import { createServer, Server } from 'http';
 import { describe } from 'mocha';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { stub } from 'sinon';
+import { restore, stub } from 'sinon';
 import io from 'socket.io';
 import { io as Client, Socket } from 'socket.io-client';
 
@@ -39,6 +39,7 @@ describe('History-database service', () => {
         if (databaseService['client']) {
             await databaseService['client'].close();
         }
+        restore();
     });
 
     it('should connect to the database when start is called', async () => {
@@ -130,9 +131,24 @@ describe('History-database service', () => {
                     gameHistoryReceived = true;
                 });
             });
-            const responseDelay = 400;
+            const responseDelay = 200;
             setTimeout(() => {
                 expect(gameHistoryReceived).to.equal(true);
+                done();
+            }, responseDelay);
+        });
+
+        it('should call resetDB and getGameHistory when reset gameHistory received', (done) => {
+            const resetStub = stub(databaseService, 'resetDB').resolves(undefined);
+            const gameHistoryStub = stub(databaseService, 'getGameHistory').resolves([gameHistoryMock]);
+            server.on('connection', (socket) => {
+                databaseService.setupSocketConnection(socket);
+                hostSocket.emit('reset gameHistory');
+            });
+            const responseDelay = 200;
+            setTimeout(() => {
+                expect(resetStub.called).to.equal(true);
+                expect(gameHistoryStub.called).to.equal(true);
                 done();
             }, responseDelay);
         });

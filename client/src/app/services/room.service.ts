@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { loadDictionaries } from '@app/actions/dictionaries.actions';
 import {
     closeRoom,
     createRoomSuccess,
@@ -30,6 +31,7 @@ export class RoomService {
 
         this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
             if (gameOptions.dictionaryType !== deletedDictionaryName) return;
+            this.store.dispatch(loadDictionaries());
             this.store.dispatch(closeRoom());
             const error = 'Dictionnaire utilisé supprimé';
             this.sendErrorMessage(error);
