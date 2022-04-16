@@ -1,5 +1,4 @@
 .sidebar {
-    padding: 0.5rem;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -37,8 +36,4 @@
     flex-direction: row;
     gap: 0.5rem;
     justify-content: center;
-}
-
-.commandButton {
-    justify-self: center;
 }

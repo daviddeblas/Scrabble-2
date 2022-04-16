@@ -1,12 +1,8 @@
 <div class="container">
-    <mat-toolbar class="game-toolbar" color="primary">
-        <span>Scrabble</span>
-        <span class="spacer"></span>
-        <app-skip-turn-button></app-skip-turn-button>
-        <app-surrender-game-button></app-surrender-game-button>
-    </mat-toolbar>
-    <app-games-objectives *ngIf="isLog2990" class="game-objective"></app-games-objectives>
-    <app-chat-box [ngClass]="isLog2990 ? 'game-chatbox-log2990' : 'game-chatbox-classic'"></app-chat-box>
+    <div class="chatbox-container">
+        <app-games-objectives class="objectives" *ngIf="isLog2990"></app-games-objectives>
+        <app-chat-box class="chatbox"></app-chat-box>
+    </div>
     <app-board class="game-board"></app-board>
     <app-easel class="game-rack"></app-easel>
     <app-sidebar class="game-sidebar"></app-sidebar>

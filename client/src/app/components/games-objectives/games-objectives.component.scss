@@ -11,3 +11,7 @@
 .mat-checkbox-indeterminate .mat-checkbox-background {
     background-color: rgb(25, 139, 25) !important;
 }
+
+::ng-deep .mat-checkbox-layout {
+    white-space: normal !important;
+}

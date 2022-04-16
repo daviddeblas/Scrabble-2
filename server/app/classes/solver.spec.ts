@@ -566,6 +566,45 @@ describe('solver', () => {
         expect(results).to.deep.equal(expected);
     });
 
+    it('should generate first solution shift', () => {
+        board.pointsPerLetter = new Map([
+            ['A', 1],
+            ['B', 2],
+            ['Z', 10],
+        ]);
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const direction = new Vec2(1, 0);
+        const position = new Vec2(7, 7);
+
+        let wordArray: Letter[];
+        let result: Vec2;
+
+        wordArray = ['A', 'B', 'A', 'B', 'A', 'Z'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(6, 7));
+
+        wordArray = ['A', 'B', 'A', 'Z', 'A', 'B'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(2, 7));
+
+        wordArray = ['A', 'A', 'B', 'A', 'Z', 'A', 'B'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(7, 7));
+
+        wordArray = ['B', 'A', 'Z', 'B', 'A', 'Z', 'A'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(1, 7));
+
+        wordArray = ['Z', 'A', 'A', 'B', 'A', 'Z', 'A'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(3, 7));
+
+        wordArray = ['A', 'B', 'A', 'Z'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(7, 7));
+    });
+
     it('should regex for perpendicular solution', () => {
         board.board[5] = [null, 'A', null, null, null, null, null, null, null, 'C', null, null, null, null, null];
 

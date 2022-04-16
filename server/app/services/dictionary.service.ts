@@ -121,7 +121,11 @@ export class DictionaryService {
             res.sendFile(dic.path, { root: path.join('./') });
         });
         this.router.post('/', (req, res) => {
-            const response = this.addDictionary((req.files?.dictionary as fileUpload.UploadedFile).data.toString('utf8'));
+            if (!req.files) {
+                res.status(badRequest).send();
+                return;
+            }
+            const response = this.addDictionary((req.files.dictionary as fileUpload.UploadedFile).data.toString('utf8'));
             if (response) {
                 res.status(badRequest).send();
                 return;
