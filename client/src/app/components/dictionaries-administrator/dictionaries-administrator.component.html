@@ -10,7 +10,7 @@
         </button>
     </mat-card-actions>
     <mat-card-content>
-        <ul>
+        <ul class="dict-list">
             <li class="dictionary" *ngFor="let dictionary of dictionaries$ | async; let i = index">
                 <mat-card>
                     <mat-card-title class="dictionary-title">{{ dictionary.title }}</mat-card-title>
