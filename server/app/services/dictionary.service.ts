@@ -59,6 +59,7 @@ export class DictionaryService {
         if (this.dictionaries.findIndex((d) => d.title === dictionary.title) >= 0) return Error('dictionary with the same title already exists');
         writeFileSync(dictionaryPath, content, 'utf8');
         this.dictionaries.push(dictionary);
+        this.broadcastDictionaryChange();
         return;
     }
 
@@ -100,6 +101,7 @@ export class DictionaryService {
 
     onDictionaryDeleted(dictionaryName: string): void {
         Container.get(Server).socketService.broadcastMessage('dictionary deleted', dictionaryName);
+        this.broadcastDictionaryChange();
     }
 
     getDictionaryFile(name: string): string {
@@ -156,5 +158,14 @@ export class DictionaryService {
         socket.on('get dictionaries', () => {
             this.sendDictionaries(socket);
         });
+    }
+
+    private broadcastDictionaryChange(): void {
+        Container.get(Server).socketService.broadcastMessage(
+            'receive dictionaries',
+            this.dictionaries.map((d) => {
+                return { title: d.title, description: d.description };
+            }),
+        );
     }
 }
