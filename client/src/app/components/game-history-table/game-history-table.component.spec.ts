@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { loadGameHistory } from '@app/actions/game-history.actions';
+import { loadGameHistory, resetGameHistory } from '@app/actions/game-history.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameHistoryInterface } from '@app/reducers/game-history.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -33,6 +33,12 @@ describe('GameHistoryTableComponent', () => {
 
     it('should dispatch loadLeaderboard when created', () => {
         const expectedAction = cold('a', { a: loadGameHistory() });
+        expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should dispatch resetGameHistory when resetGameHistory called', () => {
+        component.resetGameHistory();
+        const expectedAction = cold('a', { a: resetGameHistory() });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 });

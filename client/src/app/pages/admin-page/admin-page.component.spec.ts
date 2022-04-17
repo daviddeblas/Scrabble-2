@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { resetGameHistory } from '@app/actions/game-history.actions';
 import { resetLeaderboard } from '@app/actions/leaderboard.actions';
 import { BotAdminComponent } from '@app/components/bot-name-admin/bot-name-admin.component';
 import { DictionariesAdministratorComponent } from '@app/components/dictionaries-administrator/dictionaries-administrator.component';
@@ -41,12 +40,6 @@ describe('AdminPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('should dispatch resetGameHistory when resetGameHistory called', () => {
-        component.resetGameHistory();
-        const expectedAction = cold('a', { a: resetGameHistory() });
-        expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
     it('should dispatch resetLeaderboard when resetLeaderboard called', () => {

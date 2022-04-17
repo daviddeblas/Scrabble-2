@@ -9,19 +9,27 @@
             <mat-icon matTooltip="Réinitialiser">restore</mat-icon>
         </button>
     </mat-card-actions>
-    <mat-card-content>
-        <ul class="dict-list">
+    <mat-card-content class="dict-list">
+        <ul>
             <li class="dictionary" *ngFor="let dictionary of dictionaries$ | async; let i = index">
                 <mat-card>
                     <mat-card-title class="dictionary-title">{{ dictionary.title }}</mat-card-title>
                     <mat-card-subtitle class="dictionary-description">{{ dictionary.description }} </mat-card-subtitle>
                     <mat-card-actions>
-                        <button mat-icon-button (click)="modifyDictionary(i, dictionary)"
-                            [disabled]="dictionary.title === defaultDictionary" matTooltip="Editer">
+                        <button
+                            mat-icon-button
+                            (click)="modifyDictionary(i, dictionary)"
+                            [disabled]="dictionary.title === defaultDictionary"
+                            matTooltip="Editer"
+                        >
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="deleteDictionary(dictionary)"
-                            [disabled]="dictionary.title === defaultDictionary" matTooltip="Supprimer">
+                        <button
+                            mat-icon-button
+                            (click)="deleteDictionary(dictionary)"
+                            [disabled]="dictionary.title === defaultDictionary"
+                            matTooltip="Supprimer"
+                        >
                             <mat-icon>delete</mat-icon>
                         </button>
                         <button mat-icon-button (click)="downloadDictionary(dictionary)" matTooltip="Télécharger">
