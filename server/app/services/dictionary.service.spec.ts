@@ -133,6 +133,14 @@ describe('Dictionary Service', () => {
             expect(service.getDictionaryFile('test')).to.be.a('string');
         });
 
+        it('broadcastDictionaryChange should callbroadcastMessage from socketService', () => {
+            const broadcastStub = stub(Container.get(Server).socketService, 'broadcastMessage');
+            // eslint-disable-next-line dot-notation
+            service['broadcastDictionaryChange']();
+            expect(broadcastStub.called).to.equal(true);
+            restore();
+        });
+
         afterEach(() => {
             mockFs.restore();
         });
