@@ -1,11 +1,17 @@
 .table-container {
-    margin-top: 10px;
-    max-height: 340px;
-    overflow: auto;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 table {
     width: 100%;
+    overflow: auto;
+}
+
+.table-content {
+    overflow-y: auto;
+    flex: 1;
 }
 
 .mat-row:nth-child(even) {
@@ -17,11 +23,6 @@ table {
     color: white;
     font-size: 13px;
     font-family: Roboto, 'Helvetica Neue', sans-serif;
-}
-
-.mat-table {
-    overflow: auto;
-    max-height: 400px;
 }
 
 .mat-row {

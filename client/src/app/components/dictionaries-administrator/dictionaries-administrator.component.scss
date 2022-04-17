@@ -1,5 +1,7 @@
 .dictionaries {
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .dictionary {
@@ -28,6 +30,6 @@
 }
 
 .dict-list {
-    max-height: 65vh;
-    overflow-y: scroll;
+    flex: inherit;
+    overflow-y: auto;
 }
