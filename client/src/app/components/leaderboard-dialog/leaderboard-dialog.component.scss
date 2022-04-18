@@ -2,7 +2,7 @@ table {
     width: 100%;
 }
 
-::ng-deep .mat-row {
+.leaderboard-table ::ng-deep .mat-row {
     &:nth-child(1) {
         background-color: #ffe75e;
     }
