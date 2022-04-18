@@ -109,6 +109,7 @@ export class Room {
             return;
         }
         const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
+        const oldGameStatus = this.game.gameFinished;
         this.game.stopTimer();
         this.game.endGame();
         const looserName = looserId === this.host.id ? this.gameOptions.hostname : this.clientName;
@@ -128,8 +129,10 @@ export class Room {
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
-        const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, gameMode);
-        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
+        if (!oldGameStatus) {
+            const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, gameMode);
+            Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
+        }
         return;
     }
 
