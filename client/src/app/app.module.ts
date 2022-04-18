@@ -16,10 +16,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { BotAdminComponent } from './components/bot-name-admin/bot-name-admin.component';
+import { BotNameFormDialogComponent } from './components/bot-name-form-dialog/bot-name-form-dialog.component';
 import { ConfirmSurrenderDialogComponent } from './components/confirm-surrender-dialog/confirm-surrender-dialog.component';
 import { DictionariesAdministratorComponent } from './components/dictionaries-administrator/dictionaries-administrator.component';
 import { DictionaryFormDialogComponent } from './components/dictionary-form-dialog/dictionary-form-dialog.component';
 import { GameHistoryTableComponent } from './components/game-history-table/game-history-table.component';
+import { LeaderboardDialogComponent } from './components/leaderboard-dialog/leaderboard-dialog.component';
 import { MultiConfigWindowComponent } from './components/multi-config-window/multi-config-window.component';
 import { WaitingRoomComponent } from './components/waiting-room/waiting-room.component';
 import { BotNamesEffects } from './effects/bot-names.effects';
@@ -33,10 +35,8 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { GameJoinPageComponent } from './pages/game-join-page/game-join-page.component';
 import { GamePreparationPageComponent } from './pages/game-preparation-page/game-preparation-page.component';
 import { GameSelectionPageComponent } from './pages/game-selection-page/game-selection-page.component';
-import { LeaderboardPageComponent } from './pages/leaderboard-page/leaderboard-page.component';
 import { MaterialPageComponent } from './pages/material-page/material-page.component';
 import { SoloGameSettingsPageComponent } from './pages/solo-game-settings-page/solo-game-settings-page.component';
-import { BotNameFormDialogComponent } from './components/bot-name-form-dialog/bot-name-form-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -55,7 +55,6 @@ import { BotNameFormDialogComponent } from './components/bot-name-form-dialog/bo
         GamePreparationPageComponent,
         WaitingRoomComponent,
         GameJoinPageComponent,
-        LeaderboardPageComponent,
         SoloGameSettingsPageComponent,
         AdminPageComponent,
         GameHistoryTableComponent,
@@ -63,6 +62,7 @@ import { BotNameFormDialogComponent } from './components/bot-name-form-dialog/bo
         DictionariesAdministratorComponent,
         BotAdminComponent,
         BotNameFormDialogComponent,
+        LeaderboardDialogComponent,
     ],
     imports: [
         AppMaterialModule,

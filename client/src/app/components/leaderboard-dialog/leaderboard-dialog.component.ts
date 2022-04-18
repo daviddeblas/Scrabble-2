@@ -6,11 +6,11 @@ import { LeaderBoardScores } from '@app/reducers/leaderboard.reducer';
 import { Store } from '@ngrx/store';
 
 @Component({
-    selector: 'app-leaderboard',
-    templateUrl: './leaderboard-page.component.html',
-    styleUrls: ['./leaderboard-page.component.scss'],
+    selector: 'app-leaderboard-dialog',
+    templateUrl: './leaderboard-dialog.component.html',
+    styleUrls: ['./leaderboard-dialog.component.scss'],
 })
-export class LeaderboardPageComponent {
+export class LeaderboardDialogComponent {
     dataClassicLeaderBoard: MatTableDataSource<HighScore>;
     dataLog2990LeaderBoard: MatTableDataSource<HighScore>;
     displayedColumns: string[] = ['rank', 'name', 'score'];

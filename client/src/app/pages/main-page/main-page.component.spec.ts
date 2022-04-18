@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { changeGameMode } from '@app/actions/game-status.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -10,12 +11,21 @@ describe('MainPageComponent', () => {
     let component: MainPageComponent;
     let fixture: ComponentFixture<MainPageComponent>;
     let store: MockStore;
+    const mockDialogSpy: { open: jasmine.Spy } = {
+        open: jasmine.createSpy('open'),
+    };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [MainPageComponent],
             imports: [AppMaterialModule],
-            providers: [provideMockStore()],
+            providers: [
+                {
+                    provide: MatDialog,
+                    useValue: mockDialogSpy,
+                },
+                provideMockStore(),
+            ],
         }).compileComponents();
         store = TestBed.inject(MockStore);
     });
@@ -40,5 +50,10 @@ describe('MainPageComponent', () => {
         const expectedAction = cold('a', { a: changeGameMode({ gameMode: GameMode.Log2990 }) });
         component.log2990ModeChosen();
         expect(store.scannedActions$).toBeObservable(expectedAction);
+    });
+
+    it('should open leaderboard dialog', () => {
+        component.openLeaderboard();
+        expect(mockDialogSpy.open).toHaveBeenCalled();
     });
 });
