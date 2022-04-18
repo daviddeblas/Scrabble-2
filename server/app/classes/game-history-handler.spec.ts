@@ -6,6 +6,7 @@ import { GameHistoryHandler } from '@app/classes/game-history-handler';
 import { Player } from '@app/classes/game/player';
 import { expect } from 'chai';
 import { GameMode } from 'common/interfaces/game-mode';
+import { stub } from 'sinon';
 
 describe('GameHistoryHandler', () => {
     const player1: Player = new Player('Jean');
@@ -13,8 +14,9 @@ describe('GameHistoryHandler', () => {
 
     it('createHistoryInformation should return correct value given', () => {
         let mockDate = new Date();
-        let mockDateToString = mockDate.toLocaleString('fr-CA');
+        let mockDateToString = mockDate.toLocaleString('fr-CA', { timeZone: 'America/New_York' });
         const gameHistory = new GameHistoryHandler();
+        stub(Date, 'now').callsFake(() => mockDate.getTime());
         // eslint-disable-next-line dot-notation
         gameHistory['startDate'] = mockDate;
         const historyData = gameHistory.createGameHistoryData([player1, player2], false, GameMode.Classical);

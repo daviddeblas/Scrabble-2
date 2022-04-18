@@ -13,7 +13,7 @@ export class GameHistoryHandler {
     createGameHistoryData(players: Player[], isSurrender: boolean, gameMode: GameMode): GameHistory {
         const gameDuration = this.timerToString(Math.round((Date.now() - this.startDate.getTime()) / MILLISECONDS_PER_SEC));
         const history: GameHistory = {
-            date: this.startDate.toLocaleString('fr-CA'),
+            date: this.startDate.toLocaleString('fr-CA', { timeZone: 'America/New_York' }),
             gameDuration,
             namePlayer1: players[0].name,
             scorePlayer1: players[0].score,
