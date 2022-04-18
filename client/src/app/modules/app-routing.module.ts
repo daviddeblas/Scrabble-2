@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { GameSelectionPageComponent } from '@app/pages/game-selection-page/game-selection-page.component';
-import { LeaderboardPageComponent } from '@app/pages/leaderboard-page/leaderboard-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
 const routes: Routes = [
@@ -11,7 +10,6 @@ const routes: Routes = [
     { path: 'home', component: MainPageComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'game-selection', component: GameSelectionPageComponent },
-    { path: 'leaderboard', component: LeaderboardPageComponent },
     { path: 'admin', component: AdminPageComponent },
     { path: '**', redirectTo: '/home' },
 ];

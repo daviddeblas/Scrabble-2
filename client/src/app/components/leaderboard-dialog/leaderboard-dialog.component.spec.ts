@@ -1,20 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { loadLeaderboard } from '@app/actions/leaderboard.actions';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { LeaderBoardScores } from '@app/reducers/leaderboard.reducer';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
-import { LeaderboardPageComponent } from './leaderboard-page.component';
+import { LeaderboardDialogComponent } from './leaderboard-dialog.component';
 
-describe('LeaderboardPageComponent', () => {
-    let component: LeaderboardPageComponent;
-    let fixture: ComponentFixture<LeaderboardPageComponent>;
+describe('LeaderboardDialogComponent', () => {
+    let component: LeaderboardDialogComponent;
+    let fixture: ComponentFixture<LeaderboardDialogComponent>;
     let store: MockStore;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [LeaderboardPageComponent],
-            imports: [AppMaterialModule],
+            declarations: [LeaderboardDialogComponent],
+            imports: [AppMaterialModule, BrowserAnimationsModule],
             providers: [provideMockStore()],
         }).compileComponents();
         store = TestBed.inject(MockStore);
@@ -22,7 +23,7 @@ describe('LeaderboardPageComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(LeaderboardPageComponent);
+        fixture = TestBed.createComponent(LeaderboardDialogComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
