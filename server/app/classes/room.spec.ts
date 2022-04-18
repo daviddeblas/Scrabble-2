@@ -263,7 +263,7 @@ describe('room', () => {
                 }, RESPONSE_DELAY);
             });
 
-            it('surrenderGame should emit endGame if the game is not null', (done) => {
+            it('surrenderGame should emit endGame if the game is not null and not call gameHistory if gameFinished is true', (done) => {
                 const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
                     return;
                 });
@@ -284,12 +284,14 @@ describe('room', () => {
                 } as unknown as io.Socket;
                 room['botLevel'] = BotDifficulty.Easy;
                 room.sockets = [clientSocket, hostSocket];
+                fakeGame.gameFinished = true;
+                room.game = fakeGame;
                 room.surrenderGame(socket.id);
                 room.surrenderGame('player2');
                 setTimeout(() => {
                     expect(clientReceived && hostReceived).to.deep.equal(true);
                     expect(dataStub.called).to.equal(true);
-                    expect(gameHistoryStub.called).to.equal(true);
+                    expect(gameHistoryStub.called).to.equal(false);
                     done();
                 }, RESPONSE_DELAY * 3);
             });
