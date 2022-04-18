@@ -13,7 +13,7 @@ describe('GameHistoryHandler', () => {
 
     it('createHistoryInformation should return correct value given', () => {
         let mockDate = new Date();
-        let mockDateToString = mockDate.toLocaleString('fr-CA');
+        let mockDateToString = mockDate.toLocaleString('fr-CA', { timeZone: 'America/New_York' });
         const gameHistory = new GameHistoryHandler();
         // eslint-disable-next-line dot-notation
         gameHistory['startDate'] = mockDate;
