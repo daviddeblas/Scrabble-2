@@ -33,6 +33,7 @@ export class RoomService {
             if (gameOptions.dictionaryType !== deletedDictionaryName) return;
             this.store.dispatch(loadDictionaries());
             this.store.dispatch(closeRoom());
+            this.socketService.socket.removeAllListeners('dictionary deleted');
             const error = 'Dictionnaire utilisé supprimé';
             this.sendErrorMessage(error);
         });
@@ -67,11 +68,13 @@ export class RoomService {
     }
 
     acceptInvite(): void {
+        this.socketService.socket.removeAllListeners('dictionary deleted');
         this.socketService.send('accept');
     }
 
     closeRoom(): void {
         this.socketService.send('quit');
+        this.socketService.socket.removeAllListeners('dictionary deleted');
     }
 
     fetchRoomList(): void {
@@ -84,16 +87,19 @@ export class RoomService {
     joinRoom(roomInfo: RoomInfo, playerName: string): void {
         this.socketService.send('join room', { roomId: roomInfo.roomId, playerName });
         this.socketService.on('accepted', () => {
+            this.socketService.socket.removeAllListeners('dictionary deleted');
             this.store.dispatch(joinRoomAccepted({ roomInfo, playerName }));
         });
         this.socketService.on('refused', () => {
             this.store.dispatch(joinRoomDeclined({ roomInfo, playerName }));
+            this.socketService.socket.removeAllListeners('dictionary deleted');
             const error = "Refusée par l'hôte";
             this.sendErrorMessage(error);
         });
         this.socketService.on('dictionary deleted', (deletedDictionaryName: string) => {
             if (roomInfo.gameOptions.dictionaryType !== deletedDictionaryName) return;
             this.store.dispatch(joinInviteCanceled());
+            this.socketService.socket.removeAllListeners('dictionary deleted');
             const error = 'Dictionnaire utilisé supprimé';
             this.sendErrorMessage(error);
         });
@@ -101,6 +107,7 @@ export class RoomService {
 
     cancelJoinRoom() {
         this.socketService.send('cancel join room');
+        this.socketService.socket.removeAllListeners('dictionary deleted');
     }
 
     private sendErrorMessage(message: string): void {
