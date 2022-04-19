@@ -438,16 +438,16 @@ describe('ChatService', () => {
         expect(service['handleNonTurnSpecificCommands'](['!réserve'])).toBeTruthy();
     });
 
-    it('handleNonTurnSpecificCommand should return false on correct call', () => {
-        expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeFalsy();
+    it('handleNonTurnSpecificCommand should return true on correct call with wrong arguments', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeTruthy();
     });
 
     it('handleNonTurnSpecificCommand should return true on correct call', () => {
         expect(service['handleNonTurnSpecificCommands'](['!aide'])).toBeTruthy();
     });
 
-    it('handleNonTurnSpecificCommand should return false on correct call', () => {
-        expect(service['handleNonTurnSpecificCommands'](['!aide', 'a'])).toBeFalsy();
+    it('handleNonTurnSpecificCommand should return true on correct call with wrong arguments', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!aide', 'a'])).toBeTruthy();
     });
 
     it('should call helpProcess with the command !aide', () => {
