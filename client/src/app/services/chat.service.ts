@@ -97,23 +97,21 @@ export class ChatService {
             case '!réserve':
                 if (command.length === 1) {
                     this.handleSimpleCommand(command);
-                    return true;
                 } else {
                     this.store.dispatch(
                         receivedMessage({ username: '', message: 'Erreur de syntaxe - commande réserve mal formée', messageType: 'Error' }),
                     );
                 }
-                break;
+                return true;
             case '!aide':
                 if (command.length === 1) {
                     this.processHelp();
-                    return true;
                 } else {
                     this.store.dispatch(
                         receivedMessage({ username: '', message: 'Erreur de syntaxe - commande aide mal formée', messageType: 'Error' }),
                     );
                 }
-                break;
+                return true;
         }
         return false;
     }
