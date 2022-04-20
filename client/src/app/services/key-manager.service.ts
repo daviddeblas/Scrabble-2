@@ -40,7 +40,7 @@ export class KeyManagerService {
 
         if (blanks.length > 0)
             [...modifiedCells].reverse().forEach((cell, index) => {
-                if (cell.equals(blanks[blanks.length - 1])) {
+                if (blanks.find((position) => cell.equals(position))) {
                     letters[letters.length - 1 - index] = BLANK_LETTER;
                 }
             });
@@ -75,13 +75,13 @@ export class KeyManagerService {
         let modifiedCells: Vec2[] = [];
         let blanks: iVec2[] = [];
         this.board$.subscribe((state) => {
-            modifiedCells = state.selection.modifiedCells;
+            modifiedCells = [...state.selection.modifiedCells];
             letters = state.selection.modifiedCells.map((pos) => state.board[pos.x][pos.y] as Letter);
             blanks = state.blanks;
         });
         if (blanks.length > 0)
             modifiedCells.reverse().forEach((cell, index) => {
-                if (cell.equals(blanks[blanks.length - 1])) letters[letters.length - 1 - index] = BLANK_LETTER;
+                if (blanks.find((position) => cell.equals(position))) letters[letters.length - 1 - index] = BLANK_LETTER;
             });
         this.store.dispatch(addLettersToEasel({ letters }));
         this.store.dispatch(removeLetters({ positions: modifiedCells }));
@@ -140,11 +140,15 @@ export class KeyManagerService {
             board = state.board;
             orientation = state.selection.orientation;
         });
-        if (isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction) && board[selectedCell.x][selectedCell.y] !== null) return;
+        const isAtBoardLimit = isCellAtBoardLimit(board, selectedCell, orientation as unknown as Direction);
+        const isCellAlreadyUsed = board[selectedCell.x][selectedCell.y] !== null;
+        if (isAtBoardLimit && isCellAlreadyUsed) return;
 
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (!/^[a-zA-Z]$/.test(key)) return;
         const letter = stringToLetter(key);
-        if (this.playerService.getEasel().findIndex((l) => l === letter) < 0) return;
+        const keyInEasel = this.playerService.getEasel().findIndex((l) => l === letter);
+        if (keyInEasel < 0) return;
         this.store.dispatch(placeLetter({ letter: stringToLetter(key.toLowerCase()), isBlank: letter === '*' }));
         this.store.dispatch(removeLetterFromEasel({ letter }));
     }

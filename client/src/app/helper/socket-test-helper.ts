@@ -6,6 +6,7 @@
 type CallbackSignature = (params: unknown) => unknown;
 
 export class SocketTestHelper {
+    id: string;
     private callbacks = new Map<string, CallbackSignature[]>();
     on(event: string, callback: CallbackSignature): void {
         if (!this.callbacks.has(event)) {

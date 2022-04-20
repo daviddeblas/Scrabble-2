@@ -1,16 +1,22 @@
+import { BotNameService } from '@app/services/bot-name.service';
 import { BotDifficulty, BotService } from '@app/services/bot.service';
 import { CommandService } from '@app/services/command.service';
-import { DatabaseService } from '@app/services/database.service';
+import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
+import { HighscoreDatabaseService } from '@app/services/highscore-database.service';
+import { HistoryDatabaseService } from '@app/services/history-database.service';
 import { RoomsManager } from '@app/services/rooms-manager.service';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
 import { MIN_BOT_PLACEMENT_TIME } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { GameFinishStatus } from './game-finish-status';
 import { GameError, GameErrorType } from './game.exception';
 import { Game } from './game/game';
+import { Log2990ObjectivesHandler } from './log2990-objectives-handler';
 
 export class Room {
     started: boolean;
@@ -20,7 +26,6 @@ export class Room {
     commandService: CommandService;
 
     private clientName: string | null;
-    private botService: BotService;
     private botLevel: string | undefined;
     private playersLeft: number;
 
@@ -35,7 +40,6 @@ export class Room {
         this.game = null;
         this.clientName = null;
         this.commandService = Container.get(CommandService);
-        this.botService = Container.get(BotService);
         this.botLevel = undefined;
         this.playersLeft = 2;
     }
@@ -75,6 +79,7 @@ export class Room {
         this.sockets.forEach((s, i) => {
             this.setupSocket(s, i);
         });
+        this.sendObjectives();
     }
 
     initGame(): void {
@@ -82,6 +87,7 @@ export class Room {
 
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
+            Container.get(DictionaryService).getDictionary(this.gameOptions.dictionaryType) as Dictionary,
             [this.gameOptions.hostname, this.clientName as string],
             this.gameOptions,
             this.actionAfterTimeout(),
@@ -98,18 +104,23 @@ export class Room {
 
     surrenderGame(looserId: string): GameError | undefined {
         if (!this.game?.players) return new GameError(GameErrorType.GameNotExists);
-
+        if (!this.botLevel) {
+            this.convertToSolo(looserId === this.host.id ? 0 : 1);
+            return;
+        }
         const winnerName = looserId === this.host.id ? this.clientName : this.gameOptions.hostname;
+        const oldGameStatus = this.game.gameFinished;
         this.game.stopTimer();
         this.game.endGame();
         const looserName = looserId === this.host.id ? this.gameOptions.hostname : this.clientName;
         const surrenderMessage = looserName + ' à abandonné la partie';
         const gameFinishStatus: GameFinishStatus = new GameFinishStatus(this.game.players, this.game.bag.letters.length, winnerName);
         const game = this.game as Game;
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         this.sockets.forEach((socket, index) => {
             if (looserName !== game.players[index].name) {
                 const highscore = { name: game.players[index].name, score: game.players[index].score };
-                Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+                Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             }
             socket.emit('turn ended');
             socket.emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
@@ -118,17 +129,21 @@ export class Room {
         if (--this.playersLeft <= 0) {
             this.manager.removeRoom(this);
         }
+        if (!oldGameStatus) {
+            const gameHistory = this.game.gameHistory.createGameHistoryData(this.game.players, true, gameMode);
+            Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
+        }
         return;
     }
 
     initSoloGame(diff: BotDifficulty): void {
         this.sockets = [this.host];
         this.playersLeft--;
-        let botName: string;
 
-        while ((botName = this.botService.getName()) === this.gameOptions.hostname);
+        const botName = Container.get(BotNameService).getBotName(diff, this.gameOptions.hostname);
         this.game = new Game(
             Container.get(GameConfigService).configs[0],
+            Container.get(DictionaryService).getDictionary(this.gameOptions.dictionaryType) as Dictionary,
             [this.gameOptions.hostname, botName],
             this.gameOptions,
             this.actionAfterTimeout(),
@@ -138,12 +153,43 @@ export class Room {
         this.manager.notifyAvailableRoomsChange();
         this.setupSocket(this.sockets[0], 0);
         this.botLevel = diff;
+        this.sendObjectives();
     }
 
     quitRoomHost(): void {
         if (this.clients[0]) this.inviteRefused(this.clients[0]);
+        this.host.removeAllListeners('switch to solo room');
         this.manager.removeRoom(this);
         this.manager.notifyAvailableRoomsChange();
+    }
+
+    private convertToSolo(looserPlayerNumber: number): void {
+        this.playersLeft--;
+        this.sockets.splice(looserPlayerNumber, 1);
+        this.botLevel = BotDifficulty.Easy;
+        const game = this.game as Game;
+        if (looserPlayerNumber === 0) {
+            [game.players[0], game.players[1]] = [game.players[1], game.players[0]];
+            game.activePlayer = (game.activePlayer + 1) % 2;
+            game.log2990Objectives?.switchingPlayersObjectives();
+        }
+        game.actionAfterTurn = this.actionAfterTurnWithBot(this, BotDifficulty.Easy);
+        const surrenderMessage = game.players[1].name + ' à abandonné, conversion en partie solo débutant';
+        this.sockets[0].emit('receive message', { username: '', message: surrenderMessage, messageType: 'System' });
+        game.players[1].name = Container.get(BotNameService).getBotName(BotDifficulty.Easy, game.players[0].name);
+        this.sockets[0].emit('game status', game.getGameStatus(0, this.botLevel, true));
+        this.removeUnneededListeners(this.sockets[0]);
+        this.setupSocket(this.sockets[0], 0);
+        if (game.activePlayer === 1) game.actionAfterTurn();
+    }
+
+    private sendObjectives(): void {
+        if (!this.game?.log2990Objectives) return;
+        const log2990Objectives = this.game.log2990Objectives as Log2990ObjectivesHandler;
+        this.sockets.forEach((socket, index) => {
+            const objectiveList = [...log2990Objectives.retrieveLog2990Objective(index)];
+            socket.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+        });
     }
 
     private inviteAccepted(client: io.Socket): void {
@@ -170,11 +216,9 @@ export class Room {
             this.sockets.forEach((s, i) => {
                 if (i !== playerNumber) s.emit('receive message', { username, message, messageType });
             });
-            if (message.includes(' a quitté le jeu') && messageType === 'System') {
-                if (--this.playersLeft <= 0) {
-                    this.manager.removeRoom(this);
-                }
-            }
+            if (!(message.includes(' a quitté le jeu') && messageType === 'System')) return;
+            if (--this.playersLeft > 0) return;
+            this.manager.removeRoom(this);
         });
 
         // Initialise l'abbandon de la partie
@@ -189,7 +233,8 @@ export class Room {
             if (game.activePlayer === 1 && !game.gameFinished) {
                 let date = new Date();
                 const startDate = date.getTime();
-                const botCommand = await room.botService.move(game, diff);
+                const botService = Container.get(BotService);
+                const botCommand = await botService.move(game, diff);
                 if (botCommand instanceof GameError) return botCommand;
                 date = new Date();
                 const timeTaken = date.getTime() - startDate;

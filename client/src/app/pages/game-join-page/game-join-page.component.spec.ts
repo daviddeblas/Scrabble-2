@@ -10,6 +10,7 @@ import { RoomEffects } from '@app/effects/room.effects';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import { cold } from 'jasmine-marbles';
 import { forbiddenNameValidator, GameJoinPageComponent } from './game-join-page.component';
 const FIXTURE_COOLDOWN = 10;
@@ -20,7 +21,10 @@ describe('GameJoinPageComponent', () => {
     let store: MockStore;
     const stepperMock: jasmine.SpyObj<MatStepper> = jasmine.createSpyObj<MatStepper>('stepper', ['next', 'reset']);
 
-    const roomInfoStub: RoomInfo = { roomId: 'id', gameOptions: { dictionaryType: 'dict', hostname: 'host', timePerRound: 60 } };
+    const roomInfoStub: RoomInfo = {
+        roomId: 'id',
+        gameOptions: { dictionaryType: 'dict', hostname: 'host', gameMode: GameMode.Classical, timePerRound: 60 },
+    };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -218,7 +222,10 @@ describe('Join room in Join Page Component with undefined selector', () => {
     it('joinRoom should not dispatch "[Room] Join Room" if the selected room is undefined', () => {
         store.overrideSelector('room', {});
         component.pendingRoom$ = store.select('room');
-        const roomInfoStub = { roomId: 'id', gameOptions: { dictionaryType: 'dict', hostname: 'host', timePerRound: 60 } };
+        const roomInfoStub = {
+            roomId: 'id',
+            gameOptions: { dictionaryType: 'dict', hostname: 'host', gameMode: GameMode.Classical, timePerRound: 60 },
+        };
         component.selectRoom(roomInfoStub);
         const username = 'username';
         component.formGroup.controls.name.setValue(username);

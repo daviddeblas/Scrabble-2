@@ -7,6 +7,8 @@ import { RoomService } from '@app/services/room.service';
 import { Store } from '@ngrx/store';
 import { GameOptions } from 'common/classes/game-options';
 import { DEFAULT_TIMER, SECONDS_IN_MINUTE } from 'common/constants';
+import { iDictionary } from 'common/interfaces/dictionary';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Observable } from 'rxjs';
 
 export const MAX_TIME = 300;
@@ -19,10 +21,11 @@ export const TIMER_INCREMENT = 30;
     styleUrls: ['./multi-config-window.component.scss'],
 })
 export class MultiConfigWindowComponent implements OnInit {
-    @Input() isSoloGame: boolean = false;
-    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }> = new EventEmitter();
+    @Input() isSoloGame: boolean;
+    @Output() gameOptionsSubmitted: EventEmitter<{ gameOptions: GameOptions; botLevel?: string }>;
     settingsForm: FormGroup;
-    dictionaries$: Observable<string[]>;
+    dictionaries$: Observable<iDictionary[]>;
+    gameMode$: Observable<GameMode>;
     timer: number;
     readonly minNameLength: number = MIN_NAME_LENGTH;
     readonly maxNameLength: number = MAX_NAME_LENGTH;
@@ -31,18 +34,25 @@ export class MultiConfigWindowComponent implements OnInit {
     readonly defaultTimer: number = DEFAULT_TIMER;
     readonly timerIncrement: number = TIMER_INCREMENT;
 
-    constructor(private fb: FormBuilder, public roomService: RoomService, dictionariesStore: Store<{ dictionaries: string[] }>, store: Store) {
+    constructor(
+        private fb: FormBuilder,
+        public roomService: RoomService,
+        dictionariesStore: Store<{ dictionaries: iDictionary[] }>,
+        store: Store<{ gameMode: GameMode }>,
+    ) {
+        this.gameOptionsSubmitted = new EventEmitter();
         store.dispatch(resetAllState());
         this.timer = this.defaultTimer;
         this.dictionaries$ = dictionariesStore.select('dictionaries');
         store.dispatch(loadDictionaries());
+        this.gameMode$ = store.select('gameMode');
     }
 
     ngOnInit(): void {
         this.settingsForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(this.minNameLength), Validators.maxLength(this.maxNameLength)]],
             botLevel: ['Débutant'],
-            selectedDictionary: ['', Validators.required],
+            selectedDictionary: ['Francais', Validators.required],
         });
     }
 
@@ -55,7 +65,14 @@ export class MultiConfigWindowComponent implements OnInit {
     }
 
     onSubmit(): void {
-        const gameOptions = new GameOptions(this.settingsForm.controls.name.value, this.settingsForm.controls.selectedDictionary.value, this.timer);
+        let decidedGameMode = GameMode.Classical;
+        this.gameMode$.subscribe((gameMode) => (decidedGameMode = gameMode));
+        const gameOptions = new GameOptions(
+            this.settingsForm.controls.name.value,
+            this.settingsForm.controls.selectedDictionary.value,
+            decidedGameMode,
+            this.timer,
+        );
         if (this.isSoloGame) this.gameOptionsSubmitted.emit({ gameOptions, botLevel: this.settingsForm.controls.botLevel.value });
         else this.gameOptionsSubmitted.emit({ gameOptions });
     }

@@ -1,6 +1,5 @@
 {
     "name": "Classic",
-    "dictionaryName": "Mon dictionnaire",
     "letters": [
         { "letter": "A", "points": 1, "amount": 9 },
         { "letter": "B", "points": 3, "amount": 2 },

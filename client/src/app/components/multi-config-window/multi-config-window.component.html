@@ -21,7 +21,14 @@
             <mat-form-field class="parameter-container" appearance="fill">
                 <mat-label>Dictionnaire</mat-label>
                 <mat-select formControlName="selectedDictionary">
-                    <mat-option *ngFor="let dictionary of dictionaries$ | async; index as id" value="{{ dictionary }}">{{ dictionary }}</mat-option>
+                    <mat-option
+                        *ngFor="let dictionary of dictionaries$ | async; index as id"
+                        value="{{ dictionary.title }}"
+                        matTooltip="{{ dictionary.description }}"
+                        [matTooltipPosition]="'right'"
+                    >
+                        {{ dictionary.title }}
+                    </mat-option>
                 </mat-select>
             </mat-form-field>
 
@@ -29,7 +36,7 @@
                 <mat-label>Niveau de l'adversaire</mat-label>
                 <mat-select formControlName="botLevel">
                     <mat-option value="Débutant">Débutant</mat-option>
-                    <mat-option value="Expert" disabled>Expert</mat-option>
+                    <mat-option value="Expert">Expert</mat-option>
                 </mat-select>
             </mat-form-field>
 

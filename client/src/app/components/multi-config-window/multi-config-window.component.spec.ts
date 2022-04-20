@@ -3,9 +3,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SocketTestHelper } from '@app/helper/socket-test-helper';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
+import { GameMode } from 'common/interfaces/game-mode';
 import { MultiConfigWindowComponent } from './multi-config-window.component';
 
 describe('MultiConfigWindowComponent', () => {
@@ -14,6 +17,7 @@ describe('MultiConfigWindowComponent', () => {
     const iterationAmount = 10;
 
     beforeEach(async () => {
+        const socketHelper = new SocketTestHelper();
         await TestBed.configureTestingModule({
             declarations: [MultiConfigWindowComponent],
             imports: [AppMaterialModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule],
@@ -24,7 +28,28 @@ describe('MultiConfigWindowComponent', () => {
                     provide: MatDialogRef,
                     useValue: {},
                 },
-                provideMockStore(),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: 'gameMode',
+                            value: GameMode.Classical,
+                        },
+                    ],
+                }),
             ],
         }).compileComponents();
     });
@@ -106,7 +131,6 @@ describe('MultiConfigWindowComponent', () => {
         };
         const spy = spyOn(component, 'onSubmit').and.callFake(fakeSubmit);
         expect(component.settingsForm.controls.name.valid).toBeFalse();
-        expect(component.settingsForm.controls.selectedDictionary.valid).toBeFalse();
         expect(component.settingsForm.valid).toBeFalse();
         fixture.detectChanges();
         // Verification que le bouton ne peut pas être pressé
@@ -139,7 +163,7 @@ describe('MultiConfigWindowComponent', () => {
         fixture.detectChanges();
         const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
         component.onSubmit();
-        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', GameMode.Classical, component.timer);
         expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions });
     });
 
@@ -150,7 +174,7 @@ describe('MultiConfigWindowComponent', () => {
         fixture.detectChanges();
         const emitSpy = spyOn(component.gameOptionsSubmitted, 'emit');
         component.onSubmit();
-        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', component.timer);
+        const expectedGameOptions = new GameOptions('My Name', 'My Dictionary', GameMode.Classical, component.timer);
         const expectedLevel = 'Débutant';
         expect(emitSpy).toHaveBeenCalledOnceWith({ gameOptions: expectedGameOptions, botLevel: expectedLevel });
     });

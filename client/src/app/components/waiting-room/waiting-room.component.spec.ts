@@ -1,8 +1,6 @@
-import { CdkStepper } from '@angular/cdk/stepper';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatStepper } from '@angular/material/stepper';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { acceptInvite, closeRoom, refuseInvite, switchToSoloRoom } from '@app/actions/room.actions';
@@ -28,9 +26,6 @@ describe('WaitingRoomComponent', () => {
             imports: [AppMaterialModule, BrowserAnimationsModule, FormsModule],
             providers: [
                 FormBuilder,
-                {
-                    provide: CdkStepper,
-                },
                 {
                     provide: MatDialogRef,
                     useValue: mockDialogSpy,
@@ -77,11 +72,9 @@ describe('WaitingRoomComponent', () => {
         expect(store.dispatch).toHaveBeenCalledWith(refuseInvite());
     });
 
-    it('should dispatch "[Room] Close room" and reset form when clicking on "Annuler"', () => {
-        component.stepper = jasmine.createSpyObj<MatStepper>(['reset']);
+    it('should dispatch "[Room] Close room" when clicking on "Annuler"', () => {
         component.quitWaitingRoom();
         expect(store.dispatch).toHaveBeenCalledWith(closeRoom());
-        expect(component.stepper.reset).toHaveBeenCalled();
     });
 
     it('should dispatch "[Room] Switch To Solo Room" when convertToSolo called', () => {

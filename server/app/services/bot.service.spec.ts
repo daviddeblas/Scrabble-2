@@ -6,8 +6,9 @@ import { Game } from '@app/classes/game/game';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Solution } from '@app/interfaces/solution';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { Vec2 } from 'common/classes/vec2';
-import { BOARD_SIZE, BOT_NAMES } from 'common/constants';
+import { BOARD_SIZE } from 'common/constants';
 import { restore, stub } from 'sinon';
 import { Container } from 'typedi';
 import { BotDifficulty, BotService } from './bot.service';
@@ -28,6 +29,19 @@ describe('Bot service tests', () => {
         blanks: [],
         direction: new Vec2(0, 1),
     };
+    const solutionC: Solution = {
+        letters: [
+            new PlacedLetter('M', new Vec2(6, 7)),
+            new PlacedLetter('A', new Vec2(7, 7)),
+            new PlacedLetter('R', new Vec2(8, 7)),
+            new PlacedLetter('T', new Vec2(9, 7)),
+            new PlacedLetter('E', new Vec2(10, 7)),
+            new PlacedLetter('A', new Vec2(11, 7)),
+            new PlacedLetter('U', new Vec2(12, 7)),
+        ],
+        blanks: [],
+        direction: new Vec2(0, 1),
+    };
 
     beforeEach(async () => {
         await Container.get(DictionaryService).init();
@@ -39,6 +53,7 @@ describe('Bot service tests', () => {
             bag: { letters: ['A', 'B', 'C', 'D', 'E', '*'] },
             board: { board: fakeBoard, scorePosition: () => 2, getAffectedWords: (letters: PlacedLetter[]) => [letters] },
             config: Container.get(GameConfigService).configs[0],
+            dictionary: Container.get(DictionaryService).getDictionary('Francais') as Dictionary,
         } as unknown as Game;
     });
 
@@ -52,13 +67,10 @@ describe('Bot service tests', () => {
         expect(easyBotMoveStub.calledOnce).to.equal(true);
     });
 
-    it('move should return passer if there is no according difficulty', async () => {
-        expect(await service.move(fakeGame, BotDifficulty.Hard)).to.equal('passer');
-    });
-
-    it('getName should return one of the bot names', () => {
-        const nameChosen = service.getName();
-        expect(BOT_NAMES.includes(nameChosen)).to.equal(true);
+    it('move should call hardBotMove if the difficulty is Hard', async () => {
+        const hardBotMoveStub = stub(service as any, 'hardBotMove').callsFake(() => '');
+        service.move(fakeGame, BotDifficulty.Hard);
+        expect(hardBotMoveStub.calledOnce).to.equal(true);
     });
 
     it('easyBotMove should return pass command if the random generated number is between 0 and 0.1', async () => {
@@ -83,6 +95,31 @@ describe('Bot service tests', () => {
         const placeCommandStub = stub(service as any, 'placeCommand').callsFake(() => expectedResult);
         expect(await service['easyBotMove'](fakeGame)).to.equal(expectedResult);
         expect(placeCommandStub.called).to.equal(true);
+    });
+
+    it('hardBotMove should return pass command if no words are found and no letters are in the bag', async () => {
+        stub(service as any, 'placeCommand').callsFake(() => 'passer');
+        fakeGame.bag.letters = [];
+        expect(await service['hardBotMove'](fakeGame)).to.equal('passer');
+    });
+
+    it('hardBotMove should return exchange command with all letters if more than 7 letters are in the bag and no words are found', async () => {
+        stub(service as any, 'placeCommand').callsFake(() => 'passer');
+        expect(await service['hardBotMove'](fakeGame)).to.equal('échanger abcde*');
+    });
+
+    it('hardBotMove should return placeCommand if it returns something different than pass', async () => {
+        const expectedCommand = 'placer h7h u';
+        stub(service as any, 'placeCommand').callsFake(() => expectedCommand);
+        expect(await service['hardBotMove'](fakeGame)).to.equal(expectedCommand);
+    });
+
+    it('hardBotMove should call findLettersToExchange if there are less letters in bag than in player easel and no word placement', async () => {
+        fakeGame.bag.letters = ['A'];
+        stub(service as any, 'placeCommand').callsFake(() => 'passer');
+        const findLettersToExchangeStub = stub(service as any, 'findLettersToExchange');
+        await service['hardBotMove'](fakeGame);
+        expect(findLettersToExchangeStub.calledOnceWith(1, fakeGame.players[1].easel)).to.equal(true);
     });
 
     it('placeCommand should call determineWord if there is at least a solution', (done) => {
@@ -132,7 +169,7 @@ describe('Bot service tests', () => {
         const fakePlacements: [Solution, number][] = [];
         fakePlacements.push([solutionA, 2]);
         fakePlacements.push([solutionB, 10]);
-        expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
+        expect(service['determineEasyBotWord'](fakePlacements)).to.equal('h7h ab');
     });
 
     it('determineWord should return passer if all solutions found are greater than 18 points', () => {
@@ -147,7 +184,7 @@ describe('Bot service tests', () => {
         const fakePlacements: [Solution, number][] = [];
         fakePlacements.push([solutionA, 10]);
         fakePlacements.push([solutionB, 15]);
-        expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
+        expect(service['determineEasyBotWord'](fakePlacements)).to.equal('h7h ab');
     });
 
     it('determineWord should send the exchange with highest amount of points with random number between 0.7 and 1 with botLevel easy', () => {
@@ -156,11 +193,31 @@ describe('Bot service tests', () => {
         const fakePlacements: [Solution, number][] = [];
         fakePlacements.push([solutionA, 15]);
         fakePlacements.push([solutionB, 10]);
-        expect(service['determineWord'](fakePlacements, BotDifficulty.Easy)).to.equal('h7h ab');
+        expect(service['determineEasyBotWord'](fakePlacements)).to.equal('h7h ab');
     });
 
-    it('determineWord should send passer if bot difficulty hard', () => {
-        const fakePlacements: [Solution, number][] = [];
-        expect(service['determineWord'](fakePlacements, BotDifficulty.Hard)).to.equal('passer');
+    it('determineWord should call determineHardBotWord if bot difficulty hard', () => {
+        const determineHardBotWordStub = stub(service as any, 'determineHardBotWord');
+        const fakePlacements: [Solution, number][] = [[solutionA, 2]];
+        service['determineWord'](fakePlacements, BotDifficulty.Hard);
+        expect(determineHardBotWordStub.calledWith(fakePlacements)).to.equal(true);
+    });
+
+    it('determineWord should call determineEasyBotWord if bot difficulty Easy', () => {
+        const determineEasyHardBotWordStub = stub(service as any, 'determineEasyBotWord');
+        const fakePlacements: [Solution, number][] = [[solutionA, 2]];
+        service['determineWord'](fakePlacements, BotDifficulty.Easy);
+        expect(determineEasyHardBotWordStub.calledWith(fakePlacements)).to.equal(true);
+    });
+
+    it('determineHardBotWord return the best found word and take count of a 7 letter placement bonus', () => {
+        const fakePlacements: [Solution, number][] = [
+            [solutionA, 2],
+            [solutionC, 1],
+            [solutionB, 30],
+        ];
+        const expectedResult = 'h7v marteau';
+        const result = service['determineHardBotWord'](fakePlacements);
+        expect(result).to.equal(expectedResult);
     });
 });

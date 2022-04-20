@@ -8,10 +8,12 @@ import { Solver } from '@app/classes/solver';
 import { stringToLetter, stringToLetters } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { DECIMAL_BASE, POSITION_LAST_CHAR } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
 import io from 'socket.io';
 import { Container, Service } from 'typedi';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 
 @Service()
 export class CommandService {
@@ -94,10 +96,11 @@ export class CommandService {
         if (!(/^[a-z/*]*$/.test(args[0]) && args.length === 1)) return new GameError(GameErrorType.WrongDrawArgument);
         game.draw(stringToLetters(args[0]), playerNumber);
         const lettersToSendEveryone: string[] = [];
-        // Même si on remplace le eslint par la structure for-of, il y a quand même un eslint car on utilise
-        // jamais directement l'index, donc on a décidé de juste ignorer le problème de la structure du for
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < args[0].length; i++) lettersToSendEveryone.push('#');
+        let i = 0;
+        while (i < args[0].length) {
+            lettersToSendEveryone.push('#');
+            i++;
+        }
 
         sockets.forEach((s, index) => {
             if (index === playerNumber) s.emit('draw success', { letters: args[0], username: game.players[playerNumber].name });
@@ -119,7 +122,7 @@ export class CommandService {
 
     private async processHint(game: Game, sockets: io.Socket[], args: string[], playerNumber: number): Promise<GameError | undefined> {
         if (args.length > 0) return new GameError(GameErrorType.WrongHintArgument);
-        const solver = new Solver(game.config.dictionary, game.board, game.players[playerNumber].easel);
+        const solver = new Solver(game.dictionary, game.board, game.players[playerNumber].easel);
         const hints = await solver.getHints();
         sockets[playerNumber].emit('hint success', { hints });
         return;
@@ -127,19 +130,26 @@ export class CommandService {
 
     private postCommand(game: Game, sockets: io.Socket[]): void {
         game.resetTimer();
-        sockets.forEach((s) => {
+        sockets.forEach((s, index) => {
+            if (game.log2990Objectives) {
+                const objectiveList = [...game.log2990Objectives.retrieveLog2990Objective(index)];
+                s.emit('log2990 objectives', { publicObjectives: objectiveList.splice(0, 2), privateObjectives: objectiveList });
+            }
             s.emit('turn ended');
         });
         game.actionAfterTurn();
     }
 
     private endGame(game: Game, sockets: io.Socket[]): void {
+        const gameMode = game.log2990Objectives ? GameMode.Log2990 : GameMode.Classical;
         sockets.forEach((s, i) => {
             const endGameStatus = game.endGame().toEndGameStatus(i);
             const highscore = { name: game.players[i].name, score: game.players[i].score };
-            Container.get(DatabaseService).updateHighScore(highscore, 'classical');
+            Container.get(HighscoreDatabaseService).updateHighScore(highscore, gameMode);
             s.emit('end game', endGameStatus);
         });
+        const gameHistory = game.gameHistory.createGameHistoryData(game.players, false, gameMode);
+        Container.get(HistoryDatabaseService).addGameHistory(gameHistory);
     }
 
     private errorOnCommand(game: Game, sockets: io.Socket[], error: Error, playerNumber: number): void {
@@ -148,6 +158,9 @@ export class CommandService {
         if (error.message !== GameErrorType.InvalidWord) return;
         game.stopTimer();
         setTimeout(() => {
+            const opponentSocket = sockets[(playerNumber + 1) % 2];
+            const wrongWordMessage = "L'adversaire a placé un mot invalide";
+            if (opponentSocket) opponentSocket.emit('receive message', { username: '', message: wrongWordMessage, messageType: 'System' });
             game.nextTurn();
             this.postCommand(game, sockets);
         }, delayForInvalidWord);

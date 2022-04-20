@@ -21,4 +21,8 @@ export class LeaderboardService {
 
         this.socketService.send('get highScores');
     }
+
+    resetLeaderboard(): void {
+        this.socketService.send('reset highScores');
+    }
 }

@@ -6,9 +6,10 @@ import { PlacedLetter } from '@app/classes/placed-letter';
 import { DictionaryService } from '@app/services/dictionary.service';
 import { GameConfigService } from '@app/services/game-config.service';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
-import { stub } from 'sinon';
+import { restore, stub } from 'sinon';
 import { Container } from 'typedi';
 import { Board, createEmptyMatrix } from './board';
 
@@ -16,6 +17,7 @@ describe('board', async () => {
     let board: Board;
     await Container.get(DictionaryService).init();
     await Container.get(GameConfigService).init();
+    const dic = Container.get(DictionaryService).getDictionary('Francais') as Dictionary;
     const gameConfig = Container.get(GameConfigService).configs[0];
     const correctLettersToPlace = [
         new PlacedLetter('C', new Vec2(6, 7)),
@@ -24,7 +26,7 @@ describe('board', async () => {
     ];
 
     beforeEach(() => {
-        board = new Board(gameConfig);
+        board = new Board(gameConfig, dic);
     });
 
     it('CreateEmptyMatrix should initialize a double array filled with null', () => {
@@ -68,6 +70,14 @@ describe('board', async () => {
     it('getAffectedWords should be correct', () => {
         const words = board.getAffectedWords(correctLettersToPlace);
         words[0].forEach((l, index) => expect(l.equals(correctLettersToPlace[index])).to.eq(true));
+    });
+
+    it('getRandomWord should call config.dictionary getRandomWord', () => {
+        const randomWordSize = 2;
+        const getRandomWordStub = stub(board['dictionary'], 'getRandomWord');
+        board.getRandomWord(randomWordSize);
+        expect(getRandomWordStub.calledOnceWith(randomWordSize));
+        restore();
     });
 
     it('scorePositions should score accordingly on correct placement without any multiplier', () => {
@@ -134,7 +144,7 @@ describe('board', async () => {
         board.multipliers[7][7] = new Multiplier(2, MultiplierType.Word);
         board.multipliers[6][7] = new Multiplier(3, MultiplierType.Word);
         const expectedPoints = correctLettersToPlace.map((l) => board.pointsPerLetter.get(l.letter) as number).reduce((sum, points) => sum + points);
-        const wordMultiplier = 3;
+        const wordMultiplier = 6;
         expect(board.place(correctLettersToPlace, [], true)).to.eq(expectedPoints * wordMultiplier);
     });
 

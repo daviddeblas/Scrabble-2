@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
+import { MatStepper } from '@angular/material/stepper';
 import { Router } from '@angular/router';
 import {
     acceptInvite,
@@ -19,6 +20,7 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import { Observable, of } from 'rxjs';
 import { RoomEffects } from './room.effects';
 
@@ -66,7 +68,7 @@ describe('RoomEffects', () => {
 
         effects = TestBed.inject(RoomEffects);
 
-        gameOptionsStub = new GameOptions('host', 'dict', timer);
+        gameOptionsStub = new GameOptions('host', 'dict', GameMode.Classical, timer);
         roomInfoStub = new RoomInfo('id', gameOptionsStub);
         playerNameStub = 'player 1';
     });
@@ -96,6 +98,21 @@ describe('RoomEffects', () => {
     });
 
     it('closeRoomEffect$ should call the closeRoom from room service', () => {
+        let resetCalled = false;
+        effects.roomCreationStepper = {
+            reset: () => {
+                resetCalled = true;
+                return;
+            },
+        } as unknown as MatStepper;
+        actions$ = of(closeRoom());
+        effects.closeRoomEffect$.subscribe();
+        expect(roomService.closeRoom).toHaveBeenCalled();
+        expect(resetCalled).toBeTrue();
+    });
+
+    it('closeRoomEffect$ should call the closeRoom from room service even if the stepper is undefined', () => {
+        effects.roomCreationStepper = undefined as unknown as MatStepper;
         actions$ = of(closeRoom());
         effects.closeRoomEffect$.subscribe();
         expect(roomService.closeRoom).toHaveBeenCalled();

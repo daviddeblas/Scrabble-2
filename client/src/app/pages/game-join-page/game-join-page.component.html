@@ -1,6 +1,5 @@
 <mat-stepper linear #stepper (selectionChange)="onStepChange()">
     <mat-step [completed]="selectedRoom !== undefined" [editable]="true">
-        <p *ngIf="refused" class="error">Invitation refusée</p>
         <ng-template matStepLabel>Rejoindre une partie</ng-template>
         <button
             *ngIf="roomListLength() !== 0"
@@ -18,7 +17,8 @@
                 <p class="room">
                     <strong>Hôte</strong>: {{ room.gameOptions.hostname }} <br />
                     <strong>Temps</strong>: {{ timerToString(room.gameOptions.timePerRound) }}<br />
-                    <strong>Dictionnaire</strong>: {{ room.gameOptions.dictionaryType }}
+                    <strong>Dictionnaire</strong>: {{ room.gameOptions.dictionaryType }} <br />
+                    <strong>Mode de Jeu</strong>: {{ room.gameOptions.gameMode }}
                 </p>
                 <button mat-raised-button matStepperNext color="primary" class="button join-room" (click)="selectRoom(room)">Rejoindre</button>
             </mat-list-item>
@@ -31,7 +31,8 @@
                 <p class="room">
                     <strong>Hôte</strong>: {{ selectedRoom?.gameOptions?.hostname }} <br />
                     <strong>Temps</strong>: {{ timerToString(selectedRoom?.gameOptions?.timePerRound) }}<br />
-                    <strong>Dictionnaire</strong>: {{ selectedRoom?.gameOptions?.dictionaryType }}
+                    <strong>Dictionnaire</strong>: {{ selectedRoom?.gameOptions?.dictionaryType }} <br />
+                    <strong>Mode de Jeu</strong>: {{ selectedRoom?.gameOptions?.gameMode }}
                 </p>
                 <mat-form-field centered class="parameter-container" appearance="fill">
                     <mat-label>Veuillez saisir votre nom</mat-label>

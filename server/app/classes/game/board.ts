@@ -1,6 +1,7 @@
 import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { PlacedLetter } from '@app/classes/placed-letter';
+import { Dictionary } from 'common/classes/dictionary';
 import { Letter } from 'common/classes/letter';
 import { Multiplier, MultiplierType } from 'common/classes/multiplier';
 import { Vec2 } from 'common/classes/vec2';
@@ -23,7 +24,7 @@ export class Board {
     blanks: Vec2[];
     lastPlacedWord: Vec2[];
 
-    constructor(private config: GameConfig) {
+    constructor(private config: GameConfig, private dictionary: Dictionary) {
         this.board = createEmptyMatrix(config.boardSize);
         this.multipliers = createEmptyMatrix(config.boardSize);
         this.pointsPerLetter = new Map();
@@ -41,15 +42,15 @@ export class Board {
 
     place(letters: PlacedLetter[], blanks: number[], firstMove: boolean): number | GameError {
         this.lastPlacedWord = [];
-        if (letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y).length > 0)
-            return new GameError(GameErrorType.WrongPosition);
+        const letterOutOfBoard = letters.filter((l) => l.position.x >= this.config.boardSize.x || l.position.y >= this.config.boardSize.y);
+        if (letterOutOfBoard.length > 0) return new GameError(GameErrorType.WrongPosition);
         const words = this.getAffectedWords(letters);
         const allPlacedLetters = words.reduce((arr, currentValue) => [...arr, ...currentValue]);
         if (!firstMove && allPlacedLetters.length === letters.length) return new GameError(GameErrorType.WordNotConnected);
 
         let wordValid = true;
         words.forEach((w) => {
-            if (!this.config.dictionary.isWord(w.map((l) => l.letter))) wordValid = false;
+            if (!this.dictionary.isWord(w.map((l) => l.letter))) wordValid = false;
         });
         if (!wordValid) return new GameError(GameErrorType.InvalidWord);
 
@@ -105,7 +106,7 @@ export class Board {
                     break;
                 case MultiplierType.Word:
                     score += letterPoints;
-                    multiplier = multiplier < multi.amount ? multi.amount : multiplier;
+                    multiplier *= multi.amount;
                     break;
             }
         });
@@ -119,7 +120,7 @@ export class Board {
     }
 
     copy(): Board {
-        const returnValue = new Board(this.config);
+        const returnValue = new Board(this.config, this.dictionary);
 
         this.blanks.forEach((b) => returnValue.blanks.push(b.copy()));
 
@@ -159,6 +160,10 @@ export class Board {
         });
 
         return words;
+    }
+
+    getRandomWord(wordLength: number): string {
+        return this.dictionary.getRandomWord(wordLength);
     }
 
     private getAffectedWordFromSinglePlacement(direction: Vec2, pos: Vec2): PlacedLetter[] {

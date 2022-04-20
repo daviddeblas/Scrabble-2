@@ -3,6 +3,7 @@
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { receivedMessage } from '@app/actions/chat.actions';
+import { refreshObjectiveState } from '@app/actions/game-objective.actions';
 import { getGameStatus } from '@app/actions/game-status.actions';
 import { exchangeLetters, placeWord } from '@app/actions/player.actions';
 import { SocketTestHelper } from '@app/helper/socket-test-helper';
@@ -11,6 +12,7 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { Socket } from 'socket.io-client';
 import { ChatService } from './chat.service';
+import { SocketClientService } from './socket-client.service';
 
 describe('ChatService', () => {
     let service: ChatService;
@@ -31,11 +33,24 @@ describe('ChatService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(ChatService);
         store = TestBed.inject(MockStore);
-        service['socketService'].socket = socketHelper as unknown as Socket;
     });
 
     it('should be created', () => {
@@ -48,6 +63,17 @@ describe('ChatService', () => {
         service.broadcastMsg(expectedMessage.username, expectedMessage.message);
         setTimeout(() => {
             expect(sendSpy).toHaveBeenCalledOnceWith('send message', expectedMessage);
+            done();
+        }, RESPONSE_TIME);
+    });
+
+    it('acceptNewAction should be able to receive log2990 objectives and dispatch "[Game Objective] Refresh Objective State"', (done) => {
+        const expectedObjectives = { publicObjectives: [], privateObjectives: [] };
+        service.acceptNewAction();
+        socketHelper.peerSideEmit('log2990 objectives', expectedObjectives);
+        setTimeout(() => {
+            const expectedAction = cold('a', { a: refreshObjectiveState(expectedObjectives) });
+            expect(store.scannedActions$).toBeObservable(expectedAction);
             done();
         }, RESPONSE_TIME);
     });
@@ -142,7 +168,7 @@ describe('ChatService', () => {
     });
 
     it('acceptNewAction should be able to receive error and dispatch "[Chat] Received message" and not "[Game Status] Get Game"', (done) => {
-        const errorMessage = 'Ce placement crée une mot invalide';
+        const errorMessage = 'Ce placement crée un mot invalide';
         const expectedMessage = { username: '', message: errorMessage, messageType: 'Error' };
         service.acceptNewAction();
         socketHelper.peerSideEmit('error', errorMessage);
@@ -182,7 +208,7 @@ describe('ChatService', () => {
         const exampleMessage = ['!Bonjour'];
         service['handleTurnSpecificCommands'](exampleMessage);
         const expectedAction = cold('a', {
-            a: receivedMessage({ username: '', message: 'Commande impossible à réalisée', messageType: 'Error' }),
+            a: receivedMessage({ username: '', message: 'Entrée invalide', messageType: 'Error' }),
         });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
@@ -200,7 +226,9 @@ describe('ChatService', () => {
         const exampleMessage = '!passer';
         const otherPlayer = 'Other Player';
         service.messageWritten(otherPlayer, exampleMessage);
-        const expectedAction = cold('a', { a: receivedMessage({ username: '', message: "Ce n'est pas votre tour", messageType: 'Error' }) });
+        const expectedAction = cold('a', {
+            a: receivedMessage({ username: '', message: "Commande impossible à réaliser - Ce n'est pas votre tour", messageType: 'Error' }),
+        });
         expect(store.scannedActions$).toBeObservable(expectedAction);
     });
 
@@ -377,6 +405,20 @@ describe('ChatService', () => {
                         },
                     ],
                 }),
+                {
+                    provide: SocketClientService,
+                    useValue: {
+                        socket: socketHelper,
+                        send: (value: string) => {
+                            socketHelper.emit(value);
+                            return;
+                        },
+                        on: (event: string, callback: () => void) => {
+                            socketHelper.on(event, callback);
+                            return;
+                        },
+                    },
+                },
             ],
         }).compileComponents();
         service = TestBed.inject(ChatService);
@@ -396,12 +438,22 @@ describe('ChatService', () => {
         expect(service['handleNonTurnSpecificCommands'](['!réserve'])).toBeTruthy();
     });
 
-    it('handleNonTurnSpecificCommand should return false on correct call', () => {
-        expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeFalsy();
+    it('handleNonTurnSpecificCommand should return true on correct call with wrong arguments', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!réserve', 'a'])).toBeTruthy();
     });
 
-    it('validateExchangeCommand should return false if there is less than 7 letters in pot', () => {
-        const exampleCommand = ['!échanger', 'abcpzoe'];
-        expect(service['validateExchangeCommand'](exampleCommand)).toBeFalse();
+    it('handleNonTurnSpecificCommand should return true on correct call', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!aide'])).toBeTruthy();
+    });
+
+    it('handleNonTurnSpecificCommand should return true on correct call with wrong arguments', () => {
+        expect(service['handleNonTurnSpecificCommands'](['!aide', 'a'])).toBeTruthy();
+    });
+
+    it('should call helpProcess with the command !aide', () => {
+        const helpCommandSpy = spyOn(service as any, 'processHelp');
+        const exampleMessage = ['!aide'];
+        service['handleNonTurnSpecificCommands'](exampleMessage);
+        expect(helpCommandSpy).toHaveBeenCalledWith();
     });
 });

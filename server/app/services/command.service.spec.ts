@@ -6,26 +6,35 @@ import { GameConfig } from '@app/classes/game-config';
 import { GameError, GameErrorType } from '@app/classes/game.exception';
 import { Board } from '@app/classes/game/board';
 import { Game, MILLISECONDS_PER_SEC } from '@app/classes/game/game';
+import { Player } from '@app/classes/game/player';
+import { Log2990ObjectivesHandler } from '@app/classes/log2990-objectives-handler';
 import { PlacedLetter } from '@app/classes/placed-letter';
 import { Room } from '@app/classes/room';
 import { expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { GameOptions } from 'common/classes/game-options';
 import { stringToLetter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE } from 'common/constants';
+import { GameMode } from 'common/interfaces/game-mode';
+import { Log2990Objective } from 'common/interfaces/log2990-objectives';
 import { restore, stub, useFakeTimers } from 'sinon';
 import io from 'socket.io';
 import { Container } from 'typedi';
 import { CommandService } from './command.service';
-import { DatabaseService } from './database.service';
 import { DictionaryService } from './dictionary.service';
+import { HighscoreDatabaseService } from './highscore-database.service';
+import { HistoryDatabaseService } from './history-database.service';
 import { RoomsManager } from './rooms-manager.service';
 
 describe('Individual functions', () => {
     let sockets: io.Socket[];
     let commandService: CommandService;
     const gameConfig: GameConfig = new GameConfig('gameConfig', [], new Vec2(BOARD_SIZE, BOARD_SIZE));
-    const gameOptions: GameOptions = new GameOptions('host', 'dict', 60);
+    const gameOptions: GameOptions = new GameOptions('host', 'dict', GameMode.Classical, 60);
+    const dicService = Container.get(DictionaryService);
+    dicService.init();
+    const dictionary = dicService.getDictionary('Francais') as Dictionary;
 
     const createFakeSocket = (index: number) => {
         return {
@@ -98,7 +107,7 @@ describe('Individual functions', () => {
     });
 
     it('onCommand should call emit end game if gameEnded returns true', (done) => {
-        const dataStub = stub(Container.get(DatabaseService), 'updateHighScore').callsFake(async () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
             return;
         });
         sockets[0] = {
@@ -153,7 +162,7 @@ describe('Individual functions', () => {
     });
 
     it('parse place call returns the right placed characters', () => {
-        const game = { board: new Board(gameConfig) } as unknown as Game;
+        const game = { board: new Board(gameConfig, dictionary) } as unknown as Game;
         const commandArgs = ['h7h', 'con'];
         const placedLetters = commandService['parsePlaceCall'](game, commandArgs);
         placedLetters[0].forEach((l, index) => {
@@ -161,8 +170,45 @@ describe('Individual functions', () => {
         });
     });
 
+    it('endGame should send highScores with Log2990 GameMode', () => {
+        const dataStub = stub(Container.get(HighscoreDatabaseService), 'updateHighScore').callsFake(async () => {
+            return;
+        });
+        const gameHistoryStub = stub(Container.get(HistoryDatabaseService), 'addGameHistory').callsFake(async () => {
+            return;
+        });
+        const fakeGame = {
+            log2990Objectives: {},
+            players: [{} as Player],
+            gameHistory: {
+                createGameHistoryData: () => {
+                    return;
+                },
+            },
+            endGame: () => {
+                return {
+                    toEndGameStatus: () => {
+                        return;
+                    },
+                };
+            },
+        } as unknown as Game;
+        const fakeSocket = {
+            emit: () => {
+                return;
+            },
+        } as unknown as io.Socket;
+        sockets = [fakeSocket];
+        const responseTime = 200;
+        commandService['endGame'](fakeGame, sockets);
+        setTimeout(() => {
+            expect(dataStub.calledOnce).to.equal(true);
+            expect(gameHistoryStub.called).to.equal(true);
+        }, responseTime);
+    });
+
     it('parse place call returns the right placed characters vertical edition', () => {
-        const game = { board: new Board(gameConfig) } as unknown as Game;
+        const game = { board: new Board(gameConfig, dictionary) } as unknown as Game;
         const commandArgs = ['g8v', 'con'];
         const placedLetters = commandService['parsePlaceCall'](game, commandArgs);
         placedLetters[0].forEach((l, index) => {
@@ -186,8 +232,39 @@ describe('Individual functions', () => {
             gameOptions,
         } as unknown as Game;
         const clk = useFakeTimers();
+        const playerNumber = 0;
+        sockets = [fakeSocket];
+        commandService['postCommand'] = () => done();
+        commandService['errorOnCommand'](game, sockets, new GameError(GameErrorType.InvalidWord), playerNumber);
+        clk.tick(game['gameOptions'].timePerRound * MILLISECONDS_PER_SEC);
+        clk.restore();
+    });
+
+    it('errorCommand should start a timer and call emit from opponent', (done) => {
+        const fakeSocket = {
+            emit: (event: string) => {
+                expect(event).to.equal('error');
+            },
+        } as unknown as io.Socket;
+        const fakeOpponent = {
+            emit: (event: string, message: { username: string; message: string; messageType: string }) => {
+                expect(message.message).to.equal("L'adversaire a placé un mot invalide");
+                expect(event).to.equal('receive message');
+            },
+        } as unknown as io.Socket;
+        const game = {
+            stopTimer: () => {
+                return;
+            },
+            nextTurn: () => {
+                return;
+            },
+            gameOptions,
+        } as unknown as Game;
+        const clk = useFakeTimers();
         const playerNumber = 1;
         sockets[playerNumber] = fakeSocket;
+        sockets[(playerNumber + 1) % 2] = fakeOpponent;
         commandService['postCommand'] = () => done();
         commandService['errorOnCommand'](game, sockets, new GameError(GameErrorType.InvalidWord), playerNumber);
         clk.tick(game['gameOptions'].timePerRound * MILLISECONDS_PER_SEC);
@@ -256,7 +333,7 @@ describe('commands', () => {
         sockets.push(createFakeSocket(0));
         sockets.push(createFakeSocket(1));
 
-        gameOptions = new GameOptions('a', 'b');
+        gameOptions = new GameOptions('a', 'Francais', GameMode.Classical);
         commandService = new CommandService(Container.get(DictionaryService));
 
         room = new Room(sockets[0], Container.get(RoomsManager), gameOptions);
@@ -269,6 +346,21 @@ describe('commands', () => {
         room.sockets.pop();
         room.sockets[0].emit = (namespace: string): boolean => {
             if (namespace === 'turn ended') done();
+            return true;
+        };
+        commandService['postCommand'](game, room.sockets);
+    });
+
+    it('post command emits log2990 objectives if gameMode is LOG2990', (done) => {
+        room.sockets.pop();
+        game.log2990Objectives = new Log2990ObjectivesHandler(game);
+        stub(game.log2990Objectives, 'retrieveLog2990Objective').callsFake(() => [
+            {} as Log2990Objective,
+            {} as Log2990Objective,
+            {} as Log2990Objective,
+        ]);
+        room.sockets[0].emit = (namespace: string): boolean => {
+            if (namespace === 'log2990 objectives') done();
             return true;
         };
         commandService['postCommand'](game, room.sockets);

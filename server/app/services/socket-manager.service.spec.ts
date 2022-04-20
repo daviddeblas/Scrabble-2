@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { Server } from 'app/server';
 import { assert, expect } from 'chai';
 import { GameOptions } from 'common/classes/game-options';
 import { RoomInfo } from 'common/classes/room-info';
+import { GameMode } from 'common/interfaces/game-mode';
 import * as sinon from 'sinon';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
@@ -30,7 +32,7 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle create room event and emit game settings event', (done) => {
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
+        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', gameMode: GameMode.Classical, timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.on('create room success', (info: RoomInfo) => {
             expect(defaultOptions).to.deep.equal(info.gameOptions);
@@ -60,22 +62,12 @@ describe('SocketManager service tests', () => {
     });
 
     it('should handle request list event and emit get list event with the hostnames of the accessible rooms', (done) => {
-        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', timePerRound: 60 };
+        const defaultOptions: GameOptions = { hostname: 'My Name', dictionaryType: 'My Dictionary', gameMode: GameMode.Classical, timePerRound: 60 };
         clientSocket.emit('create room', defaultOptions);
         clientSocket.emit('request list');
         clientSocket.on('get list', (listOfRooms: RoomInfo[]) => {
             expect(listOfRooms.filter((room) => room.gameOptions.hostname === defaultOptions.hostname).length).to.eq(1);
             expect(listOfRooms).to.be.length(1);
-            done();
-        });
-    });
-
-    it('should handle get dictionaries event and emit receive dictionaries event with the dictionaries names', (done) => {
-        const expectedList = ['Mon dictionnaire'];
-        clientSocket.emit('get dictionaries');
-        clientSocket.on('receive dictionaries', (listOfDictionary) => {
-            expect(listOfDictionary).to.deep.equal(expectedList);
-            expect(listOfDictionary).to.be.length(1);
             done();
         });
     });
@@ -91,5 +83,24 @@ describe('SocketManager service tests', () => {
         const isOpen: boolean = service.isOpen();
         assert(isOpen === false);
         done();
+    });
+
+    it('broadcastMessage should call sockets.emit with the given parameters', (done) => {
+        const expectedValue = 'abc';
+        const expectedMessage = 'message';
+        service['sio'] = {
+            sockets: {
+                emit: (value: string, message: unknown) => {
+                    expect(value).to.equal(expectedValue);
+                    expect(message).to.equal(expectedMessage);
+                    done();
+                    return false;
+                },
+            } as any,
+            close: () => {
+                return;
+            },
+        } as any;
+        service.broadcastMessage(expectedValue, expectedMessage);
     });
 });

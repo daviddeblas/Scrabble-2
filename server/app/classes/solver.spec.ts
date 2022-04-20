@@ -2,15 +2,14 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
-import { Dictionary } from '@app/classes/dictionary';
 import { Line } from '@app/interfaces/line';
 import { Solution } from '@app/interfaces/solution';
 import { Word } from '@app/interfaces/word';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
+import { Dictionary } from 'common/classes/dictionary';
 import { Letter } from 'common/classes/letter';
 import { Vec2 } from 'common/classes/vec2';
 import { BOARD_SIZE, HINT_COUNT, MAX_BOT_PLACEMENT_TIME } from 'common/constants';
-import { assert } from 'console';
 import { spy, stub } from 'sinon';
 import { GameError, GameErrorType } from './game.exception';
 import { Board } from './game/board';
@@ -18,7 +17,7 @@ import { PlacedLetter } from './placed-letter';
 import { Solver } from './solver';
 
 describe('solver', () => {
-    const dictionary: Dictionary = new Dictionary('', '', []);
+    const dictionary: Dictionary = new Dictionary('', '', [], '');
     let board: Board;
     beforeEach(() => {
         board = {
@@ -259,7 +258,7 @@ describe('solver', () => {
             return [sol];
         });
 
-        const solutions = await solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME);
 
         expect(solutions).to.deep.equal(expected);
         assert(findLineStub.callCount === BOARD_SIZE * 2);
@@ -271,7 +270,7 @@ describe('solver', () => {
         stub(solver as any, 'isBoardEmpty').returns(true);
         const findFirstSolutionsStub = stub(solver as any, 'findFirstSolutions').returns([]);
 
-        const solutions = await solver['findAllSolutions']();
+        const solutions = await solver['findAllSolutions'](0);
         expect(solutions).to.deep.equal([]);
         assert(findFirstSolutionsStub.calledOnce);
     });
@@ -300,12 +299,12 @@ describe('solver', () => {
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 2;
-        let result = await solver['findAllSolutions']();
+        let result = await solver['findAllSolutions'](MAX_BOT_PLACEMENT_TIME);
         expect(result).to.deep.equal([]);
 
         fakeNow = 0;
         fakeNowIncrement = (MAX_BOT_PLACEMENT_TIME / BOARD_SIZE) * 0.75;
-        result = await solver['findAllSolutions']();
+        result = await solver['findAllSolutions'](MAX_BOT_PLACEMENT_TIME);
         expect(result).to.deep.equal([]);
 
         dateNowStub.restore();
@@ -420,16 +419,17 @@ describe('solver', () => {
 
         const solutions: Solution[] = [...new Array(2)].map((v, i) => {
             return {
-                letters: [],
+                letters: [new PlacedLetter('A', new Vec2(0, i))],
                 blanks: [],
                 direction: new Vec2(0, i),
             };
         });
+        solutions[0].blanks = [new Vec2(0, 0)];
 
         const scorePositionStub = stub(board, 'scorePosition').returns(5);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns(solutions);
 
-        const results = await solver.getEasyBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results).to.deep.equals(solutions.map((s) => [s, 5]));
 
         assert(scorePositionStub.calledTwice);
@@ -439,9 +439,40 @@ describe('solver', () => {
     it('should return no easy bot solution', async () => {
         const solver: Solver = new Solver(dictionary, board, []);
         const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([]);
-        const results = await solver.getEasyBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results).to.deep.equals([]);
         assert(findAllSolutionsStub.calledOnce);
+    });
+
+    it('should return hard bot solution', async () => {
+        const solver: Solver = new Solver(dictionary, board, []);
+
+        const allSolutions: Solution[] = [
+            {
+                letters: [new PlacedLetter('A', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+        ];
+
+        const extraSolutions: Solution[] = [...new Array(2)].map((v, i) => {
+            return {
+                letters: [new PlacedLetter('B', new Vec2(2, i))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            };
+        });
+
+        const scorePositionStub = stub(board, 'scorePosition').returns(5);
+        const findAllSolutionsStub = stub(solver as any, 'findAllSolutions').returns([...allSolutions]);
+        const findPerpendicularSolutionsStub = stub(solver as any, 'findPerpendicularSolutions').returns(extraSolutions);
+
+        const results = await solver.getBotSolutions(true);
+        expect(results).to.deep.equals([...allSolutions, ...extraSolutions].map((s) => [s, 5]));
+
+        expect(scorePositionStub.callCount).equals(3);
+        assert(findAllSolutionsStub.calledOnce);
+        assert(findPerpendicularSolutionsStub.calledOnce);
     });
 
     it('should return an error if scorePosition returns an error', async () => {
@@ -457,7 +488,7 @@ describe('solver', () => {
         stub(solver['board'], 'scorePosition').callsFake(() => {
             return new GameError(GameErrorType.LetterIsNull);
         });
-        const results = await solver.getEasyBotSolutions();
+        const results = await solver.getBotSolutions(false);
         expect(results instanceof GameError).to.equals(true);
     });
 
@@ -533,5 +564,185 @@ describe('solver', () => {
 
         const results = solver['firstSolutionTransform'](words);
         expect(results).to.deep.equal(expected);
+    });
+
+    it('should generate first solution shift', () => {
+        board.pointsPerLetter = new Map([
+            ['A', 1],
+            ['B', 2],
+            ['Z', 10],
+        ]);
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const direction = new Vec2(1, 0);
+        const position = new Vec2(7, 7);
+
+        let wordArray: Letter[];
+        let result: Vec2;
+
+        wordArray = ['A', 'B', 'A', 'B', 'A', 'Z'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(6, 7));
+
+        wordArray = ['A', 'B', 'A', 'Z', 'A', 'B'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(2, 7));
+
+        wordArray = ['A', 'A', 'B', 'A', 'Z', 'A', 'B'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(7, 7));
+
+        wordArray = ['B', 'A', 'Z', 'B', 'A', 'Z', 'A'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(1, 7));
+
+        wordArray = ['Z', 'A', 'A', 'B', 'A', 'Z', 'A'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(3, 7));
+
+        wordArray = ['A', 'B', 'A', 'Z'];
+        result = solver['firstSolutionShift'](direction, position, wordArray);
+        expect(result).to.deep.equal(new Vec2(7, 7));
+    });
+
+    it('should regex for perpendicular solution', () => {
+        board.board[5] = [null, 'A', null, null, null, null, null, null, null, 'C', null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C', '*']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(5, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex?.source).to.equal('(?=^.{2,5}$)^([a-z]{0,3})A[a-z]{0,1}$');
+    });
+
+    it('should regex for perpendicular solution until board limit', () => {
+        board.board[2] = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex?.source).to.equal('(?=^.{2,4}$)^([ABC]{0,6})A[ABC]{0,8}$');
+    });
+
+    it('should regex for perpendicular be null if letter before', () => {
+        board.board[2] = [null, null, null, null, null, 'X', null, null, null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex).to.equal(null);
+    });
+
+    it('should regex for perpendicular be null if letter after', () => {
+        board.board[2] = [null, null, null, null, null, null, null, 'X', null, null, null, null, null, null, null];
+
+        const solver: Solver = new Solver(dictionary, board, ['A', 'B', 'C']);
+        const regex = solver['perpendicularSolutionRegex']({
+            letters: [new PlacedLetter('A', new Vec2(2, 6))],
+            blanks: [],
+            direction: new Vec2(1, 0),
+        });
+
+        expect(regex).to.equal(null);
+    });
+
+    it('should search perpendicular solution', async () => {
+        const dictionarySample = { words: ['ab', 'beta', 'delta'] } as Dictionary;
+        board.board[7] = [null, null, null, null, null, 'A', 'L', 'P', 'H', 'A', null, null, null, null, null];
+        const oneLetterSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('B', new Vec2(8, 9))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionarySample, board, ['B', 'E', 'T', 'A']);
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, oneLetterSolution);
+
+        const expected: Solution[] = [
+            {
+                letters: [
+                    new PlacedLetter('B', new Vec2(8, 9)),
+                    new PlacedLetter('E', new Vec2(8, 10)),
+                    new PlacedLetter('T', new Vec2(8, 11)),
+                    new PlacedLetter('A', new Vec2(8, 12)),
+                ],
+                blanks: [],
+                direction: new Vec2(0, 1),
+            },
+        ];
+
+        expect(solutions).to.deep.equal(expected);
+    });
+
+    it('should not search perpendicular solution on multi-letters word', async () => {
+        const multiLetterSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('B', new Vec2(8, 9)), new PlacedLetter('C', new Vec2(8, 10))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexSpy = spy(solver as any, 'perpendicularSolutionRegex');
+
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, multiLetterSolution);
+        assert(perpendicularSolutionRegexSpy.notCalled);
+        expect(solutions).deep.equal([]);
+    });
+
+    it('should stop perpendicular search if time expired', async () => {
+        const inputSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('K', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexSpy = spy(solver as any, 'perpendicularSolutionRegex');
+
+        const dateNowStub = stub(Date, 'now').callsFake(() => {
+            return MAX_BOT_PLACEMENT_TIME * 2;
+        });
+
+        const solutions = await solver['findPerpendicularSolutions'](MAX_BOT_PLACEMENT_TIME, inputSolution);
+        assert(perpendicularSolutionRegexSpy.notCalled);
+        expect(solutions).deep.equal([]);
+
+        dateNowStub.restore();
+    });
+
+    it('should stop perpendicular search if regex is null', async () => {
+        const inputSolution: Solution[] = [
+            {
+                letters: [new PlacedLetter('K', new Vec2(0, 0))],
+                blanks: [],
+                direction: new Vec2(1, 0),
+            },
+        ];
+
+        const solver: Solver = new Solver(dictionary, board, []);
+        const perpendicularSolutionRegexStub = stub(solver as any, 'perpendicularSolutionRegex').returns(null);
+        const filterDuplicateLettersSpy = spy(solver as any, 'filterDuplicateLetters');
+
+        const solutions = await solver['findPerpendicularSolutions'](Date.now() + MAX_BOT_PLACEMENT_TIME, inputSolution);
+        assert(filterDuplicateLettersSpy.notCalled);
+        assert(perpendicularSolutionRegexStub.calledOnce);
+        expect(solutions).deep.equal([]);
     });
 });
