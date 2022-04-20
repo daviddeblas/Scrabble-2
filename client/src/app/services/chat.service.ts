@@ -58,7 +58,7 @@ export class ChatService {
         this.socketService.on('error', (errorMessage: string) => {
             const chatMessage = { username: '', message: errorMessage, messageType: 'Error' };
             this.store.dispatch(receivedMessage(chatMessage));
-            if (errorMessage !== 'Ce placement crée une mot invalide') {
+            if (errorMessage !== 'Ce placement crée un mot invalide') {
                 this.store.dispatch(getGameStatus());
             }
         });

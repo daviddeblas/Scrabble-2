@@ -12,17 +12,7 @@
 }
 
 .active {
-    animation: active-animation 2s infinite;
-    animation-direction: alternate;
-}
-
-@keyframes active-animation {
-    0% {
-        background-color: white;
-    }
-    100% {
-        background-color: #ccccff;
-    }
+    background-color: #9ed5e4;
 }
 
 .info {

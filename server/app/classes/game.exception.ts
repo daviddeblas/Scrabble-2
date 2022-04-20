@@ -10,7 +10,7 @@ export enum GameErrorType {
     PositionOccupied = 'Une lettre a déja été placée a cette position sur le plateau',
     InvalidWord = 'Ce placement crée une mot invalide',
     LetterIsNull = 'Lettre nulle',
-    UndefinedPoints = "Cette lettre n'as pas de valeur associee",
+    UndefinedPoints = "Cette lettre n'as pas de valeur associée",
     WrongPosition = 'Ce mot est dans la mauvaise position',
     OutOfBoundPosition = "La position du mot est à l'extérieur du plateau",
     WrongPlaceArgument = 'Les arguments pour la commande placer sont mal formés',

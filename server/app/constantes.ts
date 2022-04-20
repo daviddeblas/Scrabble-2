@@ -12,7 +12,7 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
         isValidated: false,
     },
     {
-        description: "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
+        description: "Ralonger le début et la fin d'un mot existant de deux lettres ou plus",
         value: 'Bonus de 30 points',
         isValidated: false,
     },
@@ -27,7 +27,7 @@ export const LOG2990OBJECTIVES: Log2990Objective[] = [
         isValidated: false,
     },
     {
-        description: 'Faire un mot de plus de 10 lettres',
+        description: 'Faire un mot de 10 lettres ou plus',
         value: 'Bonus de 50 points',
         isValidated: false,
     },

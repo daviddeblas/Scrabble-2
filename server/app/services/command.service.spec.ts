@@ -248,7 +248,7 @@ describe('Individual functions', () => {
         } as unknown as io.Socket;
         const fakeOpponent = {
             emit: (event: string, message: { username: string; message: string; messageType: string }) => {
-                expect(message.message).to.equal("L'adversaire à placer un mot non valide");
+                expect(message.message).to.equal("L'adversaire a placé un mot invalide");
                 expect(event).to.equal('receive message');
             },
         } as unknown as io.Socket;
