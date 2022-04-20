@@ -8,10 +8,10 @@ import { PlacedLetter } from './placed-letter';
 export enum Objectives {
     OBJECTIVE1 = 'Créer un palindrome de 4 lettres ou plus',
     OBJECTIVE2 = 'Placer 3 ou plus consonnes seulement',
-    OBJECTIVE3 = "Ralonger le début et la fin d'un mot existant de plus de deux lettres",
+    OBJECTIVE3 = "Ralonger le début et la fin d'un mot existant de deux lettres ou plus",
     OBJECTIVE4 = 'Faire un placement rapportant plus de 20 points dans les 10 premières secondes du tour',
     OBJECTIVE5 = 'Placer deux lettres qui valent 8 points ou plus en un tour',
-    OBJECTIVE6 = 'Faire un mot de plus de 10 lettres',
+    OBJECTIVE6 = 'Faire un mot de 10 lettres ou plus',
     OBJECTIVE7 = 'Avoir exactement 69 points',
     OBJECTIVE8 = 'Placer le mot : ',
 }
